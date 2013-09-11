@@ -1,4 +1,4 @@
 Sulka
 =====
 
-Uusi rengastustietojen syöttökäyttöliittymä.
+Uusi käyttöliittymä rengastustietojen syöttöön.
