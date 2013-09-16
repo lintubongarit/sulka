@@ -4,7 +4,7 @@ casper.test.begin('Home page tests', 7, function suite(test) {
     browse('/', function () {
         test.assertHttpStatus(200, "HTTP status is OK");
         test.assertTitle("Home", "Title is 'Home'");
-        test.assertSelectorHasText('body > h1', "Hallo world!", "Has a header containing the greeting 'Hallo world!'");
+        test.assertSelectorHasText('body > h1', "Hello world!", "Has a header containing the greeting 'Hello world!'");
         
         var now = moment();
         var time = now.format("HH:mm");
