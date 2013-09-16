@@ -1,4 +1,4 @@
-package edu.helsinki.sulka;
+package edu.helsinki.sulka.controllers;
 
 import java.text.DateFormat;
 import java.util.Date;
