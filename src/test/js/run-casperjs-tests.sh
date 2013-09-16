@@ -1,6 +1,9 @@
 #!/bin/bash
 # Install CasperJS 1.1.0 and PhantomJS to $HOME/bin or globally and launch the site to http://localhost:8080/ to run the frontend tests
 # Alternatively specify PATH to casperjs and phantomjs as $1 and site URL as $2
+
+cd `dirname "$0"`
+
 export PATH=$PATH:$HOME/bin
 if [ -n "$1" ]; then
 	export PATH=$1:$PATH

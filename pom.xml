@@ -181,7 +181,7 @@
 			  </executions>
 			  <configuration>
 			  	<executable>src/test/js/run-casperjs-tests.sh</executable>
-				<workingDirectory>src/test/js/</workingDirectory>
+				<workingDirectory>src/test/js</workingDirectory>
 			  </configuration>
 			</plugin>
       </plugins>
