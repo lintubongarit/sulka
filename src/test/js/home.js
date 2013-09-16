@@ -7,7 +7,7 @@ casper.test.begin('Home page tests', 7, function suite(test) {
         test.assertSelectorHasText('body > h1', "Hello world!", "Has a header containing the greeting 'Hello world!'");
         
         var now = moment();
-        var time = now.format("HH:mm");
+        var time = now.format(":mm");
         var dayOfMonth = now.format("D");
         var year = now.format("YYYY");
         var dateText = casper.evaluate(function () { return __utils__.findOne('body > p').textContent });
