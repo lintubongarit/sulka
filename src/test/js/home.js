@@ -12,10 +12,10 @@ casper.test.begin('Home page tests', 7, function suite(test) {
         var year = now.format("YYYY");
         var dateText = casper.evaluate(function () { return __utils__.findOne('body > p').textContent });
     
-        test.assert(dateText.indexOf("The time on the server is ") >= 0, "Page has timestamp");
-        test.assert(dateText.indexOf(time) >= 0, "Timestamp has correct time");
-        test.assert(dateText.indexOf(dayOfMonth) >= 0, "Timestamp has correct day of month");
-        test.assert(dateText.indexOf(year) >= 0, "Timestamp has correct year");
+        test.assertSelectorHasText("body > p", "The time on the server is ", "Page has timestamp");
+        test.assertSelectorHasText("body > p", time, "Timestamp has correct time");
+        test.assertSelectorHasText("body > p", dayOfMonth, "Timestamp has correct day of month");
+        test.assertSelectorHasText("body > p", year, "Timestamp has correct year");
     });
     
     casper.run(function () {
