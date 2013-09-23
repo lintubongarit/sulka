@@ -1,6 +1,6 @@
 var moment = require('./lib/moment.js');
 
-var LOKKI_RINGER_ID = 846;
+const LOKKI_RINGER_ID = 846;
 
 casper.test.begin('Home page tests', 9, function suite(test) {
     browse('/', function () {
