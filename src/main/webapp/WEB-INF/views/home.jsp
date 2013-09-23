@@ -16,8 +16,8 @@
 		</tr>
 		<c:forEach var="ringer" items="${ringers}">
 			<tr>
-				<td>${ringer.firstName} ${ringer.lastName}</td>
-				<td>${ringer.ID}</td>
+				<td><c:out value="${ringer.firstName}" /> <c:out value="${ringer.lastName}" /></td>
+				<td><c:out value="${ringer.ID}" /></td>
 			</tr>
 		</c:forEach>
 	</table>
