@@ -11,10 +11,13 @@ import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-@Component
+/**
+ * Autowireable Service that should be used for communicating to the API.
+ */
+@Service
 public class APIService {
 	private String username;
 	private String password;
@@ -42,7 +45,11 @@ public class APIService {
 	
 	
 	private static RestTemplate restTemplate = null;
-	protected RestTemplate getRestTemplate() {
+	
+	/**
+	 * @return the RestTemplate object that should be used to communicate to the API.
+	 */
+	public RestTemplate getRestTemplate() {
 		if (restTemplate == null) {
 			restTemplate = new RestTemplate();
 			ClientHttpRequestInterceptor interceptor = new APIAuthInterceptor(username, password);
@@ -72,15 +79,22 @@ public class APIService {
 		}
 	}
 	
-	protected final String DEFAULT_HTTP_PARAMS = "format=json";
-	protected URI getURIForPath(String path) {
-		return getURIForPath(path, DEFAULT_HTTP_PARAMS);
+	/**
+	 * @return a full URI for the path without URL parameters.
+	 */
+	public URI getURIForPath(String path) {
+		return getURIForPath(path, null);
 	}
 	
-	protected URI getURIForPath(String path, String httpParams) {
+	public static final String JSON_URL_PARAMS = "format=json";
+	
+	/**
+	 * @return a full URI for the path with given URL parameters.
+	 */
+	public URI getURIForPath(String path, String urlParams) {
 		String uri = this.urlBase + path;
-		if (httpParams != null) {
-			uri += "?" + httpParams;
+		if (urlParams != null) {
+			uri += "?" + urlParams;
 		}
 		try {
 			return new URI(uri);

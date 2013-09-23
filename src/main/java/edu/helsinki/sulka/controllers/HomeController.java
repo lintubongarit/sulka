@@ -36,7 +36,7 @@ public class HomeController {
 		String formattedDate = dateFormat.format(date);
 		model.addAttribute("serverTime", formattedDate);
 		
-		model.addAttribute("ringers", ringersService.getRingers());
+		model.addAttribute("ringers", ringersService.getAllRingers());
 		
 		return "home";
 	}

@@ -7,6 +7,9 @@ import org.springframework.stereotype.Service;
 
 import edu.helsinki.sulka.models.Ringer;
 
+/**
+ * Autowireable Service that should can be used to retrieve information about ringers.
+ */
 @Service
 public class RingersService {
 	@Autowired
@@ -24,7 +27,14 @@ public class RingersService {
 		public RingersResponseLevel2 ringers;
 	}
 	
-	public Ringer[] getRingers() {
-		return apiService.getRestTemplate().getForObject(apiService.getURIForPath("/ringers"), RingersResponse.class).ringers.ringer;
+	/**
+	 * @return all ringers from the API.
+	 */
+	public Ringer[] getAllRingers() {
+		return apiService
+				.getRestTemplate()
+				.getForObject(
+						apiService.getURIForPath("/ringers", APIService.JSON_URL_PARAMS),
+						RingersResponse.class).ringers.ringer;
 	}
 }
