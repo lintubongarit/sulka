@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import edu.helsinki.sulka.models.Municipality;
 
 /**
- * Autowireable Service that should can be used to retrieve information about municipalities.
+ * Autowireable Service that should be used to retrieve information about municipalities.
  */
 @Service
 public class MunicipalitiesService {
@@ -16,7 +16,7 @@ public class MunicipalitiesService {
 	private Logger logger;
 	
 	@Autowired
-	@Qualifier("APIConfiguration")
+	@Qualifier("DevAPIConfiguration")
 	private APIService apiService;
 	
 	private static class MunicipalitiesResponse {
