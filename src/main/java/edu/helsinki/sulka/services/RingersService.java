@@ -27,6 +27,14 @@ public class RingersService {
 		public RingersResponseLevel2 ringers;
 	}
 	
+	private static class RingerResponse {
+		private static class RingerResponseLevel2 {
+			public Ringer ringer;
+		}
+		
+		public RingerResponseLevel2 ringers;
+	}
+	
 	/**
 	 * @return all ringers from the API.
 	 */
@@ -34,7 +42,19 @@ public class RingersService {
 		return apiService
 				.getRestTemplate()
 				.getForObject(
-						apiService.getURIForPath("/ringers", APIService.JSON_URL_PARAMS),
+						apiService.getURLForPath("/ringers?format=json"),
 						RingersResponse.class).ringers.ringer;
+	}
+	
+	/**
+	 * @return ringer with ID from the API.
+	 */
+	public Ringer getRingerByID(long ID) {
+		return apiService
+				.getRestTemplate()
+				.getForObject(
+						apiService.getURLForPath("/ringers/{id}?format=json"),
+						RingerResponse.class,
+						Long.toString(ID)).ringers.ringer;
 	}
 }

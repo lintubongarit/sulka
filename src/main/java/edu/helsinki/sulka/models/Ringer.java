@@ -43,4 +43,8 @@ public class Ringer {
 	public long getID() {
 		return this.id;
 	}
+	
+	public long getYearOfBirth() {
+		return Long.parseLong(this.yearofbirth);
+	}
 }

@@ -1,4 +1,4 @@
-package edu.helsinki.sulka;
+package edu.helsinki.sulka.controllers;
 
 import static org.hamcrest.Matchers.arrayWithSize;
 import static org.hamcrest.Matchers.greaterThan;

@@ -2,8 +2,6 @@ package edu.helsinki.sulka.services;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URISyntaxException;
 
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.http.HttpRequest;
@@ -82,25 +80,7 @@ public class APIService {
 	/**
 	 * @return a full URI for the path without URL parameters.
 	 */
-	public URI getURIForPath(String path) {
-		return getURIForPath(path, null);
-	}
-	
-	public static final String JSON_URL_PARAMS = "format=json";
-	
-	/**
-	 * @return a full URI for the path with given URL parameters.
-	 */
-	public URI getURIForPath(String path, String urlParams) {
-		String uri = this.urlBase + path;
-		if (urlParams != null) {
-			uri += "?" + urlParams;
-		}
-		try {
-			return new URI(uri);
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-			throw new Error(e);
-		}
+	public String getURLForPath(String path) {
+		return this.urlBase.concat(path);
 	}
 }
