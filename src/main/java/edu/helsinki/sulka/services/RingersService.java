@@ -17,7 +17,7 @@ public class RingersService {
 	
 	@Autowired
 	@Qualifier("APIConfiguration")
-	APIService apiService;
+	private APIService apiService;
 	
 	private static class RingersResponse {
 		private static class RingersResponseLevel2 {
