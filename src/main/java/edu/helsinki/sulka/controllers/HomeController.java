@@ -41,4 +41,12 @@ public class HomeController {
 		return "home";
 	}
 	
+	/**
+	 * Show slickgrid testing ground
+	 */
+	@RequestMapping(value = "/slick", method = RequestMethod.GET)
+	public String slick(Model model){
+		return "slick";
+	}
+	
 }
