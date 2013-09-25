@@ -6,5 +6,10 @@ import org.junit.Test;
 
 public class TablesServiceTest {
 
+	private TablesService tablesService;
+	
+	public void setUp(){
+		this.tablesService = new TablesService();
+	}
 
 }
