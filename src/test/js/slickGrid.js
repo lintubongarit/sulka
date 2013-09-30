@@ -1,5 +1,3 @@
-var moment = require('./lib/moment.js');
-
 
 casper.test.begin('SlickGrid tests', 2, function suite(test) {
     browse('/slick', function () {
