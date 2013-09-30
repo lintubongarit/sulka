@@ -26,15 +26,13 @@ public class User {
 	
 	@JsonProperty("error")
 	private String error;
+	
 	@JsonProperty("pass")
 	private boolean pass = true;
 	
+	@Override
 	public String toString(){
 		return login_id + " " + expires_at + " " + email + " " + name + " " + auth_for + " " + type + " " + error + " " + pass;
-	}
-	
-	public boolean isSuccess() {
-		return error != null;
 	}
 
 	public String getLogin_id() {

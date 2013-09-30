@@ -1,11 +1,16 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ page session="false" %>
 <html>
 	<head>
 	</head>
 	<body>
-		<h2>KEY: ${key}</h2>
-		<h2>IV: ${iv}</h2>
-		<h2>DATA: ${data}</h2>
-		<h2>TEST: ${test}</h2>
-		<h2>AUTH: ${auth}</h2>
+		<c:choose>
+			<c:when test="${auth}">
+				<font color="green" size="20">Welcome fellow ringer!</font>
+			</c:when>
+			<c:otherwise>
+				<font color="red" size="20">You shall not pass!</font>
+			</c:otherwise>
+		</c:choose>
 	</body>
 </html>
