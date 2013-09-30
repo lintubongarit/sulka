@@ -13,6 +13,7 @@ public class Ringer {
 	@JsonProperty("firstname")
 	private String firstName;
 	
+	@JsonProperty("permission")
 	private long permission;
 		
 	@JsonProperty("mobile-phone")
@@ -21,6 +22,7 @@ public class Ringer {
 	@JsonProperty("yearofbirth")
 	private String yearOfBirth;
 	
+	@JsonProperty("email")
 	private String email;
 	
 	@JsonIgnoreProperties(ignoreUnknown=true)
@@ -34,6 +36,7 @@ public class Ringer {
 		@JsonProperty("city")
 		private String city;
 	}
+	@JsonProperty("address")
 	private RingerAddress address;
 	
 	@JsonIgnoreProperties(ignoreUnknown=true)
@@ -47,6 +50,7 @@ public class Ringer {
 		@JsonProperty("content")
 		private String content;
 	}
+	@JsonProperty("permit")
 	private RingerPermit permit;
 	
 	/* Accessors */
