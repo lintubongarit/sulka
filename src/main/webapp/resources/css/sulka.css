@@ -143,3 +143,13 @@ ul.feature-list-tabs li a:hover {
 .throbber {
     background: white url('resources/other/throbber.gif') no-repeat center;
 }
+
+#slick-grid {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 60px;
+    vertical-align: middle;
+    text-align: center;
+}

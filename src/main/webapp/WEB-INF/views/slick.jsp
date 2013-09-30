@@ -5,6 +5,9 @@
 <html>
 	<head>
 		<title>Sulka</title>
+		<link rel="stylesheet" href="resources/css/slick.grid.css" type="text/css" />
+		<link rel="stylesheet" href="resources/css/example.css" type="text/css" />
+		<link rel="stylesheet" href="resources/css/jquery-ui-1.8.16.custom.css" type="text/css" />
 		<link rel="stylesheet" href="resources/css/sulka.css" type="text/css" />
 	</head>
 	<body>
@@ -30,5 +33,29 @@
 		<div id="columns-pane">
 			<table id="columns-table"></table>
 		</div>
+		<script src="resources/js/jquery-1.7.min.js"></script>
+		<script src="resources/js/jquery.event.drag-2.2.js"></script>
+		<script src="resources/js/slick.core.js"></script>
+		<script src="resources/js/slick.grid.js"></script>		
+		
+		<script>
+			var grid;
+			var columns = [{id: "title", name: "Title", field: "title"},
+			               {id: "rndm", name: "Rndm", field: "rndm"}];
+			var options = {
+					enableCellNavigation: true,
+					enableColumnReorder: false
+			};
+			$(function () {
+				var data = [];
+				for (var i = 0; i < 500; i++){
+					data[i] = {
+							title: "Task " + i,
+							rndm: Math.round(Math.random()*100)
+					};
+				}
+				grid = new Slick.Grid("#slick-grid", data, columns, options);
+			});
+		</script>
 	</body>
 </html>
