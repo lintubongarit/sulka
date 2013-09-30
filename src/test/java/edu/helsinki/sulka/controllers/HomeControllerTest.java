@@ -1,7 +1,10 @@
-package edu.helsinki.sulka;
+package edu.helsinki.sulka.controllers;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.hamcrest.Matchers.arrayWithSize;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -36,6 +39,7 @@ public class HomeControllerTest {
     	mockMvc.perform(get("/"))
     		.andExpect(status().isOk())
     		.andExpect(model().attributeExists("serverTime"))
+    		.andExpect(model().attribute("ringers", arrayWithSize(greaterThan(1000))))
     		.andReturn();
 	}
 
