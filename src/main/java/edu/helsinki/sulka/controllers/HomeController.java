@@ -10,7 +10,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import edu.helsinki.sulka.models.FieldGroup;
+import edu.helsinki.sulka.services.FieldsService;
 import edu.helsinki.sulka.services.RingersService;
 
 /**
@@ -23,6 +26,9 @@ public class HomeController {
 	
 	@Autowired
 	private RingersService ringersService;
+	
+	@Autowired
+	private FieldsService fieldsService;
 	
 	/**
 	 * Simply selects the home view to render by returning its name.
@@ -47,6 +53,14 @@ public class HomeController {
 	@RequestMapping(value = "/slick", method = RequestMethod.GET)
 	public String slick(Model model){
 		return "slick";
+	}
+	
+	/**
+	 * Method to query field names
+	 */
+	@RequestMapping(value = "/fields", method = RequestMethod.GET)
+	public @ResponseBody FieldGroup[]  getFields(Model model){
+		return fieldsService.getAllFieldGroups();
 	}
 	
 }
