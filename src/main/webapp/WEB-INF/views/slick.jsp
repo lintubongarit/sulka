@@ -3,8 +3,8 @@
 
 <!DOCTYPE HTML>
 <html>
-<head>
-	<title>Sulka - Lintujen rengastus ja seurantaportaali</title>
+	<head>
+		<title>Sulka</title>
 		<link rel="stylesheet" href="resources/css/sulka.css" type="text/css" />
 	</head>
 	<body>
