@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import edu.helsinki.sulka.models.User;
@@ -32,13 +31,13 @@ public class LintuvaaraAuthDecryptService {
 	/**
 	 * @return is true if login was successful
 	 */
-	public boolean auth(String key, String iv, String data){
+	public User auth(String key, String iv, String data){
 		return apiService
 				.getRestTemplate()
 				.getForObject(
 						apiService.getURLForPath("/lintuvaara-authentication-decryptor?key={key}&iv={iv}&data={data}&format=json"),
 						LintuvaaraAuthDecryptResponse.class,
-						key, iv, data).user.isPass();
+						key, iv, data).user;
 	}
 
 }

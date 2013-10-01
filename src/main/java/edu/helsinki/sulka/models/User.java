@@ -30,6 +30,21 @@ public class User {
 	@JsonProperty("pass")
 	private boolean pass = true;
 	
+	/**
+	 * 
+	 * @return 0 if access is OK
+	 * 		   1 if access expired
+	 * 		   2 if auth variables are false
+	 */
+	public int accessStatus(){
+		if (this.isPass() && this.getExpires_at() - System.currentTimeMillis() / 1000 >= 0)
+			return 0;
+		else if (this.isPass())
+			return 1;
+		else
+			return 2;
+	}
+	
 	@Override
 	public String toString(){
 		return login_id + " " + expires_at + " " + email + " " + name + " " + auth_for + " " + type + " " + error + " " + pass;
