@@ -70,10 +70,6 @@ public class LoginControllerTest {
     public void testLoginSuccessWithAllAuthVariables() throws Exception {
     	mockMvc.perform(get("/login?key=test&iv=test&data=test"))
     		.andExpect(status().isOk())
-    		.andExpect(model().attributeExists("key"))
-    		.andExpect(model().attributeExists("iv"))
-    		.andExpect(model().attributeExists("data"))
-    		.andExpect(model().attributeExists("auth"))
     		.andReturn();
 	}
 
