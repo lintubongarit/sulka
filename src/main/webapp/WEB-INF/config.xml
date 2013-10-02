@@ -4,15 +4,10 @@
 	xmlns:context="http://www.springframework.org/schema/context"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
 	
-	<bean id="DevAPIConfiguration" class="edu.helsinki.sulka.services.APIService" >
+	<bean id="APIConfiguration" class="edu.helsinki.sulka.services.APIService" >
 		<property name="username" value="bongarit-dev" />
 		<property name="password" value="devbongarit" />
 		<property name="urlBase" value="https://h92.it.helsinki.fi/tipu-api" />
 	</bean>
 	
-	<bean id="StagingAPIConfiguration" class="edu.helsinki.sulka.services.APIService" >
-		<property name="username" value="sulka-test" />
-		<property name="password" value="SULKAsulka52" />
-		<property name="urlBase" value="http://tammitikka.fmnh.helsinki.fi:8081/util-staging" />
-	</bean>
 </beans>

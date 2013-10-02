@@ -42,7 +42,7 @@ public class APIService {
 	}
 	
 	
-	private RestTemplate restTemplate = null;
+	private static RestTemplate restTemplate = null;
 	
 	/**
 	 * @return the RestTemplate object that should be used to communicate to the API.
