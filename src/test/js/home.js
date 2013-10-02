@@ -14,12 +14,6 @@ casper.test.begin('Home page tests', 9, function suite(test) {
         var year = now.format("YYYY");
         var dateText = casper.evaluate(function () { return __utils__.findOne('body > p').textContent });
     
-<<<<<<< HEAD
-        test.assertSelectorHasText("body > p", "The time on the server is ", "Page has timestamp");
-        test.assertSelectorHasText("body > p", time, "Timestamp has correct time");
-        test.assertSelectorHasText("body > p", dayOfMonth, "Timestamp has correct day of month");
-        test.assertSelectorHasText("body > p", year, "Timestamp has correct year");
-=======
         test.assertSelectorHasText('body > p', "The time on the server is ", "Page has timestamp");
         test.assertSelectorHasText('body > p', time, "Timestamp has correct time");
         test.assertSelectorHasText('body > p', dayOfMonth, "Timestamp has correct day of month");
@@ -39,7 +33,6 @@ casper.test.begin('Home page tests', 9, function suite(test) {
             });
             return success;
         }, "Has a ringer ID for Heikki Lokki", LOKKI_RINGER_ID);
->>>>>>> 890a4d7ffacf4551a063f56595cee180ca0489a6
     });
     
     casper.run(function () {
