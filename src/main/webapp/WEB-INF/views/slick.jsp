@@ -40,21 +40,28 @@
 		
 		<script>
 			var grid;
-			var columns = [{id: "title", name: "Title", field: "title"},
-			               {id: "rndm", name: "Rndm", field: "rndm"}];
-			var options = {
-					enableCellNavigation: true,
-					enableColumnReorder: false
-			};
-			$(function () {
-				var data = [];
-				for (var i = 0; i < 500; i++){
-					data[i] = {
-							title: "Task " + i,
-							rndm: Math.round(Math.random()*100)
-					};
-				}
-				grid = new Slick.Grid("#slick-grid", data, columns, options);
+			var fields = new Array();
+			$.getJSON("http://localhost:8080/sulka/fields", function(json){
+				$.each(json, function(index, fieldGroup){
+					fieldsInGroup = fieldGroup['fields'];
+					$.each(fieldsInGroup, function(indexB, field){
+						var columnHeader = {
+							id: field['field'],
+							name: field['name'],
+							field: field['field']
+						};
+						fields.push(columnHeader);
+					});
+				});
+				
+				var options = {
+						enableCellNavigation: true,
+						enableColumnReorder: false
+				};
+				$(function () {
+					var data = [];
+					grid = new Slick.Grid("#slick-grid", data, fields, options);
+				});
 			});
 		</script>
 	</body>
