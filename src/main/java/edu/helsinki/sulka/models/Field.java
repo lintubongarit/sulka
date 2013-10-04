@@ -3,6 +3,7 @@ package edu.helsinki.sulka.models;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -11,8 +12,10 @@ public class Field {
 	@JsonProperty("field")
 	private String fieldName;
 	
+	@JsonProperty("name")
 	private String name;
-	
+
+	@JsonProperty("description")
 	private String description;
 	
 	public static enum FieldType {
@@ -27,8 +30,10 @@ public class Field {
 
 	@JsonIgnoreProperties(ignoreUnknown=true)
 	public static class EnumerationValue {
+		@JsonProperty("description")
 		private String description;
 		
+		@JsonProperty("value")
 		private String value;
 		
 		/*
@@ -42,6 +47,7 @@ public class Field {
 			return value;
 		}
 	}
+	@JsonProperty("enumerationValues")
 	private EnumerationValue[] enumerationValues;
 	
 	/*
@@ -72,6 +78,7 @@ public class Field {
 	 * Assumes getType() == FieldType.ENUMERATION
 	 * @return Map of enumeration value descriptions by possible enumeration values.
 	 */
+	@JsonIgnore
 	private Map<String, String> enumerationDescriptionsMap = null;
 	public Map<String, String> getEnumerationDescriptionsMap() {
 		if (this.enumerationDescriptionsMap != null) {
