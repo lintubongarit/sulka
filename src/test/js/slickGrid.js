@@ -7,7 +7,7 @@ casper.test.begin('SlickGrid tests', 4, function suite(test) {
 	casper.options.logLevel = "debug";
 	casper.options.verbose =  true;
 	casper.options.timeout = 600000;
-    browse('/slick', function () {
+    casper.start('http://localhost:8080/sulka/slick', function browseToSlickPage() {
     });
 
 	casper.then(function testHTTPStatusIsOk() {
