@@ -8,7 +8,7 @@ const wantedColumns = ["Rengas", "Nimirengas", "Laji", "Rengastaja", "Pvm", "Klo
 /* Columns to be added: birdStation, kkj_ddmm_lat, kkj_ddmm_lon, kkj_decimal_lat, kkj_decimal_lon, birdCondition*/
 
 
-casper.test.begin('SlickGrid tests', 6, function suite(test) {
+casper.test.begin('SlickGrid tests', 7, function suite(test) {
 	casper.options.logLevel = "debug";
 	casper.options.verbose =  true;
 	casper.options.timeout = 600000;
@@ -65,6 +65,11 @@ casper.test.begin('SlickGrid tests', 6, function suite(test) {
 			allColumnsFound = true;
 		}
 		test.assertEquals(allColumnsFound, true, "Grid has got all wanted columns.");
+	});
+
+	casper.then(function testThatGridDataVariableIsArray() {
+		test.assertInstanceOf(this.getGlobal('gridData'), Array, "SlickGrids data-variable is array.");
+
 	});
 
     casper.run(function () {

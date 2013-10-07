@@ -63,6 +63,7 @@
 		<script>
 			var grid;
 			var fields = new Array();
+			var gridData = new Array();
 			$.getJSON("api/fields/groups", function(json){
 				$.each(json.objects, function(index, fieldGroup){
 					fieldsInGroup = fieldGroup['fields'];
