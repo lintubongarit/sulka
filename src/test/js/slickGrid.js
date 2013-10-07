@@ -18,7 +18,7 @@ casper.test.begin('SlickGrid tests', 3, function suite(test) {
         test.assertTitle("Sulka", "Title is 'Sulka'");
 	});
 
-	casper.then(function() {
+	casper.then(function testThatGridVariableIsNotNull() {
 		var grid = this.getGlobal('grid');
 		test.assertNotEquals(grid, null, "SlickGrid -grid is not null");
     });
