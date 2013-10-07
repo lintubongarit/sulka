@@ -27,7 +27,6 @@ casper.test.begin('SlickGrid tests', 5, function suite(test) {
     
 
 	casper.then(function testThatColumnVariableIsNotNull() {
-		var grid = this.getGlobal('grid');
 		var columns = this.evaluate(function getColumnsFromDOM() {
 			return window.grid.getColumns();
 		});
