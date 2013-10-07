@@ -5,46 +5,81 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown=true)
 public class Ringer {
-	public long id;
+	private long id;
 	
-	public String lastname;
-	public String firstname;
-	public long permission;
+	@JsonProperty("lastname")
+	private String lastName;
+	
+	@JsonProperty("firstname")
+	private String firstName;
+	
+	@JsonProperty("permission")
+	private long permission;
 		
 	@JsonProperty("mobile-phone")
-	public String mobilePhone;
+	private String mobilePhone;
 	
-	public String yearofbirth;
-	public String email;
+	@JsonProperty("yearofbirth")
+	private String yearOfBirth;
 	
+	@JsonProperty("email")
+	private String email;
+	
+	@JsonIgnoreProperties(ignoreUnknown=true)
 	public static class RingerAddress {
-		public String street;
-		public String postcode;
-		public String city;
+		@JsonProperty("street")
+		private String street;
+		
+		@JsonProperty("postcode")
+		private String postcode;
+		
+		@JsonProperty("city")
+		private String city;
 	}
-	public RingerAddress address;
+	@JsonProperty("address")
+	private RingerAddress address;
 	
+	@JsonIgnoreProperties(ignoreUnknown=true)
 	public static class RingerPermit {
-		public String codes;
-		public String year;
-		public String content;
+		@JsonProperty("codes")
+		private String codes;
+		
+		@JsonProperty("year")
+		private String year;
+		
+		@JsonProperty("content")
+		private String content;
 	}
-	public RingerPermit permit;
+	@JsonProperty("permit")
+	private RingerPermit permit;
 	
 	/* Accessors */
-	public String getLastName() {
-		return this.lastname;
-	}
-
-	public String getFirstName() {
-		return this.firstname;
-	}
 	
+	/**
+	 * @return ringer ID (usually in the range [1-10000])
+	 */
 	public long getID() {
 		return this.id;
 	}
 	
+	/**
+	 * @return ringer last name. Usually upper-case.
+	 */
+	public String getLastName() {
+		return this.lastName;
+	}
+
+	/**
+	 * @return ringer first name. Usually upper-case.
+	 */
+	public String getFirstName() {
+		return this.firstName;
+	}
+	
+	/**
+	 * @return get ringer year of birth
+	 */
 	public long getYearOfBirth() {
-		return Long.parseLong(this.yearofbirth);
+		return Long.parseLong(this.yearOfBirth);
 	}
 }

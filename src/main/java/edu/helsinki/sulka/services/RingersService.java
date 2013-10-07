@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import edu.helsinki.sulka.models.Ringer;
 
 /**
- * Autowireable Service that should can be used to retrieve information about ringers.
+ * Autowireable Service that should be used to retrieve information about ringers.
  */
 @Service
 public class RingersService {
@@ -16,8 +16,8 @@ public class RingersService {
 	private Logger logger;
 	
 	@Autowired
-	@Qualifier("APIConfiguration")
-	APIService apiService;
+	@Qualifier("DevAPIConfiguration")
+	private APIService apiService;
 	
 	private static class RingersResponse {
 		private static class RingersResponseLevel2 {
