@@ -10,6 +10,9 @@ casper.test.begin('Uitests', 4, function suite(test) {
         	test.assertTitle("Sulka", "Title is 'Sulka'");
     	});
 	
+	casper.then(function tiedotform() {
+		test.assertExists('form[id="tiedot"]', 'Slick-page has a form with name "tiedot"');		
+	});
     	casper.run(function () {
         	test.done();
    	});

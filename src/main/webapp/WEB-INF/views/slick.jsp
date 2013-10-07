@@ -26,6 +26,14 @@
 				</td>
 			</tr>
 		</table>
+		
+		<div class="local-toolbar">
+				
+						<form id="tiedot">
+						</form>
+		</div>
+	
+		
 		<div id="row-status-box-container">
 			<div id="row-status-box" style="padding: 10px"></div>
 		</div>
