@@ -52,6 +52,9 @@
 		<div id="columns-pane">
 			<table id="columns-table"></table>
 		</div>
+		
+		<form id="tiedot"></form><!-- Added here just to make tests not fail -->
+		
 		<script src="resources/js/jquery-1.7.min.js"></script>
 		<script src="resources/js/jquery.event.drag-2.2.js"></script>
 		<script src="resources/js/slick.core.js"></script>
