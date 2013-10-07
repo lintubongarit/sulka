@@ -8,9 +8,12 @@ casper.test.begin('SlickGrid tests', 3, function suite(test) {
 	casper.options.verbose =  true;
 	casper.options.timeout = 600000;
     browse('/slick', function () {
-        test.assertHttpStatus(200, "HTTP status is OK");
         test.assertTitle("Sulka", "Title is 'Sulka'");
     });
+
+	casper.then(function testHTTPStatusIsOk() {
+		test.assertHttpStatus(200, "HTTP status is OK");
+	});
 
 	casper.then(function() {
 		var grid = this.getGlobal('grid');
