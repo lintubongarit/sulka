@@ -30,6 +30,7 @@
 		<div class="local-toolbar">
 				
 						<form id="tiedot">
+								Rengastaja: <input type="text" name="ringer">
 						</form>
 		</div>
 	
