@@ -5,8 +5,6 @@ import static org.hamcrest.Matchers.greaterThan;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-
 
 import org.junit.Before;
 import org.junit.Test;
@@ -25,7 +23,7 @@ import org.springframework.web.context.WebApplicationContext;
 	"file:src/main/webapp/WEB-INF/spring/root-context.xml",
 	"file:src/main/webapp/WEB-INF/spring/appServlet/servlet-context.xml"
 })
-public class HomeControllerTest {
+public class LoginControllerTest {
     @Autowired
     private WebApplicationContext wac;
     
@@ -37,23 +35,42 @@ public class HomeControllerTest {
     }
 
     @Test
-    public void testHome() throws Exception {
-    	mockMvc.perform(get("/"))
-    		.andExpect(status().isOk())
-    		.andExpect(model().attributeExists("serverTime"))
-    		.andExpect(model().attribute("ringers", arrayWithSize(greaterThan(1000))))
+    public void testLoginFailsWithoutAnyAuthVars() throws Exception {
+    	mockMvc.perform(get("/login"))
+    		.andExpect(status().isBadRequest())
     		.andReturn();
 	}
     
     @Test
-    public void testFieldsStatusIsOk() throws Exception {
-    	mockMvc.perform(get("/fields"))
-    		.andExpect(status().isOk());
-    }
+    public void testLoginFailsWithOnlySomeAuthVars() throws Exception {
+    	mockMvc.perform(get("/login?key=test"))
+    		.andExpect(status().isBadRequest())
+    		.andReturn();
+    	mockMvc.perform(get("/login?iv=test"))
+		.andExpect(status().isBadRequest())
+		.andReturn();
+    	mockMvc.perform(get("/login?data=test"))
+		.andExpect(status().isBadRequest())
+		.andReturn();
+    	mockMvc.perform(get("/login?key=test&iv=test"))
+		.andExpect(status().isBadRequest())
+		.andReturn();
+    	mockMvc.perform(get("/login?key=test&iv=test"))
+		.andExpect(status().isBadRequest())
+		.andReturn();
+    	mockMvc.perform(get("/login?key=test&data=test"))
+		.andExpect(status().isBadRequest())
+		.andReturn();
+    	mockMvc.perform(get("/login?iv=test&data=test"))
+		.andExpect(status().isBadRequest())
+		.andReturn();
+	}
     
     @Test
-    public void testFieldsReturnsJSON() throws Exception {
-    	mockMvc.perform(get("/fields"))
-    		.andExpect(content().contentType("application/json;charset=UTF-8"));
-    }
+    public void testLoginSuccessWithAllAuthVariables() throws Exception {
+    	mockMvc.perform(get("/login?key=test&iv=test&data=test"))
+    		.andExpect(status().isOk())
+    		.andReturn();
+	}
+
 }
