@@ -4,6 +4,8 @@ var slickCore = require('../../main/webapp/resources/js/slick.core.js');
 var slickGrid = require('../../main/webapp/resources/js/slick.grid.js');
 
 casper.test.begin('SlickGrid tests', 3, function suite(test) {
+	casper.options.logLevel = "debug";
+	casper.options.verbose =  true;
 	casper.options.timeout = 600000;
     browse('/slick', function () {
         test.assertHttpStatus(200, "HTTP status is OK");
