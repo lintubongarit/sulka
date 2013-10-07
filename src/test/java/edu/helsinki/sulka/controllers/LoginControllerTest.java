@@ -35,14 +35,14 @@ public class LoginControllerTest {
     }
 
     @Test
-    public void testLoginFailsWithoutAnyAuthVars() throws Exception {
+    public void testLoginIsBadRequestWithoutAnyAuthVars() throws Exception {
     	mockMvc.perform(get("/login"))
     		.andExpect(status().isBadRequest())
     		.andReturn();
 	}
     
     @Test
-    public void testLoginFailsWithOnlySomeAuthVars() throws Exception {
+    public void testLoginIsBadRequestWithOnlySomeAuthVars() throws Exception {
     	mockMvc.perform(get("/login?key=test"))
     		.andExpect(status().isBadRequest())
     		.andReturn();
@@ -67,7 +67,7 @@ public class LoginControllerTest {
 	}
     
     @Test
-    public void testLoginSuccessWithAllAuthVariablesThoughIsExpired() throws Exception {
+    public void testLoginIsOkWithAllAuthVariables() throws Exception {
     	mockMvc.perform(get("/login?key=test&iv=test&data=test"))
     		.andExpect(status().isOk())
     		.andReturn();
