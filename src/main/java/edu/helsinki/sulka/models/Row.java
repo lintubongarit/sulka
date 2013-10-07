@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 public class Row {
 	/**
 	 * Construct new empty Row
@@ -24,6 +26,16 @@ public class Row {
 	private Map<Field, String> fieldValues;
 	private Map<String, Field> fieldsByName;
 
+	/* The class-wide JSON serializer */
+	@JsonValue
+	public Map<String, String> toJSON() {
+		Map<String, String> json = new HashMap(fieldValues.size());
+		for (Map.Entry<Field, String> entry : fieldValues.entrySet()) {
+			json.put(entry.getKey().getFieldName(), entry.getValue());
+		}
+		return json;
+	}
+	
 	/* Generic accessors */
 	
 	/**

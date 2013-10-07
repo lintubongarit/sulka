@@ -123,7 +123,7 @@ public class RowsService {
 	 * @param speciesFilters List of bird species short hand codes to match, or null to return all.
 	 * @param ringPrefixFilter A ring code prefix to match, or null to return all.
 	 * @param sortBy A sort to use, such as [ "ringStart", "date" ], or null to use default sort.
-	 * @return list of row
+	 * @return list of rows
 	 * @throws QueryException If the query was not successful (message describes the error)
 	 */
 	public List<Row> getAllRows(final long[] ringerFilters, final String[] municipalityFilters,

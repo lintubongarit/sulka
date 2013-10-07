@@ -41,7 +41,7 @@
 		<script>
 			var grid;
 			var fields = new Array();
-			$.getJSON("http://localhost:8080/sulka/fields", function(json){
+			$.getJSON("fields", function(json){
 				$.each(json, function(index, fieldGroup){
 					fieldsInGroup = fieldGroup['fields'];
 					$.each(fieldsInGroup, function(indexB, field){
