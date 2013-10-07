@@ -31,6 +31,7 @@
 				
 						<form id="tiedot">
 								Rengastaja: <input type="text" name="ringer">
+								Vuosi (esim. 2005 tai 2005-2006): <input type="text" name="year">
 						</form>
 		</div>
 	
