@@ -16,7 +16,7 @@ import edu.helsinki.sulka.services.LintuvaaraAuthDecryptService;
  * Handles requests for the login page and passing authentication variables to Tipu-API's Lintuvaara authentication decryptor service
  */
 @Controller
-@SessionAttributes("User")
+@SessionAttributes("user")
 public class LoginController {
 
 	@Autowired
@@ -31,7 +31,7 @@ public class LoginController {
 	@RequestMapping(value = "/login", method = RequestMethod.GET)
 	public String home(Model model, @RequestParam(value = "key") String key, @RequestParam(value = "iv") String iv, @RequestParam(value = "data") String data) {		
 		User user = authService.auth(key, iv, data);
-		model.addAttribute("accessStatus", user.accessStatus());
+		model.addAttribute("user", user);
 		return "login";
 	}
 
