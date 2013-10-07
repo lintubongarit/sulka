@@ -1,4 +1,4 @@
-casper.test.begin('Uitests', 8, function suite(test) {
+casper.test.begin('Uitests', 9, function suite(test) {
 	casper.options.timeout = 600000;
 	casper.options.logLevel = "debug";
 	casper.options.verbose = true;
@@ -35,6 +35,9 @@ casper.test.begin('Uitests', 8, function suite(test) {
 		this.test.assertExists('#peru', 'the peruuta filter button exists');
 });
 
+	casper.then(function okButtonExists(){
+		this.test.assertExists('#ok', 'the ok filter button exists');
+});
     	casper.run(function () {
         	test.done();
    	});
