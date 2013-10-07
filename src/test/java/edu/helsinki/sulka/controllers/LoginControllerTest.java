@@ -67,7 +67,7 @@ public class LoginControllerTest {
 	}
     
     @Test
-    public void testLoginSuccessWithAllAuthVariables() throws Exception {
+    public void testLoginSuccessWithAllAuthVariablesThoughIsExpired() throws Exception {
     	mockMvc.perform(get("/login?key=test&iv=test&data=test"))
     		.andExpect(status().isOk())
     		.andReturn();
