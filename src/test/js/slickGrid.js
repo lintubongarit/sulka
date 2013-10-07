@@ -3,6 +3,8 @@ var jqueryEvent = require('../../main/webapp/resources/js/jquery.event.drag-2.2.
 var slickCore = require('../../main/webapp/resources/js/slick.core.js');
 var slickGrid = require('../../main/webapp/resources/js/slick.grid.js');
 
+const correctColumnCount = 33;
+
 casper.test.begin('SlickGrid tests', 5, function suite(test) {
 	casper.options.logLevel = "debug";
 	casper.options.verbose =  true;
@@ -36,7 +38,7 @@ casper.test.begin('SlickGrid tests', 5, function suite(test) {
 		var columns = this.evaluate(function getColumnsFromDOM() {
 			return window.grid.getColumns();
 		});
-		test.assertEquals(columns.length, 33, "Grid has 33 columns.");
+		test.assertEquals(columns.length, correctColumnCount, "Grid has 33 columns.");
 	});
 
     casper.run(function () {
