@@ -41,8 +41,8 @@
 		<script>
 			var grid;
 			var fields = new Array();
-			$.getJSON("http://localhost:8080/sulka/fields", function(json){
-				$.each(json, function(index, fieldGroup){
+			$.getJSON("api/fields/groups", function(json){
+				$.each(json.objects, function(index, fieldGroup){
 					fieldsInGroup = fieldGroup['fields'];
 					$.each(fieldsInGroup, function(indexB, field){
 						var columnHeader = {

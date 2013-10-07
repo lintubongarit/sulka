@@ -5,8 +5,6 @@ import static org.hamcrest.Matchers.greaterThan;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-
 
 import org.junit.Before;
 import org.junit.Test;
@@ -44,16 +42,4 @@ public class HomeControllerTest {
     		.andExpect(model().attribute("ringers", arrayWithSize(greaterThan(1000))))
     		.andReturn();
 	}
-    
-    @Test
-    public void testFieldsStatusIsOk() throws Exception {
-    	mockMvc.perform(get("/fields"))
-    		.andExpect(status().isOk());
-    }
-    
-    @Test
-    public void testFieldsReturnsJSON() throws Exception {
-    	mockMvc.perform(get("/fields"))
-    		.andExpect(content().contentType("application/json;charset=UTF-8"));
-    }
 }
