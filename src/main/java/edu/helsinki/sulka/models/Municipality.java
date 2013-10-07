@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown=true)
 public class Municipality {
+	@JsonProperty("id")
 	private String id;
 	
 	@JsonIgnoreProperties(ignoreUnknown=true)
@@ -45,10 +46,13 @@ public class Municipality {
 	
 	@JsonIgnoreProperties(ignoreUnknown=true)
 	public static class Province {
+		@JsonProperty("name")
 		public String name;
 	}
+	@JsonProperty("province")
 	private Province province;
 	
+	@JsonProperty("radius")
 	private double radius;
 	
 	@JsonProperty("merikotka-suuralue")
