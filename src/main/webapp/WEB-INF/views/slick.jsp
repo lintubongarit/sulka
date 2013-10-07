@@ -27,6 +27,11 @@
 			</tr>
 		</table>
 		
+		<script>
+			function formReset(){
+				document.getElementById("tiedot").reset();
+			}
+		</script>
 		<div class="local-toolbar">
 				
 						<form id="tiedot">
@@ -34,6 +39,7 @@
 								Vuosi (esim. 2005 tai 2005-2006): <input type="text" name="year">
 								Laji: <input type="text" name="species">
 								Kunta: <input type="text" name="state">
+								<input id="peru" type="button" onclick="formReset()" value="Peruuta">
 						</form>
 		</div>
 	
