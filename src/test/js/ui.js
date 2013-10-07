@@ -1,11 +1,8 @@
-var jquery = require('../../main/webapp/resources/js/jquery-1.7.min.js');
-var jqueryEvent = require('../../main/webapp/resources/js/jquery.event.drag-2.2.js');
-var slickCore = require('../../main/webapp/resources/js/slick.core.js');
-var slickGrid = require('../../main/webapp/resources/js/slick.grid.js');
-
-casper.test.begin('Uitests', 7, function suite(test) {
+casper.test.begin('Uitests', 8, function suite(test) {
 	casper.options.timeout = 600000;
-    	casper.start('http://localhost:8080/sulka/slick', function () {
+	casper.options.logLevel = "debug";
+	casper.options.verbose = true;
+    	browse('/slick', function () {
         	test.assertHttpStatus(200, "HTTP status is OK");
         	test.assertTitle("Sulka", "Title is 'Sulka'");
     	});
@@ -33,6 +30,10 @@ casper.test.begin('Uitests', 7, function suite(test) {
 		this.fill('form[id="tiedot"]', { state: 'HAUHO'}, false);			
 		test.assertField('state', 'HAUHO');	
 	});
+	
+	casper.then(function peruutaButtonExists(){
+		this.test.assertExists('#peru', 'the peruuta filter button exists');
+});
 
     	casper.run(function () {
         	test.done();
