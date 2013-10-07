@@ -26,7 +26,7 @@ public class LoginController {
 	private LintuvaaraAuthDecryptService authService;
 
 	/**
-	 * redirects authentication variables key, iv and data to Tipu-API's Lintuvaara authentication decryptor service
+	 * redirects authentication variables key, iv and data to Tipu-API's Lintuvaara authentication decryptor service and saves user to session
 	 */
 	@RequestMapping(value = "/login", method = RequestMethod.GET)
 	public String home(Model model, @RequestParam(value = "key") String key, @RequestParam(value = "iv") String iv, @RequestParam(value = "data") String data) {		
