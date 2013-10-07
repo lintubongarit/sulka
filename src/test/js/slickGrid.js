@@ -39,7 +39,7 @@ casper.test.begin('SlickGrid tests', 6, function suite(test) {
 		var columns = this.evaluate(function getColumnsFromDOM() {
 			return window.grid.getColumns();
 		});
-		test.assertEquals(columns.length, correctColumnCount, "Grid has 33 columns.");
+		test.assertEquals(columns.length, correctColumnCount, "Grid has " + correctColumnCount + " columns.");
 	});
 
 	casper.then(function testThatGridHasCorrectColumns() {
