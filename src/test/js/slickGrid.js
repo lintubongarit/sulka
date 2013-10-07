@@ -7,6 +7,12 @@ const correctColumnCount = 33;
 const wantedColumns = ["Rengas-", "-rengas", "Vanha rengas", "Laji", "Henkilö", "Pvm", "Tark", "Klo", "Kunta", "Paikka", "YKJ p.", "YKJ i.", "Tyyppi", "Reng.kiinnitys", "Pyyntitap.", "Toimet", "Ikä", "Peruste", "Sukupuoli", "Määritystapa", "Paino", "Siipi", "Mittaustapa", "Poikueen nro", "Poikasia", "Ikä", "Tarkkuus" ];
 /* Columns to be added: birdStation, kkj_ddmm_lat, kkj_ddmm_lon, kkj_decimal_lat, kkj_decimal_lon, birdCondition*/
 
+function sleep(ms){
+	var dt = new Date();
+	dt.setTime(dt.getTime() + ms);
+	while(new Date().getTime() < dt.getTime());
+}
+
 casper.test.begin('SlickGrid tests', 6, function suite(test) {
 	casper.options.logLevel = "debug";
 	casper.options.verbose =  true;
@@ -29,6 +35,7 @@ casper.test.begin('SlickGrid tests', 6, function suite(test) {
     
 
 	casper.then(function testThatColumnVariableIsNotNull() {
+		sleep(5000);
 		var columns = this.evaluate(function getColumnsFromDOM() {
 			return window.grid.getColumns();
 		});
