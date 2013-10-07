@@ -26,6 +26,25 @@
 				</td>
 			</tr>
 		</table>
+		
+		<script>
+			function formReset(){
+				document.getElementById("tiedot").reset();
+			}
+		</script>
+		<div class="local-toolbar">
+				
+						<form id="tiedot">
+								Rengastaja: <input type="text" name="ringer">
+								Vuosi (esim. 2005 tai 2005-2006): <input type="text" name="year">
+								Laji: <input type="text" name="species">
+								Kunta: <input type="text" name="state">
+								<input id="ok" type="button" onclick="loadJSONDoc()" value="Ok">
+								<input id="peru" type="button" onclick="formReset()" value="Peruuta">
+						</form>
+		</div>
+	
+		
 		<div id="row-status-box-container">
 			<div id="row-status-box" style="padding: 10px"></div>
 		</div>
