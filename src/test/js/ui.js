@@ -13,6 +13,11 @@ casper.test.begin('Uitests', 4, function suite(test) {
 	casper.then(function tiedotform() {
 		test.assertExists('form[id="tiedot"]', 'Slick-page has a form with name "tiedot"');		
 	});
+
+	casper.then(function ringerFieldExists() {
+		this.fill('form[id="tiedot"]', { ringer: '846' }, false);
+		test.assertField('ringer', '846');	
+	});
     	casper.run(function () {
         	test.done();
    	});
