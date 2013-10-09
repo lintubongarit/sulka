@@ -1,5 +1,23 @@
 var sulka = {
-	fetchFields: function (){
+	grid: null,
+	gridData: new Array(),
+	gridFields: {}, 
+	gridOptions: {
+		enableCellNavigation: true,
+		enableColumnReorder: false
+	},
+	
+	initGrid: function (){
+		this.gridFields = this.fetchFields();
+		this.grid = new Slick.Grid(
+									"#slick-grid",
+									this.gridData,
+									this.gridFields,
+									this.gridOptions
+									);
+	},
+		
+	fetchFields: function () {
 		var fetchedFields = new Array();
 		$.ajax({
 			url: "api/fields/groups",

@@ -31,21 +31,21 @@ casper.test.begin('SlickGrid tests', 7, function suite(test) {
 
 	casper.then(function testThatColumnVariableIsNotNull() {
 		var columns = this.evaluate(function getColumnsFromDOM() {
-			return window.grid.getColumns();
+			return window.sulka.grid.getColumns();
 		});
 		test.assertNotEquals(columns, null, "Column variable is not null.");
 	});
 
 	casper.then(function testThatColumnVariableHasRightAmountOfColumns() {
 		var columns = this.evaluate(function getColumnsFromDOM() {
-			return window.grid.getColumns();
+			return window.sulka.grid.getColumns();
 		});
 		test.assert(columns.length >= correctColumnCount, "Grid has at least " + correctColumnCount + " columns.");
 	});
 
 	casper.then(function testThatGridHasCorrectColumns() {
 		var columns = this.evaluate(function getColumnsFromDOM() {
-			return window.grid.getColumns();
+			return window.sulka.grid.getColumns();
 		});
 
 		var allColumnsFound = false;
@@ -67,8 +67,13 @@ casper.test.begin('SlickGrid tests', 7, function suite(test) {
 		test.assertEquals(allColumnsFound, true, "Grid has got all wanted columns.");
 	});
 
-	casper.then(function testThatGridDataVariableIsArray() {
-		test.assertInstanceOf(this.getGlobal('gridData'), Array, "SlickGrids data-variable is array.");
+	casper.then(function testThatGridDataVariableIsInitialized() {
+		var gridData = this.evaluate(function getGridDataFromDOM() {
+			return window.sulka.gridData;
+		});
+		test.assertInstanceOf(gridData, Array, "SlickGrids data-variable is initialized.");
+
+	});
 
 	});
 

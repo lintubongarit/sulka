@@ -62,17 +62,7 @@
 		<script src="resources/js/sulka.js"></script>
 
 		<script>
-			var grid;
-			var gridData = new Array();
-			var fields = sulka.fetchFields();
-			var options = {
-					enableCellNavigation: true,
-					enableColumnReorder: false
-			};
-			$(function () {
-				var data = [];
-				grid = new Slick.Grid("#slick-grid", data, fields, options);
-			});
+			sulka.initGrid();
 		</script>
 	</body>
 </html>
