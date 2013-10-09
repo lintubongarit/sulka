@@ -40,8 +40,74 @@ public class FieldsControllerTest {
     
     @SuppressWarnings("unchecked")
 	@Test
-    public void testGroups() throws Exception {
+    public void testAllGroups() throws Exception {
     	mockMvc.perform(get("/api/fields/groups"))
+			.andExpect(status().isOk())
+			.andExpect(content().contentType("application/json;charset=UTF-8"))
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.error").value(nullValue()))
+			.andExpect(jsonPath("$.objects").isArray())
+			.andExpect(jsonPath("$.objects[?(@.name=='common')]").exists())
+			.andExpect(jsonPath("$.objects[?(@.name=='common')].fields").isArray())
+			.andExpect(jsonPath("$.objects[?(@.name=='common')].fields[?(@.field=='species')]").exists())
+			.andExpect(jsonPath("$.objects[?(@.name=='common')].fields[?(@.field=='species')].type", everyItem(equalTo("ENUMERATION"))))
+			.andExpect(jsonPath("$.objects[?(@.name=='common')].fields[?(@.field=='ringer')]").exists())
+			.andReturn();
+	}
+    
+    @SuppressWarnings("unchecked")
+	@Test
+    public void testAllFields() throws Exception {
+    	mockMvc.perform(get("/api/fields/all"))
+			.andExpect(status().isOk())
+			.andExpect(content().contentType("application/json;charset=UTF-8"))
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.error").value(nullValue()))
+			.andExpect(jsonPath("$.objects").isArray())
+			.andExpect(jsonPath("$.objects[?(@.field=='species')]").exists())
+			.andExpect(jsonPath("$.objects[?(@.field=='species')].type", everyItem(equalTo("ENUMERATION"))))
+			.andExpect(jsonPath("$.objects[?(@.field=='species')].enumerationValues").isArray())
+			.andExpect(jsonPath("$.objects[?(@.field=='ringer')]").exists())
+			.andReturn();
+	}
+    
+    @SuppressWarnings("unchecked")
+	@Test
+    public void testBrowsingGroups() throws Exception {
+    	mockMvc.perform(get("/api/fields/groups/browsing"))
+			.andExpect(status().isOk())
+			.andExpect(content().contentType("application/json;charset=UTF-8"))
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.error").value(nullValue()))
+			.andExpect(jsonPath("$.objects").isArray())
+			.andExpect(jsonPath("$.objects[?(@.name=='common')]").exists())
+			.andExpect(jsonPath("$.objects[?(@.name=='common')].fields").isArray())
+			.andExpect(jsonPath("$.objects[?(@.name=='common')].fields[?(@.field=='species')]").exists())
+			.andExpect(jsonPath("$.objects[?(@.name=='common')].fields[?(@.field=='species')].type", everyItem(equalTo("ENUMERATION"))))
+			.andExpect(jsonPath("$.objects[?(@.name=='common')].fields[?(@.field=='ringer')]").exists())
+			.andReturn();
+	}
+    
+    @SuppressWarnings("unchecked")
+	@Test
+    public void testBrowsingFields() throws Exception {
+    	mockMvc.perform(get("/api/fields/all/browsing"))
+			.andExpect(status().isOk())
+			.andExpect(content().contentType("application/json;charset=UTF-8"))
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.error").value(nullValue()))
+			.andExpect(jsonPath("$.objects").isArray())
+			.andExpect(jsonPath("$.objects[?(@.field=='species')]").exists())
+			.andExpect(jsonPath("$.objects[?(@.field=='species')].type", everyItem(equalTo("ENUMERATION"))))
+			.andExpect(jsonPath("$.objects[?(@.field=='species')].enumerationValues").isArray())
+			.andExpect(jsonPath("$.objects[?(@.field=='ringer')]").exists())
+			.andReturn();
+	}
+    
+    @SuppressWarnings("unchecked")
+	@Test
+    public void testRingingsGroups() throws Exception {
+    	mockMvc.perform(get("/api/fields/groups/ringings"))
 			.andExpect(status().isOk())
 			.andExpect(content().contentType("application/json;charset=UTF-8"))
 			.andExpect(jsonPath("$.success").value(true))
@@ -56,8 +122,8 @@ public class FieldsControllerTest {
     
     @SuppressWarnings("unchecked")
 	@Test
-    public void testFields() throws Exception {
-    	mockMvc.perform(get("/api/fields/all"))
+    public void testRingingsFields() throws Exception {
+    	mockMvc.perform(get("/api/fields/all/ringings"))
 			.andExpect(status().isOk())
 			.andExpect(content().contentType("application/json;charset=UTF-8"))
 			.andExpect(jsonPath("$.success").value(true))

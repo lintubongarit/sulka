@@ -1,8 +1,8 @@
 package edu.helsinki.sulka.services;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -43,34 +43,81 @@ public class FieldsService {
 						FieldGroupsResponse.class).groups;
 	}
 	
+	private List<FieldGroup> filterByViewMode(Field.ViewMode viewMode, FieldGroup[] groups) {
+		ArrayList<FieldGroup> filteredGroups = new ArrayList<FieldGroup>(groups.length);
+		for (FieldGroup fg : groups) {
+			ArrayList<Field> filteredFields = new ArrayList<Field>(fg.getFields().size());
+			for (Field f : fg.getFields()) {
+				if (f.getViewModes().contains(viewMode)) {
+					filteredFields.add(f);
+				}
+			}
+			if (!filteredFields.isEmpty()) {
+				fg.setFields(filteredFields);
+				filteredGroups.add(fg);
+			}
+		}
+		return filteredGroups;
+	}
+	
 	/**
-	 * @return all fields
+	 * @param viewMode the view mode to filter displayed rows by.
+	 * @return all field groups from the API for the view mode.
 	 */
-	public Field[] getAllFields() {
+	public List<FieldGroup> getAllFieldGroups(Field.ViewMode viewMode) {
+		return filterByViewMode(viewMode, apiService
+				.getRestTemplate()
+				.getForObject(
+						apiService.getURLForPath("/ringing/fields"),
+						FieldGroupsResponse.class).groups);
+	}
+	
+	/**
+	 * @return all fields from the API
+	 */
+	public List<Field> getAllFields() {
 		FieldGroup[] fieldGroups = getAllFieldGroups();
 		int numOfFields = 0;
 		for (FieldGroup fg : fieldGroups) {
-			numOfFields += fg.getFields().length;
+			numOfFields += fg.getFields().size();
 		}
 		
 		ArrayList<Field> allFields = new ArrayList<Field>(numOfFields);
 		for (FieldGroup fg : fieldGroups) {
-			allFields.addAll(Arrays.asList(fg.getFields()));
+			allFields.addAll(fg.getFields());
 		}
 		
-		return allFields.toArray(new Field[numOfFields]);
+		return allFields;
+	}
+	
+	/**
+	 * @param viewMode the view mode to filter displayed rows by.
+	 * @return all fields from the API for the view mode.
+	 */
+	public List<Field> getAllFields(Field.ViewMode viewMode) {
+		List<FieldGroup> fieldGroups = getAllFieldGroups(viewMode);
+		int numOfFields = 0;
+		for (FieldGroup fg : fieldGroups) {
+			numOfFields += fg.getFields().size();
+		}
+		
+		ArrayList<Field> allFields = new ArrayList<Field>(numOfFields);
+		for (FieldGroup fg : fieldGroups) {
+			allFields.addAll(fg.getFields());
+		}
+		
+		return allFields;
 	}
 	
 	/**
 	 * @return all fields by field name
 	 */
 	public Map<String, Field> getAllFieldsByFieldName() {
-		Field[] allFields = getAllFields();
-		HashMap<String, Field> fieldsByFieldName = new HashMap<String, Field>(allFields.length);
+		List<Field> allFields = getAllFields();
+		HashMap<String, Field> fieldsByFieldName = new HashMap<String, Field>(allFields.size());
 		for (Field f : allFields) {
 			fieldsByFieldName.put(f.getFieldName(), f);
 		}
-		
 		return fieldsByFieldName;
 	}
 }

@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -41,8 +42,28 @@ public class FieldsController extends JSONController {
 	 */
 	@RequestMapping(value = "/api/fields/all", method = RequestMethod.GET)
 	@ResponseBody
-	public ArrayResponse<Field> fields(Locale locale, Model model)
+	public ListResponse<Field> fields(Locale locale, Model model)
 			throws RowsService.QueryException {
-		return new ArrayResponse<Field>(fieldsService.getAllFields());
+		return new ListResponse<Field>(fieldsService.getAllFields());
+	}
+	
+	/**
+	 * Returns all field groups that have column entries for given view mode.
+	 */
+	@RequestMapping(value = "/api/fields/groups/{viewMode}", method = RequestMethod.GET)
+	@ResponseBody
+	public ListResponse<FieldGroup> groups(Locale locale, Model model, @PathVariable String viewMode)
+			throws RowsService.QueryException {
+		return new ListResponse<FieldGroup>(fieldsService.getAllFieldGroups(Field.ViewMode.valueOf(viewMode.toUpperCase())));
+	}
+	
+	/**
+	 * Returns all fields for given view mode.
+	 */
+	@RequestMapping(value = "/api/fields/all/{viewMode}", method = RequestMethod.GET)
+	@ResponseBody
+	public ListResponse<Field> fields(Locale locale, Model model, @PathVariable String viewMode)
+			throws RowsService.QueryException {
+		return new ListResponse<Field>(fieldsService.getAllFields(Field.ViewMode.valueOf(viewMode.toUpperCase())));
 	}
 }
