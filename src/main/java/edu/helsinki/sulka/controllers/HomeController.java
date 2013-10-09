@@ -42,14 +42,6 @@ public class HomeController {
 	public String home(Locale locale, Model model, HttpSession session) {
 		logger.info("Welcome home! The client locale is {}.", locale);
 		
-		/*User user = (User) session.getAttribute("user");
-		if (user.accessStatus() != 0){
-			return "login";
-		} else {
-			user.setExpires_at(System.currentTimeMillis() / 1000 + 3 * 60);
-		}*/
-		
-		
 		Date date = new Date();
 		DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG, locale);
 		String formattedDate = dateFormat.format(date);

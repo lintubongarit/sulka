@@ -27,39 +27,15 @@
 	</beans:bean>
 
 	<context:component-scan base-package="edu.helsinki.sulka" />
-
-
+	
 	<context:annotation-config />
-
 
 	<mvc:interceptors>
 		<mvc:interceptor>
 			<mvc:mapping path="/**"/>
 			<mvc:exclude-mapping path="/login"/>
+			<mvc:exclude-mapping path="/testLogin/*"/>
 			<beans:bean	class="edu.helsinki.sulka.interceptors.AuthenticationInterceptor" />
 		</mvc:interceptor>
 	</mvc:interceptors>
-
-
-	<!-- <mvc:interceptors> -->
-	<!-- <mvc:interceptor> -->
-	<!-- <mvc:mapping path="/*" /> -->
-	<!-- <bean class="cz.cosi.DiMenuInterceptor" /> -->
-	<!-- </mvc:interceptor> -->
-	<!-- <mvc:interceptor> -->
-	<!-- <mvc:mapping path="/search/**" /> -->
-	<!-- <bean class="cz.cosi.DiMenuInterceptor" /> -->
-	<!-- </mvc:interceptor> -->
-
-	<!-- <mvc:interceptor> -->
-	<!-- <mvc:mapping path="/context/**" /> -->
-	<!-- <bean class="cz.cosi.DiMenuInterceptor" /> -->
-	<!-- </mvc:interceptor> -->
-	<!-- <mvc:interceptor> -->
-	<!-- <mvc:mapping path="/member/**" /> -->
-	<!-- <bean class="cz.cosi.DiMenuInterceptor" /> -->
-	<!-- </mvc:interceptor> -->
-
-
-
 </beans:beans>

@@ -1,8 +1,5 @@
 package edu.helsinki.sulka.models;
 
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -117,6 +114,9 @@ public class User {
 		this.pass = pass;
 	}
 	
-	
+	private final int refreshIncrementInMinutes = 10;
 
+	public void refreshSession() {
+		setExpires_at(System.currentTimeMillis() / 1000 + refreshIncrementInMinutes * 60);
+	}
 }
