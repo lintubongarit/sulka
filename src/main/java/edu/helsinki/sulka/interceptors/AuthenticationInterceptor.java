@@ -29,9 +29,12 @@ public class AuthenticationInterceptor implements HandlerInterceptor
 
 		HttpSession session = request.getSession(false);
 
+		if (session == null) {
+			return false;
+		}
+		
 		user = (User) session.getAttribute("user");
-
-		if (!(user == null) && (user.accessStatus() == 0)) {
+		if (user != null && user.accessStatus() == 0) {
 			increaseSessionExpirationTimeInMinutes(timeIncrementInMinutes);
 			return true;
 		}
