@@ -18,16 +18,6 @@ public class Row extends HashMap<String, String> {
 	}
 	
 	private Map<String, Field> fieldsByName;
-
-	/* The class-wide JSON serializer */
-	/*@JsonValue
-	public Map<String, String> toJSON() {
-		Map<String, String> json = new HashMap(fieldValues.size());
-		for (Map.Entry<Field, String> entry : fieldValues.entrySet()) {
-			json.put(entry.getKey().getFieldName(), entry.getValue());
-		}
-		return json;
-	}*/
 	
 	/* Generic accessors */
 	
@@ -91,5 +81,25 @@ public class Row extends HashMap<String, String> {
 	 */
 	public String getSpeciesFullName() {
 		return getField("species").getEnumerationDescription(super.get("species"));
+	}
+	
+	public String getID() {
+		return get("id");
+	}
+	
+	/*
+	 * Hash implementation.
+	 */
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof Row) {
+			return getID().equals(((Row) o).getID());
+		}
+		return super.equals(o);
+	}
+	
+	@Override
+	public int hashCode() {
+		return getID().hashCode();
 	}
 }
