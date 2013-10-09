@@ -9,6 +9,7 @@ var sulka = {
 	
 	initGrid: function (){
 		this.gridFields = this.fetchFields();
+		this.gridData = this.fetchRingings({municipality:'ESPOO'});
 		this.grid = new Slick.Grid(
 									"#slick-grid",
 									this.gridData,
@@ -38,5 +39,28 @@ var sulka = {
 			}
 		});
 		return fetchedFields;
+	},
+	
+	fetchRingings: function (filters) {
+		var rows = new Array();
+		var baseAddress = "api/rows/ringings?";
+		var filterString = "";
+		
+		for(var filter in filters){
+			if(filterString != ""){
+				filterString += "&";
+			}
+			filterString += filter + "=" + filters[filter];
+		}
+		
+		$.ajax({
+			url: baseAddress + filterString,
+			async: false,
+			dataType: 'json',
+			success: function(results){
+				rows = rows.concat(results["objects"]);
+			}
+		});
+		return rows;
 	}
 };

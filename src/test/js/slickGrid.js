@@ -8,7 +8,7 @@ const wantedColumns = ["Rengas", "Nimirengas", "Laji", "Rengastaja", "Pvm", "Klo
 /* Columns to be added: birdStation, kkj_ddmm_lat, kkj_ddmm_lon, kkj_decimal_lat, kkj_decimal_lon, birdCondition*/
 
 
-casper.test.begin('SlickGrid tests', 7, function suite(test) {
+casper.test.begin('SlickGrid tests', 8, function suite(test) {
 	casper.options.logLevel = "debug";
 	casper.options.verbose =  true;
 	casper.options.timeout = 600000;
@@ -75,6 +75,11 @@ casper.test.begin('SlickGrid tests', 7, function suite(test) {
 
 	});
 
+	casper.then(function testThatGridDataIsNotEmptyAfterInit() {
+		var response = this.evaluate(function getRowsFromDOM() {
+			return window.sulka.gridData;
+		});
+		test.assertNotEquals(response, null, "Working query returns something.");
 	});
 
     casper.run(function () {
