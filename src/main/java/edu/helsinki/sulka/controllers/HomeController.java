@@ -65,7 +65,6 @@ public class HomeController {
 			model.addAttribute("rows", null);
 			model.addAttribute("rowsError", e.getMessage());
 		}
-		
 		return "home";
 	}
 	
