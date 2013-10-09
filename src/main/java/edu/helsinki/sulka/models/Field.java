@@ -1,11 +1,14 @@
 package edu.helsinki.sulka.models;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
 
 @JsonIgnoreProperties(ignoreUnknown=true)
 public class Field {
@@ -28,6 +31,27 @@ public class Field {
 	@JsonProperty("type")
 	private FieldType type;
 
+	public static enum ViewMode {
+		BROWSING,
+		RINGINGS
+	};
+	
+	@JsonProperty("modes")
+	private Set<ViewMode> viewModes;
+	
+	@JsonSetter("modes")
+	public void setViewModes(String[] modes) {
+		Set<ViewMode> viewModes = new HashSet<ViewMode>();
+		for (String mode : modes) {
+			try {
+				viewModes.add(ViewMode.valueOf(mode));
+			} catch (IllegalArgumentException e) {
+				// Ignore
+			}
+		}
+		this.viewModes = viewModes;
+	}
+	
 	@JsonIgnoreProperties(ignoreUnknown=true)
 	public static class EnumerationValue {
 		@JsonProperty("description")
@@ -73,6 +97,10 @@ public class Field {
 		return enumerationValues;
 	}
 	
+	public Set<ViewMode> getViewModes() {
+		return viewModes;
+	}
+	
 	/**
 	 * Get map of enumeration descriptions by enumeration values.
 	 * Assumes getType() == FieldType.ENUMERATION
@@ -103,6 +131,9 @@ public class Field {
 		return getEnumerationDescriptionsMap().get(enumerationValue);
 	}
 	
+	/*
+	 * Hash implementation
+	 */
 	@Override
 	public int hashCode() {
 		return this.getFieldName().hashCode();
