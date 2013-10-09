@@ -12,12 +12,15 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+
+import edu.helsinki.sulka.models.User;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
@@ -30,10 +33,17 @@ public class FieldsControllerTest {
     private WebApplicationContext wac;
     
     private MockMvc mockMvc;
+    private MockHttpSession mockHttpSession;
 
     @Before
     public void setup() {
     	this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).build();
+    	this.mockHttpSession = new MockHttpSession();
+    	
+    	User legitUser = new User();
+    	legitUser.setPass(true);
+    	legitUser.setExpires_at(System.currentTimeMillis() / 1000 + 60);
+    	this.mockHttpSession.setAttribute("user", legitUser);
     }
 
     private static final int LOKKI_ID = 846;
@@ -41,7 +51,7 @@ public class FieldsControllerTest {
     @SuppressWarnings("unchecked")
 	@Test
     public void testAllGroups() throws Exception {
-    	mockMvc.perform(get("/api/fields/groups"))
+    	mockMvc.perform(get("/api/fields/groups").session(mockHttpSession))
 			.andExpect(status().isOk())
 			.andExpect(content().contentType("application/json;charset=UTF-8"))
 			.andExpect(jsonPath("$.success").value(true))
@@ -58,7 +68,7 @@ public class FieldsControllerTest {
     @SuppressWarnings("unchecked")
 	@Test
     public void testAllFields() throws Exception {
-    	mockMvc.perform(get("/api/fields/all"))
+    	mockMvc.perform(get("/api/fields/all").session(mockHttpSession))
 			.andExpect(status().isOk())
 			.andExpect(content().contentType("application/json;charset=UTF-8"))
 			.andExpect(jsonPath("$.success").value(true))
@@ -74,7 +84,7 @@ public class FieldsControllerTest {
     @SuppressWarnings("unchecked")
 	@Test
     public void testBrowsingGroups() throws Exception {
-    	mockMvc.perform(get("/api/fields/groups/browsing"))
+    	mockMvc.perform(get("/api/fields/groups/browsing").session(mockHttpSession))
 			.andExpect(status().isOk())
 			.andExpect(content().contentType("application/json;charset=UTF-8"))
 			.andExpect(jsonPath("$.success").value(true))
@@ -91,7 +101,7 @@ public class FieldsControllerTest {
     @SuppressWarnings("unchecked")
 	@Test
     public void testBrowsingFields() throws Exception {
-    	mockMvc.perform(get("/api/fields/all/browsing"))
+    	mockMvc.perform(get("/api/fields/all/browsing").session(mockHttpSession))
 			.andExpect(status().isOk())
 			.andExpect(content().contentType("application/json;charset=UTF-8"))
 			.andExpect(jsonPath("$.success").value(true))
@@ -107,7 +117,7 @@ public class FieldsControllerTest {
     @SuppressWarnings("unchecked")
 	@Test
     public void testRingingsGroups() throws Exception {
-    	mockMvc.perform(get("/api/fields/groups/ringings"))
+    	mockMvc.perform(get("/api/fields/groups/ringings").session(mockHttpSession))
 			.andExpect(status().isOk())
 			.andExpect(content().contentType("application/json;charset=UTF-8"))
 			.andExpect(jsonPath("$.success").value(true))
@@ -123,7 +133,7 @@ public class FieldsControllerTest {
     @SuppressWarnings("unchecked")
 	@Test
     public void testRingingsFields() throws Exception {
-    	mockMvc.perform(get("/api/fields/all/ringings"))
+    	mockMvc.perform(get("/api/fields/all/ringings").session(mockHttpSession))
 			.andExpect(status().isOk())
 			.andExpect(content().contentType("application/json;charset=UTF-8"))
 			.andExpect(jsonPath("$.success").value(true))
