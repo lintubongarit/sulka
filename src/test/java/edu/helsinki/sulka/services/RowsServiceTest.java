@@ -4,8 +4,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -103,10 +105,14 @@ public class RowsServiceTest {
 			assertNotNull("Lokki's Kanahaukka ringings in Espoo have Espoo as municipality", row.get(allFields.get("ring")));
 		}
 		
-		List<Row> subset = rowsService.getRows(new long[] {LOKKI_ID}, new String[]{"ESPOO"}, new String[]{KANAHAUKKA}, LOKKI_ESPOO_ACCGEN_RING_PREFIX_SUBSET, null);
-		assertNotNull("Lokki has a subset of Kanahaukka ringings in Espoo", subset);
-		assertTrue("Lokki has a subset of Kanahaukka ringings in Espoo", subset.size() > 0);
-		assertTrue("Subset of Lokki's Kanahaukka ringings in Espoo have less rows than the full list", subset.size() < res.size());
+		List<Row> filtered = rowsService.getRows(new long[] {LOKKI_ID}, new String[]{"ESPOO"}, new String[]{KANAHAUKKA}, LOKKI_ESPOO_ACCGEN_RING_PREFIX_SUBSET, null);
+		assertNotNull("Lokki has a subset of Kanahaukka ringings in Espoo", filtered);
+		
+		Set<Row> subSet = new HashSet<Row>(filtered);
+		Set<Row> superSet = new HashSet<Row>(res);
+		assertTrue("Lokki has a subset of Kanahaukka ringings in Espoo", subSet.size() > 0);
+		assertTrue("Subset of Lokki's Kanahaukka ringings in Espoo has less rows than the full list", subSet.size() < superSet.size());
+		assertTrue("Subset of Lokki's Kanahaukka ringings in Espoo is a subset", superSet.containsAll(subSet));
 		
 		List<Row> sort1 = rowsService.getRows(new long[] {LOKKI_ID}, new String[]{"ESPOO"}, new String[]{KANAHAUKKA}, LOKKI_ESPOO_ACCGEN_RING_PREFIX_SUBSET, new String[]{ "numberOfYoungs" });
 		List<Row> sort2 = rowsService.getRows(new long[] {LOKKI_ID}, new String[]{"ESPOO"}, new String[]{KANAHAUKKA}, LOKKI_ESPOO_ACCGEN_RING_PREFIX_SUBSET, new String[]{ "numberOfYoungs", "species" });
@@ -115,10 +121,23 @@ public class RowsServiceTest {
 		assertNotNull("Special sorted subset has rows", sort2);
 		assertNotNull("Special sorted subset has rows", sort3);
 		
-		assertEquals("Special sorted subset has as many rows as default sorted subset", subset.size(), sort1.size());
-		assertEquals("Special sorted subset has as many rows as default sorted subset", subset.size(), sort2.size());
-		assertEquals("Special sorted subset has as many rows as default sorted subset", subset.size(), sort3.size());
+		assertEquals("Special sorted subset has as many rows as default sorted subset", subSet.size(), sort1.size());
+		assertEquals("Special sorted subset has as many rows as default sorted subset", subSet.size(), sort2.size());
+		assertEquals("Special sorted subset has as many rows as default sorted subset", subSet.size(), sort3.size());
 
+		Set<Row> sortSubset = new HashSet<Row>(sort1);
+		for (Row subsetItem : sortSubset) {
+			assertTrue("Sorted subset of Lokki's Kanahaukka ringings in Espoo is subset of the full list", superSet.contains(subsetItem));
+		}
+		sortSubset = new HashSet<Row>(sort2);
+		for (Row subsetItem : sortSubset) {
+			assertTrue("Sorted subset of Lokki's Kanahaukka ringings in Espoo is subset of the full list", superSet.contains(subsetItem));
+		}
+		sortSubset = new HashSet<Row>(sort3);
+		for (Row subsetItem : sortSubset) {
+			assertTrue("Sorted subset of Lokki's Kanahaukka ringings in Espoo is subset of the full list", superSet.contains(subsetItem));
+		}
+		
 		int lastNumberOfYoungs = Integer.MAX_VALUE;
 		for (Row row : sort1) {
 			String numberOfYoungsValue = row.get("numberOfYoungs");
@@ -128,7 +147,7 @@ public class RowsServiceTest {
 			} else {
 				numberOfYoungs = Integer.parseInt(numberOfYoungsValue);
 			}
-			assertTrue("Query is sroted by numberOfYoungs value", numberOfYoungs <= lastNumberOfYoungs);
+			assertTrue("Query is sorted by numberOfYoungs value", numberOfYoungs <= lastNumberOfYoungs);
 			lastNumberOfYoungs = numberOfYoungs;
 		}
 	}
