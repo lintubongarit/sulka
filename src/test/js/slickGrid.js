@@ -4,7 +4,7 @@ var slickCore = require('../../main/webapp/resources/js/slick.core.js');
 var slickGrid = require('../../main/webapp/resources/js/slick.grid.js');
 
 const correctColumnCount = 33;
-const wantedColumns = ["Rengas-", "-rengas", "Vanha rengas", "Laji", "Henkilö", "Pvm", "Tark", "Klo", "Kunta", "Paikka", "YKJ p.", "YKJ i.", "Tyyppi", "Reng.kiinnitys", "Pyyntitap.", "Toimet", "Ikä", "Peruste", "Sukupuoli", "Määritystapa", "Paino", "Siipi", "Mittaustapa", "Poikueen nro", "Poikasia", "Ikä", "Tarkkuus" ];
+const wantedColumns = ["Rengas", "Nimirengas", "Laji", "Rengastaja", "Pvm", "Klo", "Kunta", "Paikka", "Pyyntitap.", "Toimet", "Ikä", "Peruste", "Sukupuoli", "Määritystapa", "Paino", "Siipi", "Mittaustapa", "Poikueen nro", "Poikasia", "Ikä", "Tarkkuus" ];
 /* Columns to be added: birdStation, kkj_ddmm_lat, kkj_ddmm_lon, kkj_decimal_lat, kkj_decimal_lon, birdCondition*/
 
 
@@ -40,7 +40,7 @@ casper.test.begin('SlickGrid tests', 6, function suite(test) {
 		var columns = this.evaluate(function getColumnsFromDOM() {
 			return window.grid.getColumns();
 		});
-		test.assertEquals(columns.length, correctColumnCount, "Grid has " + correctColumnCount + " columns.");
+		test.assert(columns.length >= correctColumnCount, "Grid has at least " + correctColumnCount + " columns.");
 	});
 
 	casper.then(function testThatGridHasCorrectColumns() {
@@ -59,6 +59,7 @@ casper.test.begin('SlickGrid tests', 6, function suite(test) {
 				}
 			}
 			if(columnHasBeenFound == false){
+				console.warn("Warning: missing column: " + wantedColumns[i]);
 				break;
 			}
 			allColumnsFound = true;

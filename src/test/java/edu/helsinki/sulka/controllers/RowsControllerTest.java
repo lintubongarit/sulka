@@ -59,7 +59,7 @@ public class RowsControllerTest {
 			.andExpect(jsonPath("$.error").value(nullValue()))
 			.andExpect(jsonPath("$.objects").isArray())
 			.andExpect(jsonPath("$.objects", hasSize(greaterThanOrEqualTo(7))))
-			.andExpect(jsonPath("$.objects[*].person", everyItem(equalTo(Integer.toString(LOKKI_ID)))))
+			.andExpect(jsonPath("$.objects[*].ringer", everyItem(equalTo(Integer.toString(LOKKI_ID)))))
 			.andExpect(jsonPath("$.objects[*].municipality", everyItem(equalTo("ESPOO"))))
 			.andReturn();
     	mockMvc.perform(get("/api/rows/ringings?municipality=VANTAA"))
@@ -79,7 +79,7 @@ public class RowsControllerTest {
 			.andExpect(jsonPath("$.error").value(nullValue()))
 			.andExpect(jsonPath("$.objects").isArray())
 			.andExpect(jsonPath("$.objects", hasSize(greaterThanOrEqualTo(2))))
-			.andExpect(jsonPath("$.objects[*].person", everyItem(equalTo(Integer.toString(LOKKI_ID)))))
+			.andExpect(jsonPath("$.objects[*].ringer", everyItem(equalTo(Integer.toString(LOKKI_ID)))))
 			.andExpect(jsonPath("$.objects[*].municipality", everyItem(anyOf(equalTo("VANTAA"), equalTo("ESPOO")))))
 			.andReturn();
 	}
@@ -101,7 +101,7 @@ public class RowsControllerTest {
 			.andExpect(jsonPath("$.error").value(nullValue()))
 			.andExpect(jsonPath("$.objects").isArray())
 			.andExpect(jsonPath("$.objects", hasSize(greaterThanOrEqualTo(7))))
-			.andExpect(jsonPath("$.objects[*].person", everyItem(equalTo(Integer.toString(LOKKI_ID)))))
+			.andExpect(jsonPath("$.objects[*].ringer", everyItem(equalTo(Integer.toString(LOKKI_ID)))))
 			.andExpect(jsonPath("$.objects[*].municipality", everyItem(equalTo("ESPOO"))))
 			.andReturn();
     	mockMvc.perform(get("/api/rows/controls?municipality=VANTAA"))
@@ -111,7 +111,7 @@ public class RowsControllerTest {
 			.andExpect(jsonPath("$.error").value(nullValue()))
 			.andExpect(jsonPath("$.objects").isArray())
 			.andExpect(jsonPath("$.objects", hasSize(greaterThanOrEqualTo(2))))
-			.andExpect(jsonPath("$.objects[*].person", everyItem(equalTo(Integer.toString(LOKKI_ID)))))
+			.andExpect(jsonPath("$.objects[*].ringer", everyItem(equalTo(Integer.toString(LOKKI_ID)))))
 			.andExpect(jsonPath("$.objects[*].municipality", everyItem(equalTo("VANTAA"))))
 			.andReturn();
     	mockMvc.perform(get("/api/rows/controls?municipality=VANTAA&municipality=ESPOO"))
@@ -121,7 +121,7 @@ public class RowsControllerTest {
 			.andExpect(jsonPath("$.error").value(nullValue()))
 			.andExpect(jsonPath("$.objects").isArray())
 			.andExpect(jsonPath("$.objects", hasSize(greaterThanOrEqualTo(2))))
-			.andExpect(jsonPath("$.objects[*].person", everyItem(equalTo(Integer.toString(LOKKI_ID)))))
+			.andExpect(jsonPath("$.objects[*].ringer", everyItem(equalTo(Integer.toString(LOKKI_ID)))))
 			.andExpect(jsonPath("$.objects[*].municipality", everyItem(anyOf(equalTo("VANTAA"), equalTo("ESPOO")))))
 			.andReturn();
 	}
