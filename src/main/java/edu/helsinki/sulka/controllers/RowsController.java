@@ -37,7 +37,7 @@ public class RowsController extends JSONController {
 			@RequestParam(value="ringPrefix", required=false) String ringPrefix,
 			@RequestParam(value="sort", required=false) String[] sort
 			) throws RowsService.QueryException {
-		return new ListResponse<Row>(rowsService.getAllRows(new long[] { 846 }, municipalities, species, ringPrefix, sort));
+		return new ListResponse<Row>(rowsService.getRows(new long[] { 846 }, municipalities, species, ringPrefix, sort));
 	}
 	
 	/**
@@ -52,6 +52,6 @@ public class RowsController extends JSONController {
 			@RequestParam(value="ringPrefix", required=false) String ringPrefix,
 			@RequestParam(value="sort", required=false) String[] sort
 			) throws RowsService.QueryException {
-		return new ListResponse<Row>(rowsService.getAllRows(new long[] { 846 }, municipalities, species, ringPrefix, sort));
+		return new ListResponse<Row>(rowsService.getRows(new long[] { 846 }, municipalities, species, ringPrefix, sort));
 	}
 }

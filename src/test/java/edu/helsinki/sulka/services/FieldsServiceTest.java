@@ -49,15 +49,15 @@ public class FieldsServiceTest {
 		assertNotNull("There is a field group called 'common'", common);
 		assertNotNull("There is a field group called 'place'", place);
 		
-		Field person = null;
+		Field ringer = null;
 		for (Field f : common.getFields()) {
-			if (f.getFieldName().equals("person")) {
-				person = f;
+			if (f.getFieldName().equals("ringer")) {
+				ringer = f;
 				break;
 			}
 		}
-		assertNotNull("The field group 'common' has field for 'person'", person);
-		assertTrue("The field 'person' has type INTEGER", Field.FieldType.INTEGER == person.getType());
+		assertNotNull("The field group 'common' has field for 'ringer'", ringer);
+		assertTrue("The field 'ringer' has type INTEGER", Field.FieldType.INTEGER == ringer.getType());
 		
 		Field municipality = null;
 		for (Field f : place.getFields()) {

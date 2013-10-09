@@ -58,7 +58,7 @@ public class HomeController {
 		model.addAttribute("ringers", ringersService.getAllRingers());
 		
 		try {
-			model.addAttribute("rows", rowsService.getAllRows(new long[]{ 846 }, new String[]{ "ESPOO" }, null, null, null));
+			model.addAttribute("rows", rowsService.getRows(new long[]{ 846 }, new String[]{ "ESPOO" }, null, null, null));
 			model.addAttribute("rowsError", null);
 		} catch (QueryException e) {
 			e.printStackTrace();

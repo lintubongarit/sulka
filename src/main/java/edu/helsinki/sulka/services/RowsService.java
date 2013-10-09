@@ -36,50 +36,31 @@ public class RowsService {
 	
 	@JsonIgnoreProperties(ignoreUnknown=true)
 	private static class RowsResponse {
-		@JsonProperty("values")
-		private String[][] values;
+		@JsonProperty("rows")
+		private Map<String, String>[] rows;
 		
-		@JsonProperty("fields")
-		private String[] fields;
+		@JsonProperty("countOfRows")
+		private long countOfRows;
 		
-		@JsonProperty("countOfValueRows")
-		private long countOfValueRows;
-		
-		@JsonProperty("countOfValueRowsTotal")
-		private long countOfValueRowsTotal;
-		
-		@JsonProperty("page")
-		private long page;
-		
-		@JsonProperty("pageSize")
-		private long pageSize;
+		@JsonProperty("countOfRowsTotal")
+		private long countOfRowsTotal;
 		
 		@JsonProperty("success")
 		private boolean success;
 		
-		@JsonProperty("error")
-		private String error;
+		private static class ErrorDescription {
+			@JsonProperty("localizedErrorText")
+			private String localizedErrorText;
+			
+			@JsonProperty("errorName")
+			private String errorName;
+		}
+		@JsonProperty("errors")
+		private ErrorDescription[] errors;
 		
 		/*
 		 * Accessors
 		 */
-		private List<Field> mappedFields = null;
-		/**
-		 * @param mapper A Map that contains fields by their respective names (i.e. obtained from fieldsService.getAllFieldsByFieldName())
-		 * @return Cached ordered list of fields in this response.
-		 */
-		public List<Field> getMappedFields(final Map<String, Field> mapper) {
-			if (this.mappedFields != null) {
-				return this.mappedFields;
-			}
-			
-			ArrayList<Field> mappedFields = new ArrayList<Field>(fields.length);
-			for (String fieldString : fields) {
-				mappedFields.add(mapper.get(fieldString));
-			}
-			return this.mappedFields = mappedFields;
-		}
-		
 		/**
 		 * @return If this query was successful.
 		 */
@@ -91,21 +72,14 @@ public class RowsService {
 		 * @return Error message
 		 */
 		public String getError() {
-			return error;
-		}
-		
-		/**
-		 * @return Number of all matching rows across all pages.
-		 */
-		public long getNumberOfAllRows() {
-			return countOfValueRowsTotal;
-		}
-		
-		/**
-		 * @return Page size.
-		 */
-		public long getPageSize() {
-			return pageSize;
+			if (isSuccess() || errors == null) return null;
+			String errorString = "";
+			String delimiter = "";
+			for (ErrorDescription ed : errors) {
+				errorString += delimiter + ed.localizedErrorText;
+				delimiter = ", ";
+			}
+			return errorString;
 		}
 	}
 	
@@ -117,79 +91,28 @@ public class RowsService {
 	}
 	
 	/**
-	 * Get all matching rows from the API.
-	 * @param ringerFilters List of ringers IDs to match, or null to return all.
-	 * @param municipalityFilters List of municipality shorthand codes to match, or null to return all.
-	 * @param speciesFilters List of bird species short hand codes to match, or null to return all.
-	 * @param ringPrefixFilter A ring code prefix to match, or null to return all.
-	 * @param sortBy A sort to use, such as [ "ringStart", "date" ], or null to use default sort.
-	 * @return list of rows
-	 * @throws QueryException If the query was not successful (message describes the error)
-	 */
-	public List<Row> getAllRows(final long[] ringerFilters, final String[] municipalityFilters,
-			final String[] speciesFilters, final String ringPrefixFilter, final String[] sortBy)
-			throws QueryException {
-		Map<String, Field> fieldsByFieldName = fieldsService.getAllFieldsByFieldName();
-		
-		int page = 0;
-		RowsResponse response = filterQuery(ringerFilters, municipalityFilters, speciesFilters, ringPrefixFilter, sortBy, 0, page);
-		if (!response.isSuccess()) {
-			throw new QueryException(response.getError());
-		}
-		
-		ArrayList<Row> rows = new ArrayList<Row>((int) response.getNumberOfAllRows());
-		while (true) {
-			for (String[] rowValues : response.values) {
-				Row row = new Row(rowValues.length);
-				for (int i=0; i<rowValues.length; i++) {
-					row.setFieldValue(response.getMappedFields(fieldsByFieldName).get(i), rowValues[i]);
-				}
-				rows.add(row);
-			}
-			
-			// Check if another query is needed to get more pages
-			if (response.values.length == response.getPageSize() && response.getPageSize() * (page+1) < response.getNumberOfAllRows()) {
-				response = filterQuery(ringerFilters, municipalityFilters, speciesFilters, ringPrefixFilter, sortBy, 0, ++page);
-				if (!response.isSuccess()) {
-					throw new QueryException(response.getError());
-				}
-			} else {
-				break;
-			}
-		}
-		
-		return rows;
-	}
-	/**
 	 * Get up to pageSize matching rows with page offset from the API.
 	 * @param ringerFilters List of ringers IDs to match, or null to return all.
 	 * @param municipalityFilters List of municipality shorthand codes to match, or null to return all.
 	 * @param speciesFilters List of bird species short hand codes to match, or null to return all.
 	 * @param ringPrefixFilter A ring code prefix to match, or null to return all.
 	 * @param sortBy A sort to use, such as [ "ringStart", "date" ], or null to use default sort.
-	 * @param pageSize Maximum number of results to return, or non-positive to use default.
-	 * @param page Page offset, or non-positive to return the first page.
 	 * @return list of rows
 	 * @throws QueryException If the query was not successful (message describes the error)
 	 */
 	public List<Row> getRows(final long[] ringerFilters, final String[] municipalityFilters,
-			final String[] speciesFilters, final String ringPrefixFilter, final String[] sortBy,
-			final int pageSize, final int page)
+			final String[] speciesFilters, final String ringPrefixFilter, final String[] sortBy)
 			throws QueryException {
 		Map<String, Field> fieldsByFieldName = fieldsService.getAllFieldsByFieldName();
 		
-		RowsResponse response = filterQuery(ringerFilters, municipalityFilters, speciesFilters, ringPrefixFilter, sortBy, pageSize, page);
+		RowsResponse response = filterQuery(ringerFilters, municipalityFilters, speciesFilters, ringPrefixFilter, sortBy);
 		if (!response.isSuccess()) {
 			throw new QueryException(response.getError());
 		}
 		
-		ArrayList<Row> rows = new ArrayList<Row>(response.values.length);
-		for (String[] rowValues : response.values) {
-			Row row = new Row(rowValues.length);
-			for (int i=0; i<rowValues.length; i++) {
-				row.setFieldValue(response.getMappedFields(fieldsByFieldName).get(i), rowValues[i]);
-			}
-			rows.add(row);
+		ArrayList<Row> rows = new ArrayList<Row>(response.rows.length);
+		for (Map<String, String> rowValues : response.rows) {
+			rows.add(new Row(rowValues, fieldsByFieldName));
 		}
 		
 		return rows;
@@ -255,8 +178,7 @@ public class RowsService {
 	 * @return API response to this query
 	 */
 	private RowsResponse filterQuery(final long[] ringerFilters, final String[] municipalityFilters,
-			final String[] speciesFilters, final String ringPrefixFilter, final String[] sortBy,
-			final int pageSize, final int page) {
+			final String[] speciesFilters, final String ringPrefixFilter, final String[] sortBy) {
 		String query = "";
 		String nextParamSeparator = "";
 		
@@ -286,16 +208,6 @@ public class RowsService {
 		
 		if (sortBy != null) {
 			query += nextParamSeparator + "sortBy=" + URIStringJoin(sortBy, ',');
-			nextParamSeparator = "&";
-		}
-		
-		if (pageSize > 0) {
-			query += nextParamSeparator + "pageSize=" + Integer.toString(pageSize);
-			nextParamSeparator = "&";
-		}
-		
-		if (page > 1) {
-			query += nextParamSeparator + "page=" + Integer.toString(page);
 			nextParamSeparator = "&";
 		}
 		
