@@ -58,33 +58,20 @@
 		<script src="resources/js/jquery-1.7.min.js"></script>
 		<script src="resources/js/jquery.event.drag-2.2.js"></script>
 		<script src="resources/js/slick.core.js"></script>
-		<script src="resources/js/slick.grid.js"></script>		
-		
+		<script src="resources/js/slick.grid.js"></script>
+		<script src="resources/js/sulka.js"></script>
+
 		<script>
 			var grid;
-			var fields = new Array();
 			var gridData = new Array();
-			$.getJSON("api/fields/groups", function(json){
-				$.each(json.objects, function(index, fieldGroup){
-					fieldsInGroup = fieldGroup['fields'];
-					$.each(fieldsInGroup, function(indexB, field){
-						var columnHeader = {
-							id: field['field'],
-							name: field['name'],
-							field: field['field']
-						};
-						fields.push(columnHeader);
-					});
-				});
-				
-				var options = {
-						enableCellNavigation: true,
-						enableColumnReorder: false
-				};
-				$(function () {
-					var data = [];
-					grid = new Slick.Grid("#slick-grid", data, fields, options);
-				});
+			var fields = sulka.fetchFields();
+			var options = {
+					enableCellNavigation: true,
+					enableColumnReorder: false
+			};
+			$(function () {
+				var data = [];
+				grid = new Slick.Grid("#slick-grid", data, fields, options);
 			});
 		</script>
 	</body>
