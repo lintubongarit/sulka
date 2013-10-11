@@ -14,7 +14,7 @@
 		<table id="global-toolbar" class="global-toolbar">
 			<tr class="global-toolbar">
 				<td class="global-toolbar">
-					<span class="global-toolbar-app-title">Rengas14</span>
+					<span class="global-toolbar-app-title">Sulka</span>
 					<ul id="feature-list" class="feature-list-tabs"></ul>
 				</td>
 				<td class="global-toolbar global-toolbar-user-info">
