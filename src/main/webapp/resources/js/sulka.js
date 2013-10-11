@@ -1,19 +1,15 @@
 var sulka = {
 	grid: null,
-	gridData: new Array(),
-	gridFields: {}, 
 	gridOptions: {
 		enableCellNavigation: true,
 		enableColumnReorder: false
 	},
 	
 	initGrid: function (){
-		this.gridFields = this.fetchFields();
-		this.gridData = this.fetchRingings({municipality:'ESPOO'});
 		this.grid = new Slick.Grid(
 									"#slick-grid",
-									this.gridData,
-									this.gridFields,
+									this.fetchRingings({municipality:'ESPOO'}),
+									this.fetchFields(),
 									this.gridOptions
 									);
 	},

@@ -8,7 +8,7 @@ const wantedColumns = ["Rengas", "Nimirengas", "Laji", "Rengastaja", "Pvm", "Klo
 /* Columns to be added: birdStation, kkj_ddmm_lat, kkj_ddmm_lon, kkj_decimal_lat, kkj_decimal_lon, birdCondition*/
 
 
-casper.test.begin('SlickGrid tests', 9, function suite(test) {
+casper.test.begin('SlickGrid tests', 8, function suite(test) {
 	casper.options.logLevel = "debug";
 	casper.options.verbose =  true;
 	casper.options.timeout = 600000;
@@ -67,19 +67,11 @@ casper.test.begin('SlickGrid tests', 9, function suite(test) {
 		test.assertEquals(allColumnsFound, true, "Grid has got all wanted columns.");
 	});
 
-	casper.then(function testThatGridDataVariableIsInitialized() {
-		var gridData = this.evaluate(function getGridDataFromDOM() {
-			return window.sulka.gridData;
+	casper.then(function testThatGridDataIsEmptyAfterInit() {
+		var rowCount = this.evaluate(function getRowsFromDOM() {
+			return window.sulka.grid.getDataLength();
 		});
-		test.assertInstanceOf(gridData, Array, "SlickGrids data-variable is initialized.");
-
-	});
-
-	casper.then(function testThatGridDataIsNotEmptyAfterInit() {
-		var response = this.evaluate(function getRowsFromDOM() {
-			return window.sulka.gridData;
-		});
-		test.assertNotEquals(response, null, "Working query returns something.");
+		test.assertNotEquals(rowCount, 0, "Working query returns something.");
 	});
 
 	casper.then(function testThatChangedMunicipalityFilterAndOkChangesGridData() {
