@@ -86,7 +86,7 @@ casper.test.begin('SlickGrid tests', 9, function suite(test) {
 		var oldData= this.evaluate(function getRowsFromDOM() {
 			return window.sulka.grid.getData();
 		});
-		this.fill('form[id="tiedot"]', { municipality: 'VANTAA' }, true);
+		this.fill('form[id="filters"]', { municipality: 'VANTAA' }, true);
 		var newData = this.evaluate(function getRowsFromDOM() {
 			return window.sulka.grid.getData();
 		}).length;

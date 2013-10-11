@@ -33,7 +33,7 @@
 			}
 		</script>
 		<div class="local-toolbar">
-			<form id="tiedot">
+			<form id="filters">
 				Rengastaja: <input type="text" name="ringer">
 				Vuosi (esim. 2005 tai 2005-2006): <input type="text" name="year">
 				Laji: <input type="text" name="species">

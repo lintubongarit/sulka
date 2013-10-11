@@ -7,27 +7,27 @@ casper.test.begin('Uitests', 9, function suite(test) {
         	test.assertTitle("Sulka", "Title is 'Sulka'");
     	});
 	
-	casper.then(function tiedotform() {
-		test.assertExists('form[id="tiedot"]', 'Slick-page has a form with name "tiedot"');		
+	casper.then(function filtersform() {
+		test.assertExists('form[id="filters"]', 'Slick-page has a form with name "filters"');
 	});
 
 	casper.then(function ringerFieldExists() {
-		this.fill('form[id="tiedot"]', { ringer: '846' }, false);
-		test.assertField('ringer', '846');	
+		this.fill('form[id="filters"]', { ringer: '846' }, false);
+		test.assertField('ringer', '846');
 	});
 
 	casper.then(function yearFieldExists() {
-		this.fill('form[id="tiedot"]', { year: '1990'}, false);			
-		test.assertField('year', '1990');	
+		this.fill('form[id="filters"]', { year: '1990'}, false);
+		test.assertField('year', '1990');
 	});
 
 	casper.then(function speciesFieldExists() {
-		this.fill('form[id="tiedot"]', { species: 'SYLCOM'}, false);			
-		test.assertField('species', 'SYLCOM');	
+		this.fill('form[id="filters"]', { species: 'SYLCOM'}, false);
+		test.assertField('species', 'SYLCOM');
 	});
 
 	casper.then(function municipalityFieldExists() {
-		this.fill('form[id="tiedot"]', { municipality: 'HAUHO'}, false);
+		this.fill('form[id="filters"]', { municipality: 'HAUHO'}, false);
 		test.assertField('municipality', 'HAUHO');
 	});
 	
