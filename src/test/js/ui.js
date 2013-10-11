@@ -7,8 +7,8 @@ casper.test.begin('Uitests', 9, function suite(test) {
         	test.assertTitle("Sulka", "Title is 'Sulka'");
     	});
 	
-	casper.then(function filtersform() {
-		test.assertExists('form[id="filters"]', 'Slick-page has a form with name "filters"');
+	casper.then(function filtersFormExists() {
+		test.assertExists('form[id="filters"]', 'Slick-page has a form with name "filters".');
 	});
 
 	casper.then(function ringerFieldExists() {
