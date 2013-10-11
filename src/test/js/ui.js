@@ -26,9 +26,9 @@ casper.test.begin('Uitests', 9, function suite(test) {
 		test.assertField('species', 'SYLCOM');	
 	});
 
-	casper.then(function stateFieldExists() {
-		this.fill('form[id="tiedot"]', { state: 'HAUHO'}, false);			
-		test.assertField('state', 'HAUHO');	
+	casper.then(function municipalityFieldExists() {
+		this.fill('form[id="tiedot"]', { municipality: 'HAUHO'}, false);
+		test.assertField('municipality', 'HAUHO');
 	});
 	
 	casper.then(function peruutaButtonExists(){

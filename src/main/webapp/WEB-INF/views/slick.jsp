@@ -37,7 +37,7 @@
 				Rengastaja: <input type="text" name="ringer">
 				Vuosi (esim. 2005 tai 2005-2006): <input type="text" name="year">
 				Laji: <input type="text" name="species">
-				Kunta: <input type="text" name="state">
+				Kunta: <input type="text" name="municipality">
 				<input id="ok" type="button" onclick="sulka.reloadData()" value="Ok">
 				<input id="peru" type="button" onclick="formReset()" value="Peruuta">
 			</form>
