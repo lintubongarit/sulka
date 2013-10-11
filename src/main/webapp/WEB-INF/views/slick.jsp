@@ -33,15 +33,14 @@
 			}
 		</script>
 		<div class="local-toolbar">
-				
-						<form id="tiedot">
-								Rengastaja: <input type="text" name="ringer">
-								Vuosi (esim. 2005 tai 2005-2006): <input type="text" name="year">
-								Laji: <input type="text" name="species">
-								Kunta: <input type="text" name="state">
-								<input id="ok" type="button" onclick="loadJSONDoc()" value="Ok">
-								<input id="peru" type="button" onclick="formReset()" value="Peruuta">
-						</form>
+			<form id="tiedot">
+				Rengastaja: <input type="text" name="ringer">
+				Vuosi (esim. 2005 tai 2005-2006): <input type="text" name="year">
+				Laji: <input type="text" name="species">
+				Kunta: <input type="text" name="state">
+				<input id="ok" type="button" onclick="sulka.reloadData()" value="Ok">
+				<input id="peru" type="button" onclick="formReset()" value="Peruuta">
+			</form>
 		</div>
 	
 		
