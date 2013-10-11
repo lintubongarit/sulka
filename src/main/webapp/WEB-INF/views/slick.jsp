@@ -27,19 +27,19 @@
 			</tr>
 		</table>
 		
-		<script>
-			function formReset(){
-				document.getElementById("tiedot").reset();
-			}
-		</script>
 		<div class="local-toolbar">
+			<script>
+				function clearForm() {
+					document.getElementById("filters").reset();
+				}
+			</script>
 			<form id="filters">
 				Rengastaja: <input type="text" name="ringer">
 				Vuosi (esim. 2005 tai 2005-2006): <input type="text" name="year">
 				Laji: <input type="text" name="species">
 				Kunta: <input type="text" name="municipality">
-				<input id="ok" type="button" onclick="window.sulka.reloadData(this.form)" value="Ok">
-				<input id="peru" type="button" onclick="formReset()" value="Peruuta">
+				<button id="ok" type="button" onclick="window.sulka.reloadData(this.form)">Ok</button>
+				<button id="tyhjenna" type="button" onclick="clearForm()">Tyhjennä</button>
 			</form>
 		</div>
 	

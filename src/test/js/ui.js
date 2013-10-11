@@ -1,4 +1,4 @@
-casper.test.begin('Uitests', 9, function suite(test) {
+casper.test.begin('Uitests', 13, function suite(test) {
 	casper.options.timeout = 600000;
 	casper.options.logLevel = "debug";
 	casper.options.verbose = true;
@@ -32,12 +32,27 @@ casper.test.begin('Uitests', 9, function suite(test) {
 	});
 	
 	casper.then(function peruutaButtonExists(){
-		this.test.assertExists('#peru', 'the peruuta filter button exists');
+		this.test.assertExists('#tyhjenna', 'The "Tyhjennä" filter button exists.');
 });
 
 	casper.then(function okButtonExists(){
-		this.test.assertExists('#ok', 'the ok filter button exists');
+		this.test.assertExists('#ok', 'The "Ok" filter button exists.');
 });
+
+	casper.then(function testTyhjennaButtonClearsFields(){
+		this.fill('form[id="filters"]', {
+			ringer: '1234',
+			year: '12345',
+			species: 'ABCD',
+			municipality: 'Kerava'
+			}, false);
+		this.click('button[id="tyhjenna"]');	
+		formValues = this.getFormValues('form[id="filters"]');
+		for( filter in formValues){
+			test.assertEquals(formValues[filter], "", 'The "' + filter + ' field is cleared.'); 	
+		}
+	});
+
     	casper.run(function () {
         	test.done();
    	});
