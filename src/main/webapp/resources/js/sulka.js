@@ -62,5 +62,15 @@ var sulka = {
 			}
 		});
 		return rows;
+	},
+	
+	reloadData: function (form) {
+		console.log("Reloading...");
+		filters = {
+				municipality: form.municipality.value.toUpperCase() //Kannassa nimet isoin kirjaimin
+		};
+		this.grid.setData(this.fetchRingings(filters));
+		this.grid.render();
+
 	}
 };

@@ -38,7 +38,7 @@
 				Vuosi (esim. 2005 tai 2005-2006): <input type="text" name="year">
 				Laji: <input type="text" name="species">
 				Kunta: <input type="text" name="municipality">
-				<input id="ok" type="button" onclick="sulka.reloadData()" value="Ok">
+				<input id="ok" type="button" onclick="window.sulka.reloadData(this.form)" value="Ok">
 				<input id="peru" type="button" onclick="formReset()" value="Peruuta">
 			</form>
 		</div>

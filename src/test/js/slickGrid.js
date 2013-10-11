@@ -8,7 +8,7 @@ const wantedColumns = ["Rengas", "Nimirengas", "Laji", "Rengastaja", "Pvm", "Klo
 /* Columns to be added: birdStation, kkj_ddmm_lat, kkj_ddmm_lon, kkj_decimal_lat, kkj_decimal_lon, birdCondition*/
 
 
-casper.test.begin('SlickGrid tests', 8, function suite(test) {
+casper.test.begin('SlickGrid tests', 9, function suite(test) {
 	casper.options.logLevel = "debug";
 	casper.options.verbose =  true;
 	casper.options.timeout = 600000;
@@ -80,6 +80,17 @@ casper.test.begin('SlickGrid tests', 8, function suite(test) {
 			return window.sulka.gridData;
 		});
 		test.assertNotEquals(response, null, "Working query returns something.");
+	});
+
+	casper.then(function testThatChangedMunicipalityFilterAndOkChangesGridData() {
+		var oldData= this.evaluate(function getRowsFromDOM() {
+			return window.sulka.grid.getData();
+		});
+		this.fill('form[id="tiedot"]', { municipality: 'VANTAA' }, true);
+		var newData = this.evaluate(function getRowsFromDOM() {
+			return window.sulka.grid.getData();
+		}).length;
+		test.assertNotEquals(oldData, newData, "SlickGrid has been updated.");
 	});
 
     casper.run(function () {
