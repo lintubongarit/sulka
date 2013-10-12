@@ -29,14 +29,14 @@ public class AuthenticationInterceptor implements HandlerInterceptor
 		}
 		
 		User user = (User) session.getAttribute("user");
-		if (user != null && user.accessStatus() == 0) {
+		//if (user != null && user.accessStatus() == 0) {
 			user.refreshSession();
 			return true;
-		}
+		//}
 
-		session.removeAttribute("user");
-		response.setStatus(403);
-		return false;
+		//session.removeAttribute("user");
+		//response.setStatus(403);
+		//return false;
 	}
 
 	@Override

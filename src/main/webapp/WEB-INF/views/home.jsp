@@ -30,13 +30,14 @@
 				<tr>
 					<th>Rengastaja</th>
 					<th>Lajikoodi</th>
-					<th>Laji</th>
+					<th>P‰iv‰m‰‰r‰</th>
 				</tr>
 				<c:forEach var="row" items="${rows}">
 					<tr>
 						<td><c:out value="${row.ringer}" /></td>
-						<td><c:out value="${row.speciesCode}" /></td>
-						<td><c:out value="${row.speciesFullName}" /></td>
+						<td><c:out value="${row.species}" /></td><%-- <c:out value="${row.speciesCode}" /></td> --%>
+						<td><c:out value="${row.eventDate}" /></td>
+						<%-- <td><c:out value="${row.speciesFullName}" /></td> --%>
 					</tr>
 				</c:forEach>
 			</table>

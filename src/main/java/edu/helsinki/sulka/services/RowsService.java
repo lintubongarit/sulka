@@ -215,6 +215,8 @@ public class RowsService {
 		try {
 			url = new URI(apiService.getURLForPath("/ringing/rows"));
 			url = new URI(url.getScheme(), url.getUserInfo(), url.getHost(), url.getPort(), url.getPath(), query, url.getFragment());
+			logger.info(url.toString());
+			logger.info(apiService.getUsername());
 		} catch (URISyntaxException e) {
 			throw new Error(e);
 		}
