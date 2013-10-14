@@ -75,11 +75,15 @@ var sulka = {
 var apufunktiot = {
 		parseDate: function (date){
 			var isFourDigitYear = /^[0-9]{4}$/;
+			var isExactDate = /^[0-3][0-9].[0-3][0-9].[1,2][8,9,0][0-9][0-9]$/;
+			
 			if(isFourDigitYear.test(date)){
 				return {
 					startDate: '1.1.' + date,
 					endDate: '31.12.' + date,
 				};
+			} else if(isExactDate.test(date)){
+				return { startDate: date, endDate: ''};
 			}
 			return "";
 		},
