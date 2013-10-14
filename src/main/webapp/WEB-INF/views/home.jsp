@@ -1,14 +1,10 @@
+<%@ page pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <html>
 <head>
 <title>Home</title>
 </head>
 <body>
-	<h1>Hello world!</h1>
-
-	<p>The time on the server is ${serverTime}.</p>
-
-
 	<c:choose>
 		<c:when test="${user.accessStatus() == 0}">
 			<font color="green" size="20">Welcome fellow ringer!</font>
@@ -30,14 +26,15 @@
 				<tr>
 					<th>Rengastaja</th>
 					<th>Lajikoodi</th>
-					<th>P‰iv‰m‰‰r‰</th>
+					<th>Lajin nimi</th>
+					<th>P√§iv√§m√§√§r√§</th>
 				</tr>
 				<c:forEach var="row" items="${rows}">
 					<tr>
 						<td><c:out value="${row.ringer}" /></td>
-						<td><c:out value="${row.species}" /></td><%-- <c:out value="${row.speciesCode}" /></td> --%>
+						<td><c:out value="${row.species}" /></td>
+						<td><c:out value="${row.speciesFullName}" /></td>
 						<td><c:out value="${row.eventDate}" /></td>
-						<%-- <td><c:out value="${row.speciesFullName}" /></td> --%>
 					</tr>
 				</c:forEach>
 			</table>

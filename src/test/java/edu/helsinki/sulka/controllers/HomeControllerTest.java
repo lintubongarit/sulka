@@ -63,7 +63,6 @@ public class HomeControllerTest {
     	mockMvc.perform(get("/").session(mockHttpSession))
     		.andExpect(view().name(equalTo("home")))
     		.andExpect(status().isOk())
-    		.andExpect(model().attributeExists("serverTime"))
     		.andExpect(model().attribute("ringers", arrayWithSize(greaterThan(1000))))
     		.andReturn();
 	}
