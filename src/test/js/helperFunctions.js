@@ -1,4 +1,4 @@
-casper.test.begin('HelperFunctionTests', 4, function suite(test) {
+casper.test.begin('HelperFunctionTests', 5, function suite(test) {
 	casper.options.logLevel = "debug";
 	casper.options.verbose =  true;
 	casper.options.timeout = 600000;
@@ -7,6 +7,15 @@ casper.test.begin('HelperFunctionTests', 4, function suite(test) {
     	;
     });
 
+	casper.then(function emptyStringIsParsedCorrectly() {
+		var parsedDate = this.evaluate(function (){
+			return window.apufunktiot.parseDate("");
+		});
+		test.assertEquals(parsedDate,
+						{startDate: '', endDate: ''}, 
+						"Empty string is correctly parsed.");
+	});
+	
 	casper.then(function fourDigitYearNumberIsParsedCorrectly() {
 		var parsedDate = this.evaluate(function (){
 			return window.apufunktiot.parseDate("2009");
