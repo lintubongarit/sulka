@@ -47,7 +47,7 @@ public class HomeController {
 		try {
 			model.addAttribute("rows", rowsService.getRows(
 					user.getRingerIdAsArray(), new String[]{ "ESPOO" }, null, null,
-					LocalDate.now().minusMonths(3), LocalDate.now(), null));
+					LocalDate.now().minusYears(20), LocalDate.now(), null));
 			model.addAttribute("rowsError", null);
 		} catch (QueryException e) {
 			e.printStackTrace();

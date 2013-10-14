@@ -38,7 +38,7 @@
 				Laji: <input type="text" name="species">
 				Kunta: <input type="text" name="municipality">
 				<button id="ok" type="button" onclick="window.sulka.reloadData(this.form)">Ok</button>
-				<button id="tyhjenna" type="button" onclick="clearForm()">Tyhjenn‰</button>
+				<button id="tyhjenna" type="button" onclick="clearForm()">Tyhjenn√§</button>
 			</form>
 		</div>
 	
