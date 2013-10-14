@@ -28,7 +28,7 @@ public class RowsController extends JSONController {
 	/**
 	 * Returns ringing rows by filters.
 	 */
-	@RequestMapping(value = "/api/rows/ringings", method = RequestMethod.GET)
+	@RequestMapping(value = "/api/rows/ringings", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	@ResponseBody
 	public ListResponse<Row> ringings(
 			Locale locale, Model model,
@@ -43,7 +43,7 @@ public class RowsController extends JSONController {
 	/**
 	 * Returns control rows by filters.
 	 */
-	@RequestMapping(value = "/api/rows/controls", method = RequestMethod.GET)
+	@RequestMapping(value = "/api/rows/controls", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	@ResponseBody
 	public ListResponse<Row> controls(
 			Locale locale, Model model,
