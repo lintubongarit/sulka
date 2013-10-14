@@ -71,3 +71,16 @@ var sulka = {
 
 	}
 };
+
+var apufunktiot = {
+		parseDate: function (date){
+			var isFourDigitYear = /^[0-9]{4}$/;
+			if(isFourDigitYear.test(date)){
+				return {
+					startDate: '1.1.' + date,
+					endDate: '31.12.' + date,
+				};
+			}
+			return "";
+		},
+};
