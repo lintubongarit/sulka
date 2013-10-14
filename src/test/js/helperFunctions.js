@@ -3,7 +3,7 @@ casper.test.begin('HelperFunctionTests', 5, function suite(test) {
 	casper.options.verbose =  true;
 	casper.options.timeout = 600000;
 	
-	browse('/slick', function browseToSlickPage() {
+	browse('/', function browseToSlickPage() {
     	;
     });
 

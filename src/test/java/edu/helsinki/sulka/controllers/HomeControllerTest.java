@@ -1,10 +1,7 @@
 package edu.helsinki.sulka.controllers;
 
-import static org.hamcrest.Matchers.arrayWithSize;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.greaterThan;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
@@ -59,9 +56,8 @@ public class HomeControllerTest {
     @Test
     public void testHome() throws Exception {
     	mockMvc.perform(get("/").session(goodHttpSession))
-    		.andExpect(view().name(equalTo("home")))
+    		.andExpect(view().name(equalTo("slick")))
     		.andExpect(status().isOk())
-    		.andExpect(model().attribute("ringers", arrayWithSize(greaterThan(1000))))
     		.andReturn();
     	
     	mockMvc.perform(get("/"))

@@ -12,7 +12,7 @@ casper.test.begin('SlickGrid tests', 10, function suite(test) {
 	casper.options.logLevel = "debug";
 	casper.options.verbose =  true;
 	casper.options.timeout = 600000;
-    browse('/slick', function browseToSlickPage() {
+    browse('/', function browseToSlickPage() {
     	;
     });
 

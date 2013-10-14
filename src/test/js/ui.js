@@ -2,7 +2,7 @@ casper.test.begin('Uitests', 13, function suite(test) {
 	casper.options.timeout = 600000;
 	casper.options.logLevel = "debug";
 	casper.options.verbose = true;
-    browse('/slick', function () {
+    browse('/', function () {
         test.assertHttpStatus(200, "HTTP status is OK");
         test.assertTitle("Sulka", "Title is 'Sulka'");
     });
