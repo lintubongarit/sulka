@@ -1,11 +1,10 @@
 package edu.helsinki.sulka.controllers;
 
-import java.text.DateFormat;
-import java.util.Date;
 import java.util.Locale;
 
 import javax.servlet.http.HttpSession;
 
+import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -47,7 +46,8 @@ public class HomeController {
 		
 		try {
 			model.addAttribute("rows", rowsService.getRows(
-					new long[]{ Long.parseLong(user.getLogin_id()) }, new String[]{ "ESPOO" }, null, null, null));
+					user.getRingerIdAsArray(), new String[]{ "ESPOO" }, null, null,
+					LocalDate.now().minusMonths(3), LocalDate.now(), null));
 			model.addAttribute("rowsError", null);
 		} catch (QueryException e) {
 			e.printStackTrace();
