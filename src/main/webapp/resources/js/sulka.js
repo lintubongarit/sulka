@@ -1,4 +1,4 @@
-var sulka = {
+var sulka = function (){ var sulka = {
 	grid: null,
 	gridOptions: {
 		enableCellNavigation: true,
@@ -6,11 +6,11 @@ var sulka = {
 	},
 	
 	initGrid: function (){
-		this.grid = new Slick.Grid(
+		sulka.grid = new Slick.Grid(
 									"#slick-grid",
-									this.fetchRingings({}),
-									this.fetchFields(),
-									this.gridOptions
+									sulka.fetchRingings({}),
+									sulka.fetchFields(),
+									sulka.gridOptions
 									);
 	},
 		
@@ -69,13 +69,13 @@ var sulka = {
 		};
 		var parsedDate = apufunktiot.parseDate(form.year.value);
 		for (var attrname in parsedDate) {filters[attrname] = parsedDate[attrname]; }
-		this.grid.setData(this.fetchRingings(filters));
-		this.grid.render();
+		sulka.grid.setData(sulka.fetchRingings(filters));
+		sulka.grid.render();
 
 	}
-};
+}; return sulka; }();
 
-var apufunktiot = {
+var apufunktiot = function (){ var apufunktiot = {
 		parseDate: function (date){
 			
 			var regAlku = /^/;
@@ -97,4 +97,7 @@ var apufunktiot = {
 			}
 			return {startDate: "", endDate: ""};
 		},
-};
+}; return apufunktiot; }();
+
+/* Launch initGrid() on DOM complete */
+$(sulka.initGrid);

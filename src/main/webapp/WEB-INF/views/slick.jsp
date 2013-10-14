@@ -5,9 +5,14 @@
 	<head>
 		<title>Sulka</title>
 		<link rel="stylesheet" href="resources/css/slick.grid.css" type="text/css" />
-		<link rel="stylesheet" href="resources/css/example.css" type="text/css" />
+		<!-- <link rel="stylesheet" href="resources/css/examples.css" type="text/css" /> -->
 		<link rel="stylesheet" href="resources/css/jquery-ui-1.8.16.custom.css" type="text/css" />
 		<link rel="stylesheet" href="resources/css/sulka.css" type="text/css" />
+		<script src="resources/js/jquery-1.7.min.js"></script>
+		<script src="resources/js/jquery.event.drag-2.2.js"></script>
+		<script src="resources/js/slick.core.js"></script>
+		<script src="resources/js/slick.grid.js"></script>
+		<script src="resources/js/sulka.js"></script>
 	</head>
 	<body>
 		<table id="global-toolbar" class="global-toolbar">
@@ -37,7 +42,7 @@
 				Vuosi (esim. 2005 tai 2005-2006): <input type="text" name="year">
 				Laji: <input type="text" name="species">
 				Kunta: <input type="text" name="municipality">
-				<button id="ok" type="button" onclick="window.sulka.reloadData(this.form)">Ok</button>
+				<button id="ok" type="button" onclick="sulka.reloadData(this.form)">Ok</button>
 				<button id="tyhjenna" type="button" onclick="clearForm()">Tyhjennä</button>
 			</form>
 		</div>
@@ -52,15 +57,5 @@
 		</div>
 		
 		<form id="tiedot"></form><!-- Added here just to make tests not fail -->
-		
-		<script src="resources/js/jquery-1.7.min.js"></script>
-		<script src="resources/js/jquery.event.drag-2.2.js"></script>
-		<script src="resources/js/slick.core.js"></script>
-		<script src="resources/js/slick.grid.js"></script>
-		<script src="resources/js/sulka.js"></script>
-
-		<script>
-			sulka.initGrid();
-		</script>
 	</body>
 </html>
