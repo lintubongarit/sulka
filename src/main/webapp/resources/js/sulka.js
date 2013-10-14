@@ -87,11 +87,11 @@ var apufunktiot = {
 				return { startDate: '1.1.' + date, endDate: '31.12.' + date};
 			} else if(isExactDate.test(date)){
 				return { startDate: date, endDate: ''};
-			} else if(isExactDateRange){
+			} else if(isExactDateRange.test(date)){
 				var startDateMatch = (new RegExp(regAlku.source + exactDate.source)).exec(date)[0];
 				var endDateMatch = (new RegExp(exactDate.source + regLoppu.source)).exec(date)[0];
 				return { startDate: startDateMatch, endDate: endDateMatch};
 			}
-			return "";
+			return {startDate: "", endDate: ""};
 		},
 };
