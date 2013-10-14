@@ -75,7 +75,7 @@ var sulka = {
 var apufunktiot = {
 		parseDate: function (date){
 			var isFourDigitYear = /^[0-9]{4}$/;
-			var isExactDate = /^[0-3][0-9].[0-3][0-9].[1,2][8,9,0][0-9][0-9]$/;
+			var isExactDate = /^[0-3]{0,1}[0-9].[0-3]{0,1}[0-9].[1,2][8,9,0][0-9][0-9]$/;
 			
 			if(isFourDigitYear.test(date)){
 				return {
