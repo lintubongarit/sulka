@@ -8,7 +8,7 @@ const wantedColumns = ["Rengas", "Nimirengas", "Laji", "Rengastaja", "Pvm", "Klo
 /* Columns to be added: birdStation, kkj_ddmm_lat, kkj_ddmm_lon, kkj_decimal_lat, kkj_decimal_lon, birdCondition*/
 
 
-casper.test.begin('SlickGrid tests', 8, function suite(test) {
+casper.test.begin('SlickGrid tests', 9, function suite(test) {
 	casper.options.logLevel = "debug";
 	casper.options.verbose =  true;
 	casper.options.timeout = 600000;
@@ -85,6 +85,15 @@ casper.test.begin('SlickGrid tests', 8, function suite(test) {
 		test.assertNotEquals(oldData, newData, "SlickGrid has been updated.");
 	});
 
+	casper.then(function testThatSpeciesFilterLimitsResults() {
+		this.fill('form[id="filters"]', { municipality: 'Hauho', species: 'BUBBUB'}, false);
+		this.click('button[id="ok"]');
+		var rowCount = this.evaluate(function getRowCountFromDOM() {
+			return window.sulka.grid.getDataLength();
+		});
+		test.assertTruthy(rowCount > 0, "Species filter works.");
+	})
+	
     casper.run(function () {
         test.done();
     });

@@ -63,7 +63,8 @@ var sulka = {
 	reloadData: function (form) {
 		console.log("Reloading...");
 		filters = {
-				municipality: form.municipality.value.toUpperCase() //Kannassa nimet isoin kirjaimin
+				municipality: form.municipality.value.toUpperCase(), //Kannassa nimet isoin kirjaimin
+				species: form.species.value,
 		};
 		this.grid.setData(this.fetchRingings(filters));
 		this.grid.render();
