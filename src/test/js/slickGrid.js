@@ -71,14 +71,14 @@ casper.test.begin('SlickGrid tests', 8, function suite(test) {
 		var rowCount = this.evaluate(function getRowsFromDOM() {
 			return window.sulka.grid.getDataLength();
 		});
-		test.assertNotEquals(rowCount, 0, "Working query returns something.");
+		test.assertEquals(rowCount, 0, "Grid is empty after init.");
 	});
 
 	casper.then(function testThatChangedMunicipalityFilterAndOkChangesGridData() {
 		var oldData= this.evaluate(function getRowsFromDOM() {
 			return window.sulka.grid.getData();
 		});
-		this.fill('form[id="filters"]', { municipality: 'VANTAA' }, true);
+		this.fill('form[id="filters"]', { municipality: 'VANTAA', }, true);
 		var newData = this.evaluate(function getRowsFromDOM() {
 			return window.sulka.grid.getData();
 		}).length;
