@@ -8,7 +8,7 @@ var sulka = {
 	initGrid: function (){
 		this.grid = new Slick.Grid(
 									"#slick-grid",
-									this.fetchRingings({municipality:'ESPOO'}),
+									this.fetchRingings({}),
 									this.fetchFields(),
 									this.gridOptions
 									);
