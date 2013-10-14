@@ -88,7 +88,7 @@ casper.test.begin('SlickGrid tests', 9, function suite(test) {
 	});
 
 	casper.then(function testThatSpeciesFilterLimitsResults() {
-		this.fill('form[id="filters"]', { municipality: 'Hauho', species: 'BUBBUB'}, false);
+		this.fill('form[id="filters"]', { municipality: 'Hauho', species: 'bubbub'}, false);
 		this.click('button[id="ok"]');
 		var rowCount = this.evaluate(function getRowCountFromDOM() {
 			return window.sulka.grid.getDataLength();
