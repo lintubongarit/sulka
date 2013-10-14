@@ -8,11 +8,12 @@ const wantedColumns = ["Rengas", "Nimirengas", "Laji", "Rengastaja", "Pvm", "Klo
 /* Columns to be added: birdStation, kkj_ddmm_lat, kkj_ddmm_lon, kkj_decimal_lat, kkj_decimal_lon, birdCondition*/
 
 
-casper.test.begin('SlickGrid tests', 6, function suite(test) {
+casper.test.begin('SlickGrid tests', 9, function suite(test) {
 	casper.options.logLevel = "debug";
 	casper.options.verbose =  true;
 	casper.options.timeout = 600000;
     browse('/slick', function browseToSlickPage() {
+    	;
     });
 
 	casper.then(function testHTTPStatusIsOk() {
@@ -31,21 +32,21 @@ casper.test.begin('SlickGrid tests', 6, function suite(test) {
 
 	casper.then(function testThatColumnVariableIsNotNull() {
 		var columns = this.evaluate(function getColumnsFromDOM() {
-			return window.grid.getColumns();
+			return window.sulka.grid.getColumns();
 		});
 		test.assertNotEquals(columns, null, "Column variable is not null.");
 	});
 
 	casper.then(function testThatColumnVariableHasRightAmountOfColumns() {
 		var columns = this.evaluate(function getColumnsFromDOM() {
-			return window.grid.getColumns();
+			return window.sulka.grid.getColumns();
 		});
 		test.assert(columns.length >= correctColumnCount, "Grid has at least " + correctColumnCount + " columns.");
 	});
 
 	casper.then(function testThatGridHasCorrectColumns() {
 		var columns = this.evaluate(function getColumnsFromDOM() {
-			return window.grid.getColumns();
+			return window.sulka.grid.getColumns();
 		});
 
 		var allColumnsFound = false;
@@ -56,7 +57,7 @@ casper.test.begin('SlickGrid tests', 6, function suite(test) {
 				if(wantedColumns[i] == columns[j]['name']){
 					columnHasBeenFound = true;
 					break;
-				}
+				};
 			}
 			if(columnHasBeenFound == false){
 				console.warn("Warning: missing column: " + wantedColumns[i]);
@@ -67,6 +68,34 @@ casper.test.begin('SlickGrid tests', 6, function suite(test) {
 		test.assertEquals(allColumnsFound, true, "Grid has got all wanted columns.");
 	});
 
+	casper.then(function testThatGridDataIsEmptyAfterInit() {
+		var rowCount = this.evaluate(function getRowCountFromDOM() {
+			return window.sulka.grid.getDataLength();
+		});
+		test.assertEquals(rowCount, 0, "Grid is empty after init.");
+	});
+
+	casper.then(function testThatChangedMunicipalityFilterAndOkChangesGridData() {
+		var oldData= this.evaluate(function getRowsFromDOM() {
+			return window.sulka.grid.getData();
+		});
+		this.fill('form[id="filters"]', { municipality: 'VANTAA', }, false);
+		this.click('button[id="ok"]');
+		var newData = this.evaluate(function getRowsFromDOM() {
+			return window.sulka.grid.getData();
+		}).length;
+		test.assertNotEquals(oldData, newData, "SlickGrid has been updated.");
+	});
+
+	casper.then(function testThatSpeciesFilterLimitsResults() {
+		this.fill('form[id="filters"]', { municipality: 'Hauho', species: 'BUBBUB'}, false);
+		this.click('button[id="ok"]');
+		var rowCount = this.evaluate(function getRowCountFromDOM() {
+			return window.sulka.grid.getDataLength();
+		});
+		test.assertTruthy(rowCount > 0, "Species filter works.");
+	})
+	
     casper.run(function () {
         test.done();
     });

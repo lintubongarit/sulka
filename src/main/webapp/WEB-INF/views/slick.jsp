@@ -13,7 +13,7 @@
 		<table id="global-toolbar" class="global-toolbar">
 			<tr class="global-toolbar">
 				<td class="global-toolbar">
-					<span class="global-toolbar-app-title">Rengas14</span>
+					<span class="global-toolbar-app-title">Sulka</span>
 					<ul id="feature-list" class="feature-list-tabs"></ul>
 				</td>
 				<td class="global-toolbar global-toolbar-user-info">
@@ -26,21 +26,20 @@
 			</tr>
 		</table>
 		
-		<script>
-			function formReset(){
-				document.getElementById("tiedot").reset();
-			}
-		</script>
 		<div class="local-toolbar">
-				
-						<form id="tiedot">
-								Rengastaja: <input type="text" name="ringer">
-								Vuosi (esim. 2005 tai 2005-2006): <input type="text" name="year">
-								Laji: <input type="text" name="species">
-								Kunta: <input type="text" name="state">
-								<input id="ok" type="button" onclick="loadJSONDoc()" value="Ok">
-								<input id="peru" type="button" onclick="formReset()" value="Peruuta">
-						</form>
+			<script>
+				function clearForm() {
+					document.getElementById("filters").reset();
+				}
+			</script>
+			<form id="filters">
+				Rengastaja: <input type="text" name="ringer">
+				Vuosi (esim. 2005 tai 2005-2006): <input type="text" name="year">
+				Laji: <input type="text" name="species">
+				Kunta: <input type="text" name="municipality">
+				<button id="ok" type="button" onclick="window.sulka.reloadData(this.form)">Ok</button>
+				<button id="tyhjenna" type="button" onclick="clearForm()">Tyhjennä</button>
+			</form>
 		</div>
 	
 		
@@ -57,33 +56,11 @@
 		<script src="resources/js/jquery-1.7.min.js"></script>
 		<script src="resources/js/jquery.event.drag-2.2.js"></script>
 		<script src="resources/js/slick.core.js"></script>
-		<script src="resources/js/slick.grid.js"></script>		
-		
+		<script src="resources/js/slick.grid.js"></script>
+		<script src="resources/js/sulka.js"></script>
+
 		<script>
-			var grid;
-			var fields = new Array();
-			$.getJSON("api/fields/groups/browsing", function(json){
-				$.each(json.objects, function(index, fieldGroup){
-					fieldsInGroup = fieldGroup['fields'];
-					$.each(fieldsInGroup, function(indexB, field){
-						var columnHeader = {
-							id: field['field'],
-							name: field['name'],
-							field: field['field']
-						};
-						fields.push(columnHeader);
-					});
-				});
-				
-				var options = {
-						enableCellNavigation: true,
-						enableColumnReorder: false
-				};
-				$(function () {
-					var data = [];
-					grid = new Slick.Grid("#slick-grid", data, fields, options);
-				});
-			});
+			sulka.initGrid();
 		</script>
 	</body>
 </html>
