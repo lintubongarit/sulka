@@ -65,7 +65,10 @@ var sulka = {
 		filters = {
 				municipality: form.municipality.value.toUpperCase(), //Kannassa nimet isoin kirjaimin
 				species: form.species.value,
+				
 		};
+		var parsedDate = apufunktiot.parseDate(form.year.value);
+		for (var attrname in parsedDate) {filters[attrname] = parsedDate[attrname]; }
 		this.grid.setData(this.fetchRingings(filters));
 		this.grid.render();
 
