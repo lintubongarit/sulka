@@ -84,10 +84,7 @@ var apufunktiot = {
 			var isExactDateRange = new RegExp(regAlku.source + exactDate.source + /\s*-\s*/.source + exactDate.source + regLoppu.source);
 			
 			if(isFourDigitYear.test(date)){
-				return {
-					startDate: '1.1.' + date,
-					endDate: '31.12.' + date,
-				};
+				return { startDate: '1.1.' + date, endDate: '31.12.' + date};
 			} else if(isExactDate.test(date)){
 				return { startDate: date, endDate: ''};
 			} else if(isExactDateRange){

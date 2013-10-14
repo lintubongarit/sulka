@@ -2,10 +2,10 @@ casper.test.begin('Uitests', 13, function suite(test) {
 	casper.options.timeout = 600000;
 	casper.options.logLevel = "debug";
 	casper.options.verbose = true;
-    	browse('/slick', function () {
-        	test.assertHttpStatus(200, "HTTP status is OK");
-        	test.assertTitle("Sulka", "Title is 'Sulka'");
-    	});
+    browse('/slick', function () {
+        test.assertHttpStatus(200, "HTTP status is OK");
+        test.assertTitle("Sulka", "Title is 'Sulka'");
+    });
 	
 	casper.then(function filtersFormExists() {
 		test.assertExists('form[id="filters"]', 'Slick-page has a form with name "filters".');
@@ -33,11 +33,11 @@ casper.test.begin('Uitests', 13, function suite(test) {
 	
 	casper.then(function peruutaButtonExists(){
 		this.test.assertExists('#tyhjenna', 'The "Tyhjennä" filter button exists.');
-});
+	});
 
 	casper.then(function okButtonExists(){
 		this.test.assertExists('#ok', 'The "Ok" filter button exists.');
-});
+	});
 
 	casper.then(function testTyhjennaButtonClearsFields(){
 		this.fill('form[id="filters"]', {
@@ -52,8 +52,8 @@ casper.test.begin('Uitests', 13, function suite(test) {
 			test.assertEquals(formValues[filter], "", 'The "' + filter + ' field is cleared.'); 	
 		}
 	});
-
-    	casper.run(function () {
-        	test.done();
+	
+    casper.run(function () {
+        test.done();
    	});
 });
