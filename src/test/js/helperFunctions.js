@@ -1,4 +1,4 @@
-casper.test.begin('HelperFunctionTests', 3, function suite(test) {
+casper.test.begin('HelperFunctionTests', 4, function suite(test) {
 	casper.options.logLevel = "debug";
 	casper.options.verbose =  true;
 	casper.options.timeout = 600000;
@@ -32,6 +32,15 @@ casper.test.begin('HelperFunctionTests', 3, function suite(test) {
 		test.assertEquals(parsedDate,
 						{startDate: '4.7.2005', endDate: ''},
 						"Exact date with one digit date and month is parsed correctly.");
+	});
+	
+	casper.then(function exactDateRangeIsParsedCorrectly() {
+		var parsedDate = this.evaluate(function (){
+			return window.apufunktiot.parseDate("3.6.2005 - 5.6.2006");
+		});
+		test.assertEquals(parsedDate,
+						{startDate: '3.6.2005', endDate: '5.6.2006'},
+						"Exact date range is parsed correctly.");
 	});
 	
 	casper.run(function () {
