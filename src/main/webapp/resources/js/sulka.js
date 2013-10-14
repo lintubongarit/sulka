@@ -71,3 +71,27 @@ var sulka = {
 
 	}
 };
+
+var apufunktiot = {
+		parseDate: function (date){
+			
+			var regAlku = /^/;
+			var regLoppu = /$/;
+			var exactDate = /[0-3]{0,1}\d.[0-3]{0,1}\d.[1,2][8,9,0]\d{2}/;
+			
+			var isFourDigitYear = /^\d{4}$/;
+			var isExactDate = new RegExp(regAlku.source + exactDate.source + regLoppu.source);
+			var isExactDateRange = new RegExp(regAlku.source + exactDate.source + /\s*-\s*/.source + exactDate.source + regLoppu.source);
+			
+			if(isFourDigitYear.test(date)){
+				return { startDate: '1.1.' + date, endDate: '31.12.' + date};
+			} else if(isExactDate.test(date)){
+				return { startDate: date, endDate: ''};
+			} else if(isExactDateRange){
+				var startDateMatch = (new RegExp(regAlku.source + exactDate.source)).exec(date)[0];
+				var endDateMatch = (new RegExp(exactDate.source + regLoppu.source)).exec(date)[0];
+				return { startDate: startDateMatch, endDate: endDateMatch};
+			}
+			return "";
+		},
+};
