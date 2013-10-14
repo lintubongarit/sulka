@@ -13,6 +13,7 @@ casper.test.begin('SlickGrid tests', 9, function suite(test) {
 	casper.options.verbose =  true;
 	casper.options.timeout = 600000;
     browse('/slick', function browseToSlickPage() {
+    	;
     });
 
 	casper.then(function testHTTPStatusIsOk() {
@@ -56,7 +57,7 @@ casper.test.begin('SlickGrid tests', 9, function suite(test) {
 				if(wantedColumns[i] == columns[j]['name']){
 					columnHasBeenFound = true;
 					break;
-				}
+				};
 			}
 			if(columnHasBeenFound == false){
 				console.warn("Warning: missing column: " + wantedColumns[i]);
@@ -68,7 +69,7 @@ casper.test.begin('SlickGrid tests', 9, function suite(test) {
 	});
 
 	casper.then(function testThatGridDataIsEmptyAfterInit() {
-		var rowCount = this.evaluate(function getRowsFromDOM() {
+		var rowCount = this.evaluate(function getRowCountFromDOM() {
 			return window.sulka.grid.getDataLength();
 		});
 		test.assertEquals(rowCount, 0, "Grid is empty after init.");
@@ -78,7 +79,8 @@ casper.test.begin('SlickGrid tests', 9, function suite(test) {
 		var oldData= this.evaluate(function getRowsFromDOM() {
 			return window.sulka.grid.getData();
 		});
-		this.fill('form[id="filters"]', { municipality: 'VANTAA', }, true);
+		this.fill('form[id="filters"]', { municipality: 'VANTAA', }, false);
+		this.click('button[id="ok"]');
 		var newData = this.evaluate(function getRowsFromDOM() {
 			return window.sulka.grid.getData();
 		}).length;
