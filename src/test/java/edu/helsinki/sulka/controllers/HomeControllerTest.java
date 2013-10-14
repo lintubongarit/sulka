@@ -34,47 +34,42 @@ public class HomeControllerTest {
     
     private MockMvc mockMvc;
     
-    private MockHttpSession mockHttpSession;
+    private MockHttpSession badHttpSession;
+    private MockHttpSession goodHttpSession;
     
-    private User legitUser;
-    
-    private User falseUser;
-
     @Before
     public void setup() {
     	this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).build();
-    	this.mockHttpSession = new MockHttpSession();
     	
-    	legitUser = new User();
+    	this.goodHttpSession = new MockHttpSession();
+    	User legitUser = new User();
     	legitUser.setPass(true);
+    	legitUser.setLogin_id("10020");
     	legitUser.setExpires_at(System.currentTimeMillis() / 1000 + 60);
+    	this.goodHttpSession.setAttribute("user", legitUser);
     	
-    	falseUser = new User();
-    	falseUser.setPass(true);
+    	this.badHttpSession = new MockHttpSession();
+    	User falseUser = new User();
+    	falseUser.setPass(false);
+    	legitUser.setLogin_id("10020");
     	falseUser.setExpires_at(System.currentTimeMillis() / 1000 - 60);
+    	this.badHttpSession.setAttribute("user", falseUser);
     }
 
     @Test
     public void testHome() throws Exception {
-    	
-    	
-    	this.mockHttpSession.setAttribute("user", legitUser);
-    	
-    	mockMvc.perform(get("/").session(mockHttpSession))
+    	mockMvc.perform(get("/").session(goodHttpSession))
     		.andExpect(view().name(equalTo("home")))
     		.andExpect(status().isOk())
-    		.andExpect(model().attributeExists("serverTime"))
     		.andExpect(model().attribute("ringers", arrayWithSize(greaterThan(1000))))
     		.andReturn();
-	}
-    @Test
-    public void testHomeRedirectsToLoginWithFalseSession() throws Exception {
     	
+    	mockMvc.perform(get("/"))
+			.andExpect(status().isForbidden())
+			.andReturn();
     	
-    	this.mockHttpSession.setAttribute("user", falseUser);
-    	
-    	mockMvc.perform(get("/").session(mockHttpSession))
-    		//.andExpect(view().name(equalTo("login")))
+    	mockMvc.perform(get("/").session(badHttpSession))
+    		.andExpect(status().isForbidden())
     		.andReturn();
 	}
 }

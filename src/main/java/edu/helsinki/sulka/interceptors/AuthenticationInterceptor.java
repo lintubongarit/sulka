@@ -17,10 +17,20 @@ public class AuthenticationInterceptor implements HandlerInterceptor
 	@Autowired
 	private Logger logger;
 	
+	// Set to true to temporarily use fake sessions while developing locally
+	private static final boolean useFakeSession = false;
+	
+	public static boolean getUseFakeSession() {
+		return useFakeSession;
+	}
+	
 	@Override
 	public boolean preHandle(HttpServletRequest request,
 			HttpServletResponse response, Object arg2) throws Exception {
-
+		if (useFakeSession) {
+			return setupFakeSession(request);
+		}
+		
 		HttpSession session = request.getSession(false);
 
 		if (session == null) {
@@ -37,6 +47,18 @@ public class AuthenticationInterceptor implements HandlerInterceptor
 		session.removeAttribute("user");
 		response.setStatus(403);
 		return false;
+	}
+	
+	private boolean setupFakeSession(HttpServletRequest request) {
+		User user = new User();
+		user.setLogin_id("10020");
+		user.setPass(true);
+		user.setExpires_at(System.currentTimeMillis() / 1000 + 99999);
+		
+		HttpSession session = request.getSession(true);
+		session.setAttribute("user", user);
+		
+		return true;
 	}
 
 	@Override
