@@ -31,6 +31,27 @@ public class RowsController extends JSONController {
 	private RowsService rowsService;
 
 	/**
+	 * Returns all rows by filters.
+	 */
+	@RequestMapping(value = "/api/rows", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+	@ResponseBody
+	public ListResponse<Row> all(
+			Locale locale, Model model, HttpSession session,
+			@RequestParam(value="municipality", required=false) String[] municipalities,
+			@RequestParam(value="species", required=false) String[] species,
+			@RequestParam(value="ringPrefix", required=false) String ringPrefix,
+			@RequestParam(value="startDate", required=false) @DateTimeFormat(pattern="dd.MM.YYYY") LocalDate startDate,
+			@RequestParam(value="endDate", required=false) @DateTimeFormat(pattern="dd.MM.YYYY") LocalDate endDate,
+			@RequestParam(value="sort", required=false) String[] sort
+			) throws RowsService.QueryException {
+		return new ListResponse<Row>(rowsService.getRows(
+				((User) session.getAttribute("user")).getRingerIdAsArray(),
+				municipalities, species, ringPrefix,
+				startDate, endDate,
+				sort));
+	}
+	
+	/**
 	 * Returns ringing rows by filters.
 	 */
 	@RequestMapping(value = "/api/rows/ringings", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
