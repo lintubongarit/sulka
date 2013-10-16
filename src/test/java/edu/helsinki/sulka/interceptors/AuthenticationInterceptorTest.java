@@ -9,7 +9,7 @@ public class AuthenticationInterceptorTest {
 	@Test
 	public void testGetUseFakeSession() {
 		assertFalse("AuthenticationInterceptor is not configured to use fake session",
-				AuthenticationInterceptor.getUseFakeSession());
+				AuthenticationInterceptor.getCreateFakeSession());
 	}
 
 }
