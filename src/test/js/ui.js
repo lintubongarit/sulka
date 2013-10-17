@@ -29,10 +29,10 @@ casper.test.begin('Uitests', 20, function suite(test) {
 			test.assertField('species', 'SYLCOM', "Species field exists");
 		});
 	
-		casper.then(function () {
-			this.fill('form#filters', { municipality: 'HAUHO'}, false);
-			test.assertField('municipality', 'HAUHO', "Municipality field exists");
-		});
+		/*casper.then(function () {
+			this.fill('form#filters', { ringings: true}, false);
+			test.assertField('ringings', true, "Ringings checkbox exists");
+		});*/
 		
 		casper.then(function (){
 			this.test.assertExists('form#filters input#form-reset[type=reset][value=Tyhjennä]',

@@ -21,7 +21,7 @@
 		<table id="global-toolbar" class="global-toolbar">
 			<tr class="global-toolbar">
 				<td>
-					<img src="<c:url value="resources/other/luonnontieteellinen_keskusmuseo.gif"/>"></img>
+					<img src="<c:url value="resources/img/luonnontieteellinen_keskusmuseo.gif"/>"></img>
 				</td>
 				<!-- <td class="global-toolbar">
 					<span class="global-toolbar-app-title">Sulka</span>
@@ -40,7 +40,7 @@
 					<a class="global-toolbar-lintuvaara-button" href="logout">Palaa Lintuvaaraan</a>
 				</td>
 				<td>
-					<img src="<c:url value="resources/other/sulka_logo.png"/>" style="height:91px;"></img>
+					<img src="<c:url value="resources/img/sulka_logo.png"/>" style="height:91px;"></img>
 				</td>
 			</tr>
 		</table>
@@ -53,6 +53,8 @@
 				Kunta: <input type="text" id="filters-municipality" name="municipality" />
 				<input type="submit" id="form-submit" value="OK" />
 				<input type="reset" id="form-reset" value="Tyhjennä" />
+				<input type="checkbox" id="filters-ringings" value="ringings"/> Rengastukset
+				<input type="checkbox" id="filters-recoveries" value="ringings" /> Tapaamiset
 				<span id="last-error"></span>
 				<img src="resources/img/ajax-loader.gif" id="loader-animation" />
 			</form>
