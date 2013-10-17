@@ -119,4 +119,24 @@ public class User {
 	public void refreshSession() {
 		setExpires_at(System.currentTimeMillis() / 1000 + refreshIncrementInMinutes * 60);
 	}
+	
+	public long getRingerId() {
+		if (getLogin_id() != null) {
+			try {
+				return Long.parseLong(getLogin_id());
+			}
+			catch (NumberFormatException e) {
+				return -1;
+			}
+		}
+		return -1;
+	}
+	
+	private long[] ringerIdArray = null;
+	public long[] getRingerIdAsArray() {
+		if (ringerIdArray == null) {
+			ringerIdArray = new long[]{ getRingerId() };
+		}
+		return ringerIdArray;
+	}
 }

@@ -1,9 +1,6 @@
 package edu.helsinki.sulka.controllers;
 
-import static org.hamcrest.Matchers.arrayWithSize;
-import static org.hamcrest.Matchers.greaterThan;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.Before;
@@ -67,9 +64,9 @@ public class LoginControllerTest {
 	}
     
     @Test
-    public void testLoginIsOkWithAllAuthVariables() throws Exception {
+    public void testLoginRedirectsWithAllAuthVariables() throws Exception {
     	mockMvc.perform(get("/login?key=test&iv=test&data=test"))
-    		.andExpect(status().isOk())
+    		.andExpect(status().isFound())
     		.andReturn();
 	}
 

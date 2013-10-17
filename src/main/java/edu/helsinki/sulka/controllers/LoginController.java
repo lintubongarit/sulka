@@ -36,7 +36,7 @@ public class LoginController {
 	public String login(Model model, @RequestParam String key, @RequestParam String iv, @RequestParam String data) {
 		User user = authService.auth(key, iv, data);
 		model.addAttribute("user", user);
-		return "login";
+		return "redirect:/";
 	}
 
 	/**

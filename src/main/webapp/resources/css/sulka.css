@@ -145,10 +145,6 @@ ul.feature-list-tabs li a:hover {
     width: 200px;
 }
 
-.throbber {
-    background: white url('resources/other/throbber.gif') no-repeat center;
-}
-
 #slick-grid {
     position: absolute;
     left: 0;
@@ -157,4 +153,11 @@ ul.feature-list-tabs li a:hover {
     top: 138px;
     vertical-align: middle;
     text-align: center;
+}
+
+span#last-error {
+	color: red;
+}
+img#loader-animation {
+	vertical-align: text-bottom;
 }

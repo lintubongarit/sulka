@@ -17,14 +17,56 @@ public class AuthenticationInterceptor implements HandlerInterceptor
 	@Autowired
 	private Logger logger;
 	
+	// Set to true to temporarily create fake sessions while developing locally
+	private static final boolean createFakeSession = false;
+	
+	public static boolean getCreateFakeSession() {
+		return createFakeSession;
+	}
+	
 	@Override
 	public boolean preHandle(HttpServletRequest request,
 			HttpServletResponse response, Object arg2) throws Exception {
 		
+//		User user = new User();
+//		user.setLogin_id("10020");
+//		user.setName("Gerhardt von Gyndth");
+//		user.setEmail("lintu.bongarit@gmail.com");
+//		user.setPass(true);
+//		user.setExpires_at(System.currentTimeMillis() / 1000 + 99999);
+//		
+//		HttpSession session = request.getSession(true);
+//		session.setAttribute("user", user);
+//		
+//		return true;
+		
+		//kommentoi kaikki allaoleva pois ja kommentoi ylläoleva päälle
+
+		HttpSession session = request.getSession(false);
+
+		if (session == null) {
+			if (createFakeSession) {
+				return setupFakeSession(request);
+			} else {
+				response.setStatus(403);
+				return false;
+			}
+		}
+		
+		User user = (User) session.getAttribute("user");
+		if (user != null && user.accessStatus() == 0) {
+			user.refreshSession();
+			return true;
+		}
+
+		session.removeAttribute("user");
+		response.setStatus(403);
+		return false;
+	}
+	
+	private boolean setupFakeSession(HttpServletRequest request) {
 		User user = new User();
-		user.setLogin_id("10020");
-		user.setName("Gerhardt von Gyndth");
-		user.setEmail("lintu.bongarit@gmail.com");
+		user.setLogin_id("846");
 		user.setPass(true);
 		user.setExpires_at(System.currentTimeMillis() / 1000 + 99999);
 		
@@ -32,25 +74,6 @@ public class AuthenticationInterceptor implements HandlerInterceptor
 		session.setAttribute("user", user);
 		
 		return true;
-		
-		//kommentoi kaikki allaoleva pois ja kommentoi ylläoleva päälle
-
-//		HttpSession session = request.getSession(false);
-//
-//		if (session == null) {
-//			response.setStatus(403);
-//			return false;
-//		}
-//		
-//		User user = (User) session.getAttribute("user");
-//		if (user != null && user.accessStatus() == 0) {
-//			user.refreshSession();
-//			return true;
-//		}
-//
-//		session.removeAttribute("user");
-//		response.setStatus(403);
-//		return false;
 	}
 
 	@Override

@@ -1,13 +1,21 @@
+<%@ page pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-
 <!DOCTYPE HTML>
 <html>
 	<head>
 		<title>Sulka</title>
-		<link rel="stylesheet" href="resources/css/slick.grid.css" type="text/css" />
-		<link rel="stylesheet" href="resources/css/example.css" type="text/css" />
-		<link rel="stylesheet" href="resources/css/jquery-ui-1.8.16.custom.css" type="text/css" />
+		<link rel="stylesheet" href="resources/css/lib/slick.grid.css" type="text/css" />
+		<!-- <link rel="stylesheet" href="resources/css/examples.css" type="text/css" /> -->
 		<link rel="stylesheet" href="resources/css/sulka.css" type="text/css" />
+		<script src="resources/js/lib/jquery-1.7.min.js"></script>
+		<script src="resources/js/lib/jquery.event.drag-2.2.js"></script>
+		<script src="resources/js/lib/slick.core.js"></script>
+		<script src="resources/js/lib/slick.grid.js"></script>
+		<script src="resources/js/lib/moment.min.js"></script>
+		<script src="resources/js/sulka.core.js"></script>
+		<script src="resources/js/sulka.strings.js"></script>
+		<script src="resources/js/sulka.API.js"></script>
+		<script src="resources/js/sulka.helpers.js"></script>
 	</head>
 	<body>
 		<table id="global-toolbar" class="global-toolbar">
@@ -38,18 +46,15 @@
 		</table>
 		
 		<div class="local-toolbar">
-			<script>
-				function clearForm() {
-					document.getElementById("filters").reset();
-				}
-			</script>
 			<form id="filters">
-				Rengastaja: <input type="text" name="ringer">
-				Vuosi (esim. 2005 tai 2005-2006): <input type="text" name="year">
-				Laji: <input type="text" name="species">
-				Kunta: <input type="text" name="municipality">
-				<button id="ok" type="button" onclick="window.sulka.reloadData(this.form)">Ok</button>
-				<button id="tyhjenna" type="button" onclick="clearForm()">Tyhjennä</button>
+				Rengastaja: <input type="text" id="filters-ringer" name="ringer" />
+				Aika (esim. 2005 tai 2005-2006): <input type="text" id="filters-date" name="date" />
+				Laji: <input type="text" id="filters-species" name="species" />
+				Kunta: <input type="text" id="filters-municipality" name="municipality" />
+				<input type="submit" id="form-submit" value="OK" />
+				<input type="reset" id="form-reset" value="TyhjennÃ¤" />
+				<span id="last-error"></span>
+				<img src="resources/img/ajax-loader.gif" id="loader-animation" />
 			</form>
 		</div>
 	
@@ -63,15 +68,5 @@
 		</div>
 		
 		<form id="tiedot"></form><!-- Added here just to make tests not fail -->
-		
-		<script src="resources/js/jquery-1.7.min.js"></script>
-		<script src="resources/js/jquery.event.drag-2.2.js"></script>
-		<script src="resources/js/slick.core.js"></script>
-		<script src="resources/js/slick.grid.js"></script>
-		<script src="resources/js/sulka.js"></script>
-
-		<script>
-			sulka.initGrid();
-		</script>
 	</body>
 </html>

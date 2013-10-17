@@ -37,32 +37,43 @@ public class RowsControllerTest {
     private WebApplicationContext wac;
     
     private MockMvc mockMvc;
-    private MockHttpSession mockHttpSession;
+    private MockHttpSession lokkiHttpSession;
+    private MockHttpSession testUserHttpSession;
 
+    private static final int LOKKI_ID = 846;
+    private static final int TEST_ID = 10020;
+    
     @Before
     public void setup() {
     	this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).build();
-    	this.mockHttpSession = new MockHttpSession();
+    	this.lokkiHttpSession = new MockHttpSession();
     	
-    	User legitUser = new User();
-    	legitUser.setPass(true);
-    	legitUser.setExpires_at(System.currentTimeMillis() / 1000 + 60);
-    	this.mockHttpSession.setAttribute("user", legitUser);
+    	User lokki = new User();
+    	lokki.setPass(true);
+    	lokki.setLogin_id(Integer.toString(LOKKI_ID));
+    	lokki.setExpires_at(System.currentTimeMillis() / 1000 + 60);
+    	this.lokkiHttpSession.setAttribute("user", lokki);
+    	
+    	this.testUserHttpSession = new MockHttpSession();
+    	
+    	User testUser = new User();
+    	testUser.setLogin_id(Integer.toString(TEST_ID));
+    	testUser.setPass(true);
+    	testUser.setExpires_at(System.currentTimeMillis() / 1000 + 60);
+    	this.testUserHttpSession.setAttribute("user", testUser);
     }
 
-    private static final int LOKKI_ID = 846;
-    
     @SuppressWarnings("unchecked")
 	@Test
-    public void testRingings() throws Exception {
+    public void testAll() throws Exception {
     	/* These tests need to run as Heikki Lokki */
-    	mockMvc.perform(get("/api/rows/ringings").session(mockHttpSession))
+    	mockMvc.perform(get("/api/rows").session(lokkiHttpSession))
     		.andExpect(status().isBadRequest())
     		.andExpect(content().contentType("application/json;charset=UTF-8"))
     		.andExpect(jsonPath("$.success").value(false))
     		.andExpect(jsonPath("$.error").value(notNullValue()))
     		.andReturn();
-    	mockMvc.perform(get("/api/rows/ringings?municipality=ESPOO").session(mockHttpSession))
+    	mockMvc.perform(get("/api/rows?municipality=ESPOO").session(lokkiHttpSession))
 			.andExpect(status().isOk())
 			.andExpect(content().contentType("application/json;charset=UTF-8"))
 			.andExpect(jsonPath("$.success").value(true))
@@ -72,7 +83,7 @@ public class RowsControllerTest {
 			.andExpect(jsonPath("$.objects[*].ringer", everyItem(equalTo(Integer.toString(LOKKI_ID)))))
 			.andExpect(jsonPath("$.objects[*].municipality", everyItem(equalTo("ESPOO"))))
 			.andReturn();
-    	mockMvc.perform(get("/api/rows/ringings?municipality=VANTAA").session(mockHttpSession))
+    	mockMvc.perform(get("/api/rows?municipality=VANTAA").session(lokkiHttpSession))
 			.andExpect(status().isOk())
 			.andExpect(content().contentType("application/json;charset=UTF-8"))
 			.andExpect(jsonPath("$.success").value(true))
@@ -82,7 +93,173 @@ public class RowsControllerTest {
 			.andExpect(jsonPath("$.objects[*].person", everyItem(equalTo(Integer.toString(LOKKI_ID)))))
 			.andExpect(jsonPath("$.objects[*].municipality", everyItem(equalTo("VANTAA"))))
 			.andReturn();
-    	mockMvc.perform(get("/api/rows/ringings?municipality=VANTAA&municipality=ESPOO").session(mockHttpSession))
+    	mockMvc.perform(get("/api/rows?municipality=VANTAA&municipality=ESPOO").session(lokkiHttpSession))
+			.andExpect(status().isOk())
+			.andExpect(content().contentType("application/json;charset=UTF-8"))
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.error").value(nullValue()))
+			.andExpect(jsonPath("$.objects").isArray())
+			.andExpect(jsonPath("$.objects", hasSize(greaterThanOrEqualTo(2))))
+			.andExpect(jsonPath("$.objects[*].ringer", everyItem(equalTo(Integer.toString(LOKKI_ID)))))
+			.andExpect(jsonPath("$.objects[*].municipality", everyItem(anyOf(equalTo("VANTAA"), equalTo("ESPOO")))))
+			.andReturn();
+    	
+    	/* These need to run as test user */
+    	mockMvc.perform(get("/api/rows?municipality=INKOO").session(testUserHttpSession))
+			.andExpect(status().isOk())
+			.andExpect(content().contentType("application/json;charset=UTF-8"))
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.error").value(nullValue()))
+			.andExpect(jsonPath("$.objects").isArray())
+			.andExpect(jsonPath("$.objects", hasSize(greaterThanOrEqualTo(7))))
+			.andExpect(jsonPath("$.objects[*].ringer", everyItem(equalTo(Integer.toString(TEST_ID)))))
+			.andExpect(jsonPath("$.objects[*].municipality", everyItem(equalTo("INKOO"))))
+			.andReturn();
+    	mockMvc.perform(get("/api/rows?municipality=MHAMN").session(testUserHttpSession))
+			.andExpect(status().isOk())
+			.andExpect(content().contentType("application/json;charset=UTF-8"))
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.error").value(nullValue()))
+			.andExpect(jsonPath("$.objects").isArray())
+			.andExpect(jsonPath("$.objects", hasSize(greaterThanOrEqualTo(2))))
+			.andExpect(jsonPath("$.objects[*].ringer", everyItem(equalTo(Integer.toString(TEST_ID)))))
+			.andExpect(jsonPath("$.objects[*].municipality", everyItem(equalTo("MHAMN"))))
+			.andReturn();
+    	mockMvc.perform(get("/api/rows?municipality=MHAMN&municipality=INKOO").session(testUserHttpSession))
+			.andExpect(status().isOk())
+			.andExpect(content().contentType("application/json;charset=UTF-8"))
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.error").value(nullValue()))
+			.andExpect(jsonPath("$.objects").isArray())
+			.andExpect(jsonPath("$.objects", hasSize(greaterThanOrEqualTo(2))))
+			.andExpect(jsonPath("$.objects[*].ringer", everyItem(equalTo(Integer.toString(TEST_ID)))))
+			.andExpect(jsonPath("$.objects[*].municipality", everyItem(anyOf(equalTo("MHAMN"), equalTo("INKOO")))))
+			.andReturn();
+    	mockMvc.perform(get("/api/rows?municipality=MHAMN&municipality=INKOO&startDate=13.6.1974").session(testUserHttpSession))
+			.andExpect(status().isOk())
+			.andExpect(content().contentType("application/json;charset=UTF-8"))
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.error").value(nullValue()))
+			.andExpect(jsonPath("$.objects").isArray())
+			.andExpect(jsonPath("$.objects", hasSize(greaterThanOrEqualTo(2))))
+			.andExpect(jsonPath("$.objects[*].ringer", everyItem(equalTo(Integer.toString(TEST_ID)))))
+			.andExpect(jsonPath("$.objects[*].municipality", everyItem(anyOf(equalTo("MHAMN"), equalTo("INKOO")))))
+			.andReturn();
+    	mockMvc.perform(get("/api/rows?municipality=MHAMN&municipality=INKOO&startDate=7.6.1974").session(testUserHttpSession))
+			.andExpect(status().isOk())
+			.andExpect(content().contentType("application/json;charset=UTF-8"))
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.error").value(nullValue()))
+			.andExpect(jsonPath("$.objects").isArray())
+			.andExpect(jsonPath("$.objects", hasSize(greaterThanOrEqualTo(2))))
+			.andExpect(jsonPath("$.objects[*].ringer", everyItem(equalTo(Integer.toString(TEST_ID)))))
+			.andExpect(jsonPath("$.objects[*].municipality", everyItem(anyOf(equalTo("MHAMN"), equalTo("INKOO")))))
+			.andReturn();
+    	mockMvc.perform(get("/api/rows?municipality=MHAMN&municipality=INKOO&startDate=07.6.1974").session(testUserHttpSession))
+			.andExpect(status().isOk())
+			.andExpect(content().contentType("application/json;charset=UTF-8"))
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.error").value(nullValue()))
+			.andExpect(jsonPath("$.objects").isArray())
+			.andExpect(jsonPath("$.objects", hasSize(greaterThanOrEqualTo(2))))
+			.andExpect(jsonPath("$.objects[*].ringer", everyItem(equalTo(Integer.toString(TEST_ID)))))
+			.andExpect(jsonPath("$.objects[*].municipality", everyItem(anyOf(equalTo("MHAMN"), equalTo("INKOO")))))
+			.andReturn();
+    	mockMvc.perform(get("/api/rows?municipality=MHAMN&municipality=INKOO&startDate=7.06.1974").session(testUserHttpSession))
+			.andExpect(status().isOk())
+			.andExpect(content().contentType("application/json;charset=UTF-8"))
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.error").value(nullValue()))
+			.andExpect(jsonPath("$.objects").isArray())
+			.andExpect(jsonPath("$.objects", hasSize(greaterThanOrEqualTo(2))))
+			.andExpect(jsonPath("$.objects[*].ringer", everyItem(equalTo(Integer.toString(TEST_ID)))))
+			.andExpect(jsonPath("$.objects[*].municipality", everyItem(anyOf(equalTo("MHAMN"), equalTo("INKOO")))))
+			.andReturn();
+    	mockMvc.perform(get("/api/rows?municipality=MHAMN&municipality=INKOO&startDate=07.06.1974").session(testUserHttpSession))
+			.andExpect(status().isOk())
+			.andExpect(content().contentType("application/json;charset=UTF-8"))
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.error").value(nullValue()))
+			.andExpect(jsonPath("$.objects").isArray())
+			.andExpect(jsonPath("$.objects", hasSize(greaterThanOrEqualTo(2))))
+			.andExpect(jsonPath("$.objects[*].ringer", everyItem(equalTo(Integer.toString(TEST_ID)))))
+			.andExpect(jsonPath("$.objects[*].municipality", everyItem(anyOf(equalTo("MHAMN"), equalTo("INKOO")))))
+			.andReturn();
+    	mockMvc.perform(get("/api/rows?municipality=MHAMN&municipality=INKOO&startDate=6.13.1974").session(testUserHttpSession))
+			.andExpect(status().isBadRequest())
+			.andExpect(content().contentType("application/json;charset=UTF-8"))
+    		.andExpect(jsonPath("$.success").value(false))
+    		.andExpect(jsonPath("$.error").value(notNullValue()))
+			.andReturn();
+    	mockMvc.perform(get("/api/rows?municipality=MHAMN&municipality=INKOO&startDate=1.1.1970&endDate=1.1.2013").session(testUserHttpSession))
+			.andExpect(status().isOk())
+			.andExpect(content().contentType("application/json;charset=UTF-8"))
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.error").value(nullValue()))
+			.andExpect(jsonPath("$.objects").isArray())
+			.andExpect(jsonPath("$.objects", hasSize(greaterThanOrEqualTo(2))))
+			.andExpect(jsonPath("$.objects[*].ringer", everyItem(equalTo(Integer.toString(TEST_ID)))))
+			.andExpect(jsonPath("$.objects[*].municipality", everyItem(anyOf(equalTo("MHAMN"), equalTo("INKOO")))))
+			.andReturn();
+    	mockMvc.perform(get("/api/rows?municipality=MHAMN&municipality=INKOO&startDate=01.01.1970&endDate=20.1.2013").session(testUserHttpSession))
+			.andExpect(status().isOk())
+			.andExpect(content().contentType("application/json;charset=UTF-8"))
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.error").value(nullValue()))
+			.andExpect(jsonPath("$.objects").isArray())
+			.andExpect(jsonPath("$.objects", hasSize(greaterThanOrEqualTo(2))))
+			.andExpect(jsonPath("$.objects[*].ringer", everyItem(equalTo(Integer.toString(TEST_ID)))))
+			.andExpect(jsonPath("$.objects[*].municipality", everyItem(anyOf(equalTo("MHAMN"), equalTo("INKOO")))))
+			.andReturn();
+    	mockMvc.perform(get("/api/rows?municipality=MHAMN&municipality=INKOO&startDate=01.01.1970&endDate=1.20.2013").session(testUserHttpSession))
+			.andExpect(status().isBadRequest())
+			.andExpect(content().contentType("application/json;charset=UTF-8"))
+			.andExpect(jsonPath("$.success").value(false))
+			.andExpect(jsonPath("$.error").value(notNullValue()))
+			.andReturn();
+    	mockMvc.perform(get("/api/rows?municipality=MHAMN&municipality=INKOO&startDate=01.01.1970&endDate=20.01.2013").session(testUserHttpSession))
+			.andExpect(status().isOk())
+			.andExpect(content().contentType("application/json;charset=UTF-8"))
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.error").value(nullValue()))
+			.andExpect(jsonPath("$.objects").isArray())
+			.andExpect(jsonPath("$.objects", hasSize(greaterThanOrEqualTo(2))))
+			.andExpect(jsonPath("$.objects[*].ringer", everyItem(equalTo(Integer.toString(TEST_ID)))))
+			.andExpect(jsonPath("$.objects[*].municipality", everyItem(anyOf(equalTo("MHAMN"), equalTo("INKOO")))))
+			.andReturn();
+	}
+    
+    @SuppressWarnings("unchecked")
+	@Test
+    public void testRingings() throws Exception {
+    	/* These tests need to run as Heikki Lokki */
+    	mockMvc.perform(get("/api/rows/ringings").session(lokkiHttpSession))
+    		.andExpect(status().isBadRequest())
+    		.andExpect(content().contentType("application/json;charset=UTF-8"))
+    		.andExpect(jsonPath("$.success").value(false))
+    		.andExpect(jsonPath("$.error").value(notNullValue()))
+    		.andReturn();
+    	mockMvc.perform(get("/api/rows/ringings?municipality=ESPOO").session(lokkiHttpSession))
+			.andExpect(status().isOk())
+			.andExpect(content().contentType("application/json;charset=UTF-8"))
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.error").value(nullValue()))
+			.andExpect(jsonPath("$.objects").isArray())
+			.andExpect(jsonPath("$.objects", hasSize(greaterThanOrEqualTo(7))))
+			.andExpect(jsonPath("$.objects[*].ringer", everyItem(equalTo(Integer.toString(LOKKI_ID)))))
+			.andExpect(jsonPath("$.objects[*].municipality", everyItem(equalTo("ESPOO"))))
+			.andReturn();
+    	mockMvc.perform(get("/api/rows/ringings?municipality=VANTAA").session(lokkiHttpSession))
+			.andExpect(status().isOk())
+			.andExpect(content().contentType("application/json;charset=UTF-8"))
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.error").value(nullValue()))
+			.andExpect(jsonPath("$.objects").isArray())
+			.andExpect(jsonPath("$.objects", hasSize(greaterThanOrEqualTo(2))))
+			.andExpect(jsonPath("$.objects[*].person", everyItem(equalTo(Integer.toString(LOKKI_ID)))))
+			.andExpect(jsonPath("$.objects[*].municipality", everyItem(equalTo("VANTAA"))))
+			.andReturn();
+    	mockMvc.perform(get("/api/rows/ringings?municipality=VANTAA&municipality=ESPOO").session(lokkiHttpSession))
 			.andExpect(status().isOk())
 			.andExpect(content().contentType("application/json;charset=UTF-8"))
 			.andExpect(jsonPath("$.success").value(true))
@@ -96,43 +273,128 @@ public class RowsControllerTest {
     
     @SuppressWarnings("unchecked")
 	@Test
-    public void testControls() throws Exception {
-    	/* These tests need to run as Heikki Lokki */
-    	mockMvc.perform(get("/api/rows/controls").session(mockHttpSession))
-    		.andExpect(status().isBadRequest())
-    		.andExpect(content().contentType("application/json;charset=UTF-8"))
-    		.andExpect(jsonPath("$.success").value(false))
-    		.andExpect(jsonPath("$.error").value(notNullValue()))
-    		.andReturn();
-    	mockMvc.perform(get("/api/rows/controls?municipality=ESPOO").session(mockHttpSession))
+    public void testRecoveries() throws Exception {
+    	mockMvc.perform(get("/api/rows/recoveries?municipality=INKOO").session(testUserHttpSession))
 			.andExpect(status().isOk())
 			.andExpect(content().contentType("application/json;charset=UTF-8"))
 			.andExpect(jsonPath("$.success").value(true))
 			.andExpect(jsonPath("$.error").value(nullValue()))
 			.andExpect(jsonPath("$.objects").isArray())
 			.andExpect(jsonPath("$.objects", hasSize(greaterThanOrEqualTo(7))))
-			.andExpect(jsonPath("$.objects[*].ringer", everyItem(equalTo(Integer.toString(LOKKI_ID)))))
-			.andExpect(jsonPath("$.objects[*].municipality", everyItem(equalTo("ESPOO"))))
+			.andExpect(jsonPath("$.objects[*].ringer", everyItem(equalTo(Integer.toString(TEST_ID)))))
+			.andExpect(jsonPath("$.objects[*].municipality", everyItem(equalTo("INKOO"))))
 			.andReturn();
-    	mockMvc.perform(get("/api/rows/controls?municipality=VANTAA").session(mockHttpSession))
+    	mockMvc.perform(get("/api/rows/recoveries?municipality=MHAMN").session(testUserHttpSession))
 			.andExpect(status().isOk())
 			.andExpect(content().contentType("application/json;charset=UTF-8"))
 			.andExpect(jsonPath("$.success").value(true))
 			.andExpect(jsonPath("$.error").value(nullValue()))
 			.andExpect(jsonPath("$.objects").isArray())
 			.andExpect(jsonPath("$.objects", hasSize(greaterThanOrEqualTo(2))))
-			.andExpect(jsonPath("$.objects[*].ringer", everyItem(equalTo(Integer.toString(LOKKI_ID)))))
-			.andExpect(jsonPath("$.objects[*].municipality", everyItem(equalTo("VANTAA"))))
+			.andExpect(jsonPath("$.objects[*].ringer", everyItem(equalTo(Integer.toString(TEST_ID)))))
+			.andExpect(jsonPath("$.objects[*].municipality", everyItem(equalTo("MHAMN"))))
 			.andReturn();
-    	mockMvc.perform(get("/api/rows/controls?municipality=VANTAA&municipality=ESPOO").session(mockHttpSession))
+    	mockMvc.perform(get("/api/rows/recoveries?municipality=MHAMN&municipality=INKOO").session(testUserHttpSession))
 			.andExpect(status().isOk())
 			.andExpect(content().contentType("application/json;charset=UTF-8"))
 			.andExpect(jsonPath("$.success").value(true))
 			.andExpect(jsonPath("$.error").value(nullValue()))
 			.andExpect(jsonPath("$.objects").isArray())
 			.andExpect(jsonPath("$.objects", hasSize(greaterThanOrEqualTo(2))))
-			.andExpect(jsonPath("$.objects[*].ringer", everyItem(equalTo(Integer.toString(LOKKI_ID)))))
-			.andExpect(jsonPath("$.objects[*].municipality", everyItem(anyOf(equalTo("VANTAA"), equalTo("ESPOO")))))
+			.andExpect(jsonPath("$.objects[*].ringer", everyItem(equalTo(Integer.toString(TEST_ID)))))
+			.andExpect(jsonPath("$.objects[*].municipality", everyItem(anyOf(equalTo("MHAMN"), equalTo("INKOO")))))
+			.andReturn();
+    	mockMvc.perform(get("/api/rows/recoveries?municipality=MHAMN&municipality=INKOO&startDate=13.6.1974").session(testUserHttpSession))
+			.andExpect(status().isOk())
+			.andExpect(content().contentType("application/json;charset=UTF-8"))
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.error").value(nullValue()))
+			.andExpect(jsonPath("$.objects").isArray())
+			.andExpect(jsonPath("$.objects", hasSize(greaterThanOrEqualTo(2))))
+			.andExpect(jsonPath("$.objects[*].ringer", everyItem(equalTo(Integer.toString(TEST_ID)))))
+			.andExpect(jsonPath("$.objects[*].municipality", everyItem(anyOf(equalTo("MHAMN"), equalTo("INKOO")))))
+			.andReturn();
+    	mockMvc.perform(get("/api/rows/recoveries?municipality=MHAMN&municipality=INKOO&startDate=7.6.1974").session(testUserHttpSession))
+			.andExpect(status().isOk())
+			.andExpect(content().contentType("application/json;charset=UTF-8"))
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.error").value(nullValue()))
+			.andExpect(jsonPath("$.objects").isArray())
+			.andExpect(jsonPath("$.objects", hasSize(greaterThanOrEqualTo(2))))
+			.andExpect(jsonPath("$.objects[*].ringer", everyItem(equalTo(Integer.toString(TEST_ID)))))
+			.andExpect(jsonPath("$.objects[*].municipality", everyItem(anyOf(equalTo("MHAMN"), equalTo("INKOO")))))
+			.andReturn();
+    	mockMvc.perform(get("/api/rows/recoveries?municipality=MHAMN&municipality=INKOO&startDate=07.6.1974").session(testUserHttpSession))
+			.andExpect(status().isOk())
+			.andExpect(content().contentType("application/json;charset=UTF-8"))
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.error").value(nullValue()))
+			.andExpect(jsonPath("$.objects").isArray())
+			.andExpect(jsonPath("$.objects", hasSize(greaterThanOrEqualTo(2))))
+			.andExpect(jsonPath("$.objects[*].ringer", everyItem(equalTo(Integer.toString(TEST_ID)))))
+			.andExpect(jsonPath("$.objects[*].municipality", everyItem(anyOf(equalTo("MHAMN"), equalTo("INKOO")))))
+			.andReturn();
+    	mockMvc.perform(get("/api/rows/recoveries?municipality=MHAMN&municipality=INKOO&startDate=7.06.1974").session(testUserHttpSession))
+			.andExpect(status().isOk())
+			.andExpect(content().contentType("application/json;charset=UTF-8"))
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.error").value(nullValue()))
+			.andExpect(jsonPath("$.objects").isArray())
+			.andExpect(jsonPath("$.objects", hasSize(greaterThanOrEqualTo(2))))
+			.andExpect(jsonPath("$.objects[*].ringer", everyItem(equalTo(Integer.toString(TEST_ID)))))
+			.andExpect(jsonPath("$.objects[*].municipality", everyItem(anyOf(equalTo("MHAMN"), equalTo("INKOO")))))
+			.andReturn();
+    	mockMvc.perform(get("/api/rows/recoveries?municipality=MHAMN&municipality=INKOO&startDate=07.06.1974").session(testUserHttpSession))
+			.andExpect(status().isOk())
+			.andExpect(content().contentType("application/json;charset=UTF-8"))
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.error").value(nullValue()))
+			.andExpect(jsonPath("$.objects").isArray())
+			.andExpect(jsonPath("$.objects", hasSize(greaterThanOrEqualTo(2))))
+			.andExpect(jsonPath("$.objects[*].ringer", everyItem(equalTo(Integer.toString(TEST_ID)))))
+			.andExpect(jsonPath("$.objects[*].municipality", everyItem(anyOf(equalTo("MHAMN"), equalTo("INKOO")))))
+			.andReturn();
+    	mockMvc.perform(get("/api/rows/recoveries?municipality=MHAMN&municipality=INKOO&startDate=6.13.1974").session(testUserHttpSession))
+			.andExpect(status().isBadRequest())
+			.andExpect(content().contentType("application/json;charset=UTF-8"))
+    		.andExpect(jsonPath("$.success").value(false))
+    		.andExpect(jsonPath("$.error").value(notNullValue()))
+			.andReturn();
+    	mockMvc.perform(get("/api/rows/recoveries?municipality=MHAMN&municipality=INKOO&startDate=1.1.1970&endDate=1.1.2013").session(testUserHttpSession))
+			.andExpect(status().isOk())
+			.andExpect(content().contentType("application/json;charset=UTF-8"))
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.error").value(nullValue()))
+			.andExpect(jsonPath("$.objects").isArray())
+			.andExpect(jsonPath("$.objects", hasSize(greaterThanOrEqualTo(2))))
+			.andExpect(jsonPath("$.objects[*].ringer", everyItem(equalTo(Integer.toString(TEST_ID)))))
+			.andExpect(jsonPath("$.objects[*].municipality", everyItem(anyOf(equalTo("MHAMN"), equalTo("INKOO")))))
+			.andReturn();
+    	mockMvc.perform(get("/api/rows/recoveries?municipality=MHAMN&municipality=INKOO&startDate=01.01.1970&endDate=20.1.2013").session(testUserHttpSession))
+			.andExpect(status().isOk())
+			.andExpect(content().contentType("application/json;charset=UTF-8"))
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.error").value(nullValue()))
+			.andExpect(jsonPath("$.objects").isArray())
+			.andExpect(jsonPath("$.objects", hasSize(greaterThanOrEqualTo(2))))
+			.andExpect(jsonPath("$.objects[*].ringer", everyItem(equalTo(Integer.toString(TEST_ID)))))
+			.andExpect(jsonPath("$.objects[*].municipality", everyItem(anyOf(equalTo("MHAMN"), equalTo("INKOO")))))
+			.andReturn();
+    	mockMvc.perform(get("/api/rows/recoveries?municipality=MHAMN&municipality=INKOO&startDate=01.01.1970&endDate=1.20.2013").session(testUserHttpSession))
+			.andExpect(status().isBadRequest())
+			.andExpect(content().contentType("application/json;charset=UTF-8"))
+			.andExpect(jsonPath("$.success").value(false))
+			.andExpect(jsonPath("$.error").value(notNullValue()))
+			.andReturn();
+    	mockMvc.perform(get("/api/rows/recoveries?municipality=MHAMN&municipality=INKOO&startDate=01.01.1970&endDate=20.01.2013").session(testUserHttpSession))
+			.andExpect(status().isOk())
+			.andExpect(content().contentType("application/json;charset=UTF-8"))
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.error").value(nullValue()))
+			.andExpect(jsonPath("$.objects").isArray())
+			.andExpect(jsonPath("$.objects", hasSize(greaterThanOrEqualTo(2))))
+			.andExpect(jsonPath("$.objects[*].ringer", everyItem(equalTo(Integer.toString(TEST_ID)))))
+			.andExpect(jsonPath("$.objects[*].municipality", everyItem(anyOf(equalTo("MHAMN"), equalTo("INKOO")))))
 			.andReturn();
 	}
 }
