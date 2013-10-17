@@ -55,7 +55,6 @@ public class HomeController {
 		
 		try {
 			Row r = (Row)(rowsService.getRows(new long[]{ Long.parseLong(user.getLogin_id()) }, new String[]{ "ESPOO" }, null, null, null).get(0));
-			logger.info("species is " + r.get("species"));
 			model.addAttribute("rows", rowsService.getRows(new long[]{ Long.parseLong(user.getLogin_id()) }, new String[]{ "ESPOO" }, null, null, null));
 			model.addAttribute("rowsError", null);
 		} catch (QueryException e) {

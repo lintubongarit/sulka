@@ -1,5 +1,4 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ page session="false" %>
 
 <!DOCTYPE HTML>
 <html>
@@ -13,16 +12,27 @@
 	<body>
 		<table id="global-toolbar" class="global-toolbar">
 			<tr class="global-toolbar">
-				<td class="global-toolbar">
+				<td>
+					<img src="<c:url value="resources/other/luonnontieteellinen_keskusmuseo.gif"/>"></img>
+				</td>
+				<!-- <td class="global-toolbar">
 					<span class="global-toolbar-app-title">Sulka</span>
 					<ul id="feature-list" class="feature-list-tabs"></ul>
-				</td>
-				<td class="global-toolbar global-toolbar-user-info">
+				</td> -->
+				<!-- <td class="global-toolbar global-toolbar-user-info">
 					<span id="global-toolbar-full-name" class="full-name"></span><br>
 					<span id="global-toolbar-login-id" class="login-id"></span>
+				</td> -->
+				
+				<td class="global-toolbar-user-info">
+					<c:out value="${user.getName()}"/><br>
+					<c:out value="${user.getEmail()}"/>
 				</td>
-				<td class="global-toolbar" style="text-align: right">
+				<td class="global-toolbar-logout">
 					<a class="global-toolbar-lintuvaara-button" href="logout">Palaa Lintuvaaraan</a>
+				</td>
+				<td>
+					<img src="<c:url value="resources/other/sulka_logo.png"/>" style="height:91px;"></img>
 				</td>
 			</tr>
 		</table>

@@ -43,7 +43,6 @@ input[type="checkbox"] {
 }
 
 table.global-toolbar {
-    width: 100%;
     height: 32px;
     background-color: rgb(253, 214, 136);
 }
@@ -68,10 +67,11 @@ ul.feature-list-tabs {
 }
 
 .global-toolbar-user-info {
-    line-height: 1em;
+    font-size: 0.8em;
     font-weight: bold;
-    font-size: 10pt;
-    text-align: right;
+    line-height: 1.3em;
+    padding-right: 1em;
+    vertical-align: top;
 }
 
 .global-toolbar-lintuvaara-button {
@@ -82,6 +82,11 @@ ul.feature-list-tabs {
     text-decoration: none;
     text-align: center;
     color: #000099;
+}
+
+.global-toolbar-logout {
+	vertical-align: top;
+	width: 100%;
 }
 
 .local-toolbar {
@@ -149,7 +154,7 @@ ul.feature-list-tabs li a:hover {
     left: 0;
     right: 0;
     bottom: 0;
-    top: 60px;
+    top: 138px;
     vertical-align: middle;
     text-align: center;
 }
