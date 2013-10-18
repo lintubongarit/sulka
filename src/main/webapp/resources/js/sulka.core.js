@@ -129,5 +129,5 @@ sulka = {
 
 return sulka; }();
 
-/* Launch initGrid() on DOM complete */
+/* Launch sulka.init() on DOM complete */
 $(sulka.init);
