@@ -3,7 +3,7 @@ const wantedColumns = ["Rengas", "Nimirengas", "Laji", "Rengastaja", "Pvm", "Klo
 /* Columns to be added: birdStation, kkj_ddmm_lat, kkj_ddmm_lon, kkj_decimal_lat, kkj_decimal_lon, birdCondition*/
 
 
-casper.test.begin('SlickGrid tests', 10, function suite(test) {
+casper.test.begin('SlickGrid tests', 14, function suite(test) {
 	casper.options.logLevel = "debug";
 	casper.options.verbose =  true;
 	casper.options.timeout = 600000;
@@ -47,6 +47,7 @@ casper.test.begin('SlickGrid tests', 10, function suite(test) {
 			test.assertEquals(allColumnsFound, true, "Grid has got all wanted columns.");
 		}).then(function testThatGridDataIsEmptyAfterInit() {
 			test.assertEquals(get("sulka.grid.getDataLength()"), 0, "Grid is empty after init.");
+			
 		}).then(function () {
 			// Fill form
 			oldData = get("sulka.grid.getData()");
@@ -56,6 +57,7 @@ casper.test.begin('SlickGrid tests', 10, function suite(test) {
 			var newData = get("sulka.grid.getData()");
 			test.assertNotEquals(oldData, newData, "SlickGrid has been updated.");
 			oldData = newData;
+			
 		}).then(function () {
 			this.fill('form[id="filters"]', { municipality: 'Hauho', species: 'BUBBUB'}, true);
 		}).waitWhileVisible("#loader-animation")
@@ -63,6 +65,7 @@ casper.test.begin('SlickGrid tests', 10, function suite(test) {
 			var newData = get("sulka.grid.getData()");
 			test.assertNotEquals(oldData, newData, "SlickGrid has been updated.");
 			oldData = newData;
+			
 		}).then(function () {
 			this.fill('form[id="filters"]', { municipality: 'Hauho', date: '2001'}, true);
 		}).waitWhileVisible("#loader-animation")
@@ -70,7 +73,40 @@ casper.test.begin('SlickGrid tests', 10, function suite(test) {
 			var newData = get("sulka.grid.getData()");
 			test.assertNotEquals(oldData, newData, "SlickGrid has been updated.");
 			oldData = newData;
-		});
+			
+		}).then(function () {
+			this.click('input#form-reset');	
+			this.fill('form[id="filters"]', { municipality: 'Luopio', species: 'BUBBUB'}, true);
+		}).waitWhileVisible("#loader-animation")
+		.then(function() {
+			test.assertEquals(get("sulka.grid.getDataLength()"), 7, "Both ringings and recoveries are fetched" +
+					" when radio buttons 'ringings' and 'recoveries' aren't checked");
+		
+	    }).then(function () {
+			this.click('input#form-reset');	
+			this.fill('form[id="filters"]', { municipality: 'Luopio', species: 'BUBBUB', ringings: true}, true);
+		}).waitWhileVisible("#loader-animation")
+		.then(function() {
+			test.assertEquals(get("sulka.grid.getDataLength()"), 6, "Only ringings are fetched" +
+					" when radio button 'ringings' is checked");
+		
+		}).then(function () {
+			this.click('input#form-reset');	
+			this.fill('form[id="filters"]', { municipality: 'Luopio', species: 'BUBBUB', recoveries: true}, true);
+		}).waitWhileVisible("#loader-animation")
+		.then(function() {
+			test.assertEquals(get("sulka.grid.getDataLength()"), 1, "Only recoveries are fetched" +
+					" when radio button 'recoveries' is checked");
+		
+		}).then(function () {
+			this.click('input#form-reset');	
+			this.fill('form[id="filters"]', { municipality: 'Luopio', species: 'BUBBUB',
+				ringings: true, recoveries: true}, true);
+		}).waitWhileVisible("#loader-animation")
+		.then(function() {
+			test.assertEquals(get("sulka.grid.getDataLength()"), 7, "Both ringings and recoveries are fetched" +
+					" when radio buttons 'ringings' and 'recoveries' are checked");
+		})
     });
     
     casper.run(function () {
