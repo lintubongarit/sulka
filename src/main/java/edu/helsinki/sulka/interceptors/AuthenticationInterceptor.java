@@ -18,7 +18,7 @@ public class AuthenticationInterceptor implements HandlerInterceptor
 	private Logger logger;
 	
 	// Set to true to temporarily create fake sessions while developing locally
-	private static final boolean createFakeSession = false;
+	private static final boolean createFakeSession = true;
 	
 	public static boolean getCreateFakeSession() {
 		return createFakeSession;
