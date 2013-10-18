@@ -6,7 +6,7 @@ sulka = {
 	grid: null,
 	gridOptions: {
 		enableCellNavigation: true,
-		enableColumnReorder: false
+		enableColumnReorder: true
 	},
 
 	viewMode: "browsing",
@@ -53,6 +53,8 @@ sulka = {
 		if (sulka.grid === null) return;
 		
 		sulka.helpers.unsetErrorAndShowLoader();
+		
+		sulka.getRowMode();
 		
 		var filters = sulka.getFilters();
 		if (typeof(filters) === "string") {
@@ -105,8 +107,23 @@ sulka = {
 		if (species) {
 			filters.species = species.toUpperCase();
 		}
-		
+			
 		return filters;
+	},
+	
+	getRowMode: function () {
+		ringings = $("#filters-ringings").is(':checked'),
+		recoveries = $("#filters-recoveries").is(':checked');
+		
+		if (ringings && recoveries){
+			sulka.rowsMode = "all";
+		} else if (ringings){
+			sulka.rowsMode = "ringings";
+		} else if (recoveries){
+			sulka.rowsMode = "recoveries";
+		} else{
+			sulka.rowsMode = "all";
+		}
 	}
 };
 

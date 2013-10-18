@@ -27,6 +27,7 @@ public class AuthenticationInterceptor implements HandlerInterceptor
 	@Override
 	public boolean preHandle(HttpServletRequest request,
 			HttpServletResponse response, Object arg2) throws Exception {
+
 		HttpSession session = request.getSession(false);
 
 		if (session == null) {
@@ -54,6 +55,8 @@ public class AuthenticationInterceptor implements HandlerInterceptor
 		user.setLogin_id("846");
 		user.setPass(true);
 		user.setExpires_at(System.currentTimeMillis() / 1000 + 99999);
+		user.setName("Gerhardt von Gyndth");
+		user.setEmail("lintubongarit@gmail.com");
 		
 		HttpSession session = request.getSession(true);
 		session.setAttribute("user", user);

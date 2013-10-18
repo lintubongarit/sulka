@@ -8,6 +8,7 @@
 		<!-- <link rel="stylesheet" href="resources/css/examples.css" type="text/css" /> -->
 		<link rel="stylesheet" href="resources/css/sulka.css" type="text/css" />
 		<script src="resources/js/lib/jquery-1.7.min.js"></script>
+		<script src="resources/js/lib/jquery-ui-1.8.16.custom.min.js"></script>
 		<script src="resources/js/lib/jquery.event.drag-2.2.js"></script>
 		<script src="resources/js/lib/slick.core.js"></script>
 		<script src="resources/js/lib/slick.grid.js"></script>
@@ -20,16 +21,27 @@
 	<body>
 		<table id="global-toolbar" class="global-toolbar">
 			<tr class="global-toolbar">
-				<td class="global-toolbar">
+				<td>
+					<img src="<c:url value="resources/img/luonnontieteellinen_keskusmuseo.gif"/>"></img>
+				</td>
+				<!-- <td class="global-toolbar">
 					<span class="global-toolbar-app-title">Sulka</span>
 					<ul id="feature-list" class="feature-list-tabs"></ul>
-				</td>
-				<td class="global-toolbar global-toolbar-user-info">
+				</td> -->
+				<!-- <td class="global-toolbar global-toolbar-user-info">
 					<span id="global-toolbar-full-name" class="full-name"></span><br>
 					<span id="global-toolbar-login-id" class="login-id"></span>
+				</td> -->
+				
+				<td class="global-toolbar-user-info">
+					<c:out value="${user.getName()}"/><br>
+					<c:out value="${user.getEmail()}"/>
 				</td>
-				<td class="global-toolbar" style="text-align: right">
+				<td class="global-toolbar-logout">
 					<a class="global-toolbar-lintuvaara-button" href="logout">Palaa Lintuvaaraan</a>
+				</td>
+				<td>
+					<img src="<c:url value="resources/img/sulka_logo.png"/>" style="height:91px;"></img>
 				</td>
 			</tr>
 		</table>
@@ -41,15 +53,17 @@
 				Laji: <input type="text" id="filters-species" name="species" />
 				Kunta: <input type="text" id="filters-municipality" name="municipality" />
 				<input type="submit" id="form-submit" value="OK" />
-				<input type="reset" id="form-reset" value="Tyhjennä"/>
+				<input type="reset" id="form-reset" value="Tyhjennä" />
+				<input type="checkbox" id="filters-ringings" name="ringings"/> Rengastukset
+ 				<input type="checkbox" id="filters-recoveries" name="recoveries" /> Tapaamiset
 				<img src="resources/img/ajax-loader.gif" id="loader-animation" />
 			</form>
 		</div>
 	
-		
 		<div id="row-status-box-container">
-			<span id="last-error"></span>
-			<div id="row-status-box" style="padding: 10px"></div>
+			<div id="row-status-box" style="padding: 1px">
+				<span id="last-error"></span>
+			</div>
 		</div>
 		<div id="slick-grid"></div>
 		<div id="columns-pane">
