@@ -140,12 +140,19 @@ ul.feature-list-tabs li a:hover {
     width: 200px;
 }
 
+#row-status-box-container {
+	background-color:  rgb(253, 214, 136);
+   	height: 20px;
+   	text-align: left;
+   	border-bottom: 1px solid black;
+}
+
 #slick-grid {
     position: absolute;
     left: 0;
     right: 0;
     bottom: 0;
-    top: 60px;
+    top: 80px;
     vertical-align: middle;
     text-align: center;
 }

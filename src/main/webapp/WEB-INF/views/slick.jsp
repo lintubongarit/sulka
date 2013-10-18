@@ -41,14 +41,14 @@
 				Laji: <input type="text" id="filters-species" name="species" />
 				Kunta: <input type="text" id="filters-municipality" name="municipality" />
 				<input type="submit" id="form-submit" value="OK" />
-				<input type="reset" id="form-reset" value="Tyhjennä" />
-				<span id="last-error"></span>
+				<input type="reset" id="form-reset" value="Tyhjennä"/>
 				<img src="resources/img/ajax-loader.gif" id="loader-animation" />
 			</form>
 		</div>
 	
 		
 		<div id="row-status-box-container">
+			<span id="last-error"></span>
 			<div id="row-status-box" style="padding: 10px"></div>
 		</div>
 		<div id="slick-grid"></div>
