@@ -8,6 +8,7 @@
 		<!-- <link rel="stylesheet" href="resources/css/examples.css" type="text/css" /> -->
 		<link rel="stylesheet" href="resources/css/sulka.css" type="text/css" />
 		<script src="resources/js/lib/jquery-1.7.min.js"></script>
+		<script src="resources/js/lib/jquery-ui-1.8.16.custom.min.js"></script>
 		<script src="resources/js/lib/jquery.event.drag-2.2.js"></script>
 		<script src="resources/js/lib/slick.core.js"></script>
 		<script src="resources/js/lib/slick.grid.js"></script>

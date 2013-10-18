@@ -161,3 +161,9 @@ span#last-error {
 img#loader-animation {
 	vertical-align: text-bottom;
 }
+
+.slick-header-columns {
+    background: url("../img/header-columns-bg.gif");
+    border-bottom: 1px solid #C2C3C9;
+}
+}
