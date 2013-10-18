@@ -54,8 +54,8 @@
 				Kunta: <input type="text" id="filters-municipality" name="municipality" />
 				<input type="submit" id="form-submit" value="OK" />
 				<input type="reset" id="form-reset" value="Tyhjennä" />
-				<input type="checkbox" id="filters-ringings" name="ringings"/> Rengastukset
- 				<input type="checkbox" id="filters-recoveries" name="recoveries" /> Tapaamiset
+				<input type="checkbox" id="filters-ringings" name="ringings" checked/> Rengastukset
+ 				<input type="checkbox" id="filters-recoveries" name="recoveries" checked /> Tapaamiset
 				<img src="resources/img/ajax-loader.gif" id="loader-animation" />
 			</form>
 		</div>
