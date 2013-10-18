@@ -6,7 +6,7 @@ sulka = {
 	grid: null,
 	gridOptions: {
 		enableCellNavigation: true,
-		enableColumnReorder: false
+		enableColumnReorder: true
 	},
 
 	viewMode: "browsing",
