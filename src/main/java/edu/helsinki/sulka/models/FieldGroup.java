@@ -1,5 +1,7 @@
 package edu.helsinki.sulka.models;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -12,7 +14,7 @@ public class FieldGroup {
 	private String description;
 	
 	@JsonProperty("fields")
-	private Field[] fields;
+	private List<Field> fields;
 	
 	/*
 	 * Accessors
@@ -25,7 +27,11 @@ public class FieldGroup {
 		return description;
 	}
 	
-	public Field[] getFields() {
+	public List<Field> getFields() {
 		return fields;
+	}
+	
+	public void setFields(List<Field> fields) {
+		this.fields = fields;
 	}
 }

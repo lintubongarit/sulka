@@ -4,6 +4,11 @@
 	xmlns:context="http://www.springframework.org/schema/context"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
 	
+	<bean class="edu.helsinki.sulka.configurations.TestLoginCodeConfiguration">
+		<!-- IMPORTANT! SECURITY! Remove below line for production!!! -->
+		<constructor-arg type="java.lang.String" value="b0d2cc8b16fc2de6bfbee049f2c62415cdb088ab1983eeafdbc3010f0024bc33" />
+	</bean>
+	
 	<bean id="DevAPIConfiguration" class="edu.helsinki.sulka.services.APIService" >
 		<property name="username" value="bongarit-dev" />
 		<property name="password" value="devbongarit" />

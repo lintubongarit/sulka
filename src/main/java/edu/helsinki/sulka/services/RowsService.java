@@ -8,6 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.joda.time.LocalDate;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -36,50 +39,31 @@ public class RowsService {
 	
 	@JsonIgnoreProperties(ignoreUnknown=true)
 	private static class RowsResponse {
-		@JsonProperty("values")
-		private String[][] values;
+		@JsonProperty("rows")
+		private Map<String, String>[] rows;
 		
-		@JsonProperty("fields")
-		private String[] fields;
+		@JsonProperty("countOfRows")
+		private long countOfRows;
 		
-		@JsonProperty("countOfValueRows")
-		private long countOfValueRows;
-		
-		@JsonProperty("countOfValueRowsTotal")
-		private long countOfValueRowsTotal;
-		
-		@JsonProperty("page")
-		private long page;
-		
-		@JsonProperty("pageSize")
-		private long pageSize;
+		@JsonProperty("countOfRowsTotal")
+		private long countOfRowsTotal;
 		
 		@JsonProperty("success")
 		private boolean success;
 		
-		@JsonProperty("error")
-		private String error;
+		private static class ErrorDescription {
+			@JsonProperty("localizedErrorText")
+			private String localizedErrorText;
+			
+			@JsonProperty("errorName")
+			private String errorName;
+		}
+		@JsonProperty("errors")
+		private ErrorDescription[] errors;
 		
 		/*
 		 * Accessors
 		 */
-		private List<Field> mappedFields = null;
-		/**
-		 * @param mapper A Map that contains fields by their respective names (i.e. obtained from fieldsService.getAllFieldsByFieldName())
-		 * @return Cached ordered list of fields in this response.
-		 */
-		public List<Field> getMappedFields(final Map<String, Field> mapper) {
-			if (this.mappedFields != null) {
-				return this.mappedFields;
-			}
-			
-			ArrayList<Field> mappedFields = new ArrayList<Field>(fields.length);
-			for (String fieldString : fields) {
-				mappedFields.add(mapper.get(fieldString));
-			}
-			return this.mappedFields = mappedFields;
-		}
-		
 		/**
 		 * @return If this query was successful.
 		 */
@@ -91,105 +75,126 @@ public class RowsService {
 		 * @return Error message
 		 */
 		public String getError() {
-			return error;
-		}
-		
-		/**
-		 * @return Number of all matching rows across all pages.
-		 */
-		public long getNumberOfAllRows() {
-			return countOfValueRowsTotal;
-		}
-		
-		/**
-		 * @return Page size.
-		 */
-		public long getPageSize() {
-			return pageSize;
+			if (isSuccess() || errors == null) return null;
+			String errorString = "";
+			String delimiter = "";
+			for (ErrorDescription ed : errors) {
+				errorString += delimiter + ed.localizedErrorText;
+				delimiter = ", ";
+			}
+			return errorString;
 		}
 	}
 	
 	public static class QueryException extends Exception {
 		private static final long serialVersionUID = 1L;
-		QueryException(final String message) {
+		QueryException(String message) {
 			super(message);
 		}
 	}
 	
-	/**
-	 * Get all matching rows from the API.
-	 * @param ringerFilters List of ringers IDs to match, or null to return all.
-	 * @param municipalityFilters List of municipality shorthand codes to match, or null to return all.
-	 * @param speciesFilters List of bird species short hand codes to match, or null to return all.
-	 * @param ringPrefixFilter A ring code prefix to match, or null to return all.
-	 * @param sortBy A sort to use, such as [ "ringStart", "date" ], or null to use default sort.
-	 * @return list of row
-	 * @throws QueryException If the query was not successful (message describes the error)
-	 */
-	public List<Row> getAllRows(final long[] ringerFilters, final String[] municipalityFilters,
-			final String[] speciesFilters, final String ringPrefixFilter, final String[] sortBy)
-			throws QueryException {
-		Map<String, Field> fieldsByFieldName = fieldsService.getAllFieldsByFieldName();
-		
-		int page = 0;
-		RowsResponse response = filterQuery(ringerFilters, municipalityFilters, speciesFilters, ringPrefixFilter, sortBy, 0, page);
-		if (!response.isSuccess()) {
-			throw new QueryException(response.getError());
-		}
-		
-		ArrayList<Row> rows = new ArrayList<Row>((int) response.getNumberOfAllRows());
-		while (true) {
-			for (String[] rowValues : response.values) {
-				Row row = new Row(rowValues.length);
-				for (int i=0; i<rowValues.length; i++) {
-					row.setFieldValue(response.getMappedFields(fieldsByFieldName).get(i), rowValues[i]);
-				}
-				rows.add(row);
-			}
-			
-			// Check if another query is needed to get more pages
-			if (response.values.length == response.getPageSize() && response.getPageSize() * (page+1) < response.getNumberOfAllRows()) {
-				response = filterQuery(ringerFilters, municipalityFilters, speciesFilters, ringPrefixFilter, sortBy, 0, ++page);
-				if (!response.isSuccess()) {
-					throw new QueryException(response.getError());
-				}
-			} else {
-				break;
-			}
-		}
-		
-		return rows;
+	private enum RowFilter {
+		RINGINGS,
+		RECOVERIES,
+		ALL
 	}
+	
 	/**
-	 * Get up to pageSize matching rows with page offset from the API.
+	 * Get all matching recovery and ringing rows from the API.
 	 * @param ringerFilters List of ringers IDs to match, or null to return all.
 	 * @param municipalityFilters List of municipality shorthand codes to match, or null to return all.
 	 * @param speciesFilters List of bird species short hand codes to match, or null to return all.
 	 * @param ringPrefixFilter A ring code prefix to match, or null to return all.
+	 * @param startDate Beginning of the date interval.
+	 * @param endDate End of the date interval. If this is null and startDate is not null, only return
+	 * rows from startDate
 	 * @param sortBy A sort to use, such as [ "ringStart", "date" ], or null to use default sort.
-	 * @param pageSize Maximum number of results to return, or non-positive to use default.
-	 * @param page Page offset, or non-positive to return the first page.
 	 * @return list of rows
 	 * @throws QueryException If the query was not successful (message describes the error)
 	 */
 	public List<Row> getRows(final long[] ringerFilters, final String[] municipalityFilters,
-			final String[] speciesFilters, final String ringPrefixFilter, final String[] sortBy,
-			final int pageSize, final int page)
+			final String[] speciesFilters, String ringPrefixFilter, LocalDate startDate, LocalDate endDate,
+			final String[] sortBy)
+			throws QueryException {
+		return getRowsByType(RowFilter.ALL,
+				ringerFilters, municipalityFilters, speciesFilters, ringPrefixFilter, startDate, endDate,
+				sortBy);
+	}
+	
+	/**
+	 * Get all matching recovery rows from the API.
+	 * @param ringerFilters List of ringers IDs to match, or null to return all.
+	 * @param municipalityFilters List of municipality shorthand codes to match, or null to return all.
+	 * @param speciesFilters List of bird species short hand codes to match, or null to return all.
+	 * @param ringPrefixFilter A ring code prefix to match, or null to return all.
+	 * @param startDate Beginning of the date interval.
+	 * @param endDate End of the date interval. If this is null and startDate is not null, only return
+	 * rows from startDate
+	 * @param sortBy A sort to use, such as [ "ringStart", "date" ], or null to use default sort.
+	 * @return list of rows
+	 * @throws QueryException If the query was not successful (message describes the error)
+	 */
+	public List<Row> getRingings(final long[] ringerFilters, final String[] municipalityFilters,
+			final String[] speciesFilters, String ringPrefixFilter, LocalDate startDate, LocalDate endDate,
+			final String[] sortBy)
+			throws QueryException {
+		return getRowsByType(RowFilter.RINGINGS,
+				ringerFilters, municipalityFilters, speciesFilters, ringPrefixFilter, startDate, endDate,
+				sortBy);
+	}
+	
+	
+	/**
+	 * Get all matching ringing rows from the API.
+	 * @param ringerFilters List of ringers IDs to match, or null to return all.
+	 * @param municipalityFilters List of municipality shorthand codes to match, or null to return all.
+	 * @param speciesFilters List of bird species short hand codes to match, or null to return all.
+	 * @param ringPrefixFilter A ring code prefix to match, or null to return all.
+	 * @param startDate Beginning of the date interval.
+	 * @param endDate End of the date interval. If this is null and startDate is not null, only return
+	 * rows from startDate
+	 * @param sortBy A sort to use, such as [ "ringStart", "date" ], or null to use default sort.
+	 * @return list of rows
+	 * @throws QueryException If the query was not successful (message describes the error)
+	 */
+	public List<Row> getRecoveries(final long[] ringerFilters, final String[] municipalityFilters,
+			final String[] speciesFilters, String ringPrefixFilter, LocalDate startDate, LocalDate endDate,
+			final String[] sortBy)
+			throws QueryException {
+		return getRowsByType(
+				RowFilter.RECOVERIES,
+				ringerFilters, municipalityFilters, speciesFilters, ringPrefixFilter, startDate, endDate,
+				sortBy);
+	}
+	
+	/**
+	 * Get rows by query type from the API.
+	 * @param ringerFilters List of ringers IDs to match, or null to return all.
+	 * @param municipalityFilters List of municipality shorthand codes to match, or null to return all.
+	 * @param speciesFilters List of bird species short hand codes to match, or null to return all.
+	 * @param ringPrefixFilter A ring code prefix to match, or null to return all.
+	 * @param startDate Beginning of the date interval.
+	 * @param endDate End of the date interval. If this is null and startDate is not null, only return
+	 * rows from startDate
+	 * @param sortBy A sort to use, such as [ "ringStart", "date" ], or null to use default sort.
+	 * @return list of rows
+	 * @throws QueryException If the query was not successful (message describes the error)
+	 */
+	private List<Row> getRowsByType(RowFilter rowFilter, final long[] ringerFilters, final String[] municipalityFilters,
+			final String[] speciesFilters, String ringPrefixFilter, LocalDate startDate, LocalDate endDate,
+			final String[] sortBy)
 			throws QueryException {
 		Map<String, Field> fieldsByFieldName = fieldsService.getAllFieldsByFieldName();
 		
-		RowsResponse response = filterQuery(ringerFilters, municipalityFilters, speciesFilters, ringPrefixFilter, sortBy, pageSize, page);
+		RowsResponse response = filterQuery(rowFilter,
+				ringerFilters, municipalityFilters, speciesFilters, ringPrefixFilter, startDate, endDate, sortBy);
 		if (!response.isSuccess()) {
 			throw new QueryException(response.getError());
 		}
 		
-		ArrayList<Row> rows = new ArrayList<Row>(response.values.length);
-		for (String[] rowValues : response.values) {
-			Row row = new Row(rowValues.length);
-			for (int i=0; i<rowValues.length; i++) {
-				row.setFieldValue(response.getMappedFields(fieldsByFieldName).get(i), rowValues[i]);
-			}
-			rows.add(row);
+		ArrayList<Row> rows = new ArrayList<Row>(response.rows.length);
+		for (Map<String, String> rowValues : response.rows) {
+			rows.add(new Row(rowValues, fieldsByFieldName));
 		}
 		
 		return rows;
@@ -243,22 +248,37 @@ public class RowsService {
 		return result;
 	}
 	
+	private final DateTimeFormatter API_DATE_FORMAT = DateTimeFormat.forPattern("dd.MM.YYYY");
 	/**
 	 * Query API for rows
+	 * @param rowFilter Row type filter.
 	 * @param ringerFilters List of ringers IDs to match, or null to return all.
 	 * @param municipalityFilters List of municipality shorthand codes to match, or null to return all.
 	 * @param speciesFilters List of bird species short hand codes to match, or null to return all.
 	 * @param ringPrefixFilter A ring code prefix to match, or null to return all.
+	 * @param startDate Beginning of the date interval.
+	 * @param endDate End of the date interval. If this is null and startDate is not null, only return
+	 * rows from startDate
 	 * @param sortBy A sort to use, such as [ "ringStart", "date" ], or null to use default sort.
-	 * @param pageSize Maximum number of results to return, or non-positive to use default.
-	 * @param page Page offset, or non-positive to return the first page.
 	 * @return API response to this query
 	 */
-	private RowsResponse filterQuery(final long[] ringerFilters, final String[] municipalityFilters,
-			final String[] speciesFilters, final String ringPrefixFilter, final String[] sortBy,
-			final int pageSize, final int page) {
+	private RowsResponse filterQuery(RowFilter rowFilter,
+			final long[] ringerFilters, final String[] municipalityFilters,
+			final String[] speciesFilters, String ringPrefixFilter, LocalDate startDate, LocalDate endDate,
+			final String[] sortBy) {
 		String query = "";
 		String nextParamSeparator = "";
+		
+		if (rowFilter != null) {
+			if (rowFilter == RowFilter.RECOVERIES) {
+				query += nextParamSeparator + "type=onlyRecoveries";
+				nextParamSeparator = "&";
+			}
+			else if (rowFilter == RowFilter.RINGINGS) {
+				query += nextParamSeparator + "type=onlyRingings";
+				nextParamSeparator = "&";
+			}
+		}
 		
 		if (ringerFilters != null) {
 			query += nextParamSeparator + "ringer=" + longJoin(ringerFilters, ',');
@@ -275,6 +295,14 @@ public class RowsService {
 			nextParamSeparator = "&";
 		}
 		
+		if (startDate != null && (endDate == null || !endDate.isBefore(startDate))) {
+			query += nextParamSeparator + "eventDate=" + startDate.toString(API_DATE_FORMAT);
+			if (endDate != null && endDate.isAfter(startDate)) {
+				query += "/" + endDate.toString(API_DATE_FORMAT);
+			}
+			nextParamSeparator = "&";
+		}
+		
 		if (ringPrefixFilter != null) {
 			try {
 				query += nextParamSeparator + "ring=" + URLEncoder.encode(ringPrefixFilter, "UTF-8");
@@ -286,16 +314,6 @@ public class RowsService {
 		
 		if (sortBy != null) {
 			query += nextParamSeparator + "sortBy=" + URIStringJoin(sortBy, ',');
-			nextParamSeparator = "&";
-		}
-		
-		if (pageSize > 0) {
-			query += nextParamSeparator + "pageSize=" + Integer.toString(pageSize);
-			nextParamSeparator = "&";
-		}
-		
-		if (page > 1) {
-			query += nextParamSeparator + "page=" + Integer.toString(page);
 			nextParamSeparator = "&";
 		}
 		

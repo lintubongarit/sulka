@@ -1,7 +1,6 @@
 package edu.helsinki.sulka.services;
 
 import org.slf4j.Logger;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -35,7 +34,12 @@ public class LintuvaaraAuthDecryptService {
 		return apiService
 				.getRestTemplate()
 				.getForObject(
-						apiService.getURLForPath("/lintuvaara-authentication-decryptor?key={key}&iv={iv}&data={data}&format=json"),
+						apiService.getURLForPath(
+								"/lintuvaara-authentication-decryptor" +
+									"?key={key}"+
+									"&iv={iv}"+
+									"&data={data}"+
+									"&format=json"),
 						LintuvaaraAuthDecryptResponse.class,
 						key, iv, data).user;
 	}

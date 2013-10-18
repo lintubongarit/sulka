@@ -1,29 +1,24 @@
 package edu.helsinki.sulka.models;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
-public class Row {
+public class Row extends HashMap<String, String> {
+	private static final long serialVersionUID = 1L;
+
 	/**
-	 * Construct new empty Row
+	 * Construct new Row with given fields and values.
+	 * @param values Mapping from field names to field values.
+	 * @param values Mapping from field names to Field objects.
 	 */
-	public Row() {
-		this(0);
+	public Row(Map<String, String> values, Map<String, Field> fieldMapper) {
+		super(values);
+		fieldsByName = fieldMapper;
 	}
 	
-	/**
-	 * Construct new Row with estimated number of fields.
-	 * @param numOfFields
-	 */
-	public Row(int numOfFields) {
-		fieldValues = new HashMap<Field, String>(numOfFields);
-		fieldsByName = new HashMap<String, Field>(numOfFields);
-	}
-	
-	private Map<Field, String> fieldValues;
 	private Map<String, Field> fieldsByName;
-
+	
 	/* Generic accessors */
 	
 	/**
@@ -31,17 +26,8 @@ public class Row {
 	 * @param field Field
 	 * @return Value of field in this row
 	 */
-	public String getFieldValue(final Field field) {
-		return fieldValues.get(field);
-	}
-	
-	/**
-	 * Get field value by field name
-	 * @param field Field name
-	 * @return Field value in this row
-	 */
-	public String getFieldValue(final String field) {
-		return fieldValues.get(fieldsByName.get(field));
+	public String get(final Field field) {
+		return super.get(field.getFieldName());
 	}
 	
 	/**
@@ -49,37 +35,29 @@ public class Row {
 	 * @param field Field
 	 * @param value New value.
 	 */
-	public void setFieldValue(final Field field, final String value) {
-		fieldsByName.put(field.getFieldName(), field);
-		fieldValues.put(field, value);
+	public void put(final Field field, final String value) {
+		super.put(field.getFieldName(), value);
 	}
 	
 	/**
 	 * @return get all fields defined for this row
 	 */
-	public Set<Field> getAvailableFields() {
-		return fieldValues.keySet();
+	public Collection<Field> getAvailableFields() {
+		return fieldsByName.values();
 	}
 	
 	/**
 	 * @return whether value for field has been defined for this row
 	 */
-	public boolean hasField(final Field field) {
-		return fieldValues.containsKey(field);
-	}
-	
-	/**
-	 * @return whether value for field has been defined for this row
-	 */
-	public boolean hasField(final String field) {
-		return fieldValues.containsKey(fieldsByName.get(field));
+	public boolean containsKey(final Field field) {
+		return fieldsByName.containsKey(field.getFieldName());
 	}
 	
 	/**
 	 * @return Field object by field name that is defined for this row
 	 */
-	public Field getFieldMetaInfo(final String fieldName) {
-		return this.fieldsByName.get(fieldName);
+	public Field getField(final String fieldName) {
+		return fieldsByName.get(fieldName);
 	}
 	
 	/* Specific accessors */
@@ -88,20 +66,40 @@ public class Row {
 	 * @return ringer ID for the person who entered this row
 	 */
 	public long getRinger() {
-		return Long.parseLong(getFieldValue("person"));
+		return Long.parseLong(super.get("ringer"));
 	}
 	
 	/**
 	 * @return shorthand name of the species
 	 */
 	public String getSpeciesCode() {
-		return getFieldValue("species");
+		return super.get("species");
 	}
 	
 	/**
 	 * @return full name of the species
 	 */
 	public String getSpeciesFullName() {
-		return getFieldMetaInfo("species").getEnumerationDescription(getFieldValue("species"));
+		return getField("species").getEnumerationDescription(super.get("species"));
+	}
+	
+	public String getID() {
+		return get("id");
+	}
+	
+	/*
+	 * Hash implementation.
+	 */
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof Row) {
+			return getID().equals(((Row) o).getID());
+		}
+		return super.equals(o);
+	}
+	
+	@Override
+	public int hashCode() {
+		return getID().hashCode();
 	}
 }
