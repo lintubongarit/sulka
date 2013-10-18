@@ -60,7 +60,7 @@ casper.test.begin('Uitests', 23, function suite(test) {
 			formValues = this.getFormValues('form#filters');
 			for (var filter in formValues) if (formValues.hasOwnProperty(filter)) {
 				if (filter == "ringings" || filter == "recoveries") {
-					test.assertEquals(formValues[filter], false, 'The "' + filter + ' field is cleared.'); 
+					test.assertEquals(formValues[filter], true, 'The "' + filter + ' field is cleared.'); 
 				} else {
 				test.assertEquals(formValues[filter], "", 'The "' + filter + ' field is cleared.'); 
 				}

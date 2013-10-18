@@ -84,7 +84,7 @@ casper.test.begin('SlickGrid tests', 14, function suite(test) {
 		
 	    }).then(function () {
 			this.click('input#form-reset');	
-			this.fill('form[id="filters"]', { municipality: 'Luopio', species: 'BUBBUB', ringings: true}, true);
+			this.fill('form[id="filters"]', { municipality: 'Luopio', species: 'BUBBUB', ringings: true, recoveries: false}, true);
 		}).waitWhileVisible("#loader-animation")
 		.then(function() {
 			test.assertEquals(get("sulka.grid.getDataLength()"), 6, "Only ringings are fetched" +
@@ -92,7 +92,7 @@ casper.test.begin('SlickGrid tests', 14, function suite(test) {
 		
 		}).then(function () {
 			this.click('input#form-reset');	
-			this.fill('form[id="filters"]', { municipality: 'Luopio', species: 'BUBBUB', recoveries: true}, true);
+			this.fill('form[id="filters"]', { municipality: 'Luopio', species: 'BUBBUB', recoveries: true, ringings: false}, true);
 		}).waitWhileVisible("#loader-animation")
 		.then(function() {
 			test.assertEquals(get("sulka.grid.getDataLength()"), 1, "Only recoveries are fetched" +
