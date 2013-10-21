@@ -112,8 +112,8 @@ sulka = {
 	},
 	
 	getRowMode: function () {
-		ringings = $("#filters-ringings").is(':checked'),
-		recoveries = $("#filters-recoveries").is(':checked');
+		var	ringings = $("#filters-ringings").is(':checked'),
+			recoveries = $("#filters-recoveries").is(':checked');
 		
 		if (ringings && recoveries){
 			sulka.rowsMode = "all";
