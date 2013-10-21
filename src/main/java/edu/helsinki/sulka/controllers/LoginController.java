@@ -76,7 +76,7 @@ public class LoginController implements AuthenticationEntryPoint {
 			SecurityContextHolder.getContext()
 					.setAuthentication(authentication);
 
-			return "home";
+			return "slick";
 		}
 
 		return "login";
