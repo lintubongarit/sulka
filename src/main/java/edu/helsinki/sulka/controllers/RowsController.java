@@ -8,6 +8,7 @@ import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,6 +34,7 @@ public class RowsController extends JSONController {
 	/**
 	 * Returns all rows by filters.
 	 */
+	
 	@RequestMapping(value = "/api/rows", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	@ResponseBody
 	public ListResponse<Row> all(
@@ -54,6 +56,7 @@ public class RowsController extends JSONController {
 	/**
 	 * Returns ringing rows by filters.
 	 */
+	
 	@RequestMapping(value = "/api/rows/ringings", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	@ResponseBody
 	public ListResponse<Row> ringings(

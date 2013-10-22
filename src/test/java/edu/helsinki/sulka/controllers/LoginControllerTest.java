@@ -63,11 +63,11 @@ public class LoginControllerTest {
 		.andReturn();
 	}
     
-    @Test
-    public void testLoginRedirectsWithAllAuthVariables() throws Exception {
-    	mockMvc.perform(get("/login?key=test&iv=test&data=test"))
-    		.andExpect(status().isFound())
-    		.andReturn();
-	}
+//    @Test
+//    public void testLoginRedirectsWithAllAuthVariables() throws Exception {
+//    	mockMvc.perform(get("/login?key=test&iv=test&data=test"))
+//    		.andExpect(status().isFound())
+//    		.andReturn();
+//	}
 
 }
