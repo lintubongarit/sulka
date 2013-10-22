@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
-import edu.helsinki.sulka.authentication.RestAuthenticationProvider;
 import edu.helsinki.sulka.configurations.TestLoginCodeConfiguration;
 import edu.helsinki.sulka.models.User;
 import edu.helsinki.sulka.services.LintuvaaraAuthDecryptService;
@@ -44,9 +43,6 @@ public class LoginController implements AuthenticationEntryPoint {
 	@Autowired
 	private LintuvaaraAuthDecryptService authService;
 
-	@Autowired
-	private RestAuthenticationProvider lintuvaaraAuthenticationProvider;
-
 	/**
 	 * redirects authentication variables key, iv and data to Tipu-API's
 	 * Lintuvaara authentication decryptor service and saves user to session
@@ -60,7 +56,7 @@ public class LoginController implements AuthenticationEntryPoint {
 		if (user.accessStatus() == 0) {
 			String userid;
 			userid = user.getLogin_id();
-			
+
 			List<GrantedAuthority> grantedAuths = new ArrayList<GrantedAuthority>();
 
 			try {
@@ -68,9 +64,14 @@ public class LoginController implements AuthenticationEntryPoint {
 				grantedAuths.add(new SimpleGrantedAuthority("USER"));
 
 			} catch (Exception e) {
-				grantedAuths.add(new SimpleGrantedAuthority("ADMIN"));
+				if (userid.contains("admin")) {
+					grantedAuths.add(new SimpleGrantedAuthority("USER"));
+					grantedAuths.add(new SimpleGrantedAuthority("ADMIN"));
+				} else {
+					return "login";
+				}
 			}
-			
+
 			Authentication authentication = new UsernamePasswordAuthenticationToken(
 					user.getName(), user.getEmail(), grantedAuths);
 			SecurityContextHolder.getContext()
@@ -89,7 +90,7 @@ public class LoginController implements AuthenticationEntryPoint {
 	private TestLoginCodeConfiguration testLoginCodeConfiguration;
 
 	/**
-	 * Creates a fake session for JS tests.
+	 * Creates a fake user session for JS tests.
 	 */
 	@RequestMapping(value = "/testLogin/{code}", method = RequestMethod.GET)
 	public String testLogin(HttpServletResponse response, Model model,
@@ -101,6 +102,43 @@ public class LoginController implements AuthenticationEntryPoint {
 			user.setName("Heikki Lokki");
 			user.refreshSession();
 			model.addAttribute("user", user);
+
+			List<GrantedAuthority> grantedAuths = new ArrayList<GrantedAuthority>();
+			grantedAuths.add(new SimpleGrantedAuthority("USER"));
+			Authentication authentication = new UsernamePasswordAuthenticationToken(
+					user.getName(), user.getEmail(), grantedAuths);
+			SecurityContextHolder.getContext()
+					.setAuthentication(authentication);
+
+		} else {
+			response.setStatus(403);
+			return "login";
+		}
+		return "login";
+	}
+
+	/**
+	 * Creates a fake admin session for JS tests.
+	 */
+	@RequestMapping(value = "/testAdminLogin/{code}", method = RequestMethod.GET)
+	public String testAdminLogin(HttpServletResponse response, Model model,
+			@PathVariable String code) {
+		if (testLoginCodeConfiguration.isCorrectCode(code)) {
+			User user = new User();
+			user.setPass(true);
+			user.setLogin_id("846");
+			user.setName("Heikki Lokki");
+			user.refreshSession();
+			model.addAttribute("user", user);
+
+			List<GrantedAuthority> grantedAuths = new ArrayList<GrantedAuthority>();
+			grantedAuths.add(new SimpleGrantedAuthority("USER"));
+			grantedAuths.add(new SimpleGrantedAuthority("ADMIN"));
+			Authentication authentication = new UsernamePasswordAuthenticationToken(
+					user.getName(), user.getEmail(), grantedAuths);
+			SecurityContextHolder.getContext()
+					.setAuthentication(authentication);
+
 		} else {
 			response.setStatus(403);
 			return "login";

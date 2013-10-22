@@ -7,9 +7,7 @@
 
 	<security:debug />
 
-	<!-- <security:global-method-security secured-annotations="enabled" /> -->
-	<security:global-method-security
-		pre-post-annotations="enabled" />
+
 
 	<!-- Disable security on static resources -->
 	<security:http pattern="/resources/**" security="none" />
@@ -67,9 +65,6 @@
 	<security:authentication-manager alias="authenticationManager">
 		<security:authentication-provider
 			ref="restAuthenticationProvider" />
-		<!-- <security:authentication-provider ref="rememberMeAuthenticationProvider" 
-			/> -->
-
 	</security:authentication-manager>
 
 	<!-- <bean id="rememberMeAuthenticationProvider" -->

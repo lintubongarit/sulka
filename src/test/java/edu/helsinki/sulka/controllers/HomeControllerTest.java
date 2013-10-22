@@ -1,9 +1,10 @@
 package edu.helsinki.sulka.controllers;
 
-import static org.hamcrest.Matchers.equalTo;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,97 +18,89 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.FilterChainProxy;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.filter.DelegatingFilterProxy;
 
 import edu.helsinki.sulka.models.User;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
 @ContextConfiguration({ "file:src/main/webapp/WEB-INF/spring/root-context.xml",
-		"file:src/main/webapp/WEB-INF/spring/appServlet/servlet-context.xml" })
+		"file:src/main/webapp/WEB-INF/spring/security.xml",
+		"file:src/main/webapp/WEB-INF/spring/appServlet/servlet-context.xml"
+
+})
 public class HomeControllerTest {
+
+	@Autowired
+	private FilterChainProxy springSecurityFilterChain;
+
 	@Autowired
 	private WebApplicationContext wac;
 
 	private MockMvc mockMvc;
 
-	private MockHttpSession badHttpSession;
-	private MockHttpSession goodHttpSession;
+	private final String LOGIN_PAGE_URL = "/login";
+	private final String SECURED_URI = "/";
 
 	@Before
 	public void setup() {
-		this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).build();
+		mockMvc = webAppContextSetup(wac)
+				// Enable Spring Security
+				.addFilters(springSecurityFilterChain).alwaysDo(print())
+				.build();
+	}
+
+	@Test
+	public void itShouldDenyAnonymousAccess() throws Exception {
+		mockMvc.perform(get(SECURED_URI)).andExpect(status().isUnauthorized());
+	}
+	
+	@Test
+	public void itShouldAnonymousAccessToLoginPage() throws Exception {
+		mockMvc.perform(get(LOGIN_PAGE_URL)).andExpect(status().isBadRequest());
+	}
 
 
+	@Test
+	public void itShouldAllowAccessToSecuredPageForPermittedUser()
+			throws Exception {
 
-
-
-		this.goodHttpSession = new MockHttpSession();
 		User legitUser = new User();
 		legitUser.setPass(true);
 		legitUser.setLogin_id("10020");
 		legitUser.setExpires_at(System.currentTimeMillis() / 1000 + 60);
-		this.goodHttpSession.setAttribute("user", legitUser);
+		legitUser.setName("Test User");
+		legitUser.setEmail("test@user.invalid");
 
-		this.badHttpSession = new MockHttpSession();
+		List<GrantedAuthority> userAuths = new ArrayList<GrantedAuthority>();
+		userAuths.add(new SimpleGrantedAuthority("USER"));
 
-		User falseUser = new User();
-		falseUser.setPass(false);
-		legitUser.setLogin_id("10020");
-		falseUser.setExpires_at(System.currentTimeMillis() / 1000 - 60);
-		this.badHttpSession.setAttribute("user", falseUser);
+		MockHttpSession session = new MockHttpSession();
+
+		Authentication authentication = new UsernamePasswordAuthenticationToken(
+				legitUser.getLogin_id(), legitUser.getEmail(), userAuths);
+
+		SecurityContext securityContext = SecurityContextHolder.getContext();
+
+		securityContext.setAuthentication(authentication);
+
+		session.setAttribute("user", legitUser);
+
+		session.setAttribute(
+				HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+				securityContext);
+
+		mockMvc.perform(get(SECURED_URI).session(session)).andExpect(
+				status().isOk());
 	}
-	
-	@Test
-	public void todoFixTestsASAP(){
-		
-	}
-
-//	@Test
-//	public void testHome_goodHttpSession() throws Exception {
-//		List<GrantedAuthority> grantedAuths = new ArrayList<GrantedAuthority>();
-//
-//		grantedAuths.add(new SimpleGrantedAuthority("USER"));
-//		grantedAuths.add(new SimpleGrantedAuthority("ADMIN"));
-//		Authentication authentication = new UsernamePasswordAuthenticationToken(
-//				"test", "test", grantedAuths);
-//		SecurityContextHolder.getContext().setAuthentication(authentication);
-//
-//		mockMvc.perform(get("/").session(goodHttpSession))
-//				.andExpect(view().name(equalTo("slick")))
-//				.andExpect(status().isOk()).andReturn();
-//	}
-//
-//	@Test
-//	public void testHome_badhttpSession() throws Exception {
-//		List<GrantedAuthority> grantedAuths = new ArrayList<GrantedAuthority>();
-//		grantedAuths.add(new SimpleGrantedAuthority("NONE"));
-//
-//		Authentication authentication = new UsernamePasswordAuthenticationToken(
-//				"test", "test", grantedAuths);
-//		SecurityContextHolder.getContext().setAuthentication(authentication);
-//
-//		
-//		mockMvc.perform(get("/").session(badHttpSession))
-//				.andExpect(status().isForbidden()).andReturn();
-//	}
-//
-//	@Test
-//	public void testHome_isForbidden() throws Exception {
-//		
-//		List<GrantedAuthority> grantedAuths = new ArrayList<GrantedAuthority>();
-//		grantedAuths.add(new SimpleGrantedAuthority("NONE"));
-//
-//		Authentication authentication = new UsernamePasswordAuthenticationToken(
-//				"test", "test", grantedAuths);
-//		SecurityContextHolder.getContext().setAuthentication(authentication);
-//		mockMvc.perform(get("/")).andExpect(status().isForbidden()).andReturn();
-//	}
 
 }
