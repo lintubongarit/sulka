@@ -1,11 +1,17 @@
-casper.test.begin('Uitests', 27, function suite(test) {
+casper.test.begin('Uitests', 32, function suite(test) {
 	casper.options.timeout = 600000;
 	casper.options.logLevel = "debug";
 	casper.options.verbose = true;
+	
     browse('/', function () {
+    	// Generic
         test.assertHttpStatus(200, "HTTP status is OK");
         test.assertTitle("Sulka", "Title is 'Sulka'");
+        
+        test.assertTrue(count("#slick-grid .slick-header-column") >= 10, "There are at least ten columns");
+        test.assertTrue(count("#slick-grid .column-group-header") >= 3, "There are at least three column groups");
 		
+    	// Data loading and filtering
 		casper.then(function () {
 			test.assertNotVisible('#loader-animation', "Loader animation is not shown.");
 		});
@@ -118,6 +124,32 @@ casper.test.begin('Uitests', 27, function suite(test) {
 			this.log(this.getCurrentUrl());
 			test.assertEquals(this.getCurrentUrl(), "http://localhost:8080/sulka/?", "browsing link works on addRinging page");
 		});
+		
+    	// Column hiding/showing
+		var previousColsLength = 0;
+		casper.then(function () {
+			previousColsLength = casper.evaluate(function () {
+				var cols = $("#slick-grid .slick-header-column");
+				sulka.columnHeaderContextMenu.call(cols[0], {pageX: 0, pageY: 0, preventDefault: function () {}});
+				return cols.length;
+			});
+		}).then(function () {
+			test.assertVisible("#header-context-menu", "Context menu is shown");
+		}).thenClick("#header-context-menu .context-menu-item", function () {
+			var currentColsLength = casper.evaluate(function () {
+				var cols = $("#slick-grid .slick-header-column");
+				return cols.length;
+			});
+			test.assertTrue(currentColsLength + 1 == previousColsLength, "Clicking on context menu item hides one column");
+			previousColsLength = currentColsLength;
+		}).thenClick("#header-context-menu .context-menu-item", function () {
+			var currentColsLength = casper.evaluate(function () {
+				var cols = $("#slick-grid .slick-header-column");
+				return cols.length;
+			});
+			test.assertTrue(currentColsLength == previousColsLength + 1, "Re-clicking on context menu item re-shows one column");
+		});
+	
     });
 	
     casper.run(function () {

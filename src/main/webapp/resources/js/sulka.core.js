@@ -98,13 +98,12 @@ sulka = {
 		return visible;
 	},
 	
-	columnHeaderContextMenu: function (event, data) {
+	columnHeaderContextMenu: function (event) {
 		event.preventDefault();
 		
 		$("#header-context-menu")
 			.css("top", event.pageY)
 			.css("left", event.pageX)
-			.data("column", data.column)
 			.show();
 		
 		$("body").one("click", function () {
