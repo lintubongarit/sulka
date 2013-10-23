@@ -86,13 +86,6 @@ public class RowsService {
 		}
 	}
 	
-	public static class QueryException extends Exception {
-		private static final long serialVersionUID = 1L;
-		QueryException(String message) {
-			super(message);
-		}
-	}
-	
 	private enum RowFilter {
 		RINGINGS,
 		RECOVERIES,
@@ -110,12 +103,12 @@ public class RowsService {
 	 * rows from startDate
 	 * @param sortBy A sort to use, such as [ "ringStart", "date" ], or null to use default sort.
 	 * @return list of rows
-	 * @throws QueryException If the query was not successful (message describes the error)
+	 * @throws APIQueryException If the query was not successful (message describes the error)
 	 */
 	public List<Row> getRows(final long[] ringerFilters, final String[] municipalityFilters,
 			final String[] speciesFilters, String ringPrefixFilter, LocalDate startDate, LocalDate endDate,
 			final String[] sortBy)
-			throws QueryException {
+			throws APIQueryException {
 		return getRowsByType(RowFilter.ALL,
 				ringerFilters, municipalityFilters, speciesFilters, ringPrefixFilter, startDate, endDate,
 				sortBy);
@@ -132,12 +125,12 @@ public class RowsService {
 	 * rows from startDate
 	 * @param sortBy A sort to use, such as [ "ringStart", "date" ], or null to use default sort.
 	 * @return list of rows
-	 * @throws QueryException If the query was not successful (message describes the error)
+	 * @throws APIQueryException If the query was not successful (message describes the error)
 	 */
 	public List<Row> getRingings(final long[] ringerFilters, final String[] municipalityFilters,
 			final String[] speciesFilters, String ringPrefixFilter, LocalDate startDate, LocalDate endDate,
 			final String[] sortBy)
-			throws QueryException {
+			throws APIQueryException {
 		return getRowsByType(RowFilter.RINGINGS,
 				ringerFilters, municipalityFilters, speciesFilters, ringPrefixFilter, startDate, endDate,
 				sortBy);
@@ -155,12 +148,12 @@ public class RowsService {
 	 * rows from startDate
 	 * @param sortBy A sort to use, such as [ "ringStart", "date" ], or null to use default sort.
 	 * @return list of rows
-	 * @throws QueryException If the query was not successful (message describes the error)
+	 * @throws APIQueryException If the query was not successful (message describes the error)
 	 */
 	public List<Row> getRecoveries(final long[] ringerFilters, final String[] municipalityFilters,
 			final String[] speciesFilters, String ringPrefixFilter, LocalDate startDate, LocalDate endDate,
 			final String[] sortBy)
-			throws QueryException {
+			throws APIQueryException {
 		return getRowsByType(
 				RowFilter.RECOVERIES,
 				ringerFilters, municipalityFilters, speciesFilters, ringPrefixFilter, startDate, endDate,
@@ -178,18 +171,18 @@ public class RowsService {
 	 * rows from startDate
 	 * @param sortBy A sort to use, such as [ "ringStart", "date" ], or null to use default sort.
 	 * @return list of rows
-	 * @throws QueryException If the query was not successful (message describes the error)
+	 * @throws APIQueryException If the query was not successful (message describes the error)
 	 */
 	private List<Row> getRowsByType(RowFilter rowFilter, final long[] ringerFilters, final String[] municipalityFilters,
 			final String[] speciesFilters, String ringPrefixFilter, LocalDate startDate, LocalDate endDate,
 			final String[] sortBy)
-			throws QueryException {
+			throws APIQueryException {
 		Map<String, Field> fieldsByFieldName = fieldsService.getAllFieldsByFieldName();
 		
 		RowsResponse response = filterQuery(rowFilter,
 				ringerFilters, municipalityFilters, speciesFilters, ringPrefixFilter, startDate, endDate, sortBy);
 		if (!response.isSuccess()) {
-			throw new QueryException(response.getError());
+			throw new APIQueryException(response.getError());
 		}
 		
 		ArrayList<Row> rows = new ArrayList<Row>(response.rows.length);

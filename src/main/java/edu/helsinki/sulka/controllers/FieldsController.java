@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import edu.helsinki.sulka.models.Field;
 import edu.helsinki.sulka.models.FieldGroup;
 import edu.helsinki.sulka.services.FieldsService;
-import edu.helsinki.sulka.services.RowsService;
 
 /**
  * Handles requests for available fields info.
@@ -34,8 +33,7 @@ public class FieldsController extends JSONController {
 	@PreAuthorize("hasRole('USER')")
 	@RequestMapping(value = "/api/fields/groups", method = RequestMethod.GET)
 	@ResponseBody
-	public ArrayResponse<FieldGroup> groups(Locale locale, Model model)
-			throws RowsService.QueryException {
+	public ArrayResponse<FieldGroup> groups(Locale locale, Model model) {
 		return new ArrayResponse<FieldGroup>(fieldsService.getAllFieldGroups());
 	}
 	
@@ -45,8 +43,7 @@ public class FieldsController extends JSONController {
 	@PreAuthorize("hasRole('USER')")
 	@RequestMapping(value = "/api/fields/all", method = RequestMethod.GET)
 	@ResponseBody
-	public ListResponse<Field> fields(Locale locale, Model model)
-			throws RowsService.QueryException {
+	public ListResponse<Field> fields(Locale locale, Model model) {
 		return new ListResponse<Field>(fieldsService.getAllFields());
 	}
 	
@@ -56,8 +53,7 @@ public class FieldsController extends JSONController {
 	@PreAuthorize("hasRole('USER')")
 	@RequestMapping(value = "/api/fields/groups/{viewMode}", method = RequestMethod.GET)
 	@ResponseBody
-	public ListResponse<FieldGroup> groups(Locale locale, Model model, @PathVariable String viewMode)
-			throws RowsService.QueryException {
+	public ListResponse<FieldGroup> groups(Locale locale, Model model, @PathVariable String viewMode) {
 		return new ListResponse<FieldGroup>(fieldsService.getAllFieldGroups(Field.ViewMode.valueOf(viewMode.toUpperCase())));
 	}
 	
@@ -67,8 +63,7 @@ public class FieldsController extends JSONController {
 	@PreAuthorize("hasRole('USER')")
 	@RequestMapping(value = "/api/fields/all/{viewMode}", method = RequestMethod.GET)
 	@ResponseBody
-	public ListResponse<Field> fields(Locale locale, Model model, @PathVariable String viewMode)
-			throws RowsService.QueryException {
+	public ListResponse<Field> fields(Locale locale, Model model, @PathVariable String viewMode) {
 		return new ListResponse<Field>(fieldsService.getAllFields(Field.ViewMode.valueOf(viewMode.toUpperCase())));
 	}
 }

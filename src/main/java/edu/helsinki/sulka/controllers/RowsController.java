@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import edu.helsinki.sulka.models.Row;
 import edu.helsinki.sulka.models.User;
+import edu.helsinki.sulka.services.APIQueryException;
 import edu.helsinki.sulka.services.RowsService;
 
 /**
@@ -45,7 +46,7 @@ public class RowsController extends JSONController {
 			@RequestParam(value="startDate", required=false) @DateTimeFormat(pattern="dd.MM.YYYY") LocalDate startDate,
 			@RequestParam(value="endDate", required=false) @DateTimeFormat(pattern="dd.MM.YYYY") LocalDate endDate,
 			@RequestParam(value="sort", required=false) String[] sort
-			) throws RowsService.QueryException {
+			) throws APIQueryException {
 		return new ListResponse<Row>(rowsService.getRows(
 				((User) session.getAttribute("user")).getRingerIdAsArray(),
 				municipalities, species, ringPrefix,
@@ -67,7 +68,7 @@ public class RowsController extends JSONController {
 			@RequestParam(value="startDate", required=false) @DateTimeFormat(pattern="dd.MM.YYYY") LocalDate startDate,
 			@RequestParam(value="endDate", required=false) @DateTimeFormat(pattern="dd.MM.YYYY") LocalDate endDate,
 			@RequestParam(value="sort", required=false) String[] sort
-			) throws RowsService.QueryException {
+			) throws APIQueryException {
 		return new ListResponse<Row>(rowsService.getRingings(
 				((User) session.getAttribute("user")).getRingerIdAsArray(),
 				municipalities, species, ringPrefix,
@@ -89,7 +90,7 @@ public class RowsController extends JSONController {
 			@RequestParam(value="startDate", required=false) @DateTimeFormat(pattern="dd.MM.YYYY") LocalDate startDate,
 			@RequestParam(value="endDate", required=false) @DateTimeFormat(pattern="dd.MM.YYYY") LocalDate endDate,
 			@RequestParam(value="sort", required=false) String[] sort
-			) throws RowsService.QueryException {
+			) throws APIQueryException {
 		return new ListResponse<Row>(rowsService.getRecoveries(
 				((User) session.getAttribute("user")).getRingerIdAsArray(),
 				municipalities, species, ringPrefix,
