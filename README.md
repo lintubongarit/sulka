@@ -17,4 +17,7 @@ Oracle .jar is found in the repo, but before Maven can find it you must run the 
 Frontend tests
 --------------
 Frontend tests are launched with ```mvn exec:exec``` and require the git-latest [CasperJS](http://casperjs.org/) and 
-version 1.9 of [PhantomJS](http://phantomjs.org/) in PATH.
+version 1.9 of [PhantomJS](http://phantomjs.org/) in PATH. Also, they obviously require that the server is running in
+the localhost (or in the URL specified as the second argument to the test runner at
+```src/test/js/run-casperjs-tests.sh```. The first argument can be used to specify an alternate location for CasperJS 
+and PhantomJS.)
