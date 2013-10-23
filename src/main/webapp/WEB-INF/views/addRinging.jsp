@@ -18,6 +18,8 @@
 		<script src="resources/js/sulka.API.js"></script>
 		<script src="resources/js/sulka.helpers.js"></script>
 		<script src="resources/js/sulka.addRinging.js"></script>
+		
+		<c:set var="contextPath" value="${pageContext.request.contextPath}"/>
 	</head>
 	<body>
 		<table id="global-toolbar" class="global-toolbar">
@@ -62,12 +64,12 @@
 					<button type="button" value="new row" onclick="sulka.addRow();">Lisää rivi</button>
 				</td>
 				<td class="local-toolbar-menu">
-					<form action="/sulka">
+					<form action="${contextPath}">
 					    <input type="submit" id="browsing"  value="Selaus">
 				    </form>
 				</td>
 				<td class="local-toolbar-menu">
-					<form action="/sulka/addringing">
+					<form action="${contextPath}/addringing">
 					    <input type="submit" id="addRinging"  value="Rengastusten syöttö">
 					</form>
 				</td>
