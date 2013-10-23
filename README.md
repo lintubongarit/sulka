@@ -1,7 +1,7 @@
 Sulka
 =====
 
-Uusi käyttöliittymä rengastustietojen syöttöön.
+The new web frontend for entering bird ringing data.
 
 Installing
 ==========
@@ -10,6 +10,7 @@ Should work out of the box with Maven and Java 7 (versions as of fall 2013) with
 Oracle DB module
 ----------------
 Oracle .jar is found in the repo, but before Maven can find it you must run the following command on top-level:
+
     mvn install:install-file -Dfile=other_files/ojdbc7.jar \
     	-DgroupId=com.oracle -DartifactId=ojdbc7 -Dversion=12.1.0.1 \
     	-Dpackaging=jar
