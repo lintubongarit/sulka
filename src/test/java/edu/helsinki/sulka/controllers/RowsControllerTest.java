@@ -190,9 +190,6 @@ public class RowsControllerTest {
 			.andReturn();
     	mockMvc.perform(get("/api/rows?municipality=MHAMN&municipality=INKOO&startDate=6.13.1974").session(testUserHttpSession))
 			.andExpect(status().isBadRequest())
-			.andExpect(content().contentType("application/json;charset=UTF-8"))
-    		.andExpect(jsonPath("$.success").value(false))
-    		.andExpect(jsonPath("$.error").value(notNullValue()))
 			.andReturn();
     	mockMvc.perform(get("/api/rows?municipality=MHAMN&municipality=INKOO&startDate=1.1.1970&endDate=1.1.2013").session(testUserHttpSession))
 			.andExpect(status().isOk())
@@ -216,9 +213,6 @@ public class RowsControllerTest {
 			.andReturn();
     	mockMvc.perform(get("/api/rows?municipality=MHAMN&municipality=INKOO&startDate=01.01.1970&endDate=1.20.2013").session(testUserHttpSession))
 			.andExpect(status().isBadRequest())
-			.andExpect(content().contentType("application/json;charset=UTF-8"))
-			.andExpect(jsonPath("$.success").value(false))
-			.andExpect(jsonPath("$.error").value(notNullValue()))
 			.andReturn();
     	mockMvc.perform(get("/api/rows?municipality=MHAMN&municipality=INKOO&startDate=01.01.1970&endDate=20.01.2013").session(testUserHttpSession))
 			.andExpect(status().isOk())
@@ -359,9 +353,6 @@ public class RowsControllerTest {
 			.andReturn();
     	mockMvc.perform(get("/api/rows/recoveries?municipality=MHAMN&municipality=INKOO&startDate=6.13.1974").session(testUserHttpSession))
 			.andExpect(status().isBadRequest())
-			.andExpect(content().contentType("application/json;charset=UTF-8"))
-    		.andExpect(jsonPath("$.success").value(false))
-    		.andExpect(jsonPath("$.error").value(notNullValue()))
 			.andReturn();
     	mockMvc.perform(get("/api/rows/recoveries?municipality=MHAMN&municipality=INKOO&startDate=1.1.1970&endDate=1.1.2013").session(testUserHttpSession))
 			.andExpect(status().isOk())
@@ -385,9 +376,6 @@ public class RowsControllerTest {
 			.andReturn();
     	mockMvc.perform(get("/api/rows/recoveries?municipality=MHAMN&municipality=INKOO&startDate=01.01.1970&endDate=1.20.2013").session(testUserHttpSession))
 			.andExpect(status().isBadRequest())
-			.andExpect(content().contentType("application/json;charset=UTF-8"))
-			.andExpect(jsonPath("$.success").value(false))
-			.andExpect(jsonPath("$.error").value(notNullValue()))
 			.andReturn();
     	mockMvc.perform(get("/api/rows/recoveries?municipality=MHAMN&municipality=INKOO&startDate=01.01.1970&endDate=20.01.2013").session(testUserHttpSession))
 			.andExpect(status().isOk())

@@ -68,15 +68,4 @@ public abstract class JSONController {
 	public ErrorResponse handleAPIException(Exception e) {
 		return new ErrorResponse(e.getMessage());
 	}
-	
-	/**
-	 * Other exceptions are printed and HTTP 500 is returned.
-	 */
-	@ExceptionHandler(Exception.class)
-	@ResponseBody
-	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-	public ErrorResponse handleException(Exception e) {
-		e.printStackTrace();
-		return new ErrorResponse(e.getMessage());
-	}
 }
