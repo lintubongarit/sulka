@@ -7,6 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.web.FilterChainProxy;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -18,17 +19,21 @@ import org.springframework.web.context.WebApplicationContext;
 @WebAppConfiguration
 @ContextConfiguration({
 	"file:src/main/webapp/WEB-INF/spring/root-context.xml",
+	"file:src/main/webapp/WEB-INF/spring/security.xml",
 	"file:src/main/webapp/WEB-INF/spring/appServlet/servlet-context.xml"
 })
 public class LoginControllerTest {
     @Autowired
     private WebApplicationContext wac;
     
+	@Autowired
+	private FilterChainProxy springSecurityFilterChain;
+
     private MockMvc mockMvc;
 
     @Before
     public void setup() {
-    	this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).build();
+    	mockMvc = MockMvcBuilders.webAppContextSetup(wac).addFilters(springSecurityFilterChain).build();
     }
 
     @Test
@@ -44,30 +49,22 @@ public class LoginControllerTest {
     		.andExpect(status().isBadRequest())
     		.andReturn();
     	mockMvc.perform(get("/login?iv=test"))
-		.andExpect(status().isBadRequest())
-		.andReturn();
+			.andExpect(status().isBadRequest())
+			.andReturn();
     	mockMvc.perform(get("/login?data=test"))
-		.andExpect(status().isBadRequest())
-		.andReturn();
+			.andExpect(status().isBadRequest())
+			.andReturn();
     	mockMvc.perform(get("/login?key=test&iv=test"))
-		.andExpect(status().isBadRequest())
-		.andReturn();
+			.andExpect(status().isBadRequest())
+			.andReturn();
     	mockMvc.perform(get("/login?key=test&iv=test"))
-		.andExpect(status().isBadRequest())
-		.andReturn();
+			.andExpect(status().isBadRequest())
+			.andReturn();
     	mockMvc.perform(get("/login?key=test&data=test"))
-		.andExpect(status().isBadRequest())
-		.andReturn();
+			.andExpect(status().isBadRequest())
+			.andReturn();
     	mockMvc.perform(get("/login?iv=test&data=test"))
-		.andExpect(status().isBadRequest())
-		.andReturn();
+			.andExpect(status().isBadRequest())
+			.andReturn();
 	}
-    
-//    @Test
-//    public void testLoginRedirectsWithAllAuthVariables() throws Exception {
-//    	mockMvc.perform(get("/login?key=test&iv=test&data=test"))
-//    		.andExpect(status().isFound())
-//    		.andReturn();
-//	}
-
 }

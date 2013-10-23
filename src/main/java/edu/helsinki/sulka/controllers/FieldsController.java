@@ -4,6 +4,7 @@ import java.util.Locale;
 
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,6 +31,7 @@ public class FieldsController extends JSONController {
 	/**
 	 * Returns all field groups.
 	 */
+	@PreAuthorize("hasRole('USER')")
 	@RequestMapping(value = "/api/fields/groups", method = RequestMethod.GET)
 	@ResponseBody
 	public ArrayResponse<FieldGroup> groups(Locale locale, Model model)
@@ -40,6 +42,7 @@ public class FieldsController extends JSONController {
 	/**
 	 * Returns all fields.
 	 */
+	@PreAuthorize("hasRole('USER')")
 	@RequestMapping(value = "/api/fields/all", method = RequestMethod.GET)
 	@ResponseBody
 	public ListResponse<Field> fields(Locale locale, Model model)
@@ -50,6 +53,7 @@ public class FieldsController extends JSONController {
 	/**
 	 * Returns all field groups that have column entries for given view mode.
 	 */
+	@PreAuthorize("hasRole('USER')")
 	@RequestMapping(value = "/api/fields/groups/{viewMode}", method = RequestMethod.GET)
 	@ResponseBody
 	public ListResponse<FieldGroup> groups(Locale locale, Model model, @PathVariable String viewMode)
@@ -60,6 +64,7 @@ public class FieldsController extends JSONController {
 	/**
 	 * Returns all fields for given view mode.
 	 */
+	@PreAuthorize("hasRole('USER')")
 	@RequestMapping(value = "/api/fields/all/{viewMode}", method = RequestMethod.GET)
 	@ResponseBody
 	public ListResponse<Field> fields(Locale locale, Model model, @PathVariable String viewMode)

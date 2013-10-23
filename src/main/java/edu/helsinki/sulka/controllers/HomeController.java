@@ -24,7 +24,7 @@ public class HomeController {
 	 * Simply selects the home view to render by returning its name.
 	 */
 	
-	@PreAuthorize("hasAnyRole('USER,ADMIN')")
+	@PreAuthorize("hasRole('USER')")
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public String home(Locale locale, Model model, HttpSession session) {
 		return "slick";

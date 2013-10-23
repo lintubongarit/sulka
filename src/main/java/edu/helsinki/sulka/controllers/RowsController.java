@@ -34,7 +34,7 @@ public class RowsController extends JSONController {
 	/**
 	 * Returns all rows by filters.
 	 */
-	
+	@PreAuthorize("hasRole('USER')")
 	@RequestMapping(value = "/api/rows", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	@ResponseBody
 	public ListResponse<Row> all(
@@ -56,7 +56,7 @@ public class RowsController extends JSONController {
 	/**
 	 * Returns ringing rows by filters.
 	 */
-	
+	@PreAuthorize("hasRole('USER')")
 	@RequestMapping(value = "/api/rows/ringings", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	@ResponseBody
 	public ListResponse<Row> ringings(
@@ -78,6 +78,7 @@ public class RowsController extends JSONController {
 	/**
 	 * Returns recovery rows by filters.
 	 */
+	@PreAuthorize("hasRole('USER')")
 	@RequestMapping(value = "/api/rows/recoveries", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	@ResponseBody
 	public ListResponse<Row> recoveries(

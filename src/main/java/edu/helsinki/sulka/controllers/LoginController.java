@@ -88,14 +88,17 @@ public class LoginController implements AuthenticationEntryPoint {
 	 */
 	@Autowired
 	private TestLoginCodeConfiguration testLoginCodeConfiguration;
+	
+	private static final boolean ALLOW_ONLY_LOCALHOST_TEST_LOGIN = true;
 
 	/**
 	 * Creates a fake user session for JS tests.
 	 */
 	@RequestMapping(value = "/testLogin/{code}", method = RequestMethod.GET)
 	public String testLogin(HttpServletResponse response, Model model,
-			@PathVariable String code) {
-		if (testLoginCodeConfiguration.isCorrectCode(code)) {
+			@PathVariable String code, HttpServletRequest request) {
+		if (testLoginCodeConfiguration.isCorrectCode(code) &&
+				(!ALLOW_ONLY_LOCALHOST_TEST_LOGIN || request.getRemoteAddr().equals("127.0.0.1"))) {
 			User user = new User();
 			user.setPass(true);
 			user.setLogin_id("846");
@@ -122,8 +125,9 @@ public class LoginController implements AuthenticationEntryPoint {
 	 */
 	@RequestMapping(value = "/testAdminLogin/{code}", method = RequestMethod.GET)
 	public String testAdminLogin(HttpServletResponse response, Model model,
-			@PathVariable String code) {
-		if (testLoginCodeConfiguration.isCorrectCode(code)) {
+			@PathVariable String code, HttpServletRequest request) {
+		if (testLoginCodeConfiguration.isCorrectCode(code) &&
+				(!ALLOW_ONLY_LOCALHOST_TEST_LOGIN || request.getRemoteAddr().equals("127.0.0.1"))) {
 			User user = new User();
 			user.setPass(true);
 			user.setLogin_id("846");

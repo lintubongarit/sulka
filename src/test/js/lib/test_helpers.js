@@ -3,7 +3,7 @@ const LOCALE = 'fi_FI';
 const TEST_SESSION_CODE = "b0d2cc8b16fc2de6bfbee049f2c62415cdb088ab1983eeafdbc3010f0024bc33";
 
 /**
- * Browse to path in tested deployment, inject jQuery and execute testCb when done. 
+ * Create login session, browse to path in tested deployment, inject jQuery and execute testCb when done. 
  * @param path Web page path to test
  * @param testCb Callback to execute when ready.
  */
