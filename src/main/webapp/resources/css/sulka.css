@@ -212,3 +212,37 @@ img#loader-animation {
 	border-bottom: 0px;
 	float: left;
 }
+
+.context-menu {
+	background: lightgray;
+	border: 1px solid black;
+	margin: 0;
+	padding: 2px;
+	display: inline-block;
+	min-width: 100px;
+	box-shadow: 2px 2px 2px silver;
+	-moz-box-shadow: 2px 2px 2px silver;
+	-webkit-box-shadow: 2px 2px 2px silver;
+	z-index: 99999;
+}
+.context-menu li.context-menu-item {
+	padding: 4px 4px 4px 4px;
+	list-style: none;
+	cursor: pointer;
+}
+.context-menu li.context-menu-item:hover {
+	background-color: white;
+}
+.context-menu li.context-menu-item span.context-menu-tick  {
+	display: inline-block;
+	width: 1.5ex;
+	font-weight: bold;
+	font-size: 125%;
+	vertical-align: middle;
+}
+
+.context-menu li.context-menu-title {
+	padding: 4px;
+	list-style: none;
+	font-weight: bold;
+}

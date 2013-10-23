@@ -11,7 +11,7 @@ Oracle DB module
 ----------------
 Oracle .jar is found in the repo, but before Maven can find it you must run the following command on top-level:
 
-    mvn install:install-file -Dfile=other_files/ojdbc7.jar \
+    mvn install:install-file -Dfile=lib/ojdbc7.jar \
     	-DgroupId=com.oracle -DartifactId=ojdbc7 -Dversion=12.1.0.1 \
     	-Dpackaging=jar
 

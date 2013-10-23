@@ -25,3 +25,12 @@ function get(codeString) {
 	}, codeString);
 	return JSON.parse(json);
 };
+
+/**
+ * Get selector element count.
+ */
+function count(selector) {
+	return casper.evaluate(function (selector) {
+		return __utils__.findAll(selector).length;
+	}, selector);
+}

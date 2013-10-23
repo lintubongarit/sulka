@@ -86,7 +86,6 @@
 		<div id="columns-pane">
 			<table id="columns-table"></table>
 		</div>
-		
-		<form id="tiedot"></form><!-- Added here just to make tests not fail -->
+		<ul id="header-context-menu" class="context-menu" style="display:none;position:absolute"></ul>
 	</body>
 </html>

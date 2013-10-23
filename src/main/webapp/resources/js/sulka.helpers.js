@@ -164,7 +164,18 @@ helpers = {
 		}
 		
 		return null;
-	}
+	},
+	
+    disableSelection: function ($target) {
+      if ($target && $target.jquery) {
+        $target
+            .attr("unselectable", "on")
+            .css("MozUserSelect", "none")
+            .bind("selectstart.ui", function () {
+              return false;
+            }); // from jquery:ui.core.js 1.7.2
+      }
+    }
 };
 
 return helpers; }();
