@@ -10,13 +10,12 @@ Should work out of the box with Maven and Java 7 (versions as of fall 2013) with
 Oracle DB module
 ----------------
 Oracle .jar is found in the repo, but before Maven can find it you must run the following command on top-level:
-```mvn install:install-file -Dfile=other_files/ojdbc7.jar \
+	mvn install:install-file -Dfile=other_files/ojdbc7.jar \
                   -DgroupId=com.oracle -DartifactId=ojdbc7 -Dversion=12.1.0.1 \
-                  -Dpackaging=jar```
+                  -Dpackaging=jar
 
 
 Frontend tests
 --------------
-Frontend tests are launched with 
-```mvn exec:exec```
-and require the git-latest [CasperJS](http://casperjs.org/) and version 1.9 of [PhantomJS](http://phantomjs.org/) in path.
+Frontend tests are launched with ```mvn exec:exec``` and require the git-latest [CasperJS](http://casperjs.org/) and 
+version 1.9 of [PhantomJS](http://phantomjs.org/) in PATH.
