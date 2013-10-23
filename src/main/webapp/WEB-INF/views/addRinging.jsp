@@ -17,6 +17,7 @@
 		<script src="resources/js/sulka.strings.js"></script>
 		<script src="resources/js/sulka.API.js"></script>
 		<script src="resources/js/sulka.helpers.js"></script>
+		<script src="resources/js/sulka.addRinging.js"></script>
 	</head>
 	<body>
 		<table id="global-toolbar" class="global-toolbar">
@@ -46,29 +47,39 @@
 			</tr>
 		</table>
 		
-		<div class="local-toolbar">
-			<form id="filters">
-				Rengastaja: <input type="text" id="filters-ringer" name="ringer" />
-				
-				<input type="hidden" id="filters-date" name="date" value="" />
-				
-				
-				Laji: <input type="text" id="filters-species" name="species" />
-				Kunta: <input type="text" id="filters-municipality" name="municipality" />
-				<input type="submit" id="form-submit" value="OK" />
-				<input type="reset" id="form-reset" value="Tyhjennä" />
-				<input type="checkbox" id="filters-ringings" name="ringings" checked/> Rengastukset
- 				<input type="checkbox" id="filters-recoveries" name="recoveries" checked /> Tapaamiset
-				<img src="resources/img/ajax-loader.gif" id="loader-animation" />
-			</form>
-		</div>
+		<table class="local-toolbar">
+			<tr>
+				<td>
+					<form id="filters">
+						Laji: <input type="text" id="filters-species" name="species" />
+						Kunta: <input type="text" id="filters-municipality" name="municipality" />
+						<input type="submit" id="form-submit" value="OK" />
+						<input type="reset" id="form-reset" value="Tyhjennä" />
+						<img src="resources/img/ajax-loader.gif" id="loader-animation" />
+					</form>
+				</td>
+				<td>
+					<button type="button" value="new row" onclick="sulka.addRow();">Lisää rivi</button>
+				</td>
+				<td class="local-toolbar-menu">
+					<form action="/sulka">
+					    <input type="submit" value="Selaus">
+				    </form>
+				</td>
+				<td class="local-toolbar-menu">
+					<form action="/sulka/addringing">
+					    <input type="submit" value="Rengastusten syöttö">
+					</form>
+				</td>
+			</tr>
+		</table>
 	
 		<div id="row-status-box-container">
 			<div id="row-status-box" style="padding: 1px">
 				<span id="last-error"></span>
 			</div>
 		</div>
-		<div id="slick-grid"></div>
+		<div id="slick-grid" class="addRow"></div>
 		<div id="columns-pane">
 			<table id="columns-table"></table>
 		</div>

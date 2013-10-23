@@ -15,6 +15,7 @@ sulka = {
 	init: function () {
 		sulka.initEventHandlers();
 		sulka.initGrid();
+		sulka.chooseMode();
 	},
 
 	initEventHandlers: function () {
@@ -23,6 +24,16 @@ sulka = {
 			sulka.reloadData();
 		});
 	},
+	
+	chooseMode: function () {
+		$("#mode").submit(function (event) {
+			console.log('yes: ' + $("#mode-browsing").val());
+		});
+	},
+	
+	asd: $("button").click(function(){
+		console.log(this.id);
+	}),
 	
 	initGrid: function () {
 		sulka.helpers.showLoader();
@@ -90,7 +101,7 @@ sulka = {
 		var filters;
 		var municipality = $.trim($("#filters-municipality").val()),
 			species = $.trim($("#filters-species").val()),
-			date = $.trim($("#filters-date").val());
+			date = sulka.getDate();
 		
 		if (date) {
 			filters = sulka.helpers.parseDateInput(date);
@@ -111,6 +122,13 @@ sulka = {
 		return filters;
 	},
 	
+	getDate: function () {
+		return $.trim($("#filters-date").val());
+	},
+	
+	/**
+	 * Gets the wanted rows mode from the checkboxes in filters-form
+	 */
 	getRowMode: function () {
 		var	ringings = $("#filters-ringings").is(':checked'),
 			recoveries = $("#filters-recoveries").is(':checked');
@@ -125,9 +143,12 @@ sulka = {
 			sulka.rowsMode = "all";
 		}
 	}
+	
 };
 
 return sulka; }();
 
 /* Launch sulka.init() on DOM complete */
 $(sulka.init);
+
+console.log('hahaha');

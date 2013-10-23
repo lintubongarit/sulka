@@ -31,16 +31,6 @@ public class AddRingingController {
 	@PreAuthorize("hasAnyRole('USER,ADMIN')")
 	@RequestMapping(value = "/addringing", method = RequestMethod.GET)
 	public String home(Locale locale, Model model, HttpSession session) {
-		Calendar c = Calendar.getInstance();
-		DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
-		
-		model.addAttribute("startDate", dateFormat.format(c.getTime()));
-		System.out.println(dateFormat.format(c.getTime()));
-		
-		c.set(c.get(c.YEAR) - 1, c.get(c.MONTH), c.get(c.DAY_OF_MONTH));
-		model.addAttribute("endDate", dateFormat.format(c.getTime()));
-		System.out.println(dateFormat.format(c.getTime()));
-		
 		return "addRinging";
 	}
 }

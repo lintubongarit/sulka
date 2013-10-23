@@ -46,7 +46,21 @@
 			</tr>
 		</table>
 		
-		<div class="local-toolbar">
+		<table class="local-toolbar" >
+			<tr>
+				<td class="local-toolbar-menu">
+					<form action="/sulka">
+					    <input type="submit" value="Selaus">
+				    </form>
+				</td>
+				<td class="local-toolbar-menu">
+					<form action="/sulka/addringing">
+					    <input type="submit" value="Rengastusten syöttö">
+					</form>
+				</td>
+			</tr>
+			<tr><td>
+		
 			<form id="filters">
 				Rengastaja: <input type="text" id="filters-ringer" name="ringer" />
 				Aika (esim. 2005 tai 2005-2006): <input type="text" id="filters-date" name="date" />
@@ -58,14 +72,15 @@
  				<input type="checkbox" id="filters-recoveries" name="recoveries" checked /> Tapaamiset
 				<img src="resources/img/ajax-loader.gif" id="loader-animation" />
 			</form>
-		</div>
+			</td></tr>
+		</table>
 	
 		<div id="row-status-box-container">
 			<div id="row-status-box" style="padding: 1px">
 				<span id="last-error"></span>
 			</div>
 		</div>
-		<div id="slick-grid"></div>
+		<div id="slick-grid" class="browse"></div>
 		<div id="columns-pane">
 			<table id="columns-table"></table>
 		</div>

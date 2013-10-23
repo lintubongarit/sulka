@@ -90,14 +90,18 @@ ul.feature-list-tabs {
 }
 
 .local-toolbar {
-    width: 100%;
     height: 28px;
     margin: 0;
     padding: 0;
     border-top: 1px solid black;
     border-bottom: 1px solid black;
     background-color: rgb(253, 214, 136);
-    vertical-align: middle;
+    width: 100%;
+}
+
+.local-toolbar-menu {
+	vertical-align: right;
+	float: right;
 }
 
 .current-feature-title {
@@ -147,7 +151,7 @@ ul.feature-list-tabs li a:hover {
 
 #row-status-box-container {
 	background-color:  rgb(253, 214, 136);
-   	height: 20px;
+   	height: 15px;
    	text-align: left;
    	border-bottom: 1px solid black;
 }
@@ -157,9 +161,17 @@ ul.feature-list-tabs li a:hover {
     left: 0;
     right: 0;
     bottom: 0;
-    top: 158px;
+    top: 220px;
     vertical-align: middle;
     text-align: center;
+}
+
+#slick-grid.browse{
+	top: 210px;
+}
+
+#slick-grid.addRow{
+	top: 170px;
 }
 
 span#last-error {
