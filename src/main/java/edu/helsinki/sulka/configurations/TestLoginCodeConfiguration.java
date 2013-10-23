@@ -14,6 +14,6 @@ public class TestLoginCodeConfiguration {
 	
 	private String code = null;
 	public boolean isCorrectCode(final String userCode) {
-		return this.code != null && this.code.equals(userCode);
+		return this.code != null && this.code.length() > 0 && this.code.equals(userCode);
 	}
 }
