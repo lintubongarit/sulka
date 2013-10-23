@@ -84,7 +84,7 @@ public class LoginController implements AuthenticationEntryPoint {
 			SecurityContextHolder.getContext()
 					.setAuthentication(authentication);
 
-			return "slick";
+			return "redirect:/";
 		}
 
 		return "redirect:" + redirectUrl;

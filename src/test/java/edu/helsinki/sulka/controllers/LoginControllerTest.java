@@ -1,6 +1,8 @@
 package edu.helsinki.sulka.controllers;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
+
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.Before;
@@ -30,6 +32,8 @@ public class LoginControllerTest {
 	private FilterChainProxy springSecurityFilterChain;
 
     private MockMvc mockMvc;
+    
+    private String REDIRECT_URI = "http://lintuvaara.ihku.fi/";
 
     @Before
     public void setup() {
@@ -39,32 +43,32 @@ public class LoginControllerTest {
     @Test
     public void testLoginIsBadRequestWithoutAnyAuthVars() throws Exception {
     	mockMvc.perform(get("/login"))
-    		.andExpect(status().isBadRequest())
+    		.andExpect(redirectedUrl(REDIRECT_URI))
     		.andReturn();
 	}
     
     @Test
     public void testLoginIsBadRequestWithOnlySomeAuthVars() throws Exception {
     	mockMvc.perform(get("/login?key=test"))
-    		.andExpect(status().isBadRequest())
+    		.andExpect(redirectedUrl(REDIRECT_URI))
     		.andReturn();
     	mockMvc.perform(get("/login?iv=test"))
-			.andExpect(status().isBadRequest())
+			.andExpect(redirectedUrl(REDIRECT_URI))
 			.andReturn();
     	mockMvc.perform(get("/login?data=test"))
-			.andExpect(status().isBadRequest())
+			.andExpect(redirectedUrl(REDIRECT_URI))
 			.andReturn();
     	mockMvc.perform(get("/login?key=test&iv=test"))
-			.andExpect(status().isBadRequest())
+			.andExpect(redirectedUrl(REDIRECT_URI))
 			.andReturn();
     	mockMvc.perform(get("/login?key=test&iv=test"))
-			.andExpect(status().isBadRequest())
+			.andExpect(redirectedUrl(REDIRECT_URI))
 			.andReturn();
     	mockMvc.perform(get("/login?key=test&data=test"))
-			.andExpect(status().isBadRequest())
+			.andExpect(redirectedUrl(REDIRECT_URI))
 			.andReturn();
     	mockMvc.perform(get("/login?iv=test&data=test"))
-			.andExpect(status().isBadRequest())
+			.andExpect(redirectedUrl(REDIRECT_URI))
 			.andReturn();
 	}
 }
