@@ -22,9 +22,16 @@ sulka = {
 			sulka.helpers.cancelEvent(event);
 			sulka.reloadData();
 		});
+		$("#header-context-menu-show").click(function () {
+			sulka.showColumn($("#header-context-menu").data("column"));
+		});
+		$("#header-context-menu-hide").click(function () {
+			sulka.hideColum($("#header-context-menu").data("column"));
+		});
 	},
 	
 	fieldGroups: null,
+	TICK_MARK: "✓",
 	initGrid: function () {
 		sulka.helpers.showLoader();
 		sulka.API.fetchFieldGroups(
@@ -34,25 +41,83 @@ sulka = {
 				
 				sulka.fieldGroups = fieldGroups;
 				var columns = [];
+				var $headerContextMenu = $("#header-context-menu");
 				$.each(fieldGroups, function () {
 					var group = this;
+					$headerContextMenu.append(
+						$("<li></li>")
+							.addClass("context-menu-title")
+							.text(group.description)
+					);
 					$.each(this.fields, function () {
 						var column = {
 							id: group.name + "/" + this.field,
 							field: this.field,
 							name: this.name,
 							toolTip: this.description,
-							$sulkaGroup: group
+							$sulkaGroup: group,
+							$sulkaVisible: true
 						};
 						columns.push(column);
+						$headerContextMenu.append(
+								$("<li></li>")
+									.addClass("context-menu-item")
+									.append(
+											$("<span></span>")
+												.addClass("context-menu-tick")
+												.text(sulka.TICK_MARK)
+									)
+									.append(
+											$("<span></span>")
+												.text(this.name)
+									)
+									.data("column", column)
+						);
 					});
 				});
-				sulka.grid = new Slick.Grid("#slick-grid", [], columns, sulka.gridOptions);
+				sulka.columns = columns;
+				sulka.grid = new Slick.Grid("#slick-grid", [], sulka.getVisibleColumns(), sulka.gridOptions);
 				sulka.initColumnGroups();
+				sulka.grid.onHeaderContextMenu.subscribe(sulka.columnHeaderContextMenu);
+				$headerContextMenu.find("li.context-menu-item").click(sulka.headerContextMenuItemClicked);
 				sulka.reloadData();
 			},
 			sulka.helpers.hideLoaderAndSetError
 		);
+	},
+	
+	getVisibleColumns: function () {
+		var visible = [];
+		$.each(sulka.columns, function () {
+			if (this.$sulkaVisible) {
+				visible.push(this);
+			}
+		});
+		return visible;
+	},
+	
+	columnHeaderContextMenu: function (event, data) {
+		event.preventDefault();
+		
+		$("#header-context-menu")
+			.css("top", event.pageY)
+			.css("left", event.pageX)
+			.data("column", data.column)
+			.show();
+		
+		$("body").one("click", function () {
+			$("#header-context-menu").hide();
+		});
+	},
+	
+	headerContextMenuItemClicked: function () {
+		var column = $(this).data("column");
+		if (column) {
+			column.$sulkaVisible = !column.$sulkaVisible;
+			sulka.grid.setColumns(sulka.getVisibleColumns());
+			console.log(sulka.getVisibleColumns());
+			$(this).closest("li").find("span.context-menu-tick").text(column.$sulkaVisible ? sulka.TICK_MARK : "");
+		}
 	},
 	
 	columnGroupsDiv: null,
@@ -64,6 +129,7 @@ sulka = {
 		).insertBefore(
 			'#slick-grid div.slick-header div.slick-header-columns:first-child'
 		);
+		sulka.helpers.disableSelection(sulka.columnGroupsDiv);
 		sulka.grid.onColumnsResized.subscribe(sulka.renderColumnGroups);
 		sulka.grid.onColumnsReordered.subscribe(sulka.renderColumnGroups);
 		sulka.renderColumnGroups();

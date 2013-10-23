@@ -70,6 +70,7 @@
 			<table id="columns-table"></table>
 		</div>
 		
-		<form id="tiedot"></form><!-- Added here just to make tests not fail -->
+		<form id="tiedot"></form>
+		<ul id="header-context-menu" class="context-menu" style="display:none;position:absolute"></ul>
 	</body>
 </html>
