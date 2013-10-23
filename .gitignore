@@ -53,3 +53,5 @@ local.properties
 .cproject
 # PDT-specific
 .buildpath
+#Secret Stuff
+src/main/resources/hibernate.cfg.xml
