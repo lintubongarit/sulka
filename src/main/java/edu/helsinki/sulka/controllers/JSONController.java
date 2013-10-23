@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import edu.helsinki.sulka.services.APIQueryException;
+
 /**
  * Base class for Controllers that only return JSON.
  */
@@ -57,10 +59,13 @@ public abstract class JSONController {
 		public boolean success = true;
 	}
 	
-	@ExceptionHandler(Exception.class)
+	/**
+	 * Handles API exceptions gracefully.
+	 */
+	@ExceptionHandler(APIQueryException.class)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	public ErrorResponse handleException(Exception e) {
+	public ErrorResponse handleAPIException(Exception e) {
 		return new ErrorResponse(e.getMessage());
 	}
 }

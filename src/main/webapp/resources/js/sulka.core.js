@@ -11,11 +11,10 @@ sulka = {
 
 	viewMode: "browsing",
 	rowsMode: "ringings",
-
+	
 	init: function () {
 		sulka.initEventHandlers();
 		sulka.initGrid();
-		sulka.chooseMode();
 	},
 
 	initEventHandlers: function () {
@@ -25,34 +24,102 @@ sulka = {
 		});
 	},
 	
-	chooseMode: function () {
-		$("#mode").submit(function (event) {
-			console.log('yes: ' + $("#mode-browsing").val());
-		});
-	},
-	
-	asd: $("button").click(function(){
-		console.log(this.id);
-	}),
-	
+	fieldGroups: null,
+
 	initGrid: function () {
 		sulka.helpers.showLoader();
-		sulka.API.fetchFields(
+		sulka.API.fetchFieldGroups(
 			sulka.viewMode,
-			function (fields) {
+			function (fieldGroups) {
 				sulka.helpers.hideLoaderAndUnsetError();
-				fields = $.map(fields, function (field) {
-					var columnHeader = {
-						id: field['field'],
-						name: field['name'],
-						field: field['field']
-					};
-					return columnHeader;
+				
+				sulka.fieldGroups = fieldGroups;
+				var columns = [];
+				$.each(fieldGroups, function () {
+					var group = this;
+					$.each(this.fields, function () {
+						var column = {
+							id: group.name + "/" + this.field,
+							field: this.field,
+							name: this.name,
+							toolTip: this.description,
+							$sulkaGroup: group
+						};
+						columns.push(column);
+					});
 				});
-				sulka.grid = new Slick.Grid("#slick-grid", [], fields, sulka.gridOptions);
+				sulka.grid = new Slick.Grid("#slick-grid", [], columns, sulka.gridOptions);
+				sulka.initColumnGroups();
 				sulka.reloadData();
 			},
 			sulka.helpers.hideLoaderAndSetError
+		);
+	},
+	
+	columnGroupsDiv: null,
+	initColumnGroups: function () {
+		sulka.columnGroupsDiv = $(
+			'<div></div>'
+		).addClass(
+			'column-group-headers'
+		).insertBefore(
+			'#slick-grid div.slick-header div.slick-header-columns:first-child'
+		);
+		sulka.grid.onColumnsResized.subscribe(sulka.renderColumnGroups);
+		sulka.grid.onColumnsReordered.subscribe(sulka.renderColumnGroups);
+		sulka.renderColumnGroups();
+	},
+	
+	COL_GROUP_OUTSIDE_WIDTH: 9,
+	_makeColumnGroup: function (description, width) {
+		return $(
+			'<div></div>'
+		).addClass(
+			'column-group-header'
+		).append(
+			$(
+				'<span></span>'
+			).addClass(
+				'column-group-name'
+			).text(
+				description
+			).attr(
+				"title",
+				description
+			)
+		).css(
+				"width",
+				(width - sulka.COL_GROUP_OUTSIDE_WIDTH) + "px"
+		);
+	},
+	
+	SLICK_WIDTH_ADJUST: -1000,
+	renderColumnGroups: function () {
+		var columns = sulka.grid.getColumns(),
+			groupDivs = [];
+		
+		var currentGroup = null,
+			currentGroupWidth = 0;
+		$.each(columns, function () {
+			if (currentGroup === this.$sulkaGroup) {
+				currentGroupWidth += this.width;
+			} else {
+				if (currentGroup !== null) {
+					groupDivs.push(sulka._makeColumnGroup(currentGroup.description, currentGroupWidth));
+				}
+				currentGroup = this.$sulkaGroup;
+				currentGroupWidth = this.width;
+			}
+		});
+		if (currentGroup !== null) {
+			groupDivs.push(sulka._makeColumnGroup(currentGroup.description, currentGroupWidth));
+		}
+		
+		sulka.columnGroupsDiv.empty().css(
+			"width",
+			($(".slick-header-columns").width() + sulka.SLICK_WIDTH_ADJUST) + "px" 
+		).append(
+			groupDivs
 		);
 	},
 	

@@ -12,6 +12,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import edu.helsinki.sulka.models.User;
+
 /**
  * Handles requests for the application home page.
  */
@@ -24,9 +26,12 @@ public class HomeController {
 	 * Simply selects the home view to render by returning its name.
 	 */
 	
-	@PreAuthorize("hasAnyRole('USER,ADMIN')")
+	@PreAuthorize("hasRole('USER')")
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public String home(Locale locale, Model model, HttpSession session) {
+		User user = (User) session.getAttribute("user");
+		user.setLogin_id("846");
+		session.setAttribute("user", user);
 		return "slick";
 	}
 }

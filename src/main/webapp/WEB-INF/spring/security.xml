@@ -4,7 +4,7 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
       http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd">
 
-	<security:debug />
+	<!-- <security:debug /> -->
 
 	<!-- Disable security on static resources -->
 	<security:http pattern="/resources/**" security="none" />
@@ -13,13 +13,27 @@
 	<security:http entry-point-ref="restAuthenticationEntryPoint"
 		use-expressions="true">
 		<!-- Configures the security rules of our REST API -->
-		<security:intercept-url pattern="/login" access="permitAll()" />
-		<security:intercept-url pattern="/"	access="hasAnyRole('ADMIN,USER')" />
-		<security:intercept-url pattern="/**"	access="hasAnyRole('ADMIN,USER')" />
-		<!-- Adds the custom login filter to Spring Security filter chain -->
-<!-- 		<security:custom-filter ref="loginFilter" position="FORM_LOGIN_FILTER" /> -->
+		<security:intercept-url pattern="/login"
+			access="permitAll()" />
+		<security:intercept-url pattern="/testLogin/*"
+			access="permitAll()" />
+		<security:intercept-url pattern="/status/*"
+			access="permitAll()" />
+		<security:intercept-url pattern="/logout"
+			access="permitAll()" />
+		<security:intercept-url pattern="/"
+			access="hasRole('USER')" />
+		<security:intercept-url pattern="/**"
+			access="hasRole('USER')" />
+
 		<!-- Adds a logout filter to Spring Security filter chain -->
-		<security:logout logout-url="/logout" delete-cookies="true"	invalidate-session="true" success-handler-ref="restLogoutSuccessHandler" />
+		<security:logout logout-url="/logout" delete-cookies="true"
+			invalidate-session="true" />
+		<security:logout logout-success-url="/logoutSuccess" />
+		<security:access-denied-handler
+			error-page="/status/403" />
+
+
 	</security:http>
 
 	<!-- Configures the authentication entry point that returns HTTP status 
@@ -27,34 +41,6 @@
 	<bean id="restAuthenticationEntryPoint"
 		class="edu.helsinki.sulka.authentication.RestAuthenticationEntryPoint" />
 
-	<!-- Configures a custom login filter bean -->
-	<bean id="loginFilter"
-		class="org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter">
-		<property name="authenticationManager" ref="authenticationManager" />
-		<property name="authenticationFailureHandler" ref="restAuthenticationFailureHandler" />
-		<property name="authenticationSuccessHandler" ref="restAuthenticationSuccessHandler" />
-		<property name="filterProcessesUrl" value="/loginnnnnnii" />
-		<property name="usernameParameter" value="username" />
-		<property name="passwordParameter" value="password" />
-		<property name="postOnly" value="true" />
-	</bean>
-
-	<!-- Configures a custom authentication success handler that returns HTTP 
-		status code 200 -->
-	<bean id="restAuthenticationSuccessHandler"
-		class="edu.helsinki.sulka.authentication.RestAuthenticationSuccessHandler" />
-
-	<!-- Configures a custom authentication failure handler that returns HTTP 
-		status code 401 -->
-	<bean id="restAuthenticationFailureHandler"
-		class="edu.helsinki.sulka.authentication.RestAuthenticationFailureHandler" />
-
-	<!-- Configures a custom logout success handler that returns HTTP status 
-		code 200 -->
-	<bean id="restLogoutSuccessHandler"
-		class="edu.helsinki.sulka.authentication.RestLogoutSuccessHandler" />
-
-	<!-- Configures a custom authenticationProvider -->
 	<bean id="restAuthenticationProvider"
 		class="edu.helsinki.sulka.authentication.RestAuthenticationProvider" />
 
@@ -63,9 +49,4 @@
 		<security:authentication-provider
 			ref="restAuthenticationProvider" />
 	</security:authentication-manager>
-
-	<!-- <bean id="rememberMeAuthenticationProvider" -->
-	<!-- class="org.springframework.security.authentication.RememberMeAuthenticationProvider"> -->
-	<!-- </bean> -->
-
 </beans>

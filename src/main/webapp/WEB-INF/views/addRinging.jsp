@@ -7,12 +7,12 @@
 		<link rel="stylesheet" href="resources/css/lib/slick.grid.css" type="text/css" />
 		<!-- <link rel="stylesheet" href="resources/css/examples.css" type="text/css" /> -->
 		<link rel="stylesheet" href="resources/css/sulka.css" type="text/css" />
-		<script src="resources/js/lib/jquery-1.7.min.js"></script>
-		<script src="resources/js/lib/jquery-ui-1.8.16.custom.min.js"></script>
+		<script src="resources/js/lib/jquery-1.10.2.min.js"></script>
+    	<script src="resources/js/lib/jquery-ui-1.10.3.custom.min.js"></script>
 		<script src="resources/js/lib/jquery.event.drag-2.2.js"></script>
+		<script src="resources/js/lib/moment.min.js"></script>
 		<script src="resources/js/lib/slick.core.js"></script>
 		<script src="resources/js/lib/slick.grid.js"></script>
-		<script src="resources/js/lib/moment.min.js"></script>
 		<script src="resources/js/sulka.core.js"></script>
 		<script src="resources/js/sulka.strings.js"></script>
 		<script src="resources/js/sulka.API.js"></script>
@@ -63,12 +63,12 @@
 				</td>
 				<td class="local-toolbar-menu">
 					<form action="/sulka">
-					    <input type="submit" value="Selaus">
+					    <input type="submit" id="browsing"  value="Selaus">
 				    </form>
 				</td>
 				<td class="local-toolbar-menu">
 					<form action="/sulka/addringing">
-					    <input type="submit" value="Rengastusten syöttö">
+					    <input type="submit" id="addRinging"  value="Rengastusten syöttö">
 					</form>
 				</td>
 			</tr>

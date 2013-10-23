@@ -19,6 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -43,13 +44,21 @@ public class LoginController implements AuthenticationEntryPoint {
 	@Autowired
 	private LintuvaaraAuthDecryptService authService;
 
+	private String redirectUrl = "http://lintuvaara.ihku.fi/";
+
 	/**
 	 * redirects authentication variables key, iv and data to Tipu-API's
 	 * Lintuvaara authentication decryptor service and saves user to session
 	 */
 	@RequestMapping(value = "/login", method = RequestMethod.GET)
-	public String login(Model model, @RequestParam String key,
-			@RequestParam String iv, @RequestParam String data) {
+	public String login(Model model,
+			@RequestParam(value = "key", required = false) String key,
+			@RequestParam(value = "iv", required = false) String iv,
+			@RequestParam(value = "data", required = false) String data) {
+
+		if (key == null || iv == null || data == null)
+			return "redirect:" + redirectUrl;
+
 		User user = authService.auth(key, iv, data);
 		model.addAttribute("user", user);
 
@@ -68,7 +77,7 @@ public class LoginController implements AuthenticationEntryPoint {
 					grantedAuths.add(new SimpleGrantedAuthority("USER"));
 					grantedAuths.add(new SimpleGrantedAuthority("ADMIN"));
 				} else {
-					return "login";
+					return "redirect:" + redirectUrl;
 				}
 			}
 
@@ -77,25 +86,53 @@ public class LoginController implements AuthenticationEntryPoint {
 			SecurityContextHolder.getContext()
 					.setAuthentication(authentication);
 
-			return "slick";
+			return "redirect:/";
 		}
 
-		return "login";
+		return "redirect:" + redirectUrl;
 	}
 
+	@RequestMapping(value = "/status/403", method = RequestMethod.GET)
+	public String accessDenied(Model model) {
+		model.addAttribute("msg",
+				"ERROR 403, You don't have privileges to view this page!!!");
+		return "/status/403";
+	}
+
+	
+	@RequestMapping(value = "/status/404", method = RequestMethod.GET)
+	public String notFound(Model model) {
+		model.addAttribute("msg",
+				"ERROR 404, content not found!");
+		return "/status/403";
+	}
+	
+	
+	@RequestMapping(value = "/status/401", method = RequestMethod.GET)
+	public String unauthorizedAccess(Model model) {
+		model.addAttribute("msg",
+				"ERROR 401, Unauthorized Access, you have to login first!");
+		return "/status/401";
+	}
+	
+	
 	/**
 	 * This value should be set from a bean and disabled for production.
 	 */
 	@Autowired
 	private TestLoginCodeConfiguration testLoginCodeConfiguration;
 
+	private static final boolean ALLOW_ONLY_LOCALHOST_TEST_LOGIN = true;
+
 	/**
 	 * Creates a fake user session for JS tests.
 	 */
 	@RequestMapping(value = "/testLogin/{code}", method = RequestMethod.GET)
 	public String testLogin(HttpServletResponse response, Model model,
-			@PathVariable String code) {
-		if (testLoginCodeConfiguration.isCorrectCode(code)) {
+			@PathVariable String code, HttpServletRequest request) {
+		if (testLoginCodeConfiguration.isCorrectCode(code)
+				&& (!ALLOW_ONLY_LOCALHOST_TEST_LOGIN || request.getRemoteAddr()
+						.equals("127.0.0.1"))) {
 			User user = new User();
 			user.setPass(true);
 			user.setLogin_id("846");
@@ -122,8 +159,10 @@ public class LoginController implements AuthenticationEntryPoint {
 	 */
 	@RequestMapping(value = "/testAdminLogin/{code}", method = RequestMethod.GET)
 	public String testAdminLogin(HttpServletResponse response, Model model,
-			@PathVariable String code) {
-		if (testLoginCodeConfiguration.isCorrectCode(code)) {
+			@PathVariable String code, HttpServletRequest request) {
+		if (testLoginCodeConfiguration.isCorrectCode(code)
+				&& (!ALLOW_ONLY_LOCALHOST_TEST_LOGIN || request.getRemoteAddr()
+						.equals("127.0.0.1"))) {
 			User user = new User();
 			user.setPass(true);
 			user.setLogin_id("846");

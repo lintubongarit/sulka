@@ -7,6 +7,8 @@ target/
 *.class
 # Package Files #
 *.jar
+!other_files/*.jar
+!lib/*.jar
 *.war
 *.ear
 *.db
