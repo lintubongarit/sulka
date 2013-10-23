@@ -173,4 +173,30 @@ img#loader-animation {
     background: url("../img/header-columns-bg.gif");
     border-bottom: 1px solid #C2C3C9;
 }
+.slick-header {
+	height: 50px;
+}
+.column-group-headers {
+	background: url("../img/header-columns-bg.gif");
+	position: relative;
+	white-space: nowrap;
+	cursor: default;
+	overflow: hidden;
+}
+
+.column-group-headers .column-group-header {
+	position: relative;
+	display: inline-block;
+	overflow: hidden;
+	-o-text-overflow: ellipsis;
+	text-overflow: ellipsis;
+	height: 16px;
+	line-height: 16px;
+	margin: 0;
+	padding: 4px 0;
+	border-right: 1px solid silver;
+	border-left: 0px;
+	border-top: 0px;
+	border-bottom: 0px;
+	float: left;
 }
