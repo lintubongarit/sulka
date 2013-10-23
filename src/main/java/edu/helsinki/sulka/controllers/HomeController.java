@@ -29,9 +29,6 @@ public class HomeController {
 	@PreAuthorize("hasRole('USER')")
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public String home(Locale locale, Model model, HttpSession session) {
-		User user = (User) session.getAttribute("user");
-		user.setLogin_id("846");
-		session.setAttribute("user", user);
 		return "slick";
 	}
 }
