@@ -48,7 +48,7 @@
 			</tr>
 		</table>
 		
-		<table class="local-toolbar" >
+		<table class="local-toolbar">
 			<tr>
 				<td class="local-toolbar-menu">
 					<form action="${contextPath}">
@@ -61,20 +61,21 @@
 					</form>
 				</td>
 			</tr>
-			<tr><td>
-		
-			<form id="filters">
-				Rengastaja: <input type="text" id="filters-ringer" name="ringer" />
-				Aika (esim. 2005 tai 2005-2006): <input type="text" id="filters-date" name="date" />
-				Laji: <input type="text" id="filters-species" name="species" />
-				Kunta: <input type="text" id="filters-municipality" name="municipality" />
-				<input type="submit" id="form-submit" value="OK" />
-				<input type="reset" id="form-reset" value="Tyhjennä" />
-				<input type="checkbox" id="filters-ringings" name="ringings" checked/> Rengastukset
- 				<input type="checkbox" id="filters-recoveries" name="recoveries" checked /> Tapaamiset
-				<img src="resources/img/ajax-loader.gif" id="loader-animation" />
-			</form>
-			</td></tr>
+			<tr>
+				<td>
+					<form id="filters">
+						Rengastaja: <input type="text" id="filters-ringer" name="ringer" />
+						Aika (esim. 2005 tai 2005-2006): <input type="text" id="filters-date" name="date" />
+						Laji: <input type="text" id="filters-species" name="species" />
+						Kunta: <input type="text" id="filters-municipality" name="municipality" />
+						<input type="submit" id="form-submit" value="OK" />
+						<input type="reset" id="form-reset" value="Tyhjennä" />
+						<input type="checkbox" id="filters-ringings" name="ringings" checked/> Rengastukset
+		 				<input type="checkbox" id="filters-recoveries" name="recoveries" checked /> Tapaamiset
+						<img src="resources/img/ajax-loader.gif" id="loader-animation" />
+					</form>
+				</td>
+			</tr>
 		</table>
 	
 		<div id="row-status-box-container">
@@ -82,7 +83,7 @@
 				<span id="last-error"></span>
 			</div>
 		</div>
-		<div id="slick-grid" class="browse"></div>
+		<div id="slick-grid"></div>
 		<div id="columns-pane">
 			<table id="columns-table"></table>
 		</div>

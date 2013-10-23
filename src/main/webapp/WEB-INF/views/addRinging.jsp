@@ -51,6 +51,19 @@
 		
 		<table class="local-toolbar">
 			<tr>
+				<td></td>
+				<td class="local-toolbar-menu">
+					<form action="${contextPath}">
+					    <input type="submit" id="browsing" value="Selaus">
+				    </form>
+				</td>
+				<td class="local-toolbar-menu">
+					<form action="${contextPath}/addringing">
+					    <input type="submit" id="addRinging" value="Rengastusten syöttö">
+					</form>
+				</td>
+			</tr>
+			<tr>
 				<td>
 					<form id="filters">
 						Laji: <input type="text" id="filters-species" name="species" />
@@ -61,17 +74,7 @@
 					</form>
 				</td>
 				<td>
-					<button type="button" value="new row" onclick="sulka.addRow();">Lisää rivi</button>
-				</td>
-				<td class="local-toolbar-menu">
-					<form action="${contextPath}">
-					    <input type="submit" id="browsing"  value="Selaus">
-				    </form>
-				</td>
-				<td class="local-toolbar-menu">
-					<form action="${contextPath}/addringing">
-					    <input type="submit" id="addRinging"  value="Rengastusten syöttö">
-					</form>
+					<button type="button" class="local-toolbar-menu" value="new row" onclick="sulka.addRow();">Lisää rivi</button>
 				</td>
 			</tr>
 		</table>
@@ -81,7 +84,7 @@
 				<span id="last-error"></span>
 			</div>
 		</div>
-		<div id="slick-grid" class="addRow"></div>
+		<div id="slick-grid"></div>
 		<div id="columns-pane">
 			<table id="columns-table"></table>
 		</div>

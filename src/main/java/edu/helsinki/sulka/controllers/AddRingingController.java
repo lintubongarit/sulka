@@ -28,7 +28,7 @@ public class AddRingingController {
 	 * Simply selects the home view to render by returning its name.
 	 */
 	
-	@PreAuthorize("hasAnyRole('USER,ADMIN')")
+	@PreAuthorize("hasAnyRole('USER')")
 	@RequestMapping(value = "/addringing", method = RequestMethod.GET)
 	public String home(Locale locale, Model model, HttpSession session) {
 		return "addRinging";
