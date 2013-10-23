@@ -1,25 +1,12 @@
-<%@ page pageEncoding="UTF-8" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-	<head>
-	</head>
-	<body>
-		<c:choose>
-			<c:when test="${user.accessStatus() == 0}">
-				<font color="green" size="20">Welcome ${user.getName()}!</font>
-				<p/>
-				<a href="${pageContext.request.contextPath}/">Etusivulle</a> 
-			</c:when>
-			<c:otherwise>
-				<font color="red" size="20">You shall not pass!</font>
-				<c:choose>
-					<c:when test="${user.accessStatus() == 1}">
-						<p>
-						<i>Access expired</i>
-					</c:when>
-				</c:choose>
-			</c:otherwise>
-		</c:choose>
-		<p>
-	</body>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Login</title>
+</head>
+<body>
+<p>Login</p>
+</body>
 </html>
