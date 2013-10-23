@@ -1,7 +1,7 @@
 Sulka
 =====
 
-Uusi käyttöliittymä rengastustietojen syöttöön.
+The new web frontend for entering bird ringing data.
 
 Installing
 ==========
