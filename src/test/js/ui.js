@@ -1,4 +1,4 @@
-casper.test.begin('Uitests', 23, function suite(test) {
+casper.test.begin('Uitests', 27, function suite(test) {
 	casper.options.timeout = 600000;
 	casper.options.logLevel = "debug";
 	casper.options.verbose = true;
@@ -89,7 +89,35 @@ casper.test.begin('Uitests', 23, function suite(test) {
 				date: '2.7.2006'
 			}, true);
 			test.assertVisible('#loader-animation', "Submitting valid query causes spinner to show.");
-    	});
+    	
+    	}).then(function () {
+			this.click('input#browsing');
+		}).waitForUrl('http://localhost:8080/sulka/?')
+		.then(function() {
+			this.log(this.getCurrentUrl());
+			test.assertEquals(this.getCurrentUrl(), "http://localhost:8080/sulka/?", "browsing link works on browsing page");
+
+    	}).then(function () {
+			this.click('input#addRinging');
+		}).waitForUrl('http://localhost:8080/sulka/addringing?')
+		.then(function() {
+			this.log(this.getCurrentUrl());
+			test.assertEquals(this.getCurrentUrl(), "http://localhost:8080/sulka/addringing?", "addRinging link works on browsing page");
+			
+		}).then(function () {
+			this.click('input#addRinging');
+		}).waitForUrl('http://localhost:8080/sulka/addringing?')
+		.then(function() {
+			this.log(this.getCurrentUrl());
+			test.assertEquals(this.getCurrentUrl(), "http://localhost:8080/sulka/addringing?", "addRinging link works on addRinging page");
+		
+	    }).then(function () {
+			this.click('input#browsing');
+		}).waitForUrl('http://localhost:8080/sulka/?')
+		.then(function() {
+			this.log(this.getCurrentUrl());
+			test.assertEquals(this.getCurrentUrl(), "http://localhost:8080/sulka/?", "browsing link works on addRinging page");
+		});
     });
 	
     casper.run(function () {

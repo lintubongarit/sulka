@@ -1,5 +1,9 @@
 package edu.helsinki.sulka.controllers;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
 import javax.servlet.http.HttpSession;
@@ -12,13 +16,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import edu.helsinki.sulka.models.User;
-
 /**
  * Handles requests for the application home page.
  */
 @Controller
-public class HomeController {
+public class AddRingingController {
 	@Autowired
 	private Logger logger;
 	
@@ -26,9 +28,9 @@ public class HomeController {
 	 * Simply selects the home view to render by returning its name.
 	 */
 	
-	@PreAuthorize("hasRole('USER')")
-	@RequestMapping(value = "/", method = RequestMethod.GET)
+	@PreAuthorize("hasAnyRole('USER,ADMIN')")
+	@RequestMapping(value = "/addringing", method = RequestMethod.GET)
 	public String home(Locale locale, Model model, HttpSession session) {
-		return "slick";
+		return "addRinging";
 	}
 }

@@ -7,9 +7,9 @@
 		<link rel="stylesheet" href="resources/css/lib/slick.grid.css" type="text/css" />
 		<!-- <link rel="stylesheet" href="resources/css/examples.css" type="text/css" /> -->
 		<link rel="stylesheet" href="resources/css/sulka.css" type="text/css" />
-   		<script src="resources/js/lib/jquery-1.10.2.min.js"></script>
+		<script src="resources/js/lib/jquery-1.10.2.min.js"></script>
     	<script src="resources/js/lib/jquery-ui-1.10.3.custom.min.js"></script>
-   		<script src="resources/js/lib/jquery.event.drag-2.2.js"></script>
+		<script src="resources/js/lib/jquery.event.drag-2.2.js"></script>
 		<script src="resources/js/lib/moment.min.js"></script>
 		<script src="resources/js/lib/slick.core.js"></script>
 		<script src="resources/js/lib/slick.grid.js"></script>
@@ -17,6 +17,7 @@
 		<script src="resources/js/sulka.strings.js"></script>
 		<script src="resources/js/sulka.API.js"></script>
 		<script src="resources/js/sulka.helpers.js"></script>
+		<script src="resources/js/sulka.addRinging.js"></script>
 	</head>
 	<body>
 		<table id="global-toolbar" class="global-toolbar">
@@ -46,33 +47,31 @@
 			</tr>
 		</table>
 		
-		<table class="local-toolbar" >
+		<table class="local-toolbar">
 			<tr>
+				<td>
+					<form id="filters">
+						Laji: <input type="text" id="filters-species" name="species" />
+						Kunta: <input type="text" id="filters-municipality" name="municipality" />
+						<input type="submit" id="form-submit" value="OK" />
+						<input type="reset" id="form-reset" value="Tyhjennä" />
+						<img src="resources/img/ajax-loader.gif" id="loader-animation" />
+					</form>
+				</td>
+				<td>
+					<button type="button" value="new row" onclick="sulka.addRow();">Lisää rivi</button>
+				</td>
 				<td class="local-toolbar-menu">
 					<form action="/sulka">
-					    <input type="submit" id="browsing" value="Selaus">
+					    <input type="submit" id="browsing"  value="Selaus">
 				    </form>
 				</td>
 				<td class="local-toolbar-menu">
 					<form action="/sulka/addringing">
-					    <input type="submit" id="addRinging" value="Rengastusten syöttö">
+					    <input type="submit" id="addRinging"  value="Rengastusten syöttö">
 					</form>
 				</td>
 			</tr>
-			<tr><td>
-		
-			<form id="filters">
-				Rengastaja: <input type="text" id="filters-ringer" name="ringer" />
-				Aika (esim. 2005 tai 2005-2006): <input type="text" id="filters-date" name="date" />
-				Laji: <input type="text" id="filters-species" name="species" />
-				Kunta: <input type="text" id="filters-municipality" name="municipality" />
-				<input type="submit" id="form-submit" value="OK" />
-				<input type="reset" id="form-reset" value="Tyhjennä" />
-				<input type="checkbox" id="filters-ringings" name="ringings" checked/> Rengastukset
- 				<input type="checkbox" id="filters-recoveries" name="recoveries" checked /> Tapaamiset
-				<img src="resources/img/ajax-loader.gif" id="loader-animation" />
-			</form>
-			</td></tr>
 		</table>
 	
 		<div id="row-status-box-container">
@@ -80,12 +79,11 @@
 				<span id="last-error"></span>
 			</div>
 		</div>
-		<div id="slick-grid" class="browse"></div>
+		<div id="slick-grid" class="addRow"></div>
 		<div id="columns-pane">
 			<table id="columns-table"></table>
 		</div>
 		
-		<form id="tiedot"></form>
-		<ul id="header-context-menu" class="context-menu" style="display:none;position:absolute"></ul>
+		<form id="tiedot"></form><!-- Added here just to make tests not fail -->
 	</body>
 </html>

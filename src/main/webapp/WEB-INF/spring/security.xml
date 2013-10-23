@@ -4,7 +4,7 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
       http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd">
 
-	<!-- <security:debug />  -->
+	<!-- <security:debug /> -->
 
 	<!-- Disable security on static resources -->
 	<security:http pattern="/resources/**" security="none" />
@@ -17,7 +17,9 @@
 			access="permitAll()" />
 		<security:intercept-url pattern="/testLogin/*"
 			access="permitAll()" />
-		<security:intercept-url pattern="/testAdminLogin/*"
+		<security:intercept-url pattern="/status/*"
+			access="permitAll()" />
+		<security:intercept-url pattern="/logout"
 			access="permitAll()" />
 		<security:intercept-url pattern="/"
 			access="hasRole('USER')" />
@@ -27,6 +29,11 @@
 		<!-- Adds a logout filter to Spring Security filter chain -->
 		<security:logout logout-url="/logout" delete-cookies="true"
 			invalidate-session="true" />
+		<security:logout logout-success-url="/logoutSuccess" />
+		<security:access-denied-handler
+			error-page="/status/403" />
+
+
 	</security:http>
 
 	<!-- Configures the authentication entry point that returns HTTP status 
@@ -36,7 +43,6 @@
 
 	<bean id="restAuthenticationProvider"
 		class="edu.helsinki.sulka.authentication.RestAuthenticationProvider" />
-
 
 	<!-- Configures in-memory implementation of the UserDetailsService implementation -->
 	<security:authentication-manager alias="authenticationManager">

@@ -31,7 +31,9 @@ sulka = {
 	},
 	
 	fieldGroups: null,
+	
 	TICK_MARK: "✓",
+	
 	initGrid: function () {
 		sulka.helpers.showLoader();
 		sulka.API.fetchFieldGroups(
@@ -115,7 +117,6 @@ sulka = {
 		if (column) {
 			column.$sulkaVisible = !column.$sulkaVisible;
 			sulka.grid.setColumns(sulka.getVisibleColumns());
-			console.log(sulka.getVisibleColumns());
 			$(this).closest("li").find("span.context-menu-tick").text(column.$sulkaVisible ? sulka.TICK_MARK : "");
 		}
 	},
@@ -233,7 +234,7 @@ sulka = {
 		var filters;
 		var municipality = $.trim($("#filters-municipality").val()),
 			species = $.trim($("#filters-species").val()),
-			date = $.trim($("#filters-date").val());
+			date = sulka.getDate();
 		
 		if (date) {
 			filters = sulka.helpers.parseDateInput(date);
@@ -254,6 +255,13 @@ sulka = {
 		return filters;
 	},
 	
+	getDate: function () {
+		return $.trim($("#filters-date").val());
+	},
+	
+	/**
+	 * Gets the wanted rows mode from the checkboxes in filters-form
+	 */
 	getRowMode: function () {
 		var	ringings = $("#filters-ringings").is(':checked'),
 			recoveries = $("#filters-recoveries").is(':checked');
@@ -268,6 +276,7 @@ sulka = {
 			sulka.rowsMode = "all";
 		}
 	}
+	
 };
 
 return sulka; }();
