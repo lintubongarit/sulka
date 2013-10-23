@@ -6,7 +6,7 @@ sulka = {
 	grid: null,
 	gridOptions: {
 		enableCellNavigation: true,
-		enableColumnReorder: false
+		enableColumnReorder: true
 	},
 
 	viewMode: "browsing",
@@ -41,7 +41,8 @@ sulka = {
 							id: group.name + "/" + this.field,
 							field: this.field,
 							name: this.name,
-							toolTip: this.description
+							toolTip: this.description,
+							$sulkaGroup: group
 						};
 						columns.push(column);
 					});
@@ -64,51 +65,58 @@ sulka = {
 			'#slick-grid div.slick-header div.slick-header-columns:first-child'
 		);
 		sulka.grid.onColumnsResized.subscribe(sulka.renderColumnGroups);
+		sulka.grid.onColumnsReordered.subscribe(sulka.renderColumnGroups);
 		sulka.renderColumnGroups();
 	},
 	
-	COL_GROUP_BORDER_WIDTH: 1,
+	COL_GROUP_OUTSIDE_WIDTH: 9,
+	_makeColumnGroup: function (description, width) {
+		return $(
+			'<div></div>'
+		).addClass(
+			'column-group-header'
+		).append(
+			$(
+				'<span></span>'
+			).addClass(
+				'column-group-name'
+			).text(
+				description
+			).attr(
+				"title",
+				description
+			)
+		).css(
+				"width",
+				(width - sulka.COL_GROUP_OUTSIDE_WIDTH) + "px"
+		);
+	},
+	
+	SLICK_WIDTH_ADJUST: -1000,
 	renderColumnGroups: function () {
 		var columns = sulka.grid.getColumns(),
-			totalWidth = 500,
-			columnWidths = {};
+			groupDivs = [];
 		
+		var currentGroup = null,
+			currentGroupWidth = 0;
 		$.each(columns, function () {
-			totalWidth += this.width;
-			columnWidths[this.id] = this.width;
+			if (currentGroup === this.$sulkaGroup) {
+				currentGroupWidth += this.width;
+			} else {
+				if (currentGroup !== null) {
+					groupDivs.push(sulka._makeColumnGroup(currentGroup.description, currentGroupWidth));
+				}
+				currentGroup = this.$sulkaGroup;
+				currentGroupWidth = this.width;
+			}
 		});
-		
-		var groupDivs = $.map(sulka.fieldGroups, function (group) {
-			var groupWidth = 0;
-			$.each(group.fields, function () {
-				var colWidth = columnWidths[group.name + '/' + this.field];
-				groupWidth += colWidth ? colWidth : 0;
-			});
-			
-			return $(
-				'<div></div>'
-			).addClass(
-				'column-group-header'
-			).append(
-				$(
-					'<span></span>'
-				).addClass(
-					'column-group-name'
-				).text(
-					group.description
-				).attr(
-					"title",
-					group.description
-				)
-			).css(
-					"width",
-					(groupWidth - sulka.COL_GROUP_BORDER_WIDTH) + "px"
-			);
-		});
+		if (currentGroup !== null) {
+			groupDivs.push(sulka._makeColumnGroup(currentGroup.description, currentGroupWidth));
+		}
 		
 		sulka.columnGroupsDiv.empty().css(
 			"width",
-			totalWidth + "px"
+			($(".slick-header-columns").width() + sulka.SLICK_WIDTH_ADJUST) + "px" 
 		).append(
 			groupDivs
 		);
