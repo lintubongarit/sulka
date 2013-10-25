@@ -17,7 +17,7 @@
 		<script src="resources/js/sulka.strings.js"></script>
 		<script src="resources/js/sulka.API.js"></script>
 		<script src="resources/js/sulka.helpers.js"></script>
-		<script src="resources/js/sulka.addRinging.js"></script>
+		<script src="resources/js/sulka.addRecovery.js"></script>
 		
 		<c:set var="contextPath" value="${pageContext.request.contextPath}"/>
 	</head>
