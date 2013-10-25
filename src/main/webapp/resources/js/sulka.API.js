@@ -12,7 +12,7 @@ sulka.API = function(API) {
 		 * Get fields from the API and call handler with the fetched fields when
 		 * done.
 		 * 
-		 * @param type Either "browsing", "ringings" or "all". Browsing type to return fields for.
+		 * @param type Either "browsing", "ringings", "recoveries" or "all". Browsing type to return fields for.
 		 * @param onSuccess Called on success with an array of field group objects.
 		 * @param onError If defined, called on failure with the error message, if any.
 		 */
@@ -39,7 +39,7 @@ sulka.API = function(API) {
 		 * Get field groups from the API and call handler with the fetched
 		 * groups when done.
 		 * 
-		 * @param type Either "browsing", "ringings" or "all". Browsing type to return fields for.
+		 * @param type Either "browsing", "ringings", "recoveries" or "all". Browsing type to return fields for.
 		 * @param onSuccess Called on success with an array of field objects.
 		 * @param onError If defined, called on failure with the error message, if any.
 		 */
