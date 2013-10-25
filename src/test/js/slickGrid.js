@@ -3,7 +3,7 @@ const wantedColumns = ["Rengas", "Nimirengas", "Laji", "Rengastaja", "Pvm", "Klo
 /* Columns to be added: birdStation, kkj_ddmm_lat, kkj_ddmm_lon, kkj_decimal_lat, kkj_decimal_lon, birdCondition*/
 
 
-casper.test.begin('SlickGrid tests', 15, function suite(test) {
+casper.test.begin('SlickGrid tests', 14, function suite(test) {
 	casper.options.logLevel = "debug";
 	casper.options.verbose =  true;
 	casper.options.timeout = 600000;
@@ -106,13 +106,7 @@ casper.test.begin('SlickGrid tests', 15, function suite(test) {
 		.then(function() {
 			test.assertEquals(get("sulka.grid.getDataLength()"), 7, "Both ringings and recoveries are fetched" +
 					" when radio buttons 'ringings' and 'recoveries' are checked");
-		
-	    }).then(function () {
-			this.click('input#addRinging');
-		}).waitWhileVisible("#loader-animation")
-		.then(function() {
-			test.assertEquals(get("sulka.grid.getDataLength()"), 429, "Fetches only ringing from the last year"); // last 2 years atm...
-		})
+	    });
 		
 		
     });
