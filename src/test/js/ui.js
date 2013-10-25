@@ -95,34 +95,27 @@ casper.test.begin('Uitests', 32, function suite(test) {
 				date: '2.7.2006'
 			}, true);
 			test.assertVisible('#loader-animation', "Submitting valid query causes spinner to show.");
-    	
     	}).then(function () {
 			this.click('input#browsing');
-		}).waitForUrl('http://localhost:8080/sulka/?')
-		.then(function() {
+    	}).then(function() {
 			this.log(this.getCurrentUrl());
-			test.assertEquals(this.getCurrentUrl(), "http://localhost:8080/sulka/?", "browsing link works on browsing page");
-
+			test.assertEquals(this.getCurrentUrl(), URL + "/?", "browsing link works on browsing page");
     	}).then(function () {
 			this.click('input#addRinging');
-		}).waitForUrl('http://localhost:8080/sulka/addringing?')
-		.then(function() {
+    	}).then(function() {
 			this.log(this.getCurrentUrl());
-			test.assertEquals(this.getCurrentUrl(), "http://localhost:8080/sulka/addringing?", "addRinging link works on browsing page");
+			test.assertEquals(this.getCurrentUrl(), URL + "/addringing?", "addRinging link works on browsing page");
 			
 		}).then(function () {
 			this.click('input#addRinging');
-		}).waitForUrl('http://localhost:8080/sulka/addringing?')
-		.then(function() {
+		}).then(function() {
 			this.log(this.getCurrentUrl());
-			test.assertEquals(this.getCurrentUrl(), "http://localhost:8080/sulka/addringing?", "addRinging link works on addRinging page");
-		
+			test.assertEquals(this.getCurrentUrl(), URL + "/addringing?", "addRinging link works on addRinging page");
 	    }).then(function () {
 			this.click('input#browsing');
-		}).waitForUrl('http://localhost:8080/sulka/?')
-		.then(function() {
+	    }).then(function() {
 			this.log(this.getCurrentUrl());
-			test.assertEquals(this.getCurrentUrl(), "http://localhost:8080/sulka/?", "browsing link works on addRinging page");
+			test.assertEquals(this.getCurrentUrl(), URL + "/?", "browsing link works on addRinging page");
 		});
 		
     	// Column hiding/showing
