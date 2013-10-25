@@ -36,7 +36,7 @@ import edu.helsinki.sulka.models.User;
                 "file:src/main/webapp/WEB-INF/spring/appServlet/servlet-context.xml"
 
 })
-public class HomeControllerTest {
+public class TabsControllerTest {
 
         @Autowired
         private FilterChainProxy springSecurityFilterChain;
@@ -62,9 +62,11 @@ public class HomeControllerTest {
                 mockMvc.perform(get(SECURED_URI)).andExpect(status().isUnauthorized());
         }
         
+        private static final String SSO_URL = "http://lintuvaara.ihku.fi/";
+        
         @Test
-        public void itShouldAnonymousAccessToLoginPage() throws Exception {
-                mockMvc.perform(get(LOGIN_PAGE_URL)).andExpect(redirectedUrl("http://lintuvaara.ihku.fi/"));
+        public void itShouldRedirectAnonymousAccessToSSOPage() throws Exception {
+                mockMvc.perform(get(LOGIN_PAGE_URL)).andExpect(redirectedUrl(SSO_URL));
         }
 
 

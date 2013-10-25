@@ -12,23 +12,23 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import edu.helsinki.sulka.models.User;
-
 /**
- * Handles requests for the application home page.
+ * Handles requests for different top level tabs.
  */
 @Controller
-public class HomeController {
+public class TabsController {
 	@Autowired
 	private Logger logger;
 	
-	/**
-	 * Simply selects the home view to render by returning its name.
-	 */
-	
 	@PreAuthorize("hasRole('USER')")
 	@RequestMapping(value = "/", method = RequestMethod.GET)
-	public String home(Locale locale, Model model, HttpSession session) {
-		return "slick";
+	public String browse(Locale locale, Model model, HttpSession session) {
+		return "browse";
+	}
+	
+	@PreAuthorize("hasAnyRole('USER')")
+	@RequestMapping(value = "/addRingings", method = RequestMethod.GET)
+	public String addRingings(Locale locale, Model model, HttpSession session) {
+		return "addRingings";
 	}
 }
