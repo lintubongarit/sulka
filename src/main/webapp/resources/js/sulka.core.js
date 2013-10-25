@@ -217,11 +217,20 @@ sulka = {
 				} else {
 					sulka.helpers.hideLoaderAndUnsetError();
 				}
+				console.log(rows);
 				sulka.grid.setData(rows);
 				sulka.grid.render();
 			},
 			sulka.helpers.hideLoaderAndSetError
 		);
+		
+//		var asd = sulka.grid.getData();
+//		
+//		for (var i = 0; i < asd.length; i++){
+//			console.log(asd[i]);
+//		}
+		
+		//console.log(sulka.grid.getData());
 	},
 	
 	/**

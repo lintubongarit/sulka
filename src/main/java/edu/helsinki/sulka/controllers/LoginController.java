@@ -29,6 +29,7 @@ import edu.helsinki.sulka.configurations.SSOLoginPageURLConfiguration;
 import edu.helsinki.sulka.configurations.TestLoginCodeConfiguration;
 import edu.helsinki.sulka.models.User;
 import edu.helsinki.sulka.services.LintuvaaraAuthDecryptService;
+import edu.helsinki.sulka.services.LoginService;
 
 /**
  * Handles requests for the login page and passing authentication variables to
@@ -41,6 +42,9 @@ public class LoginController implements AuthenticationEntryPoint {
 	@Autowired
 	private Logger logger;
 
+	@Autowired
+	private LoginService loginService;
+	
 	@Autowired
 	private LintuvaaraAuthDecryptService authService;
 
@@ -62,36 +66,13 @@ public class LoginController implements AuthenticationEntryPoint {
 
 		if (key == null || iv == null || data == null)
 			return "redirect:" + SSOLoginURL.getURL();
-
-		User user = authService.auth(key, iv, data);
+			
+		User user = loginService.login(iv, key, data);
+		
 		model.addAttribute("user", user);
 
-		if (user.accessStatus() == 0) {
-			String userid;
-			userid = user.getLogin_id();
-
-			List<GrantedAuthority> grantedAuths = new ArrayList<GrantedAuthority>();
-
-			try {
-				Long.parseLong(userid);
-				grantedAuths.add(new SimpleGrantedAuthority("USER"));
-
-			} catch (Exception e) {
-				if (userid.contains("admin")) {
-					grantedAuths.add(new SimpleGrantedAuthority("USER"));
-					grantedAuths.add(new SimpleGrantedAuthority("ADMIN"));
-				} else {
-					return "redirect:" + SSOLoginURL.getURL();
-				}
-			}
-
-			Authentication authentication = new UsernamePasswordAuthenticationToken(
-					user.getName(), user.getEmail(), grantedAuths);
-			SecurityContextHolder.getContext()
-					.setAuthentication(authentication);
-
+		if (user.accessStatus() == 0)
 			return "redirect:/";
-		}
 
 		return "redirect:" + SSOLoginURL.getURL();
 	}

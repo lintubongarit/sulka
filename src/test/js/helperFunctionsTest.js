@@ -1,11 +1,6 @@
 casper.test.begin('HelperFunctionTests', 69, function suite(test) {
-	casper.options.logLevel = "debug";
-	casper.options.verbose =  true;
-	casper.options.timeout = 600000;
-	
 	browse('/', function () {
 		var strings = get("sulka.strings");
-		
 		test.assertEquals(
 				get('sulka.helpers.parseDateInput("2009")'),
 				{startDate: '01.01.2009', endDate: '31.12.2009'}, 
