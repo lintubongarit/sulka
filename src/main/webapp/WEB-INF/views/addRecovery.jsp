@@ -62,6 +62,11 @@
 					    <input type="submit" id="addRinging" value="Rengastusten syöttö">
 					</form>
 				</td>
+				<td class="local-toolbar-menu">
+					<form action="${contextPath}/addrecovery">
+					    <input type="submit" id="addRecovery" value="Tapaamisten syöttö">
+				    </form>
+				</td>
 			</tr>
 			<tr>
 				<td>

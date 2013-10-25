@@ -1,9 +1,9 @@
 sulka.addRecovery = function(addRecovery) {
 
-	sulka.viewMode = "ringings";
+	sulka.viewMode = "recoveries";
 	
 	sulka.getRowMode = function() {
-		sulka.rowsMode = "ringings";
+		sulka.rowsMode = "recoveries";
 	};
 
 	sulka.addRow = function() {
