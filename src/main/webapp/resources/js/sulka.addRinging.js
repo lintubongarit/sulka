@@ -1,4 +1,4 @@
-sulka.addRingings = function(addRingings) {
+sulka.addRinging = function(addRinging) {
 
 	sulka.viewMode = "ringings";
 	
