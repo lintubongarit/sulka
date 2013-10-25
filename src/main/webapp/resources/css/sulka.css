@@ -15,66 +15,48 @@ h1 {
     font-size: 28pt;
 }
 
-td, th {
-    vertical-align: middle;
-    padding: 0.5em;
-}
-
-th {
-    font-weight: bold;
-    text-align: left;
-    background-color: #ffd88b;
-    border-bottom: 1px #d6a14e solid;
-    border-right: 1px #d6a14e solid;
-}
-
 input[type="checkbox"] {
     vertical-align: baseline;
     margin-left: 0.5em;
     margin-right: 0.5em;
 }
+table, table tbody, table tr, table td {
+	border: 0;
+	margin: 0;
+	padding: 0;
+}
 
 /* ----- */
 
-.global-toolbar {
-    margin: 0;
-    padding: 0;
-    vertical-align: middle;
-}
-
-table.global-toolbar {
-    height: 32px;
+.global-toolbar, ul.feature-list-tabs {
     background-color: rgb(253, 214, 136);
+    width: 100%;
 }
-
-.global-toolbar-app-title {
-    font-size: 18pt;
-    font-weight: bold;
-    color: darkred;
+.global-toolbar { 
+	height: 91px;
+	overflow: hidden;
 }
-
-ul.feature-list-tabs {
-    margin: 0;
-    padding: 0;
-    display: inline;
-    list-style-type: none;
+img.global-toolbar-lumo {
+	display: inline-block;
+	height: 91px;
+	float: left;
 }
-
-.global-toolbar-feature-button {
+.global-toolbar-user {
+	display: inline-block;
+	float: right;
+	text-align: right;
+	padding-right: 2em;
+	padding-top: 1em;
 }
-
-.global-toolbar-feature-button {
-}
-
 .global-toolbar-user-info {
     font-size: 0.8em;
     font-weight: bold;
     line-height: 1.3em;
-    padding-right: 1em;
-    vertical-align: top;
+    margin-bottom: .5em;
 }
 
 .global-toolbar-lintuvaara-button {
+	display: inline-block;
     padding: 5px;
     border-radius: 5px;
     border: 1px #d6a14e solid;
@@ -84,63 +66,75 @@ ul.feature-list-tabs {
     color: #000099;
 }
 
-.global-toolbar-logout {
-	vertical-align: top;
-	width: 100%;
+.global-toolbar-logo {
+	display: inline-block;
+	float: right;
+	padding-right: 1em;
+	height: 91px;
+	width: 87px
 }
 
-.local-toolbar {
-    height: 28px;
+ul.feature-list-tabs {
     margin: 0;
     padding: 0;
-    border-top: 1px solid black;
-    border-bottom: 1px solid black;
-    background-color: rgb(253, 214, 136);
-    width: 100%;
+    padding-top: 5px;
+    height: 25px;
+    overflow: hidden;
+    display: block;
+    list-style-type: none;
+    
 }
-
-.local-toolbar-menu {
-	vertical-align: right;
-	float: right;
+ul.feature-list-tabs li:first-child {
+    margin-left: 2em;
 }
-
-.current-feature-title {
-    font-size: 16pt;
-    font-weight: bold;    
-}
-
 ul.feature-list-tabs li {
-    display: inline;
-    margin: 0;
-    padding: 2px;
-}
-
-ul.feature-list-tabs li .feature-item {
+    display: inline-block;
+    margin-left: .5em;
     border: 1px solid gray;
-    font-size: 10pt;
-    font-weight: bold;
+    border-bottom: 0px none;
     height: 100%;
-    padding: .2em 1em;
-    color: #fff;
     background-color: #036;
 }
 
-ul.feature-list-tabs li .current-feature-item {
+ul.feature-list-tabs li.current-feature-item {
     color: #fff;
     background-color: darkred;
 }
-
 ul.feature-list-tabs li a {
+	display: block;
+	text-decoration: none;
+    font-size: 10pt;
+    font-weight: bold;
+    color: #fff;
+    padding: 3px 10px;
+}
+ul.feature-list-tabs li:hover {
     color: #fff;
     background-color: #036;
     text-decoration: none;
 }
 
-ul.feature-list-tabs li a:hover {
+ul.feature-list-tabs li:hover {
     color: #fff;
     background-color: #369;
 }
 
+.local-toolbar {
+    height: 38px;
+    background-color: rgb(253, 214, 136);
+    width: 100%;
+	border-top: 1px solid black;
+    border-bottom: 1px solid black;
+    border-collapse: collapse;
+}
+.local-toolbar td {
+   	padding: 4px;
+   	height: 30px;
+}
+.local-toolbar-menu {
+	vertical-align: right;
+	float: right;
+}
 .ringer-select {
     display: none;
 }
@@ -148,39 +142,34 @@ ul.feature-list-tabs li a:hover {
 #ringer-select {
     width: 200px;
 }
-
-#row-status-box-container {
-	background-color:  rgb(253, 214, 136);
-   	height: 15px;
-   	text-align: left;
-   	border-bottom: 1px solid black;
+img#loader-animation {
+	vertical-align: text-bottom;
 }
-
+#row-status-box-container {
+	background-color: rgb(253, 214, 136);
+   	height: 24px;
+	width: 100%;
+   	border-bottom: 1px solid black;
+   	border-collapse: collapse;
+}
+#row-status-box {
+	padding: 4px;
+	height: 16px;
+	overflow: hidden; 
+	vertical-align: middle;
+}
 #slick-grid {
     position: absolute;
     left: 0;
     right: 0;
     bottom: 0;
-    top: 210px;
+    top: 186px;
     vertical-align: middle;
     text-align: center;
 }
-
-#slick-grid.browse{
-	top: 210px;
-}
-
-#slick-grid.addRow{
-	top: 170px;
-}
-
 span#last-error {
 	color: red;
 }
-img#loader-animation {
-	vertical-align: text-bottom;
-}
-
 .slick-header-columns {
     background: url("../img/header-columns-bg.gif");
     border-bottom: 1px solid #C2C3C9;
