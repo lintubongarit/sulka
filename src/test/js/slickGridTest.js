@@ -4,10 +4,6 @@ const wantedColumns = ["Rengas", "Nimirengas", "Laji", "Rengastaja", "Pvm", "Klo
 
 
 casper.test.begin('SlickGrid tests', 14, function suite(test) {
-	casper.options.logLevel = "debug";
-	casper.options.verbose =  true;
-	casper.options.timeout = 600000;
-	
     browse('/', function browseToSlickPage() {
     	var oldData = null;
     	
