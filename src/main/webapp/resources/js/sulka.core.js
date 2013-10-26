@@ -58,7 +58,9 @@ sulka = {
 							name: this.name,
 							toolTip: this.description,
 							$sulkaGroup: group,
-							$sulkaVisible: true
+							$sulkaVisible: true,
+							width:  20 + (this.name.toString().length * 6)
+							
 						};
 						columns.push(column);
 						$headerContextMenu.append(
