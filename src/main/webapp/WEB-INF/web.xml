@@ -89,5 +89,9 @@
 		<location>/status/404</location>
 	</error-page>
 
+	<error-page>
+		<error-code>401</error-code>
+		<location>/status/401</location>
+	</error-page>
 
 </web-app>

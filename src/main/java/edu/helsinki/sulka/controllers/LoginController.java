@@ -77,30 +77,6 @@ public class LoginController implements AuthenticationEntryPoint {
 		return "redirect:" + SSOLoginURL.getURL();
 	}
 
-	@RequestMapping(value = "/status/403", method = RequestMethod.GET)
-	public String accessDenied(Model model) {
-		model.addAttribute("msg",
-				"ERROR 403, You don't have privileges to view this page!!!");
-		return "/status/403";
-	}
-
-	
-	@RequestMapping(value = "/status/404", method = RequestMethod.GET)
-	public String notFound(Model model) {
-		model.addAttribute("msg",
-				"ERROR 404, content not found!");
-		return "/status/403";
-	}
-	
-	
-	@RequestMapping(value = "/status/401", method = RequestMethod.GET)
-	public String unauthorizedAccess(Model model) {
-		model.addAttribute("msg",
-				"ERROR 401, Unauthorized Access, you have to login first!");
-		return "/status/401";
-	}
-	
-	
 	/**
 	 * This value should be set from a bean and disabled for production.
 	 */

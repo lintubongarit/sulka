@@ -19,7 +19,7 @@
 		<script src="resources/js/sulka.helpers.js"></script>
 		<script src="resources/js/sulka.addRecoveries.js"></script>
 	</head>
-	<body class="add-row">
+	<body>
 		<%@include file="_header.jsp" %>
 		<table class="local-toolbar">
 			<tr>
