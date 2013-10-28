@@ -17,7 +17,7 @@ sulka.addRecovery = function(addRecovery) {
 	sulka.getDate = function() {
 		var now = new Date();
 		var date = now.getDate() + '.' + (now.getMonth() + 1) + '.'
-				+ (now.getFullYear() - 11) + '-' + now.getDate() + '.'
+				+ (now.getFullYear() - 2) + '-' + now.getDate() + '.'
 				+ (now.getMonth() + 1) + '.' + now.getFullYear();
 		console.log(date);
 		return date;
