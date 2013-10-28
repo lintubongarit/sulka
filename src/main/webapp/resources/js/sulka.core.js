@@ -251,9 +251,6 @@ sulka = {
 		
 	},
 	
-	
-
-	
 	/**
 	 * Get current row filter object by filters form values.
 	 * 
