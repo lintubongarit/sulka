@@ -96,6 +96,7 @@ sulka = {
 				sulka.grid.onHeaderContextMenu.subscribe(sulka.columnHeaderContextMenu);
 				$headerContextMenu.find("li.context-menu-item").click(sulka.headerContextMenuItemClicked);
 				sulka.reloadData();
+				sulka.grid.setSelectionModel(new Slick.CellSelectionModel());
 				
 				sulka.grid.onSort.subscribe(function (e, args) {
 					var data = sulka.grid.getData();
@@ -119,7 +120,6 @@ sulka = {
 			},
 			sulka.helpers.hideLoaderAndSetError
 		); 
-		grid.setSelectionModel(new Slick.CellSelectionModel());
 	},
 	
 	
