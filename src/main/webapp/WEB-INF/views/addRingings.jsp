@@ -25,6 +25,7 @@
 			<tr>
 				<td>
 					<form id="filters">
+						Aika (esim. 2005 tai 2005-2006): <input type="text" id="filters-date" name="date" />
 						Laji: <input type="text" id="filters-species" name="species" />
 						Kunta: <input type="text" id="filters-municipality" name="municipality" />
 						<input type="submit" id="form-submit" value="OK" />

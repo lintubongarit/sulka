@@ -1,14 +1,9 @@
-casper.test.begin('Browsing pages form tests', 16, function suite(test) {
+casper.test.begin('Browsing pages form tests for admin', 14, function suite(test) {
     browse('/', function () {
     	// Data loading and filtering
 		
 		casper.then(function () {
 			test.assertExists('form#filters', 'Browse page has a form with name "filters".');
-		});
-	
-		casper.then(function () {
-			this.fill('form#filters', { ringer: '846' }, false);
-			test.assertField('ringer', '846', "Ringer field exists");
 		});
 	
 		casper.then(function () {
@@ -48,7 +43,6 @@ casper.test.begin('Browsing pages form tests', 16, function suite(test) {
 	
 		casper.then(function (){
 			this.fill('form#filters', {
-				ringer: '1234',
 				date: '12345',
 				species: 'ABCD',
 				municipality: 'Kerava'
