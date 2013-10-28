@@ -6,7 +6,8 @@ sulka = {
 	grid: null,
 	gridOptions: {
 		enableCellNavigation: true,
-		enableColumnReorder: true
+		enableColumnReorder: true,
+		multiColumnSort: true
 	},
 
 	viewMode: "browsing",
@@ -36,6 +37,7 @@ sulka = {
 	
 	initGrid: function () {
 		sulka.helpers.showLoader();
+
 		sulka.API.fetchFieldGroups(
 			sulka.viewMode,
 			function (fieldGroups) {
@@ -58,7 +60,9 @@ sulka = {
 							name: this.name,
 							toolTip: this.description,
 							$sulkaGroup: group,
-							$sulkaVisible: true
+							$sulkaVisible: true,
+							width:  20 + (this.name.toString().length * 6),
+							sortable:true					
 						};
 						columns.push(column);
 						$headerContextMenu.append(
@@ -79,14 +83,42 @@ sulka = {
 				});
 				sulka.columns = columns;
 				sulka.grid = new Slick.Grid("#slick-grid", [], sulka.getVisibleColumns(), sulka.gridOptions);
+
+				
+				
+		
+				
 				sulka.initColumnGroups();
 				sulka.grid.onHeaderContextMenu.subscribe(sulka.columnHeaderContextMenu);
 				$headerContextMenu.find("li.context-menu-item").click(sulka.headerContextMenuItemClicked);
 				sulka.reloadData();
+				
+		sulka.grid.onSort.subscribe(function (e, args) {
+					
+					var data = sulka.grid.getData();
+				      var cols = args.sortCols;
+
+				      data.sort(function (dataRow1, dataRow2) {
+				        for (var i = 0, l = cols.length; i < l; i++) {
+				          var field = cols[i].sortCol.field;
+				          var sign = cols[i].sortAsc ? 1 : -1;
+				          var value1 = dataRow1[field], value2 = dataRow2[field];
+				          var result = (value1 == value2 ? 0 : (value1 > value2 ? 1 : -1)) * sign;
+				          if (result != 0) {
+				            return result;
+				          }
+				        }
+				        return 0;
+				      });
+				      sulka.grid.invalidate();
+				      sulka.grid.render();
+				    });
+				
 			},
 			sulka.helpers.hideLoaderAndSetError
 		);
 	},
+	
 	
 	getVisibleColumns: function () {
 		var visible = [];
@@ -217,17 +249,23 @@ sulka = {
 				} else {
 					sulka.helpers.hideLoaderAndUnsetError();
 				}
+				console.log(rows);
 				sulka.grid.setData(rows);
 				sulka.grid.render();
 			},
 			sulka.helpers.hideLoaderAndSetError
 		);
+		
 	},
+	
+	
+
 	
 	/**
 	 * Get current row filter object by filters form values.
-	 * @returns Filter object, or a string if there are parsing
-	 * errors. The string describes the error.
+	 * 
+	 * @returns Filter object, or a string if there are parsing errors. The
+	 *          string describes the error.
 	 */
 	getFilters: function () {
 		var filters;
@@ -275,10 +313,11 @@ sulka = {
 			sulka.rowsMode = "all";
 		}
 	}
-	
 };
 
+
 return sulka; }();
+
 
 /* Launch sulka.init() on DOM complete */
 $(sulka.init);

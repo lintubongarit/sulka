@@ -33,7 +33,8 @@ public class Field {
 
 	public static enum ViewMode {
 		BROWSING,
-		RINGINGS
+		RINGINGS,
+		RECOVERIES
 	};
 	
 	@JsonProperty("modes")

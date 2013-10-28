@@ -19,16 +19,17 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
+import edu.helsinki.sulka.configurations.SSOLoginPageURLConfiguration;
 import edu.helsinki.sulka.configurations.TestLoginCodeConfiguration;
 import edu.helsinki.sulka.models.User;
 import edu.helsinki.sulka.services.LintuvaaraAuthDecryptService;
+import edu.helsinki.sulka.services.LoginService;
 
 /**
  * Handles requests for the login page and passing authentication variables to
@@ -42,9 +43,16 @@ public class LoginController implements AuthenticationEntryPoint {
 	private Logger logger;
 
 	@Autowired
+	private LoginService loginService;
+	
+	@Autowired
 	private LintuvaaraAuthDecryptService authService;
 
-	private String redirectUrl = "http://lintuvaara.ihku.fi/";
+	/**
+	 * This value should be set from a bean and disabled for production.
+	 */
+	@Autowired
+	private SSOLoginPageURLConfiguration SSOLoginURL;
 
 	/**
 	 * redirects authentication variables key, iv and data to Tipu-API's
@@ -57,39 +65,16 @@ public class LoginController implements AuthenticationEntryPoint {
 			@RequestParam(value = "data", required = false) String data) {
 
 		if (key == null || iv == null || data == null)
-			return "redirect:" + redirectUrl;
-
-		User user = authService.auth(key, iv, data);
+			return "redirect:" + SSOLoginURL.getURL();
+			
+		User user = loginService.login(iv, key, data);
+		
 		model.addAttribute("user", user);
 
-		if (user.accessStatus() == 0) {
-			String userid;
-			userid = user.getLogin_id();
-
-			List<GrantedAuthority> grantedAuths = new ArrayList<GrantedAuthority>();
-
-			try {
-				Long.parseLong(userid);
-				grantedAuths.add(new SimpleGrantedAuthority("USER"));
-
-			} catch (Exception e) {
-				if (userid.contains("admin")) {
-					grantedAuths.add(new SimpleGrantedAuthority("USER"));
-					grantedAuths.add(new SimpleGrantedAuthority("ADMIN"));
-				} else {
-					return "redirect:" + redirectUrl;
-				}
-			}
-
-			Authentication authentication = new UsernamePasswordAuthenticationToken(
-					user.getName(), user.getEmail(), grantedAuths);
-			SecurityContextHolder.getContext()
-					.setAuthentication(authentication);
-
+		if (user.accessStatus() == 0)
 			return "redirect:/";
-		}
 
-		return "redirect:" + redirectUrl;
+		return "redirect:" + SSOLoginURL.getURL();
 	}
 
 	@RequestMapping(value = "/status/403", method = RequestMethod.GET)
