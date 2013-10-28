@@ -236,3 +236,10 @@ span#last-error {
 	list-style: none;
 	font-weight: bold;
 }
+#text-width-tester {
+	position: absolute;
+	visibility: invisible;
+	width: auto;
+	height: auto;
+	left: -1000px;
+}

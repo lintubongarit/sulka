@@ -58,6 +58,17 @@ sulka = {
 	fieldGroups: null,
 	
 	/**
+	 * Get rendered text width.
+	 */
+	getRenderedTextWidth: function (text) {
+		var width = $("#text-width-tester").text(text).width();
+		$("#text-width-tester").text("");
+		return width;
+	},
+	
+	COL_PADDING: 14,
+	COL_MAX_WIDTH: 200,
+	/**
 	 * Called at start to initialize grid.
 	 */
 	initGrid: function () {
@@ -74,23 +85,49 @@ sulka = {
 				var $headerContextMenu = $("#header-context-menu");
 				$.each(fieldGroups, function () {
 					var group = this;
+					
 					var contextHeader = $("<li></li>")
 						.addClass("context-menu-title")
 						.text(group.description);
 					sulka.contextMenuItemById[group.name] = contextHeader; 
 					$headerContextMenu.append(contextHeader);
+					
 					$.each(this.fields, function () {
-						var id = group.name + "/" + this.field;
+						var field = this;
+						var id = group.name + "/" + field.field;
+						
+						var width;
+						var isFlexible = false;
+						if (field.enumerationValues) {
+							isFlexible = false;
+							width = sulka.COL_PADDING;
+							$.each(field.enumerationValues, function () {
+								var enumWidth = Math.min(
+										sulka.COL_MAX_WIDTH, sulka.getRenderedTextWidth(this.value) + sulka.COL_PADDING);
+								if (enumWidth > width) {
+									width = enumWidth;
+								}
+							});
+						} else {
+							isFlexible = true;
+							width = Math.min(
+									sulka.COL_MAX_WIDTH, sulka.getRenderedTextWidth(field.name) + sulka.COL_PADDING);
+						}
+						
 						var column = {
 							id: id,
-							field: this.field,
-							name: this.name,
-							toolTip: this.description,
+							field: field.field,
+							name: field.name,
+							toolTip: field.description,
+							sortable: true,
+							width: width,
 							$sulkaGroup: group,
 							$sulkaVisible: true,
-							sortable:true					
+							// Flexible columns are resized on next data fetch
+							$sulkaFlexible: isFlexible
 						};
 						columns.push(column);
+						
 						var contextItem = $("<li></li>")
 							.addClass("context-menu-item")
 							.append(
@@ -100,16 +137,16 @@ sulka = {
 							)
 							.append(
 								$("<span></span>")
-									.text(this.name)
+									.text(field.name)
 							)
 							.data("column", column);
 						sulka.contextMenuItemById[id] = contextItem;
 						$headerContextMenu.append(contextItem);
 					});
 				});
-				
-				// Actually initialize Grid
 				sulka.columns = columns;
+				
+				// We are now ready to actually initialize the grid
 				sulka.grid = new Slick.Grid("#slick-grid", [], sulka.getVisibleColumns(), sulka.gridOptions);
 				
 				sulka.initColumnGroups();
@@ -340,12 +377,60 @@ sulka = {
 				} else {
 					sulka.helpers.hideLoaderAndUnsetError();
 				}
+				
+				sulka.adjustFlexibleCols(rows);
 				sulka.grid.setData(rows);
 				sulka.grid.render();
 			},
 			sulka.helpers.hideLoaderAndSetError
 		);
+	},
+	
+	/**
+	 * Adjust flexible columns for new data. 
+	 */
+	adjustFlexibleCols: function (rows) {
+		var flexibleCols = [];
 		
+		var a = sulka.grid.getColumns();
+		for (var i=0; i<a.length; i++) {
+			var col = a[i];
+			if (col.$sulkaFlexible) {
+				col.$sulkaFlexible = false;
+				col.$sulkaMaxStrLen = 0;
+				col.$sulkaMaxTextWidth = sulka.COL_PADDING;
+				flexibleCols.push(col);
+			}
+		}
+		
+		if (flexibleCols.length == 0) {
+			return;
+		}
+		
+		for (var i=0; i<rows.length; i++) {
+			var row = rows[i];
+			for (var j=0; j<flexibleCols.length; j++) {
+				var col = flexibleCols[j];
+				if (col.$sulkaMaxTextWidth >= sulka.COL_MAX_WIDTH) continue;
+				
+				var str = String(row[col.field]);
+				if (str.length > col.$sulkaMaxStrLen) {
+					col.$sulkaMaxStrLen = str.length;
+					// sulka.getRenderedTextWidth() is an expensive call
+					var newWidth = sulka.COL_PADDING + sulka.getRenderedTextWidth(str);
+					if (col.$sulkaMaxTextWidth < newWidth) {
+						col.$sulkaMaxTextWidth = Math.max(newWidth, col.$sulkaMaxTextWidth);
+					}
+				}
+			}
+		}
+		
+		for (var j=0; j<flexibleCols.length; j++) {
+			var col = flexibleCols[j];
+			col.width = Math.min(sulka.COL_MAX_WIDTH, col.$sulkaMaxTextWidth);
+		}
+		sulka.grid.setColumns(a);
+		sulka.renderColumnGroups();
 	},
 	
 	/**
