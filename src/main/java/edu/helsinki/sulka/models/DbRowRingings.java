@@ -16,8 +16,24 @@ public class DbRowRingings implements Serializable {
 	@Column(name = "id")
 	private Long id;
 	
-	@Column(name = "ringingAsJSON")
-	private String ringingAsJSON;
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	@Column(name = "row")
+	private String row;
+
+	public String getRow() {
+		return row;
+	}
+
+	public void setRow(String row) {
+		this.row = row;
+	}
 	
 	
 	
