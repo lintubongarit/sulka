@@ -428,6 +428,8 @@ sulka = {
 		for (var j=0; j<flexibleCols.length; j++) {
 			var col = flexibleCols[j];
 			col.width = Math.min(sulka.COL_MAX_WIDTH, col.$sulkaMaxTextWidth);
+			delete col.$sulkaMaxStrLen;
+			delete col.$sulkaMaxTextWidth;
 		}
 		sulka.grid.setColumns(a);
 		sulka.renderColumnGroups();
