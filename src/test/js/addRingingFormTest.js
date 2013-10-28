@@ -1,4 +1,6 @@
-casper.test.begin('AddRinger pages form tests', 8, function suite(test) {
+var moment = require('lib/moment.min.js');
+
+casper.test.begin('AddRinger pages form tests', 10, function suite(test) {
     browse('/', function () {
     	// Data loading and filtering
 		
@@ -16,6 +18,14 @@ casper.test.begin('AddRinger pages form tests', 8, function suite(test) {
 				this.fill('form#filters', { municipality: 'LUOPIO'}, false);
 				test.assertField('municipality', 'LUOPIO', "Municipality field exists");
 			
+		}).then(function () {
+			var now = moment();
+			var lastYear = now.clone().subtract("years", 1);
+			var dateFmt = "DD.MM.YYYY";
+			var dateSearch = lastYear.format(dateFmt) + "-" + now.format(dateFmt); 
+			
+			test.assertField('date', dateSearch, "Date search is by default the last 12 months");
+		
 		}).then(function (){
 			this.test.assertExists('form#filters input#form-reset[type=reset][value=Tyhjennä]',
 				'The "Tyhjennä" filter button exists.');
