@@ -167,17 +167,22 @@ sulka = {
 	 * Adjust grid positioning and size after window resize. 
 	 */
 	resizeGrid: function () {
-		var y = $("#row-status-box-container").offset().top + $("#row-status-box-container").outerHeight();
-		var width = $(document).width(),
-			height = $(document).height();
+		setTimeout(function () {
+			var y = $("#row-status-box-container").offset().top + $("#row-status-box-container").outerHeight();
+			var width = $(window).width() - sulka.freeze.getWidth();
 			
-		$("#slick-grid").css({
-			top: y + "px",
-			height: Math.max(0, height - y) + "px",
-			width: width + "px"
-		});
-		
-		sulka.grid.resizeCanvas();
+			console.log($(document).width());
+			console.log(width);
+				
+			$("#slick-grid").css({
+				top: y + "px",
+				width: width + "px"
+			});
+			
+			sulka.freeze.position(y);
+			
+			sulka.grid.resizeCanvas();
+		}, 100);
 	},
 	
 	/**

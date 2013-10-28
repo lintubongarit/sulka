@@ -158,14 +158,19 @@ img#loader-animation {
 	overflow: hidden; 
 	vertical-align: middle;
 }
-#slick-grid {
+#slick-grid, #freeze-grid {
     position: absolute;
     left: 0;
-    right: 0;
     bottom: 0;
     top: 186px;
     vertical-align: middle;
     text-align: center;
+}
+#slick-grid {
+	right: 0;
+}
+#freeze-grid {
+	width: 0;
 }
 span#last-error {
 	color: red;
