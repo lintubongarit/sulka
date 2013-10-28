@@ -1,5 +1,6 @@
 <%@ page pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <c:set var="selectedTab" value="browse" />
 <!DOCTYPE HTML>
 <html>
@@ -24,7 +25,9 @@
 			<tr>
 				<td>
 					<form id="filters">
-						Rengastaja: <input type="text" id="filters-ringer" name="ringer" />
+					    <sec:authorize access="hasRole('ADMIN')">
+        					Rengastaja: <input type="text" id="filters-ringer" name="ringer" />
+    					</sec:authorize>
 						Aika (esim. 2005 tai 2005-2006): <input type="text" id="filters-date" name="date" />
 						Laji: <input type="text" id="filters-species" name="species" />
 						Kunta: <input type="text" id="filters-municipality" name="municipality" />

@@ -1,13 +1,16 @@
 casper.test.begin('Column picker tests', 3, function suite(test) {
     browse('/', function () {
     	var previousColsLength = 0;
+    	
 		casper.then(function () {
 			this.click('#browse-tab');
 			
 		}).then(function () {
 			previousColsLength = casper.evaluate(function () {
 				var cols = $("#slick-grid .slick-header-column");
-				sulka.columnHeaderContextMenu.call(cols[0], {pageX: 0, pageY: 0, preventDefault: function () {}});
+		    	var fakeEvent = {pageX: 0, pageY: 0, preventDefault: function () {}};
+		    	var fakeArgs = {column: { id: "common"} };
+				sulka.columnHeaderContextMenu.call(cols[0], fakeEvent, fakeArgs);
 				return cols.length;
 			});
 			

@@ -40,6 +40,7 @@ sulka = {
 	
 	TICK_MARK: "✓",
 	
+	contextMenuItemById: {}, 
 	initGrid: function () {
 		sulka.helpers.showLoader();
 
@@ -53,14 +54,15 @@ sulka = {
 				var $headerContextMenu = $("#header-context-menu");
 				$.each(fieldGroups, function () {
 					var group = this;
-					$headerContextMenu.append(
-						$("<li></li>")
-							.addClass("context-menu-title")
-							.text(group.description)
-					);
+					var contextHeader = $("<li></li>")
+						.addClass("context-menu-title")
+						.text(group.description);
+					sulka.contextMenuItemById[group.name] = contextHeader; 
+					$headerContextMenu.append(contextHeader);
 					$.each(this.fields, function () {
+						var id = group.name + "/" + this.field;
 						var column = {
-							id: group.name + "/" + this.field,
+							id: id,
 							field: this.field,
 							name: this.name,
 							toolTip: this.description,
@@ -69,58 +71,51 @@ sulka = {
 							width:  20 + (this.name.toString().length * 6),
 							sortable:true,					
 							editor: Slick.Editors.Text
-
 						};
 						columns.push(column);
-						$headerContextMenu.append(
-								$("<li></li>")
-									.addClass("context-menu-item")
-									.append(
-											$("<span></span>")
-												.addClass("context-menu-tick")
-												.text(sulka.TICK_MARK)
-									)
-									.append(
-											$("<span></span>")
-												.text(this.name)
-									)
-									.data("column", column)
-						);
+						var contextItem = $("<li></li>")
+							.addClass("context-menu-item")
+							.append(
+									$("<span></span>")
+										.addClass("context-menu-tick")
+										.text(sulka.TICK_MARK)
+							)
+							.append(
+									$("<span></span>")
+										.text(this.name)
+							)
+							.data("column", column);
+						sulka.contextMenuItemById[id] = contextItem;
+						$headerContextMenu.append(contextItem);
 					});
 				});
 				sulka.columns = columns;
 				sulka.grid = new Slick.Grid("#slick-grid", [], sulka.getVisibleColumns(), sulka.gridOptions);
 
-				
-				
-		
-				
 				sulka.initColumnGroups();
 				sulka.grid.onHeaderContextMenu.subscribe(sulka.columnHeaderContextMenu);
 				$headerContextMenu.find("li.context-menu-item").click(sulka.headerContextMenuItemClicked);
 				sulka.reloadData();
 				
-		sulka.grid.onSort.subscribe(function (e, args) {
-					
+				sulka.grid.onSort.subscribe(function (e, args) {
 					var data = sulka.grid.getData();
-				      var cols = args.sortCols;
-
-				      data.sort(function (dataRow1, dataRow2) {
-				        for (var i = 0, l = cols.length; i < l; i++) {
-				          var field = cols[i].sortCol.field;
-				          var sign = cols[i].sortAsc ? 1 : -1;
-				          var value1 = dataRow1[field], value2 = dataRow2[field];
-				          var result = (value1 == value2 ? 0 : (value1 > value2 ? 1 : -1)) * sign;
-				          if (result != 0) {
-				            return result;
-				          }
-				        }
-				        return 0;
-				      });
-				      sulka.grid.invalidate();
-				      sulka.grid.render();
-				    });
-				
+				    var cols = args.sortCols;
+				    
+					data.sort(function (dataRow1, dataRow2) {
+						for (var i = 0, l = cols.length; i < l; i++) {
+							var field = cols[i].sortCol.field;
+							var sign = cols[i].sortAsc ? 1 : -1;
+							var value1 = dataRow1[field], value2 = dataRow2[field];
+							var result = (value1 == value2 ? 0 : (value1 > value2 ? 1 : -1)) * sign;
+							if (result != 0) {
+								return result;
+							}
+					    }
+					    return 0;
+					  });
+					  sulka.grid.invalidate();
+					  sulka.grid.render();
+				});
 			},
 			sulka.helpers.hideLoaderAndSetError
 		); 
@@ -138,14 +133,36 @@ sulka = {
 		return visible;
 	},
 	
-	columnHeaderContextMenu: function (event) {
+	CONTEXT_HEIGHT_ADJUST: 6,
+	columnHeaderContextMenu: function (event, args) {
 		event.preventDefault();
 		
-		$("#header-context-menu")
-			.css("top", event.pageY)
-			.css("left", event.pageX)
-			.show();
+		var contextItem = undefined; 
+		if ($(event.target).data("sulka.group.id")) {
+			var groupId = $(event.target).data("sulka.group.id");
+			if (sulka.contextMenuItemById.hasOwnProperty(groupId)) {
+				contextItem = sulka.contextMenuItemById[groupId];
+			}
+		}
 		
+		if (args.column) {
+			var colId = args.column.id; 
+			if (sulka.contextMenuItemById.hasOwnProperty(colId)) {
+				contextItem = sulka.contextMenuItemById[colId];
+			}
+		}
+		
+		if (contextItem === undefined) {
+			return;
+		}
+		
+		$("#header-context-menu")
+			.css("top", event.pageY + "px")
+			.css("left", event.pageX + "px")
+			.height($(document).height() - event.pageY - sulka.CONTEXT_HEIGHT_ADJUST)
+			.show()
+			.scrollTop(Math.max(0, $("#header-context-menu").scrollTop() + contextItem.position().top));
+	
 		$("body").one("click", function () {
 			$("#header-context-menu").hide();
 		});
@@ -156,6 +173,7 @@ sulka = {
 		if (column) {
 			column.$sulkaVisible = !column.$sulkaVisible;
 			sulka.grid.setColumns(sulka.getVisibleColumns());
+			sulka.renderColumnGroups();
 			$(this).closest("li").find("span.context-menu-tick").text(column.$sulkaVisible ? sulka.TICK_MARK : "");
 		}
 	},
@@ -176,7 +194,7 @@ sulka = {
 	},
 	
 	COL_GROUP_OUTSIDE_WIDTH: 9,
-	_makeColumnGroup: function (description, width) {
+	_makeColumnGroup: function (name, description, width) {
 		return $(
 			'<div></div>'
 		).addClass(
@@ -195,12 +213,15 @@ sulka = {
 		).css(
 				"width",
 				(width - sulka.COL_GROUP_OUTSIDE_WIDTH) + "px"
+		).data(
+			"sulka.group.id",
+			name
 		);
 	},
 	
 	SLICK_WIDTH_ADJUST: -1000,
 	renderColumnGroups: function () {
-		var columns = sulka.grid.getColumns(),
+		var columns = sulka.getVisibleColumns(),
 			groupDivs = [];
 		
 		var currentGroup = null,
@@ -210,14 +231,14 @@ sulka = {
 				currentGroupWidth += this.width;
 			} else {
 				if (currentGroup !== null) {
-					groupDivs.push(sulka._makeColumnGroup(currentGroup.description, currentGroupWidth));
+					groupDivs.push(sulka._makeColumnGroup(currentGroup.name, currentGroup.description, currentGroupWidth));
 				}
 				currentGroup = this.$sulkaGroup;
 				currentGroupWidth = this.width;
 			}
 		});
 		if (currentGroup !== null) {
-			groupDivs.push(sulka._makeColumnGroup(currentGroup.description, currentGroupWidth));
+			groupDivs.push(sulka._makeColumnGroup(currentGroup.name, currentGroup.description, currentGroupWidth));
 		}
 		
 		sulka.columnGroupsDiv.empty().css(
@@ -257,7 +278,6 @@ sulka = {
 				} else {
 					sulka.helpers.hideLoaderAndUnsetError();
 				}
-				console.log(rows);
 				sulka.grid.setData(rows);
 				sulka.grid.render();
 			},
@@ -265,9 +285,6 @@ sulka = {
 		);
 		
 	},
-	
-	
-
 	
 	/**
 	 * Get current row filter object by filters form values.
