@@ -26,12 +26,6 @@ public class LocalDatabaseServiceTest {
 	private LocalDatabaseService localDatabaseService;
 	
 	@Test
-	public void testDatabaseIsEmptyAtBeginning() {
-		List<DbRowRingings> rows = localDatabaseService.getRingings(0);
-		assertTrue(rows.isEmpty());
-	}
-	
-	@Test
 	public void testAddRingingGrowsSizeOfReturnedList(){
 		DbRowRingings row = new DbRowRingings();
 		row.setUserId(1);
