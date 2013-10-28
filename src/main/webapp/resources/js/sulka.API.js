@@ -129,8 +129,21 @@ sulka.API = function(API) {
 				}
 				errorHandler();
 			};
+		},
+		
+		validate : function(row) {
+			
+			$.ajax({
+				url : API.BASE + "/validate/" + row,
+				dataType : 'json',
+				success : function(results) {
+					if (onSuccess) {
+						onSuccess(results.objects);
+					}
+				},
+				error : API._jQueryErrorHandler(onError)
+			});
 		}
 	};
-
 	return API;
 }();

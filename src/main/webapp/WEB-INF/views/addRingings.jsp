@@ -13,11 +13,12 @@
 		<script src="resources/js/lib/moment.min.js"></script>
 		<script src="resources/js/lib/slick.core.js"></script>
 		<script src="resources/js/lib/slick.grid.js"></script>
+		<script src="resources/js/lib/slick.rowselectionmodel.js"></script>
 		<script src="resources/js/sulka.core.js"></script>
 		<script src="resources/js/sulka.strings.js"></script>
 		<script src="resources/js/sulka.API.js"></script>
 		<script src="resources/js/sulka.helpers.js"></script>
-		<script src="resources/js/sulka.addRingings.js"></script>
+		<script src="resources/js/sulka.addRingings.js"></script>		
 	</head>
 	<body class="add-row">
 		<%@include file="_header.jsp" %>
@@ -34,6 +35,7 @@
 					</form>
 				</td>
 				<td>
+					<button type="button" class="local-toolbar-menu" value="new row" onclick="sulka.validate();">Validoi</button>
 					<button type="button" class="local-toolbar-menu" value="new row" onclick="sulka.addRow();">Lisää rivi</button>
 				</td>
 			</tr>

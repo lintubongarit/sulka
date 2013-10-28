@@ -29,6 +29,9 @@ sulka = {
 		$("#header-context-menu-hide").click(function () {
 			sulka.hideColum($("#header-context-menu").data("column"));
 		});
+		$("#slick-grid").click(function () {
+			console.log('click', sulka.grid.getSelectionModel());
+		});
 	},
 	
 	fieldGroups: null,
@@ -85,10 +88,12 @@ sulka = {
 				});
 				sulka.columns = columns;
 				sulka.grid = new Slick.Grid("#slick-grid", [], sulka.getVisibleColumns(), sulka.gridOptions);
+				
 
 				sulka.initColumnGroups();
 				sulka.grid.onHeaderContextMenu.subscribe(sulka.columnHeaderContextMenu);
 				$headerContextMenu.find("li.context-menu-item").click(sulka.headerContextMenuItemClicked);
+				sulka.grid.setSelectionModel(new Slick.RowSelectionModel());
 				sulka.reloadData();
 				
 				sulka.grid.onSort.subscribe(function (e, args) {

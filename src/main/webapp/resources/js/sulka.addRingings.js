@@ -13,6 +13,11 @@ sulka.addRinging = function(addRinging) {
 		sulka.grid.updateRowCount();
 		sulka.grid.render();
 	};
+	
+	sulka.validate = function() {
+		console.log(sulka.grid.getSelectedRows());
+		//sulka.API.validate(sulka.grid.getSelectedRow());
+	};
 
 }();
 
