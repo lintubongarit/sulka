@@ -44,4 +44,11 @@ public class DbRowRingings implements Serializable {
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
+	
+	@Override
+	public boolean equals(Object obj){
+		if(obj instanceof DbRowRingings)
+			return id == ((DbRowRingings)obj).id;
+		return false;
+	}
 }
