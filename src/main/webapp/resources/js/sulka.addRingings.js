@@ -10,6 +10,7 @@ sulka.addRinging = function(addRinging) {
 		var data = sulka.grid.getData();
 		data.unshift({});
 		sulka.grid.setData(data);
+		sulka.grid.updateRowCount();
 		sulka.grid.render();
 	};
 
