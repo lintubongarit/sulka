@@ -16,6 +16,14 @@ public class DbRowRingings implements Serializable {
 	@Column(name = "id")
 	private Long id;
 	
+	public DbRowRingings(){
+	}
+	
+	public DbRowRingings(Long id, String row){
+		this.id = id;
+		this.row = row;
+	}
+	
 	public Long getId() {
 		return id;
 	}
