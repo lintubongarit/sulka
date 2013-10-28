@@ -1,15 +1,13 @@
 package edu.helsinki.sulka.services;
 
 import java.util.List;
-import java.util.logging.Logger;
 
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import edu.helsinki.sulka.models.DbRowRingings;
+import edu.helsinki.sulka.repositories.RingingRepository;
+
 
 /**
  * Autowireable service that handles storing of user-inputted rows
@@ -17,28 +15,14 @@ import edu.helsinki.sulka.models.DbRowRingings;
 @Service
 public class LocalDatabaseService {
 
-	private SessionFactory sessionFactory;
+	@Autowired
+	private RingingRepository ringingRepository;
 	
-	public void setSessionFactory(SessionFactory sessionFactory){
-		this.sessionFactory = sessionFactory;
-	}
-	
-	public void addRinging(DbRowRingings ringingRow){
-		Session session = sessionFactory.openSession();
-		session.beginTransaction();
-		session.save(ringingRow);
-		session.getTransaction().commit();
-		session.close();
+	public void addRinging(DbRowRingings ringingRow){	
+		ringingRepository.save(ringingRow);
 	}
 
-	public List<DbRowRingings> getRows(int userId) {
-		Session session = sessionFactory.openSession();
-		session.beginTransaction();
-		Query q = session.createQuery("from DbRowRingings");
-		List<DbRowRingings> results = q.list();
-		session.close();
-		return results;
+	public List<DbRowRingings> getRingings(int userId) {
+		return (List<DbRowRingings>) ringingRepository.findByUserId(userId);
 	}
-	
-
 }
