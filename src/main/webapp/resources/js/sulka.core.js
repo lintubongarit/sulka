@@ -84,36 +84,30 @@ sulka = {
 				sulka.columns = columns;
 				sulka.grid = new Slick.Grid("#slick-grid", [], sulka.getVisibleColumns(), sulka.gridOptions);
 
-				
-				
-		
-				
 				sulka.initColumnGroups();
 				sulka.grid.onHeaderContextMenu.subscribe(sulka.columnHeaderContextMenu);
 				$headerContextMenu.find("li.context-menu-item").click(sulka.headerContextMenuItemClicked);
 				sulka.reloadData();
 				
-		sulka.grid.onSort.subscribe(function (e, args) {
-					
+				sulka.grid.onSort.subscribe(function (e, args) {
 					var data = sulka.grid.getData();
-				      var cols = args.sortCols;
-
-				      data.sort(function (dataRow1, dataRow2) {
-				        for (var i = 0, l = cols.length; i < l; i++) {
-				          var field = cols[i].sortCol.field;
-				          var sign = cols[i].sortAsc ? 1 : -1;
-				          var value1 = dataRow1[field], value2 = dataRow2[field];
-				          var result = (value1 == value2 ? 0 : (value1 > value2 ? 1 : -1)) * sign;
-				          if (result != 0) {
-				            return result;
-				          }
-				        }
-				        return 0;
-				      });
-				      sulka.grid.invalidate();
-				      sulka.grid.render();
-				    });
-				
+				    var cols = args.sortCols;
+				    
+					data.sort(function (dataRow1, dataRow2) {
+						for (var i = 0, l = cols.length; i < l; i++) {
+							var field = cols[i].sortCol.field;
+							var sign = cols[i].sortAsc ? 1 : -1;
+							var value1 = dataRow1[field], value2 = dataRow2[field];
+							var result = (value1 == value2 ? 0 : (value1 > value2 ? 1 : -1)) * sign;
+							if (result != 0) {
+								return result;
+							}
+					    }
+					    return 0;
+					  });
+					  sulka.grid.invalidate();
+					  sulka.grid.render();
+				});
 			},
 			sulka.helpers.hideLoaderAndSetError
 		);
