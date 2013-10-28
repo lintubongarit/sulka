@@ -8,5 +8,5 @@ import edu.helsinki.sulka.models.DbRowRingings;
 
 
 public interface RingingRepository extends CrudRepository<DbRowRingings, Long>{
-	List<DbRowRingings> findByUserId(Integer userId);
+	List<DbRowRingings> findByUserId(String userId);
 }

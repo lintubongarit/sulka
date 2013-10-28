@@ -19,7 +19,7 @@ public class DbRowRingings implements Serializable {
 	@Column(name = "id")
 	private Long id;
 	@Column(name = "userId")
-	private int userId;
+	private String userId;
 	@Column(name = "row")
 	private String row;
 	
@@ -29,10 +29,10 @@ public class DbRowRingings implements Serializable {
 	public void setId(Long id) {
 		this.id = id;
 	}	
-	public int getUserId() {
+	public String getUserId() {
 		return userId;
 	}
-	public void setUserId(int userId) {
+	public void setUserId(String userId) {
 		this.userId = userId;
 	}
 	public String getRow() {

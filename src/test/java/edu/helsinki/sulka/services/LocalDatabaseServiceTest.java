@@ -28,10 +28,10 @@ public class LocalDatabaseServiceTest {
 	@Test
 	public void testAddRingingGrowsSizeOfReturnedList(){
 		DbRowRingings row = new DbRowRingings();
-		row.setUserId(1);
+		row.setUserId("1");
 		row.setRow("TESTI");
 		localDatabaseService.addRinging(row);
-		List<DbRowRingings> rows = localDatabaseService.getRingings(1);
+		List<DbRowRingings> rows = localDatabaseService.getRingings("1");
 		assertEquals(rows.size(), 1);
 	}
 
@@ -40,11 +40,11 @@ public class LocalDatabaseServiceTest {
 	public void testOnlyUsersRowsAreReturned(){
 		for(int i=0; i < 500; i++){
 			DbRowRingings row = new DbRowRingings();
-			row.setUserId(i%10);
+			row.setUserId(Integer.toString(i%10));
 			row.setRow("Testi: " + i);
 		}
-		int wantedUserId = 4;
-		List<DbRowRingings> rows = localDatabaseService.getRingings(4);
+		String wantedUserId = "4";
+		List<DbRowRingings> rows = localDatabaseService.getRingings("4");
 		for(DbRowRingings row: rows){
 			assertEquals(row.getUserId(), wantedUserId);
 		}

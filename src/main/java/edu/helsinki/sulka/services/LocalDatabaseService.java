@@ -22,7 +22,7 @@ public class LocalDatabaseService {
 		ringingRepository.save(ringingRow);
 	}
 
-	public List<DbRowRingings> getRingings(int userId) {
+	public List<DbRowRingings> getRingings(String userId) {
 		return (List<DbRowRingings>) ringingRepository.findByUserId(userId);
 	}
 }
