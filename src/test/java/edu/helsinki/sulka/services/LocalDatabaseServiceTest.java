@@ -53,5 +53,11 @@ public class LocalDatabaseServiceTest {
 		assertTrue(rows.isEmpty());
 	}
 	
+	@Test
+	public void testAddRingingIncreasesRowCount(){
+		localDatabaseService.addRinging(new DbRowRingings(1L, "TESTI"));
+		List <DbRowRingings> rows = localDatabaseService.getRows(USER_ID);
+		assertEquals(rows.size(), 1);
+	}
 
 }
