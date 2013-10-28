@@ -13,14 +13,13 @@ sulka.addRecovery = function(addRecovery) {
 		sulka.grid.updateRowCount();
 		sulka.grid.render();
 	};
-
-	sulka.getDate = function() {
-		var now = new Date();
-		var date = now.getDate() + '.' + (now.getMonth() + 1) + '.'
-				+ (now.getFullYear() - 2) + '-' + now.getDate() + '.'
-				+ (now.getMonth() + 1) + '.' + now.getFullYear();
-		console.log(date);
-		return date;
-	};
-
+	
 }();
+
+$(function () {
+	var now = moment();
+	var lastYear = now.clone().subtract("years", 1);
+	var dateFmt = "DD.MM.YYYY";
+	var dateSearch = lastYear.format(dateFmt) + "-" + now.format(dateFmt); 
+	$("#filters-date").val(dateSearch); 
+});
