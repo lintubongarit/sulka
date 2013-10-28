@@ -3,7 +3,14 @@ var sulka = function (sulka) {
  * The main application container.
  */
 sulka = {
+	/**
+	 * Reference to Slick Grid object
+	 */
 	grid: null,
+	
+	/**
+	 * Slick grid options.
+	 */
 	gridOptions: {
 		enableCellNavigation: true,
 		enableColumnReorder: true,
@@ -13,11 +20,17 @@ sulka = {
 	viewMode: "browsing",
 	rowsMode: "ringings",
 	
+	/**
+	 * Called at start, when the document has fully loaded.
+	 */
 	init: function () {
 		sulka.initEventHandlers();
 		sulka.initGrid();
 	},
 
+	/**
+	 * Called at start to attach generic DOM event handlers
+	 */
 	initEventHandlers: function () {
 		$("#filters").submit(function (event) {
 			sulka.helpers.cancelEvent(event);
@@ -31,14 +44,26 @@ sulka = {
 		});
 	},
 	
-	fieldGroups: null,
-	
 	TICK_MARK: "✓",
 	
-	contextMenuItemById: {}, 
+	/**
+	 * Stores context menu <li></li> elements by corresponding column ID.
+	 */
+	contextMenuItemById: {},
+	
+	/**
+	 * Reference to current view's columns and fieldGroups.
+	 */
+	columns: null,
+	fieldGroups: null,
+	
+	/**
+	 * Called at start to initialize grid.
+	 */
 	initGrid: function () {
 		sulka.helpers.showLoader();
 		
+		// Get view fields
 		sulka.API.fetchFieldGroups(
 			sulka.viewMode,
 			function (fieldGroups) {
@@ -63,26 +88,27 @@ sulka = {
 							toolTip: this.description,
 							$sulkaGroup: group,
 							$sulkaVisible: true,
-							width:  ((this.name.toString().length<5)?35:20) + (this.name.toString().length * 9),
 							sortable:true					
 						};
 						columns.push(column);
 						var contextItem = $("<li></li>")
 							.addClass("context-menu-item")
 							.append(
-									$("<span></span>")
-										.addClass("context-menu-tick")
-										.text(sulka.TICK_MARK)
+								$("<span></span>")
+									.addClass("context-menu-tick")
+									.text(sulka.TICK_MARK)
 							)
 							.append(
-									$("<span></span>")
-										.text(this.name)
+								$("<span></span>")
+									.text(this.name)
 							)
 							.data("column", column);
 						sulka.contextMenuItemById[id] = contextItem;
 						$headerContextMenu.append(contextItem);
 					});
 				});
+				
+				// Actually initialize Grid
 				sulka.columns = columns;
 				sulka.grid = new Slick.Grid("#slick-grid", [], sulka.getVisibleColumns(), sulka.gridOptions);
 				
@@ -91,24 +117,7 @@ sulka = {
 				$headerContextMenu.find("li.context-menu-item").click(sulka.headerContextMenuItemClicked);
 				sulka.reloadData();
 				
-				sulka.grid.onSort.subscribe(function (e, args) {
-					var data = sulka.grid.getData();
-				    var cols = args.sortCols;
-				    
-					data.sort(function (dataRow1, dataRow2) {
-						for (var i = 0, l = cols.length; i < l; i++) {
-							var field = cols[i].sortCol.field;
-							var sign = cols[i].sortAsc ? 1 : -1;
-							var value1 = dataRow1[field], value2 = dataRow2[field];
-							var result = (value1 == value2 ? 0 : (value1 > value2 ? 1 : -1)) * sign;
-							if (result != 0) {
-								return result;
-							}
-					    }
-					    return 0;
-					  });
-					  sulka.grid.invalidate();
-				});
+				sulka.grid.onSort.subscribe(sulka.onGridSort);
 				
 				$(window).resize(sulka.resizeGrid);
 				sulka.resizeGrid();
@@ -134,6 +143,9 @@ sulka = {
 		sulka.grid.resizeCanvas();
 	},
 	
+	/**
+	 * Return currently visible columns (even those not currently on grid)
+	 */
 	getVisibleColumns: function () {
 		var visible = [];
 		$.each(sulka.columns, function () {
@@ -144,7 +156,32 @@ sulka = {
 		return visible;
 	},
 	
+	/**
+	 * Called by SlickGrid when the grid needs to be sorted. 
+	 */
+	onGridSort: function (event, args) {
+		var data = sulka.grid.getData();
+	    var cols = args.sortCols;
+	    
+		data.sort(function (dataRow1, dataRow2) {
+			for (var i = 0, l = cols.length; i < l; i++) {
+				var field = cols[i].sortCol.field;
+				var sign = cols[i].sortAsc ? 1 : -1;
+				var value1 = dataRow1[field], value2 = dataRow2[field];
+				var result = (value1 == value2 ? 0 : (value1 > value2 ? 1 : -1)) * sign;
+				if (result != 0) {
+					return result;
+				}
+		    }
+		    return 0;
+		  });
+		  sulka.grid.invalidate();
+	},
+	
 	CONTEXT_HEIGHT_ADJUST: 6,
+	/**
+	 * Called by SlickGrid to show context menu on headers. 
+	 */
 	columnHeaderContextMenu: function (event, args) {
 		event.preventDefault();
 		
@@ -179,6 +216,9 @@ sulka = {
 		});
 	},
 	
+	/**
+	 * Called when a context menu item is clicked.
+	 */
 	headerContextMenuItemClicked: function () {
 		var column = $(this).data("column");
 		if (column) {
@@ -190,6 +230,10 @@ sulka = {
 	},
 	
 	columnGroupsDiv: null,
+	/**
+	 * Called once at start to initialize column group rendering after columns have been
+	 * fetched.
+	 */
 	initColumnGroups: function () {
 		sulka.columnGroupsDiv = $(
 			'<div></div>'
@@ -205,6 +249,9 @@ sulka = {
 	},
 	
 	COL_GROUP_OUTSIDE_WIDTH: 9,
+	/**
+	 * Create column group element. 
+	 */
 	_makeColumnGroup: function (name, description, width) {
 		return $(
 			'<div></div>'
@@ -231,6 +278,9 @@ sulka = {
 	},
 	
 	SLICK_WIDTH_ADJUST: -1000,
+	/**
+	 * Called whenever column groups need to be re-rendered.
+	 */
 	renderColumnGroups: function () {
 		var columns = sulka.grid.getColumns(),
 			groupDivs = [];
@@ -308,7 +358,7 @@ sulka = {
 		var filters;
 		var municipality = $.trim($("#filters-municipality").val()),
 			species = $.trim($("#filters-species").val()),
-			date = sulka.getDate();
+			date = $.trim($("#filters-date").val());
 		
 		if (date) {
 			filters = sulka.helpers.parseDateInput(date);
@@ -327,10 +377,6 @@ sulka = {
 		}
 			
 		return filters;
-	},
-	
-	getDate: function () {
-		return $.trim($("#filters-date").val());
 	},
 	
 	/**
@@ -354,7 +400,6 @@ sulka = {
 
 
 return sulka; }();
-
 
 /* Launch sulka.init() on DOM complete */
 $(sulka.init);
