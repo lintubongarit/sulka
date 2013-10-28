@@ -69,7 +69,7 @@ sulka = {
 							$sulkaGroup: group,
 							$sulkaVisible: true,
 							width:  20 + (this.name.toString().length * 6),
-							sortable:true,					
+							sortable:true,
 							editor: Slick.Editors.Text
 						};
 						columns.push(column);
@@ -114,6 +114,7 @@ sulka = {
 					    }
 					    return 0;
 					  });
+					  
 					  sulka.grid.invalidate();
 					  sulka.grid.render();
 				});
