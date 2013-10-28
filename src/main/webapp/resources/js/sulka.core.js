@@ -66,7 +66,7 @@ sulka = {
 		return width;
 	},
 	
-	COL_PADDING: 14,
+	COL_PADDING: 20,
 	COL_MAX_WIDTH: 200,
 	/**
 	 * Called at start to initialize grid.
@@ -211,8 +211,8 @@ sulka = {
 				}
 		    }
 		    return 0;
-		  });
-		  sulka.grid.invalidate();
+		});
+		sulka.grid.invalidate();
 	},
 	
 	CONTEXT_HEIGHT_ADJUST: 6,

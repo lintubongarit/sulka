@@ -243,3 +243,7 @@ span#last-error {
 	height: auto;
 	left: -1000px;
 }
+.slick-sort-indicator {
+	margin-left: 0px !important;
+	margin-right: 2px;
+}
