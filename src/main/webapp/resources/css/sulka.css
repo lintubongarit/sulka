@@ -213,6 +213,7 @@ span#last-error {
 	-moz-box-shadow: 2px 2px 2px silver;
 	-webkit-box-shadow: 2px 2px 2px silver;
 	z-index: 99999;
+	overflow-y: scroll;
 }
 .context-menu li.context-menu-item {
 	padding: 4px 4px 4px 4px;
