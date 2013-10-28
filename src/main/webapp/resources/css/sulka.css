@@ -28,11 +28,11 @@ table, table tbody, table tr, table td {
 
 /* ----- */
 
-.global-toolbar, ul.feature-list-tabs {
+#global-toolbar, ul.feature-list-tabs {
     background-color: rgb(253, 214, 136);
     width: 100%;
 }
-.global-toolbar { 
+#global-toolbar { 
 	height: 91px;
 	overflow: hidden;
 }

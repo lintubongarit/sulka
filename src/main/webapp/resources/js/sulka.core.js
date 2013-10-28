@@ -38,7 +38,7 @@ sulka = {
 	contextMenuItemById: {}, 
 	initGrid: function () {
 		sulka.helpers.showLoader();
-
+		
 		sulka.API.fetchFieldGroups(
 			sulka.viewMode,
 			function (fieldGroups) {
@@ -85,7 +85,7 @@ sulka = {
 				});
 				sulka.columns = columns;
 				sulka.grid = new Slick.Grid("#slick-grid", [], sulka.getVisibleColumns(), sulka.gridOptions);
-
+				
 				sulka.initColumnGroups();
 				sulka.grid.onHeaderContextMenu.subscribe(sulka.columnHeaderContextMenu);
 				$headerContextMenu.find("li.context-menu-item").click(sulka.headerContextMenuItemClicked);
@@ -108,13 +108,31 @@ sulka = {
 					    return 0;
 					  });
 					  sulka.grid.invalidate();
-					  sulka.grid.render();
 				});
+				
+				$(window).resize(sulka.resizeGrid);
+				sulka.resizeGrid();
 			},
 			sulka.helpers.hideLoaderAndSetError
 		);
 	},
 	
+	/**
+	 * Adjust grid positioning and size after window resize. 
+	 */
+	resizeGrid: function () {
+		var y = $("#row-status-box-container").offset().top + $("#row-status-box-container").outerHeight();
+		var width = $(document).width(),
+			height = $(document).height();
+			
+		$("#slick-grid").css({
+			top: y + "px",
+			height: Math.max(0, height - y) + "px",
+			width: width + "px"
+		});
+		
+		sulka.grid.resizeCanvas();
+	},
 	
 	getVisibleColumns: function () {
 		var visible = [];
