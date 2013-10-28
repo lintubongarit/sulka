@@ -7,7 +7,12 @@ sulka = {
 	gridOptions: {
 		enableCellNavigation: true,
 		enableColumnReorder: true,
-		multiColumnSort: true
+		multiColumnSort: true,
+		editable: true,
+		enableAddRow: true,
+		enableCellNavigation: true,
+		asyncEditorLoading: false,
+		autoEdit: false
 	},
 
 	viewMode: "browsing",
@@ -62,7 +67,9 @@ sulka = {
 							$sulkaGroup: group,
 							$sulkaVisible: true,
 							width:  20 + (this.name.toString().length * 6),
-							sortable:true					
+							sortable:true,					
+							editor: Slick.Editors.Text
+
 						};
 						columns.push(column);
 						$headerContextMenu.append(
@@ -116,7 +123,8 @@ sulka = {
 				
 			},
 			sulka.helpers.hideLoaderAndSetError
-		);
+		); 
+		grid.setSelectionModel(new Slick.CellSelectionModel());
 	},
 	
 	
