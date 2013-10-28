@@ -18,6 +18,8 @@ public class DbRowRingings implements Serializable {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "id")
 	private Long id;
+	@Column(name = "userId")
+	private int userId;
 	@Column(name = "row")
 	private String row;
 	
@@ -26,6 +28,12 @@ public class DbRowRingings implements Serializable {
 	}
 	public void setId(Long id) {
 		this.id = id;
+	}	
+	public int getUserId() {
+		return userId;
+	}
+	public void setUserId(int userId) {
+		this.userId = userId;
 	}
 	public String getRow() {
 		return row;
