@@ -63,7 +63,7 @@ sulka = {
 							toolTip: this.description,
 							$sulkaGroup: group,
 							$sulkaVisible: true,
-							width:  20 + (this.name.toString().length * 6),
+							width:  ((this.name.toString().length<5)?35:20) + (this.name.toString().length * 9),
 							sortable:true					
 						};
 						columns.push(column);
