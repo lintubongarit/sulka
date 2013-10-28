@@ -1,6 +1,6 @@
 <%@ page pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<c:set var="selectedTab" value="addRingings" />
+<c:set var="selectedTab" value="addRecoveries" />
 <!DOCTYPE HTML>
 <html>
 	<head>
@@ -17,7 +17,7 @@
 		<script src="resources/js/sulka.strings.js"></script>
 		<script src="resources/js/sulka.API.js"></script>
 		<script src="resources/js/sulka.helpers.js"></script>
-		<script src="resources/js/sulka.addRingings.js"></script>
+		<script src="resources/js/sulka.addRecoveries.js"></script>
 	</head>
 	<body class="add-row">
 		<%@include file="_header.jsp" %>

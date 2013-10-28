@@ -3,7 +3,7 @@ casper.test.begin('Browsing pages form tests', 16, function suite(test) {
     	// Data loading and filtering
 		
 		casper.then(function () {
-			test.assertExists('form#filters', 'Slick-page has a form with name "filters".');
+			test.assertExists('form#filters', 'Browse page has a form with name "filters".');
 		});
 	
 		casper.then(function () {

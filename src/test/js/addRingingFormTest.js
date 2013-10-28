@@ -3,7 +3,7 @@ casper.test.begin('AddRinger pages form tests', 8, function suite(test) {
     	// Data loading and filtering
 		
 		casper.then(function () {
-			this.click('input#addRinging');
+			this.click('#add-ringings-tab');
 			
 		}).then(function () {
 			test.assertExists('form#filters', 'addRingings-page has a form with name "filters".');

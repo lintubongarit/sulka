@@ -14,18 +14,26 @@
 <ul id="feature-list" class="feature-list-tabs">
 	<c:choose>
 		<c:when test="${selectedTab.equals('browse')}">
-			<li class="current-feature-item"><a href="<c:url value="/"/>">Selailu</a></li>
+			<li class="current-feature-item"><a id="browse-tab" href="<c:url value="/"/>">Selailu</a></li>
 		</c:when>
 		<c:otherwise>
-			<li><a href="<c:url value="/"/>">Selailu</a></li>
+			<li><a id="browse-tab" href="<c:url value="/"/>">Selailu</a></li>
 		</c:otherwise>
 	</c:choose>	
 	<c:choose>
 		<c:when test="${selectedTab.equals('addRingings')}">
-			<li class="current-feature-item"><a href="<c:url value="/addRingings"/>">Rengastusten syöttö</a></li>
+			<li class="current-feature-item"><a id="add-ringings-tab" href="<c:url value="/addRingings"/>">Rengastusten syöttö</a></li>
 		</c:when>
 		<c:otherwise>
-			<li><a href="<c:url value="/addRingings"/>">Rengastusten syöttö</a></li>
+			<li><a id="add-ringings-tab" href="<c:url value="/addRingings"/>">Rengastusten syöttö</a></li>
+		</c:otherwise>
+	</c:choose>	
+	<c:choose>
+		<c:when test="${selectedTab.equals('addRecoveries')}">
+			<li class="current-feature-item"><a id="add-recoveries-tab" href="<c:url value="/addRecoveries"/>">Kontrollien syöttö</a></li>
+		</c:when>
+		<c:otherwise>
+			<li><a id="add-recoveries-tab" href="<c:url value="/addRecoveries"/>">Kontrollien syöttö</a></li>
 		</c:otherwise>
 	</c:choose>	
 </ul>

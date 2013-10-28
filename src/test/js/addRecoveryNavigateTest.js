@@ -1,25 +1,25 @@
-casper.test.begin('addRecovery navigating tests', 3, function suite(test) {
-	browse('/', function () {
+casper.test.begin('addRecoveries navigating tests', 3, function suite(test) {
+	browse('/addRecoveries', function () {
 		casper.then(function () {
-			this.click('input#addRecovery');
+			this.click('#add-recoveries-tab');
 			
 		}).then(function() {
-			test.assertEquals(this.getCurrentUrl(), URL + "/addrecovery?", "addRecovery link works on addRecovery page");
+			test.assertEquals(this.getCurrentUrl(), URL + "/addRecoveries", "addRecoveries link works on addRecoveries page");
 			
 		}).then(function () {
-			this.click('input#browsing');
+			this.click('#browse-tab');
 			
 		}).then(function() {
-			test.assertEquals(this.getCurrentUrl(), URL + "/?", "browsing link works on addRecovery page");
+			test.assertEquals(this.getCurrentUrl(), URL + "/", "browse link works on addRecoveries page");
 			
 		}).then(function () {
-			this.click('input#addRecovery');
+			this.click('#add-recoveries-tab');
 			
 		}).then(function () {
-			this.click('input#addRinging');
+			this.click('#add-ringings-tab');
 			
 		}).then(function() {
-			test.assertEquals(this.getCurrentUrl(), URL + "/addringing?", "addRinging link works on addRecovery page");
+			test.assertEquals(this.getCurrentUrl(), URL + "/addRingings", "addRingings link works on addRecoveries page");
 		}); 
 
 	});

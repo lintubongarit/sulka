@@ -1,24 +1,24 @@
-casper.test.begin('addRinging navigating tests', 3, function suite(test) {
+casper.test.begin('addRingings navigating tests', 3, function suite(test) {
 	browse('/', function () {
 		casper.then(function () {
-			this.click('input#addRinging');
+			this.click('#add-ringings-tab');
 			
 		}).then(function() {
-			test.assertEquals(this.getCurrentUrl(), URL + "/addringing?", "addRinging link works on addRinging page");
+			test.assertEquals(this.getCurrentUrl(), URL + "/addRingings", "addRingings link works on addRinging page");
 			
 		}).then(function () {
-			this.click('input#browsing');
+			this.click('#browse-tab');
 		}).then(function() {
-			test.assertEquals(this.getCurrentUrl(), URL + "/?", "browsing link works on addRinging page");
+			test.assertEquals(this.getCurrentUrl(), URL + "/", "browsing link works on addRinging page");
 			
 		}).then(function () {
-			this.click('input#addRinging');
+			this.click('#add-ringings-tab');
 			
 		}).then(function () {
-			this.click('input#addRecovery');
+			this.click('#add-recoveries-tab');
 			
 		}).then(function() {
-			test.assertEquals(this.getCurrentUrl(), URL + "/addrecovery?", "addRecovery link works on addRinging page");
+			test.assertEquals(this.getCurrentUrl(), URL + "/addRecoveries", "addRecoveries link works on addRingings page");
 		}); 
 
 	});

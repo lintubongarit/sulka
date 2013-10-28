@@ -3,14 +3,12 @@ const wantedColumns = ["Rengas", "Nimirengas", "Laji", "Rengastaja", "Pvm", "Klo
 /* Columns to be added: birdStation, kkj_ddmm_lat, kkj_ddmm_lon, kkj_decimal_lat, kkj_decimal_lon, birdCondition*/
 
 
-casper.test.begin('SlickGrid tests', 14, function suite(test) {
+casper.test.begin('SlickGrid tests', 13, function suite(test) {
     browse('/', function browseToSlickPage() {
     	var oldData = null;
     	
 		casper.then(function () {
 			test.assertHttpStatus(200, "HTTP status is OK");
-		}).then(function () {
-	        test.assertTitle("Sulka", "Title is 'Sulka'");
 		}).then(function () {
 			var grid = this.getGlobal('grid');
 			test.assertNotEquals(grid, null, "SlickGrid -grid is not null");

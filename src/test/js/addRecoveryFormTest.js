@@ -1,11 +1,8 @@
-casper.test.begin('AddRecovery pages form tests', 8, function suite(test) {
-    browse('/', function () {
+casper.test.begin('addRecoveries pages form tests', 8, function suite(test) {
+    browse('/addRecoveries', function () {
     	// Data loading and filtering
 		
 		casper.then(function () {
-			this.click('input#addRecovery');
-			
-		}).then(function () {
 			test.assertExists('form#filters', 'addRingings-page has a form with name "filters".');
 			
 		}).then(function () {

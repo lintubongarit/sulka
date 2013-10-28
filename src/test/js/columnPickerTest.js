@@ -2,7 +2,7 @@ casper.test.begin('Column picker tests', 3, function suite(test) {
     browse('/', function () {
     	var previousColsLength = 0;
 		casper.then(function () {
-			this.click('input#browsing');
+			this.click('#browse-tab');
 			
 		}).then(function () {
 			previousColsLength = casper.evaluate(function () {
