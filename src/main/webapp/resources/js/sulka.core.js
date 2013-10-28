@@ -14,7 +14,12 @@ sulka = {
 	gridOptions: {
 		enableCellNavigation: true,
 		enableColumnReorder: true,
-		multiColumnSort: true
+		multiColumnSort: true,
+		editable: true,
+		enableAddRow: true,
+		enableCellNavigation: true,
+		asyncEditorLoading: false,
+		autoEdit: false
 	},
 
 	viewMode: "browsing",
@@ -125,6 +130,7 @@ sulka = {
 							$sulkaVisible: true,
 							// Flexible columns are resized on next data fetch
 							$sulkaFlexible: isFlexible
+							editor: Slick.Editors.Text
 						};
 						columns.push(column);
 						
@@ -153,6 +159,7 @@ sulka = {
 				sulka.grid.onHeaderContextMenu.subscribe(sulka.columnHeaderContextMenu);
 				$headerContextMenu.find("li.context-menu-item").click(sulka.headerContextMenuItemClicked);
 				sulka.reloadData();
+				sulka.grid.setSelectionModel(new Slick.CellSelectionModel());
 				
 				sulka.grid.onSort.subscribe(sulka.onGridSort);
 				
@@ -160,7 +167,7 @@ sulka = {
 				sulka.resizeGrid();
 			},
 			sulka.helpers.hideLoaderAndSetError
-		);
+		); 
 	},
 	
 	/**
