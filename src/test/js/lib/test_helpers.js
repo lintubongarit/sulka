@@ -15,6 +15,19 @@ function browse(path, testCb) {
 	});
 };
 /**
+ * Create admin login session, browse to path in tested deployment, inject jQuery and execute testCb when done. 
+ * @param path Web page path to test
+ * @param testCb Callback to execute when ready.
+ */
+function browseAdmin(path, testCb) {
+	casper.start(URL + "/testAdminLogin/" + TEST_SESSION_CODE);
+	casper.thenOpen(URL + path, function () {
+		casper.page.injectJs('lib/jquery-' + JQUERY_VERSION + '.min.js');
+		testCb.apply(null, arguments);
+	});
+};
+
+/**
  * Evaluate string in the browser environment and return its value (value must be 
  * serializeable to JSON.)   
  * @param codeString JavaScript code snippet to evaluate.
