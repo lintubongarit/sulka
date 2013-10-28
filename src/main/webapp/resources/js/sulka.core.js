@@ -260,7 +260,13 @@ sulka = {
 		var column = $(this).data("column");
 		if (column) {
 			column.$sulkaVisible = !column.$sulkaVisible;
-			sulka.grid.setColumns(sulka.getVisibleColumns());
+			var visibleCols = sulka.getVisibleColumns();
+			if (visibleCols.length == 0) {
+				// Refuse to hide all columns
+				column.$sulkaVisible = true;
+				return;
+			}
+			sulka.grid.setColumns(visibleCols);
 			sulka.renderColumnGroups();
 			$(this).closest("li").find("span.context-menu-tick").text(column.$sulkaVisible ? sulka.TICK_MARK : "");
 		}
