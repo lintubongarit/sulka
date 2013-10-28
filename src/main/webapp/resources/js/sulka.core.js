@@ -156,7 +156,6 @@ sulka = {
 			.show()
 			.scrollTop(Math.max(0, $("#header-context-menu").scrollTop() + contextItem.position().top));
 	
-		
 		$("body").one("click", function () {
 			$("#header-context-menu").hide();
 		});
@@ -167,6 +166,7 @@ sulka = {
 		if (column) {
 			column.$sulkaVisible = !column.$sulkaVisible;
 			sulka.grid.setColumns(sulka.getVisibleColumns());
+			sulka.renderColumnGroups();
 			$(this).closest("li").find("span.context-menu-tick").text(column.$sulkaVisible ? sulka.TICK_MARK : "");
 		}
 	},
