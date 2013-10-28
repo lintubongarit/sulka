@@ -29,9 +29,9 @@ public class LocalStorageController extends JSONController {
 	}
 	
 	@PreAuthorize("hasRole('USER')")
-	@RequestMapping(value = "/api/storage/update/ringing", method = RequestMethod.POST, produces = "application/json;charset=UTF-8", consumes="application/json")
+	@RequestMapping(value = "/api/storage/ringing/save", method = RequestMethod.POST, produces = "application/json;charset=UTF-8", consumes="application/json")
 	@ResponseBody
-	public ObjectResponse<String> updateRingingsDatabase(Locale locale,
+	public ObjectResponse<String> saveRinging(Locale locale,
 			Model model, HttpSession session,
 			@RequestBody DbRowRingings ringing,
 			BindingResult bindingResult) throws LocalStorageException {

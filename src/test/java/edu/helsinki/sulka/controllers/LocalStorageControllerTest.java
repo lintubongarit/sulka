@@ -56,7 +56,7 @@ public class LocalStorageControllerTest {
 
 	@Test
 	public void testLocalStorageControllerStatusIsOk() throws Exception {
-		mockMvc.perform(post("/api/storage/update/ringing")
+		mockMvc.perform(post("/api/storage/ringing/save")
 						.session(lokkiHttpSession)
 						.contentType(MediaType.APPLICATION_JSON)
 						.content("{\"id\":\"1234\", \"row\":\"asdflkaöjö\"}".getBytes()))
@@ -65,7 +65,7 @@ public class LocalStorageControllerTest {
 	}
 	@Test
 	public void testLocalStorageControllerReturnsJSON() throws Exception {
-		mockMvc.perform(post("/api/storage/update/ringing")
+		mockMvc.perform(post("/api/storage/ringing/save")
 						.session(lokkiHttpSession)
 						.contentType(MediaType.APPLICATION_JSON)
 						.content("{\"id\":\"1234\", \"row\":\"asdflkaöjö\"}".getBytes()))
@@ -76,7 +76,7 @@ public class LocalStorageControllerTest {
 	
 	@Test
 	public void testLocalStorageControllerReturnsErrorIfPostDataIsntJSON() throws Exception {
-		mockMvc.perform(post("/api/storage/update/ringing")
+		mockMvc.perform(post("/api/storage/ringing/save")
 						.session(lokkiHttpSession)
 						.contentType(MediaType.APPLICATION_XML)
 						.content("{\"id\":\"1234\", \"row\":\"asdflkaöjö\"}".getBytes()))
@@ -86,7 +86,7 @@ public class LocalStorageControllerTest {
 	
 	@Test
 	public void testLocalStorageControllerReturnsErrorWithWronglyNamedIdField() throws Exception {
-		mockMvc.perform(post("/api/storage/update/ringing")
+		mockMvc.perform(post("/api/storage/ringing/save")
 				.session(lokkiHttpSession)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("{\"JOTAIN\":\"1234\", \"row\":\"asdflkaöjö\"}".getBytes()))
@@ -96,7 +96,7 @@ public class LocalStorageControllerTest {
 
 	@Test
 	public void testLocalStorageControllerReturnsErrorWithWronglyNamedRowField() throws Exception {
-		mockMvc.perform(post("/api/storage/update/ringing")
+		mockMvc.perform(post("/api/storage/ringing/save")
 				.session(lokkiHttpSession)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("{\"id\":\"1234\", \"ABCD\":\"asdflkaöjö\"}".getBytes()))
