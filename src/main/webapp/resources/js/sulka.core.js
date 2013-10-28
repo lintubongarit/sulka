@@ -243,7 +243,6 @@ sulka = {
 				} else {
 					sulka.helpers.hideLoaderAndUnsetError();
 				}
-				console.log(rows);
 				sulka.grid.setData(rows);
 				sulka.grid.render();
 			},
