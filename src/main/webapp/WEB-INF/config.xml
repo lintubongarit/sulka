@@ -4,6 +4,9 @@
 
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
 
+
+    <import resource="spring/database.xml" />
+    
 	<bean class="edu.helsinki.sulka.configurations.TestLoginCodeConfiguration">
 		<!-- IMPORTANT! SECURITY! Remove below line for production!!! -->
 		<constructor-arg type="java.lang.String"
