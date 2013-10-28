@@ -7,7 +7,6 @@
 	</head>
 	<body>
 		<img alt="404-bird" src="<c:url value="/resources/img/404-bird.jpg" />" style="float:right">
-		<h1><c:out value="${msg}" /></h1>
-		<p><a href="http://lintuvaara.ihku.fi">Click here to authenticate in Lintuvaara</a></p>
+		<h1>Virhe 401: Kirjaudu sisään ensin</h1>
 	</body>
 </html>

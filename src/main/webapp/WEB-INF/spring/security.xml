@@ -30,8 +30,7 @@
 		<security:logout logout-url="/logout" delete-cookies="true"
 			invalidate-session="true" />
 		<security:logout logout-success-url="/logoutSuccess" />
-		<security:access-denied-handler
-			error-page="/status/403" />
+		<security:access-denied-handler error-page="/status/403" />
 
 
 	</security:http>

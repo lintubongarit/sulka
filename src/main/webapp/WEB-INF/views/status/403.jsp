@@ -7,6 +7,6 @@
 	</head>
 	<body>
 		<img alt="404-bird" src="<c:url value="/resources/img/404-bird.jpg" />" style="float:right">
-		<h1><c:out value="${msg}" /></h1>
+		<h1>Virhe 403: Ei oikeutusta</h1>
 	</body>
 </html>
