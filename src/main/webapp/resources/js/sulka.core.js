@@ -214,11 +214,12 @@ sulka = {
 	
 	SLICK_WIDTH_ADJUST: -1000,
 	renderColumnGroups: function () {
-		var columns = sulka.getVisibleColumns(),
+		var columns = sulka.grid.getColumns(),
 			groupDivs = [];
 		
 		var currentGroup = null,
 			currentGroupWidth = 0;
+		
 		$.each(columns, function () {
 			if (currentGroup === this.$sulkaGroup) {
 				currentGroupWidth += this.width;
