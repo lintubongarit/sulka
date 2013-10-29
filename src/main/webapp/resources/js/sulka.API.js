@@ -131,17 +131,18 @@ sulka.API = function(API) {
 			};
 		},
 		
-		validate : function(row) {
+		validate : function(row, onError) {
+			
+			console.log(API.BASE + "/validate?data=" + row);
 			
 			$.ajax({
-				url : API.BASE + "/validate/" + row,
+				url : API.BASE + "/validate?data=" + row,
 				dataType : 'json',
-				success : function(results) {
-					if (onSuccess) {
-						onSuccess(results.objects);
-					}
-				},
 				error : API._jQueryErrorHandler(onError)
+			}).done(function( data ) {
+				if ( console && console.log ) {
+					console.log( "Sample of data:", data );
+					}
 			});
 		}
 	};

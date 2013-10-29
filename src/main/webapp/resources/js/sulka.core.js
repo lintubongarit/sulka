@@ -29,9 +29,6 @@ sulka = {
 		$("#header-context-menu-hide").click(function () {
 			sulka.hideColum($("#header-context-menu").data("column"));
 		});
-		$("#slick-grid").click(function () {
-			console.log('click', sulka.grid.getSelectionModel());
-		});
 	},
 	
 	fieldGroups: null,
