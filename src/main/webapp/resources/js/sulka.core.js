@@ -144,14 +144,14 @@ sulka = {
 
 						    $.extend(this, _editor);
 
-						    function init() {
+						    function initFormulaEditor() {
 						      // register a plugin to select a range and append it to the textbox
-						      // since events are fired in reverse order (most recently added are executed first),
+						      // since events are fired in reverse orderx (most recently added are executed first),
 						      // this will override other plugins like moverows or selection model and will
 						      // not require the grid to not be in the edit mode
 						      _selector = new Slick.CellRangeSelector();
 						      _selector.onCellRangeSelected.subscribe(_self.handleCellRangeSelected);
-						      args.grid.registerPlugin(_selector);
+						      sulka.grid.registerPlugin(_selector);
 						    }
 
 						    this.destroy = function () {
@@ -172,7 +172,7 @@ sulka = {
 						    };
 
 
-						    init();
+						    initFormulaEditor();
 						  }
 						
 						var contextItem = $("<li></li>")
@@ -207,19 +207,22 @@ sulka = {
 				sulka.grid.registerPlugin(sulka.copyManager);
 				
 				
+				
 				sulka.initColumnGroups();
 				sulka.grid.onHeaderContextMenu.subscribe(sulka.columnHeaderContextMenu);
 				$headerContextMenu.find("li.context-menu-item").click(sulka.headerContextMenuItemClicked);
+				
 				sulka.reloadData();
-				
-				
-				
 				
 				sulka.copyManager.onPasteCells.subscribe(sulka.onPasteCells);
 				
 				sulka.grid.onSort.subscribe(sulka.onGridSort);
 				
+				
+				sulka.grid.onAddNewRow.subscribe(sulka.onAddNewRow);
+				
 				$(window).resize(sulka.resizeGrid);
+				
 				sulka.resizeGrid();
 			},
 			sulka.helpers.hideLoaderAndSetError
@@ -280,8 +283,7 @@ sulka = {
 	
 	
 	onPasteCells: function(event, args){
-		
-	  sulka.copyManager.onPasteCells.subscribe(function (e, args) {
+		  sulka.copyManager.onPasteCells.subscribe(function (e, args) {
 	      if (args.from.length !== 1 || args.to.length !== 1) {
 	        throw "This implementation only supports single range copy and paste operations";
 	      }
@@ -442,6 +444,8 @@ sulka = {
 		);
 	},
 	
+    	
+	
 	/**
 	 * Reload all data to table, applying new filters etc.
 	 */
@@ -481,18 +485,14 @@ sulka = {
 	},
 	
 	
-	onAddNewRow: function(){
-	    sulka.grid.onAddNewRow.subscribe(function (e, args) {
+	onAddNewRow: function(event, args){
+			var data = sulka.grid.getData();
 	        var item = args.item;
 	        var column = args.column;
-	        grid.invalidateRow(data.length);
+	        sulka.grid.invalidateRow(data.length);
 	        data.push(item);
-	        grid.updateRowCount();
-	        grid.render();
-	      });
-		
-		
-		
+	        sulka.grid.updateRowCount();
+	        sulka.grid.render();
 	},
 	
 	/**
