@@ -36,12 +36,6 @@ sulka = {
 			sulka.helpers.cancelEvent(event);
 			sulka.reloadData();
 		});
-		$("#header-context-menu-show").click(function () {
-			sulka.showColumn($("#header-context-menu").data("column"));
-		});
-		$("#header-context-menu-hide").click(function () {
-			sulka.hideColum($("#header-context-menu").data("column"));
-		});
 	},
 	
 	TICK_MARK: "✓",
@@ -150,7 +144,7 @@ sulka = {
 				sulka.grid = new Slick.Grid("#slick-grid", [], sulka.getVisibleColumns(), sulka.gridOptions);
 				
 				sulka.initColumnGroups();
-				sulka.grid.onHeaderContextMenu.subscribe(sulka.columnHeaderContextMenu);
+				sulka.grid.onHeaderContextMenu.subscribe(sulka.showColumnHeaderContextMenu);
 				$headerContextMenu.find("li.context-menu-item").click(sulka.headerContextMenuItemClicked);
 				sulka.reloadData();
 				
@@ -167,9 +161,11 @@ sulka = {
 	 * Adjust grid positioning and size after window resize. 
 	 */
 	resizeGrid: function () {
+		$("#header-context-menu").hide();
+		
 		var y = $("#row-status-box-container").offset().top + $("#row-status-box-container").outerHeight();
-		var width = $(document).width(),
-			height = $(document).height();
+		var width = $(window).width(),
+			height = $(window).height();
 			
 		$("#slick-grid").css({
 			top: y + "px",
@@ -219,7 +215,7 @@ sulka = {
 	/**
 	 * Called by SlickGrid to show context menu on headers. 
 	 */
-	columnHeaderContextMenu: function (event, args) {
+	showColumnHeaderContextMenu: function (event, args) {
 		event.preventDefault();
 		
 		var contextItem = undefined; 
@@ -242,9 +238,22 @@ sulka = {
 		}
 		
 		$("#header-context-menu")
-			.css("top", event.pageY + "px")
-			.css("left", event.pageX + "px")
-			.height($(document).height() - event.pageY - sulka.CONTEXT_HEIGHT_ADJUST)
+			.find(".context-menu-item-selected")
+			.removeClass("context-menu-item-selected");
+		contextItem.addClass("context-menu-item-selected");
+		
+		var winWidth = $(window).width(),
+			winHeight = $(window).height();
+		
+		var menuWidth = $("#header-context-menu").width();
+		
+		var x = Math.max(0, Math.min(winWidth - menuWidth, event.pageX)),
+			y = Math.max(0, event.pageY);
+		
+		$("#header-context-menu")
+			.css("left", x + "px")
+			.css("top", y + "px")
+			.height(winHeight - event.pageY - sulka.CONTEXT_HEIGHT_ADJUST)
 			.show()
 			.scrollTop(Math.max(0, $("#header-context-menu").scrollTop() + contextItem.position().top));
 	
