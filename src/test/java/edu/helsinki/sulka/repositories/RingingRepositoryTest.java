@@ -1,11 +1,9 @@
 package edu.helsinki.sulka.repositories;
 
-import junit.framework.Assert;
-
+import static org.junit.Assert.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -20,19 +18,27 @@ import edu.helsinki.sulka.repositories.RingingRepository;
 })
 public class RingingRepositoryTest {
 
-	 @Autowired  
-	 private RingingRepository ringingRepository;
-	
-	 @Test  
-    @Rollback(false)  
-	public void testCreate() {  
-		DatabaseRow p = new DatabaseRow();  
-		p.setRow("asd");  
+	@Autowired  
+	private RingingRepository ringingRepository;
+
+	@Test
+	public void testNewRowsGetIdFromRepository() {  
+		DatabaseRow row = new DatabaseRow();
+		row.setRow("asd");  
 		  
-		p = ringingRepository.save(p);  
-		Assert.assertNotNull(p.getId());  
-		System.out.println("Created Id: " + p.getId());  
-    }     
+		row = ringingRepository.save(row);
+		assertNotNull(row.getId());
+	}     
+	
+	@Test
+	public void testDefinedRowDataIsKept(){
+		String rowData = "asdölkjaeoårids";
+		DatabaseRow row = new DatabaseRow();
+		row.setRow(rowData);  
+		  
+		row = ringingRepository.save(row);
+		assertEquals(row.getRow(), rowData);
+	}
 	
 }
 
