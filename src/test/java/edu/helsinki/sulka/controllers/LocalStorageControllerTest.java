@@ -1,9 +1,12 @@
 package edu.helsinki.sulka.controllers;
 
+
+import static org.hamcrest.Matchers.notNullValue;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -17,6 +20,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
+
 
 import edu.helsinki.sulka.SecuritySessionHelper;
 import edu.helsinki.sulka.models.User;
@@ -101,6 +105,29 @@ public class LocalStorageControllerTest {
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("{\"id\":\"1234\", \"ABCD\":\"asdflkaöjö\"}".getBytes()))
 		.andExpect(status().isBadRequest()) // Should be internal server error
+		.andReturn();
+	}
+
+	@Test
+	public void testLocalStorageControllerAcceptsContentWithoutId() throws Exception {
+		mockMvc.perform(post("/api/storage/ringing/save")
+				.session(lokkiHttpSession)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("{\"row\":\"asdflkaöjö\"}".getBytes()))
+		.andExpect(status().isOk()) // Should be internal server error
+		.andReturn();
+	}
+	
+	@Test
+	public void testLocalStorageControllerReturnsRowWithCorrectColumns() throws Exception {
+		mockMvc.perform(post("/api/storage/ringing/save")
+				.session(lokkiHttpSession)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("{\"row\":\"asdflkaöjö\"}".getBytes()))
+		.andExpect(status().isOk())
+		.andExpect(jsonPath("$.object.id").value(notNullValue()))
+		.andExpect(jsonPath("$.object.userId").value(notNullValue()))
+		.andExpect(jsonPath("$.object.row").value(notNullValue()))
 		.andReturn();
 	}
 }
