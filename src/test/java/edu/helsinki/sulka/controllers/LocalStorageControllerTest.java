@@ -246,4 +246,45 @@ public class LocalStorageControllerTest {
 		.andReturn();
 	}
 	
+	@Test
+	public void testDeleteRecoveryStatusIsOk() throws Exception {
+		mockMvc.perform(delete("/api/storage/recovery")
+						.session(lokkiHttpSession)
+						.contentType(MediaType.APPLICATION_JSON)
+						.content("{\"id\":\"1\", \"userId\":\"846\", \"row\":\"asdflökjasd\"}".getBytes()))
+				.andExpect(status().isOk())
+				.andReturn();
+		}
+	
+	@Test
+	public void testDeleteRecoveryReturnsJSON() throws Exception {
+		mockMvc.perform(delete("/api/storage/recovery")
+						.session(lokkiHttpSession)
+						.contentType(MediaType.APPLICATION_JSON)
+						.content("{\"id\":\"1\", \"userId\":\"846\", \"row\":\"asdflökjasd\"}".getBytes()))
+				.andExpect(status().isOk())
+				.andExpect(content().contentType("application/json;charset=UTF-8"))
+				.andReturn();
+	}
+	
+	@Test
+	public void testDeleteRecoveryReturnsErrorIfDeleteDataIsntJSON() throws Exception {
+		mockMvc.perform(delete("/api/storage/recovery")
+						.session(lokkiHttpSession)
+						.contentType(MediaType.APPLICATION_XML)
+						.content("{\"id\":\"1\", \"userId\":\"846\", \"row\":\"asdflökjasd\"}".getBytes()))
+				.andExpect(status().isUnsupportedMediaType())
+				.andReturn();
+	}
+	
+	@Test
+	public void testDeleteRecoveryReturnsErrorIfUserIdDoesNotMatchRowUserId() throws Exception {
+		mockMvc.perform(delete("/api/storage/recovery")
+						.session(lokkiHttpSession)
+						.contentType(MediaType.APPLICATION_XML)
+						.content("{\"id\":\"1\", \"userId\":\"123\", \"row\":\"asdflökjasd\"}".getBytes()))
+				.andExpect(status().isUnsupportedMediaType())
+				.andReturn();
+	}
+	
 }

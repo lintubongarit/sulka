@@ -95,5 +95,16 @@ public class LocalDatabaseServiceTest {
 		row = localDatabaseService.addRecovery(row);
 		assertNotNull(row.getId());
 	}
+	
+	@Test
+	public void testRemoveRecoveryDeletesRowFromDatabase(){
+		DatabaseRow row = new DatabaseRow();
+		row.setUserId("1");
+		row.setRow("Testi4");
+		row = localDatabaseService.addRecovery(row);
+		localDatabaseService.removeRecovery(row);
+		List<DatabaseRow> rows = localDatabaseService.getRecoveries("1");
+		assertTrue(rows.isEmpty());
+	}
 
 }
