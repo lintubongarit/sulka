@@ -38,7 +38,7 @@ public class LocalStorageController extends JSONController {
 	@PreAuthorize("hasRole('USER')")
 	@RequestMapping(value = "/api/storage/ringing/save", method = RequestMethod.POST, produces = "application/json;charset=UTF-8", consumes="application/json")
 	@ResponseBody
-	public ObjectResponse<String> saveRinging(Locale locale,
+	public ObjectResponse<DbRowRingings> saveRinging(Locale locale,
 			Model model, HttpSession session,
 			@RequestBody DbRowRingings ringing,
 			BindingResult bindingResult) throws LocalStorageException {
@@ -46,9 +46,8 @@ public class LocalStorageController extends JSONController {
 			throw new LocalStorageException("Database update failed");
 		}
 		ringing.setUserId(((User) session.getAttribute("user")).getLogin_id());
-		localDatabaseService.addRinging(ringing);
 		
-		return new ObjectResponse<String>("Database updated successfully.");
+		return new ObjectResponse<DbRowRingings>(localDatabaseService.addRinging(ringing));
 	}
 	
 	/**

@@ -35,7 +35,6 @@ public class LocalDatabaseServiceTest {
 		assertEquals(rows.size(), 1);
 	}
 
-	
 	@Test
 	public void testOnlyUsersRowsAreReturned(){
 		for(int i=0; i < 500; i++){
@@ -48,8 +47,24 @@ public class LocalDatabaseServiceTest {
 		for(DbRowRingings row: rows){
 			assertEquals(row.getUserId(), wantedUserId);
 		}
-		
-		
+	}
+	
+	@Test
+	public void testAddRingingReturnsSomething(){
+		DbRowRingings row = new DbRowRingings();
+		row.setUserId("1");
+		row.setRow("TESTI");
+		row = localDatabaseService.addRinging(row);
+		assertNotNull(row);
+	}
+	
+	@Test
+	public void testAddRingingReturnsRowWithId(){
+		DbRowRingings row = new DbRowRingings();
+		row.setUserId("1");
+		row.setRow("TESTI");
+		row = localDatabaseService.addRinging(row);
+		assertNotNull(row.getId());
 	}
 
 

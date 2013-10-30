@@ -18,8 +18,8 @@ public class LocalDatabaseService {
 	@Autowired
 	private RingingRepository ringingRepository;
 	
-	public void addRinging(DbRowRingings ringingRow){	
-		ringingRepository.save(ringingRow);
+	public DbRowRingings addRinging(DbRowRingings ringingRow){	
+		return ringingRepository.save(ringingRow);
 	}
 
 	public List<DbRowRingings> getRingings(String userId) {
