@@ -8,7 +8,7 @@ sulka.addRinging = function(addRinging) {
 
 	sulka.addRow = function() {
 		var data = sulka.grid.getData();
-		data.unshift({});
+		data.unshift({"nameRing": "A 0617342","ring": "A 0617342","eventDate": "51.6.1998","lon": "32904","numberOfYoungs": "5","species": "TURPIL","municipality": "ALAHÄR","type": "Rengastus","id": "A 0617342","ageDeterminationMethod": "V","clutchNumber": "3","ringer": "2574","age": "PP","coordinateType": "ykj","ringEnd": "A 0617346","lat": "70125"});
 		sulka.grid.setData(data);
 		sulka.grid.updateRowCount();
 		sulka.grid.render();

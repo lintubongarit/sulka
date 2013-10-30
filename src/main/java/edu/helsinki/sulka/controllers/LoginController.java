@@ -64,16 +64,16 @@ public class LoginController implements AuthenticationEntryPoint {
 			@RequestParam(value = "iv", required = false) String iv,
 			@RequestParam(value = "data", required = false) String data) {
 
-//		if (key == null || iv == null || data == null)
-//			return "redirect:" + SSOLoginURL.getURL();
-//			
-//		User user = loginService.login(iv, key, data);
+		if (key == null || iv == null || data == null)
+			return "redirect:" + SSOLoginURL.getURL();
+			
+		User user = loginService.login(iv, key, data);
 		
-		User user = new User();
-		user.setPass(true);
-		user.setLogin_id("846");
-		user.setName("Heikki Lokki");
-		user.refreshSession();
+//		User user = new User();
+//		user.setPass(true);
+//		user.setLogin_id("846");
+//		user.setName("Heikki Lokki");
+//		user.refreshSession();
 		
 		model.addAttribute("user", user);
 		

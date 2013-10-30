@@ -6,14 +6,30 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonIgnoreProperties(ignoreUnknown=true)
 public class Validation {
 	
-	@JsonProperty("passes")
-	private boolean passes;
-
 	@JsonProperty("errors")
 	private Error errors;
 	
+	@JsonProperty("passes")
+	private boolean passes;
+	
 	@JsonIgnoreProperties(ignoreUnknown=true)
-	public static class EventDate {
+	private static class Error {
+		
+		@JsonProperty("eventDate")
+		private EventDate[] eventDate;
+		
+		public EventDate[] getEventDate() {
+			return eventDate;
+		}
+
+		public void setEventDate(EventDate[] eventDate) {
+			this.eventDate = eventDate;
+		}
+		
+	}
+	
+	@JsonIgnoreProperties(ignoreUnknown=true)
+	private static class EventDate {
 		
 		@JsonProperty("localizedErrorText")
 		private String localizedErrorText;
@@ -39,8 +55,6 @@ public class Validation {
 		
 	}
 	
-	@JsonProperty("eventDate")
-	private EventDate[] eventDate;
 
 	public boolean isPasses() {
 		return passes;
@@ -56,14 +70,6 @@ public class Validation {
 
 	public void setErrors(Error errors) {
 		this.errors = errors;
-	}
-
-	public EventDate[] getEventDate() {
-		return eventDate;
-	}
-
-	public void setEventDate(EventDate[] eventDate) {
-		this.eventDate = eventDate;
 	}
 	
 	

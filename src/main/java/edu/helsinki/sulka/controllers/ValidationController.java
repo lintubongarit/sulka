@@ -27,11 +27,11 @@ public class ValidationController {
 	private ValidateService validateService;
 	
 	@PreAuthorize("hasRole('USER')")
-	@RequestMapping(value = "/api/validate", method = RequestMethod.GET)
+	@RequestMapping(value = "/api/validate", method = RequestMethod.GET, produces="application/json")
 	@ResponseBody
 	public Validation validate(Locale locale, Model model, HttpSession session,
 			@RequestParam(value="data", required=false) String data){
-		System.out.println("wwas here");
+		System.out.println("controller");
 		return validateService.validate(data);
 	}
 
