@@ -1,5 +1,4 @@
 sulka.groups = function (grid, container) {
-	var SLICK_WIDTH_ADJUST = -1000;
 	var COL_GROUP_OUTSIDE_WIDTH = 9;
 	
 	var columnGroupsDiv = $(
@@ -9,7 +8,7 @@ sulka.groups = function (grid, container) {
 	).insertBefore(
 		container.find('div.slick-header div.slick-header-columns:first-child')
 	);
-	sulka.helpers.disableSelection(sulka.columnGroupsDiv);
+	sulka.helpers.disableSelection(columnGroupsDiv);
 	
 	/**
 	 * Create column group element. 
@@ -31,8 +30,8 @@ sulka.groups = function (grid, container) {
 				description
 			)
 		).css(
-				"width",
-				(width - COL_GROUP_OUTSIDE_WIDTH) + "px"
+			"width",
+			(width - COL_GROUP_OUTSIDE_WIDTH) + "px"
 		).data(
 			"sulka.group.id",
 			name
@@ -43,6 +42,8 @@ sulka.groups = function (grid, container) {
 	 * Called whenever column groups need to be re-rendered.
 	 */
 	function render() {
+		var SLICK_WIDTH_ADJUST = -1000;
+		
 		var columns = grid.getColumns(),
 			groupDivs = [];
 		
@@ -66,7 +67,7 @@ sulka.groups = function (grid, container) {
 		
 		columnGroupsDiv.empty().css(
 			"width",
-			($(".slick-header-columns").width() + SLICK_WIDTH_ADJUST) + "px" 
+			(container.find(".slick-header-columns").width() + SLICK_WIDTH_ADJUST) + "px" 
 		).append(
 			groupDivs
 		);

@@ -175,7 +175,7 @@ sulka = {
 		sulka.copyManager = new Slick.CellCopyManager();
 		sulka.grid.registerPlugin(sulka.copyManager);
 		
-		sulka.grid.$columnGroups = new sulka.groups(sulka.grid);
+		sulka.grid.$columnGroups = new sulka.groups(sulka.grid, $("#slick-grid"));
 		
 		sulka.freeze.init();
 		

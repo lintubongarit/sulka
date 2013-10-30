@@ -22,8 +22,10 @@
 		<script src="resources/js/lib/slick.grid.js"></script>
 		<script src="resources/js/sulka.core.js"></script>
 		<script src="resources/js/sulka.strings.js"></script>
-		<script src="resources/js/sulka.API.js"></script>
 		<script src="resources/js/sulka.helpers.js"></script>
+		<script src="resources/js/sulka.API.js"></script>
+		<script src="resources/js/sulka.groups.js"></script>
+		<script src="resources/js/sulka.freeze.js"></script>
 		<script src="resources/js/sulka.addRecoveries.js"></script>
 	</head>
 	<body>
