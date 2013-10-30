@@ -1,10 +1,14 @@
 package edu.helsinki.sulka.controllers;
 
-
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.everyItem;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
@@ -55,8 +59,71 @@ public class LocalStorageControllerTest {
     	lokki.setLogin_id(Integer.toString(LOKKI_ID));
     	lokki.setExpires_at(System.currentTimeMillis() / 1000 + 60);
     	lokkiHttpSession = SecuritySessionHelper.createUserSession(lokki);
-}
+	}
 	
+	@Test
+	public void testGetRingingsStatusIsOk() throws Exception {
+		mockMvc.perform(get("/api/storage/ringing")
+						.session(lokkiHttpSession))
+				.andExpect(status().isOk())
+				.andReturn();
+	}
+	
+	@Test
+	public void testGetRingingsReturnsJSON() throws Exception {
+		mockMvc.perform(get("/api/storage/ringing")
+						.session(lokkiHttpSession))
+				.andExpect(status().isOk())
+				.andExpect(content().contentType("application/json;charset=UTF-8"))
+				.andReturn();
+	}
+	
+	@Test
+	public void testGetRingingsReturnJSONsSuccessIsTrue() throws Exception {
+		mockMvc.perform(get("/api/storage/ringing")
+						.session(lokkiHttpSession))
+				.andExpect(status().isOk())
+				.andExpect(content().contentType("application/json;charset=UTF-8"))
+				.andExpect(jsonPath("$.success").value(true))
+				.andReturn();
+	}
+	
+	@Test
+	public void testGetRingingsReturnJSONsContainsNoErrors() throws Exception {
+		mockMvc.perform(get("/api/storage/ringing")
+						.session(lokkiHttpSession))
+				.andExpect(status().isOk())
+				.andExpect(content().contentType("application/json;charset=UTF-8"))
+				.andExpect(jsonPath("$.success").value(true))
+				.andExpect(jsonPath("$.error").value(nullValue()))
+				.andReturn();
+	}
+	
+	@Test
+	public void testGetRingingsReturnJSONsObjectsIsArray() throws Exception {
+		mockMvc.perform(get("/api/storage/ringing")
+						.session(lokkiHttpSession))
+				.andExpect(status().isOk())
+				.andExpect(content().contentType("application/json;charset=UTF-8"))
+				.andExpect(jsonPath("$.success").value(true))
+				.andDo(print())
+				.andExpect(jsonPath("$.error").value(nullValue()))
+				.andExpect(jsonPath("$.objects").isArray())
+				.andReturn();
+	}
+	
+	@Test
+	public void testGetRingingsReturnJSONsObjectsUserIdIsCorrect() throws Exception {
+		mockMvc.perform(get("/api/storage/ringing")
+						.session(lokkiHttpSession))
+				.andExpect(status().isOk())
+				.andExpect(content().contentType("application/json;charset=UTF-8"))
+				.andExpect(jsonPath("$.success").value(true))
+				.andExpect(jsonPath("$.error").value(nullValue()))
+				.andExpect(jsonPath("$.objects").isArray())
+				.andExpect(jsonPath("$.objects[*].userId", everyItem(equalTo(Integer.toString(LOKKI_ID)))))
+				.andReturn();
+	}
 
 	@Test
 	public void testSaveRingingStatusIsOk() throws Exception {
