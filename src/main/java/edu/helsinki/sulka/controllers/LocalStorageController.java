@@ -36,7 +36,7 @@ public class LocalStorageController extends JSONController {
 	}
 	
 	@PreAuthorize("hasRole('USER')")
-	@RequestMapping(value = "/api/storage/ringing/save", method = RequestMethod.POST, produces = "application/json;charset=UTF-8", consumes="application/json")
+	@RequestMapping(value = "/api/storage/ringing", method = RequestMethod.POST, produces = "application/json;charset=UTF-8", consumes="application/json")
 	@ResponseBody
 	public ObjectResponse<DatabaseRow> saveRinging(Locale locale,
 			Model model, HttpSession session,
@@ -70,7 +70,7 @@ public class LocalStorageController extends JSONController {
 	
 	
 	@PreAuthorize("hasRole('USER')")
-	@RequestMapping(value = "/api/storage/recovery/save", method = RequestMethod.POST, produces = "application/json;charset=UTF-8", consumes="application/json")
+	@RequestMapping(value = "/api/storage/recovery", method = RequestMethod.POST, produces = "application/json;charset=UTF-8", consumes="application/json")
 	@ResponseBody
 	public ObjectResponse<DatabaseRow> saveRecovery(Locale locale,
 			Model model, HttpSession session,
