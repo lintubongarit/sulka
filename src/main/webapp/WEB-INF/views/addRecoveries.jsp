@@ -6,6 +6,7 @@
 	<head>
 		<title>Sulka - Lisää rengastuksia</title>
 		<link rel="stylesheet" href="resources/css/lib/slick.grid.css" type="text/css" />
+		<link rel="stylesheet" href="resources/css/examples.css" type="text/css" />
 		<link rel="stylesheet" href="resources/css/sulka.css" type="text/css" />
 		<link rel="stylesheet" href="resources/css/examples.css" type="text/css" />
 		<script src="resources/js/lib/jquery-1.10.2.min.js"></script>

@@ -15,11 +15,20 @@ sulka = {
 		enableCellNavigation: true,
 		enableColumnReorder: true,
 		multiColumnSort: true,
-	    editable: true,
-	    enableAddRow: true,
+	    editable: false,
+	    enableAddRow: false,
 	    enableCellNavigation: true,
 	    asyncEditorLoading: false,
-	    autoEdit: true
+	    autoEdit: false
+	},
+	
+	/**
+	 * Base column options.
+	 */
+	columnOptions: {
+		sortable: true,
+		editable: true,
+		$sulkaVisible: true,
 	},
 
 	viewMode: "browsing",
@@ -30,7 +39,7 @@ sulka = {
 	 */
 	init: function () {
 		sulka.initEventHandlers();
-		sulka.initGrid();
+		sulka.initColumns(); // Calls initGrid when done
 	},
 
 	/**
@@ -68,9 +77,9 @@ sulka = {
 	COL_PADDING: 20,
 	COL_MAX_WIDTH: 200,
 	/**
-	 * Called at start to initialize grid.
+	 * Called at start to get columns. Calls initGrid() when done. 
 	 */
-	initGrid: function () {
+	initColumns: function () {
 		sulka.helpers.showLoader();
 		
 		// Get view fields
@@ -113,61 +122,17 @@ sulka = {
 									sulka.COL_MAX_WIDTH, sulka.getRenderedTextWidth(field.name) + sulka.COL_PADDING);
 						}
 						
-						var column = {
+						var column = $.extend({
 							id: id,
 							field: field.field,
 							name: field.name,
 							toolTip: field.description,
-							sortable: true,
 							width: width,
 							$sulkaGroup: group,
-							$sulkaVisible: true,
 							// Flexible columns are resized on next data fetch
 							$sulkaFlexible: isFlexible,
-							editor: FormulaEditor
-						};
+						}, sulka.columnOptions);
 						columns.push(column);
-						
-						  /***
-						   * A proof-of-concept cell editor with Excel-like range selection and insertion.
-						   */
-						  function FormulaEditor(args) {
-						    var _self = this;
-						    var _editor = new Slick.Editors.Text(args);
-						    var _selector;
-
-						    $.extend(this, _editor);
-
-						    function initFormulaEditor() {
-						      // register a plugin to select a range and append it to the textbox
-						      // since events are fired in reverse orderx (most recently added are executed first),
-						      // this will override other plugins like moverows or selection model and will
-						      // not require the grid to not be in the edit mode
-						      _selector = new Slick.CellRangeSelector();
-						      _selector.onCellRangeSelected.subscribe(_self.handleCellRangeSelected);
-						      sulka.grid.registerPlugin(_selector);
-						    }
-
-						    this.destroy = function () {
-						      _selector.onCellRangeSelected.unsubscribe(_self.handleCellRangeSelected);
-						      sulka.grid.unregisterPlugin(_selector);
-						      _editor.destroy();
-						    };
-
-						    this.handleCellRangeSelected = function (e, args) {
-						      _editor.setValue(
-						          _editor.getValue() +
-						              grid.getColumns()[args.range.fromCell].name +
-						              args.range.fromRow +
-						              ":" +
-						              grid.getColumns()[args.range.toCell].name +
-						              args.range.toRow
-						      );
-						    };
-
-
-						    initFormulaEditor();
-						  }
 						
 						var contextItem = $("<li></li>")
 							.addClass("context-menu-item")
@@ -186,46 +151,46 @@ sulka = {
 					});
 				});
 				sulka.columns = columns;
-				
-				// We are now ready to actually initialize the grid
-				sulka.grid = new Slick.Grid("#slick-grid", [], sulka.getVisibleColumns(), sulka.gridOptions);
-				
-
-				sulka.grid.setSelectionModel(new Slick.CellSelectionModel());
-				
-				sulka.grid.registerPlugin(new Slick.AutoTooltips());
-
-
-			    // set keyboard focus on the grid
-				sulka.grid.getCanvasNode().focus();
-				
-				sulka.copyManager = new Slick.CellCopyManager();
-				sulka.grid.registerPlugin(sulka.copyManager);
-				
-				
-				
-				sulka.initColumnGroups();
-				sulka.grid.onHeaderContextMenu.subscribe(sulka.showColumnHeaderContextMenu);
-				$headerContextMenu.find("li.context-menu-item").click(sulka.headerContextMenuItemClicked);
-
-				sulka.grid.setSelectionModel(new Slick.RowSelectionModel());
-				
-
-				sulka.reloadData();
-				
-				sulka.copyManager.onPasteCells.subscribe(sulka.onPasteCells);
-				
-				sulka.grid.onSort.subscribe(sulka.onGridSort);
-				
-				
-				sulka.grid.onAddNewRow.subscribe(sulka.onAddNewRow);
-				
-				$(window).resize(sulka.resizeGrid);
-				
-				sulka.resizeGrid();
+				sulka.initGrid();
 			},
 			sulka.helpers.hideLoaderAndSetError
 		);
+	},
+	
+	/**
+	 * Init grid. Called once at start after columns have been fetched.
+	 */
+	initGrid: function () {
+		// We are now ready to actually initialize the grid
+		sulka.grid = new Slick.Grid("#slick-grid", [], sulka.getVisibleColumns(), sulka.gridOptions);
+		
+		sulka.grid.setSelectionModel(new Slick.CellSelectionModel());
+		
+		sulka.grid.registerPlugin(new Slick.AutoTooltips());
+
+	    // set keyboard focus on the grid
+		sulka.grid.getCanvasNode().focus();
+		
+		sulka.copyManager = new Slick.CellCopyManager();
+		sulka.grid.registerPlugin(sulka.copyManager);
+		
+		sulka.initColumnGroups();
+		
+		sulka.grid.onHeaderContextMenu.subscribe(sulka.showColumnHeaderContextMenu);
+		$("#header-context-menu li.context-menu-item").click(sulka.headerContextMenuItemClicked);
+		
+		sulka.grid.setSelectionModel(new Slick.RowSelectionModel());
+		
+		sulka.copyManager.onPasteCells.subscribe(sulka.onPasteCells);
+		
+		sulka.grid.onSort.subscribe(sulka.onGridSort);
+		
+		sulka.grid.onAddNewRow.subscribe(sulka.onAddNewRow);
+		
+		$(window).resize(sulka.resizeGrid);
+		sulka.resizeGrid();
+		
+		sulka.reloadData();
 	},
 	
 	/**
@@ -488,14 +453,15 @@ sulka = {
 					sulka.helpers.hideLoaderAndUnsetError();
 				}
 				
-				sulka.adjustFlexibleCols(rows);
+				if (rows.length > 0) {
+					sulka.adjustFlexibleCols(rows);
+				}
 				sulka.grid.setData(rows);
 				sulka.grid.render();
 			},
 			sulka.helpers.hideLoaderAndSetError
 		);
 	},
-	
 	
 	onAddNewRow: function(event, args){
 			var data = sulka.grid.getData();
