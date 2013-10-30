@@ -14,7 +14,12 @@ sulka = {
 	gridOptions: {
 		enableCellNavigation: true,
 		enableColumnReorder: true,
-		multiColumnSort: true
+		multiColumnSort: true,
+	    editable: true,
+	    enableAddRow: true,
+	    enableCellNavigation: true,
+	    asyncEditorLoading: false,
+	    autoEdit: true
 	},
 
 	viewMode: "browsing",
@@ -35,12 +40,6 @@ sulka = {
 		$("#filters").submit(function (event) {
 			sulka.helpers.cancelEvent(event);
 			sulka.reloadData();
-		});
-		$("#header-context-menu-show").click(function () {
-			sulka.showColumn($("#header-context-menu").data("column"));
-		});
-		$("#header-context-menu-hide").click(function () {
-			sulka.hideColum($("#header-context-menu").data("column"));
 		});
 	},
 	
@@ -124,9 +123,51 @@ sulka = {
 							$sulkaGroup: group,
 							$sulkaVisible: true,
 							// Flexible columns are resized on next data fetch
-							$sulkaFlexible: isFlexible
+							$sulkaFlexible: isFlexible,
+							editor: FormulaEditor
 						};
 						columns.push(column);
+						
+						  /***
+						   * A proof-of-concept cell editor with Excel-like range selection and insertion.
+						   */
+						  function FormulaEditor(args) {
+						    var _self = this;
+						    var _editor = new Slick.Editors.Text(args);
+						    var _selector;
+
+						    $.extend(this, _editor);
+
+						    function init() {
+						      // register a plugin to select a range and append it to the textbox
+						      // since events are fired in reverse order (most recently added are executed first),
+						      // this will override other plugins like moverows or selection model and will
+						      // not require the grid to not be in the edit mode
+						      _selector = new Slick.CellRangeSelector();
+						      _selector.onCellRangeSelected.subscribe(_self.handleCellRangeSelected);
+						      args.grid.registerPlugin(_selector);
+						    }
+
+						    this.destroy = function () {
+						      _selector.onCellRangeSelected.unsubscribe(_self.handleCellRangeSelected);
+						      sulka.grid.unregisterPlugin(_selector);
+						      _editor.destroy();
+						    };
+
+						    this.handleCellRangeSelected = function (e, args) {
+						      _editor.setValue(
+						          _editor.getValue() +
+						              grid.getColumns()[args.range.fromCell].name +
+						              args.range.fromRow +
+						              ":" +
+						              grid.getColumns()[args.range.toCell].name +
+						              args.range.toRow
+						      );
+						    };
+
+
+						    init();
+						  }
 						
 						var contextItem = $("<li></li>")
 							.addClass("context-menu-item")
@@ -149,10 +190,26 @@ sulka = {
 				// We are now ready to actually initialize the grid
 				sulka.grid = new Slick.Grid("#slick-grid", [], sulka.getVisibleColumns(), sulka.gridOptions);
 				
+				sulka.grid.setSelectionModel(new Slick.CellSelectionModel());
+				
+				sulka.grid.registerPlugin(new Slick.AutoTooltips());
+
+			    // set keyboard focus on the grid
+				sulka.grid.getCanvasNode().focus();
+				
+				sulka.copyManager = new Slick.CellCopyManager();
+				sulka.grid.registerPlugin(sulka.copyManager);
+				
+				
 				sulka.initColumnGroups();
-				sulka.grid.onHeaderContextMenu.subscribe(sulka.columnHeaderContextMenu);
+				sulka.grid.onHeaderContextMenu.subscribe(sulka.showColumnHeaderContextMenu);
 				$headerContextMenu.find("li.context-menu-item").click(sulka.headerContextMenuItemClicked);
 				sulka.reloadData();
+				
+				
+				
+				
+				sulka.copyManager.onPasteCells.subscribe(sulka.onPasteCells);
 				
 				sulka.grid.onSort.subscribe(sulka.onGridSort);
 				
@@ -170,9 +227,6 @@ sulka = {
 		setTimeout(function () {
 			var y = $("#row-status-box-container").offset().top + $("#row-status-box-container").outerHeight();
 			var width = $(window).width() - sulka.freeze.getWidth();
-			
-			console.log($(document).width());
-			console.log(width);
 				
 			$("#slick-grid").css({
 				top: y + "px",
@@ -220,11 +274,36 @@ sulka = {
 		sulka.grid.invalidate();
 	},
 	
+	
+	onPasteCells: function(event, args){
+		
+	  sulka.copyManager.onPasteCells.subscribe(function (e, args) {
+	      if (args.from.length !== 1 || args.to.length !== 1) {
+	        throw "This implementation only supports single range copy and paste operations";
+	      }
+	      var from = args.from[0];
+	      var to = args.to[0];
+	      var val;
+	      for (var i = 0; i <= from.toRow - from.fromRow; i++) {
+	        for (var j = 0; j <= from.toCell - from.fromCell; j++) {
+	          if (i <= to.toRow - to.fromRow && j <= to.toCell - to.fromCell) {
+	            val = data[from.fromRow + i][columns[from.fromCell + j].field];
+	            data[to.fromRow + i][columns[to.fromCell + j].field] = val;
+	            sulka.grid.invalidateRow(to.fromRow + i);
+	          }
+	        }
+	      }
+	      grid.render();
+	    });
+	},
+	
+	
+	
 	CONTEXT_HEIGHT_ADJUST: 6,
 	/**
 	 * Called by SlickGrid to show context menu on headers. 
 	 */
-	columnHeaderContextMenu: function (event, args) {
+	showColumnHeaderContextMenu: function (event, args) {
 		event.preventDefault();
 		
 		var contextItem = undefined; 
@@ -247,9 +326,22 @@ sulka = {
 		}
 		
 		$("#header-context-menu")
-			.css("top", event.pageY + "px")
-			.css("left", event.pageX + "px")
-			.height($(document).height() - event.pageY - sulka.CONTEXT_HEIGHT_ADJUST)
+			.find(".context-menu-item-selected")
+			.removeClass("context-menu-item-selected");
+		contextItem.addClass("context-menu-item-selected");
+		
+		var winWidth = $(window).width(),
+			winHeight = $(window).height();
+		
+		var menuWidth = $("#header-context-menu").width();
+		
+		var x = Math.max(0, Math.min(winWidth - menuWidth, event.pageX)),
+			y = Math.max(0, event.pageY);
+		
+		$("#header-context-menu")
+			.css("left", x + "px")
+			.css("top", y + "px")
+			.height(winHeight - event.pageY - sulka.CONTEXT_HEIGHT_ADJUST)
 			.show()
 			.scrollTop(Math.max(0, $("#header-context-menu").scrollTop() + contextItem.position().top));
 	
@@ -389,14 +481,27 @@ sulka = {
 					sulka.helpers.hideLoaderAndUnsetError();
 				}
 				
-				if (rows.length > 0) {
-					sulka.adjustFlexibleCols(rows);
-				}
+				sulka.adjustFlexibleCols(rows);
 				sulka.grid.setData(rows);
 				sulka.grid.render();
 			},
 			sulka.helpers.hideLoaderAndSetError
 		);
+	},
+	
+	
+	onAddNewRow: function(){
+	    sulka.grid.onAddNewRow.subscribe(function (e, args) {
+	        var item = args.item;
+	        var column = args.column;
+	        grid.invalidateRow(data.length);
+	        data.push(item);
+	        grid.updateRowCount();
+	        grid.render();
+	      });
+		
+		
+		
 	},
 	
 	/**

@@ -12,7 +12,13 @@
     	<script src="resources/js/lib/jquery-ui-1.10.3.custom.min.js"></script>
    		<script src="resources/js/lib/jquery.event.drag-2.2.js"></script>
 		<script src="resources/js/lib/moment.min.js"></script>
+		<script src="resources/js/lib/plugins/slick.autotooltips.js"></script>
+		<script src="resources/js/lib/plugins/slick.cellrangedecorator.js"></script>
+		<script src="resources/js/lib/plugins/slick.cellrangeselector.js"></script>
+		<script src="resources/js/lib/plugins/slick.cellcopymanager.js"></script>
+		<script src="resources/js/lib/plugins/slick.cellselectionmodel.js"></script>
 		<script src="resources/js/lib/slick.core.js"></script>
+		<script src="resources/js/lib/slick.editors.js"></script>
 		<script src="resources/js/lib/slick.grid.js"></script>
 		<script src="resources/js/sulka.core.js"></script>
 		<script src="resources/js/sulka.freeze.js"></script>
