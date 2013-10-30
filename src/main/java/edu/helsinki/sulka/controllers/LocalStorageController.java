@@ -84,6 +84,24 @@ public class LocalStorageController extends JSONController {
 		return new ObjectResponse<DatabaseRow>(localDatabaseService.addRecovery(recovery));
 	}
 	
+	@PreAuthorize("hasRole('USER')")
+	@RequestMapping(value = "/api/storage/recovery", method = RequestMethod.DELETE, produces = "application/json;charset=UTF-8", consumes="application/json")
+	@ResponseBody
+	public ObjectResponse<String> deleteRecovery(Locale locale,
+			Model model, HttpSession session,
+			@RequestBody DatabaseRow recovery,
+			BindingResult bindingResult) throws LocalStorageException {
+		if(bindingResult.hasErrors()){
+			throw new LocalStorageException("Database update failed.");
+		}
+		if(!((User) session.getAttribute("user")).getLogin_id().equals(recovery.getUserId()))
+			throw new LocalStorageException("Database update failed. User id and row owner id doesn't match.");
+
+		localDatabaseService.removeRinging(recovery);
+		
+		return new ObjectResponse<String>("Database updated.");
+	}
+	
 	
 	/**
 	 * Handles storage exceptions gracefully.
