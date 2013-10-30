@@ -240,6 +240,70 @@ public class LocalStorageControllerTest {
 	}
 	
 	@Test
+	public void testGetRecoveryStatusIsOk() throws Exception {
+		mockMvc.perform(get("/api/storage/recovery")
+						.session(lokkiHttpSession))
+				.andExpect(status().isOk())
+				.andReturn();
+	}
+	
+	@Test
+	public void testGetRecoveriesReturnsJSON() throws Exception {
+		mockMvc.perform(get("/api/storage/recovery")
+						.session(lokkiHttpSession))
+				.andExpect(status().isOk())
+				.andExpect(content().contentType("application/json;charset=UTF-8"))
+				.andReturn();
+	}
+	
+	@Test
+	public void testGetRecoveriesReturnJSONsSuccessIsTrue() throws Exception {
+		mockMvc.perform(get("/api/storage/recovery")
+						.session(lokkiHttpSession))
+				.andExpect(status().isOk())
+				.andExpect(content().contentType("application/json;charset=UTF-8"))
+				.andExpect(jsonPath("$.success").value(true))
+				.andReturn();
+	}
+	
+	@Test
+	public void testGetRecoveriesReturnJSONsContainsNoErrors() throws Exception {
+		mockMvc.perform(get("/api/storage/recovery")
+						.session(lokkiHttpSession))
+				.andExpect(status().isOk())
+				.andExpect(content().contentType("application/json;charset=UTF-8"))
+				.andExpect(jsonPath("$.success").value(true))
+				.andExpect(jsonPath("$.error").value(nullValue()))
+				.andReturn();
+	}
+	
+	@Test
+	public void testGetRecoveriesReturnJSONsObjectsIsArray() throws Exception {
+		mockMvc.perform(get("/api/storage/recovery")
+						.session(lokkiHttpSession))
+				.andExpect(status().isOk())
+				.andExpect(content().contentType("application/json;charset=UTF-8"))
+				.andExpect(jsonPath("$.success").value(true))
+				.andDo(print())
+				.andExpect(jsonPath("$.error").value(nullValue()))
+				.andExpect(jsonPath("$.objects").isArray())
+				.andReturn();
+	}
+	
+	@Test
+	public void testGetRecoveriesReturnJSONsObjectsUserIdIsCorrect() throws Exception {
+		mockMvc.perform(get("/api/storage/recovery")
+						.session(lokkiHttpSession))
+				.andExpect(status().isOk())
+				.andExpect(content().contentType("application/json;charset=UTF-8"))
+				.andExpect(jsonPath("$.success").value(true))
+				.andExpect(jsonPath("$.error").value(nullValue()))
+				.andExpect(jsonPath("$.objects").isArray())
+				.andExpect(jsonPath("$.objects[*].userId", everyItem(equalTo(Integer.toString(LOKKI_ID)))))
+				.andReturn();
+	}
+	
+	@Test
 	public void testSaveRecoveryStatusIsOk() throws Exception {
 		mockMvc.perform(post("/api/storage/recovery")
 						.session(lokkiHttpSession)
