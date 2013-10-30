@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import edu.helsinki.sulka.models.DbRowRingings;
+import edu.helsinki.sulka.models.DatabaseRow;
 import edu.helsinki.sulka.models.User;
 import edu.helsinki.sulka.services.LocalDatabaseService;
 
@@ -38,18 +38,33 @@ public class LocalStorageController extends JSONController {
 	@PreAuthorize("hasRole('USER')")
 	@RequestMapping(value = "/api/storage/ringing/save", method = RequestMethod.POST, produces = "application/json;charset=UTF-8", consumes="application/json")
 	@ResponseBody
-	public ObjectResponse<String> saveRinging(Locale locale,
+	public ObjectResponse<DatabaseRow> saveRinging(Locale locale,
 			Model model, HttpSession session,
-			@RequestBody DbRowRingings ringing,
+			@RequestBody DatabaseRow ringing,
 			BindingResult bindingResult) throws LocalStorageException {
 		if(bindingResult.hasErrors()){
 			throw new LocalStorageException("Database update failed");
 		}
 		ringing.setUserId(((User) session.getAttribute("user")).getLogin_id());
-		localDatabaseService.addRinging(ringing);
 		
-		return new ObjectResponse<String>("Database updated successfully.");
+		return new ObjectResponse<DatabaseRow>(localDatabaseService.addRinging(ringing));
 	}
+	
+	@PreAuthorize("hasRole('USER')")
+	@RequestMapping(value = "/api/storage/recovery/save", method = RequestMethod.POST, produces = "application/json;charset=UTF-8", consumes="application/json")
+	@ResponseBody
+	public ObjectResponse<DatabaseRow> saveRecovery(Locale locale,
+			Model model, HttpSession session,
+			@RequestBody DatabaseRow recovery,
+			BindingResult bindingResult) throws LocalStorageException {
+		if(bindingResult.hasErrors()){
+			throw new LocalStorageException("Database update failed");
+		}
+		recovery.setUserId(((User) session.getAttribute("user")).getLogin_id());
+		
+		return new ObjectResponse<DatabaseRow>(localDatabaseService.addRecovery(recovery));
+	}
+	
 	
 	/**
 	 * Handles storage exceptions gracefully.

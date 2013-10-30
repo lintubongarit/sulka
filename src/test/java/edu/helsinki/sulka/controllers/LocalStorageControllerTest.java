@@ -1,9 +1,12 @@
 package edu.helsinki.sulka.controllers;
 
+
+import static org.hamcrest.Matchers.notNullValue;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -17,6 +20,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
+
 
 import edu.helsinki.sulka.SecuritySessionHelper;
 import edu.helsinki.sulka.models.User;
@@ -55,16 +59,16 @@ public class LocalStorageControllerTest {
 	
 
 	@Test
-	public void testLocalStorageControllerStatusIsOk() throws Exception {
+	public void testSaveRingingStatusIsOk() throws Exception {
 		mockMvc.perform(post("/api/storage/ringing/save")
 						.session(lokkiHttpSession)
 						.contentType(MediaType.APPLICATION_JSON)
-						.content("{\"id\":\"1234\", \"row\":\"asdflkaöjö\"}".getBytes()))
+						.content("{\"row\":\"asdflkaöjö\"}".getBytes()))
 				.andExpect(status().isOk())
 				.andReturn();
 	}
 	@Test
-	public void testLocalStorageControllerReturnsJSON() throws Exception {
+	public void testSaveRingingReturnsJSON() throws Exception {
 		mockMvc.perform(post("/api/storage/ringing/save")
 						.session(lokkiHttpSession)
 						.contentType(MediaType.APPLICATION_JSON)
@@ -75,7 +79,7 @@ public class LocalStorageControllerTest {
 	}
 	
 	@Test
-	public void testLocalStorageControllerReturnsErrorIfPostDataIsntJSON() throws Exception {
+	public void testSaveRingingReturnsErrorIfPostDataIsntJSON() throws Exception {
 		mockMvc.perform(post("/api/storage/ringing/save")
 						.session(lokkiHttpSession)
 						.contentType(MediaType.APPLICATION_XML)
@@ -85,7 +89,7 @@ public class LocalStorageControllerTest {
 	}
 	
 	@Test
-	public void testLocalStorageControllerReturnsErrorWithWronglyNamedIdField() throws Exception {
+	public void testSaveRingingReturnsErrorWithWronglyNamedIdField() throws Exception {
 		mockMvc.perform(post("/api/storage/ringing/save")
 				.session(lokkiHttpSession)
 				.contentType(MediaType.APPLICATION_JSON)
@@ -95,7 +99,7 @@ public class LocalStorageControllerTest {
 	}
 
 	@Test
-	public void testLocalStorageControllerReturnsErrorWithWronglyNamedRowField() throws Exception {
+	public void testSaveRingingReturnsErrorWithWronglyNamedRowField() throws Exception {
 		mockMvc.perform(post("/api/storage/ringing/save")
 				.session(lokkiHttpSession)
 				.contentType(MediaType.APPLICATION_JSON)
@@ -103,4 +107,102 @@ public class LocalStorageControllerTest {
 		.andExpect(status().isBadRequest()) // Should be internal server error
 		.andReturn();
 	}
+
+	@Test
+	public void testSaveRingingAcceptsContentWithoutId() throws Exception {
+		mockMvc.perform(post("/api/storage/ringing/save")
+				.session(lokkiHttpSession)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("{\"row\":\"asdflkaöjö\"}".getBytes()))
+		.andExpect(status().isOk()) // Should be internal server error
+		.andReturn();
+	}
+	
+	@Test
+	public void testSaveRingingReturnsRowWithCorrectColumns() throws Exception {
+		mockMvc.perform(post("/api/storage/ringing/save")
+				.session(lokkiHttpSession)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("{\"row\":\"asdflkaöjö\"}".getBytes()))
+		.andExpect(status().isOk())
+		.andExpect(jsonPath("$.object.id").value(notNullValue()))
+		.andExpect(jsonPath("$.object.userId").value(notNullValue()))
+		.andExpect(jsonPath("$.object.row").value(notNullValue()))
+		.andReturn();
+	}
+	
+	@Test
+	public void testSaveRecoveryStatusIsOk() throws Exception {
+		mockMvc.perform(post("/api/storage/recovery/save")
+						.session(lokkiHttpSession)
+						.contentType(MediaType.APPLICATION_JSON)
+						.content("{\"row\":\"asdflkaöjö\"}".getBytes()))
+				.andExpect(status().isOk())
+				.andReturn();
+	}
+	
+	@Test
+	public void testSaveRecoveryReturnsJSON() throws Exception {
+		mockMvc.perform(post("/api/storage/recovery/save")
+						.session(lokkiHttpSession)
+						.contentType(MediaType.APPLICATION_JSON)
+						.content("{\"row\":\"asdflkaöjö\"}".getBytes()))
+				.andExpect(status().isOk())
+				.andExpect(content().contentType("application/json;charset=UTF-8"))
+				.andReturn();
+	}
+	
+	@Test
+	public void testSaveRecoveryReturnsErrorIfPostDataIsntJSON() throws Exception {
+		mockMvc.perform(post("/api/storage/recovery/save")
+						.session(lokkiHttpSession)
+						.contentType(MediaType.APPLICATION_XML)
+						.content("{\"id\":\"1234\", \"row\":\"asdflkaöjö\"}".getBytes()))
+				.andExpect(status().isUnsupportedMediaType())
+				.andReturn();
+	}
+	
+	@Test
+	public void testSaveRecoveryReturnsErrorWithWronglyNamedIdField() throws Exception {
+		mockMvc.perform(post("/api/storage/recovery/save")
+				.session(lokkiHttpSession)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("{\"JOTAIN\":\"1234\", \"row\":\"asdflkaöjö\"}".getBytes()))
+		.andExpect(status().isBadRequest()) // Should be internal server error
+		.andReturn();
+	}
+
+	@Test
+	public void testSaveRecoveryReturnsErrorWithWronglyNamedRowField() throws Exception {
+		mockMvc.perform(post("/api/storage/recovery/save")
+				.session(lokkiHttpSession)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("{\"ABCD\":\"asdflkaöjö\"}".getBytes()))
+		.andExpect(status().isBadRequest()) // Should be internal server error
+		.andReturn();
+	}
+
+	@Test
+	public void testSaveRecoveryAcceptsContentWithoutId() throws Exception {
+		mockMvc.perform(post("/api/storage/recovery/save")
+				.session(lokkiHttpSession)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("{\"row\":\"asdflkaöjö\"}".getBytes()))
+		.andExpect(status().isOk()) // Should be internal server error
+		.andReturn();
+	}
+	
+	@Test
+	public void testSaveRecoveryReturnsRowWithCorrectColumns() throws Exception {
+		mockMvc.perform(post("/api/storage/recovery/save")
+				.session(lokkiHttpSession)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("{\"row\":\"asdflkaöjö\"}".getBytes()))
+		.andExpect(status().isOk())
+		.andExpect(jsonPath("$.object.id").value(notNullValue()))
+		.andExpect(jsonPath("$.object.userId").value(notNullValue()))
+		.andExpect(jsonPath("$.object.row").value(notNullValue()))
+		.andReturn();
+	}
+	
 }
