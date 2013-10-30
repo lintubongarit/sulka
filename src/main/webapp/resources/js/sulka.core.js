@@ -451,7 +451,7 @@ sulka = {
 					sulka.helpers.hideLoaderAndUnsetError();
 				}
 				
-				if (rows.length > 0)
+				if (rows.length > 0) {
 					sulka.adjustFlexibleCols(rows);
 				}
 				sulka.grid.setData(rows);
