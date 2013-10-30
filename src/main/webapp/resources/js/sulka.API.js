@@ -102,8 +102,7 @@ sulka.API = function(API) {
 			});
 		},
 		
-		
-		
+				
 		addRingingRow: function(status, row, onSuccess, onError){
 			
 			$.ajax({
@@ -120,7 +119,6 @@ sulka.API = function(API) {
 				error : API._jQueryErrorHandler(onError)
 			});
 		},
-		
 
 		/**
 		 * Creates and returns a jQuery AJAX error handler function that will

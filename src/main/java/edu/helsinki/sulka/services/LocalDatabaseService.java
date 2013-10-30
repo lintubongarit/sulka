@@ -20,21 +20,30 @@ public class LocalDatabaseService {
 	private RingingRepository ringingRepository;
 	
 	@Autowired
-	private RecoveriesRepository recoveriesRepository;
-	
-	public DatabaseRow addRinging(DatabaseRow ringingRow){	
-		return ringingRepository.save(ringingRow);
-	}
+	private RecoveriesRepository recoveryRepository;
 
 	public List<DatabaseRow> getRingings(String userId) {
 		return (List<DatabaseRow>) ringingRepository.findByUserId(userId);
 	}
-
+	
+	public List<DatabaseRow> getRecoveries(String userId) {
+		return (List<DatabaseRow>) recoveryRepository.findByUserId(userId);
+	}
+	
+	public DatabaseRow addRinging(DatabaseRow ringingRow){	
+		return ringingRepository.save(ringingRow);
+	}
+	
 	public DatabaseRow addRecovery(DatabaseRow recoveryRow) {
-		return recoveriesRepository.save(recoveryRow);
+		return recoveryRepository.save(recoveryRow);
 	}
 
 	public void removeRinging(DatabaseRow ringingRow) {
 		ringingRepository.delete(ringingRow);
+	}
+
+	public void removeRecovery(DatabaseRow recoveryRow) {
+		recoveryRepository.delete(recoveryRow);
+		
 	}
 }
