@@ -224,19 +224,17 @@ sulka = {
 	 * Adjust grid positioning and size after window resize. 
 	 */
 	resizeGrid: function () {
-		$("#header-context-menu").hide();
-		
-		var y = $("#row-status-box-container").offset().top + $("#row-status-box-container").outerHeight();
-		var width = $(window).width(),
-			height = $(window).height();
+		setTimeout(function () {
+			var y = $("#row-status-box-container").offset().top + $("#row-status-box-container").outerHeight();
+			var width = $(window).width();
+				
+			$("#slick-grid").css({
+				top: y + "px",
+				width: width + "px"
+			});
 			
-		$("#slick-grid").css({
-			top: y + "px",
-			height: Math.max(0, height - y) + "px",
-			width: width + "px"
-		});
-		
-		sulka.grid.resizeCanvas();
+			sulka.grid.resizeCanvas();
+		}, 100);
 	},
 	
 	/**
