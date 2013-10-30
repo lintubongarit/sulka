@@ -459,7 +459,6 @@ sulka = {
 		);
 	},
 	
-	
 	onAddNewRow: function(event, args){
 			var data = sulka.grid.getData();
 	        var item = args.item;
