@@ -564,7 +564,10 @@ if (typeof Slick === "undefined") {
 
         if (m.sortable) {
           header.addClass("slick-header-sortable");
-          header.append("<span class='slick-sort-indicator' />");
+          // LOCAL SULKA FIX: SlickGrid bug
+          // See https://github.com/mleibman/SlickGrid/issues/653
+          //header.append("<span class='slick-sort-indicator' />");
+          header.prepend("<span class='slick-sort-indicator' />");
         }
 
         trigger(self.onHeaderCellRendered, {

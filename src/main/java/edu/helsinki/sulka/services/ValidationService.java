@@ -1,5 +1,8 @@
 package edu.helsinki.sulka.services;
 
+import java.io.IOException;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -8,6 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import edu.helsinki.sulka.models.Row;
 import edu.helsinki.sulka.models.Validation;
 
 
@@ -28,20 +36,12 @@ public class ValidationService {
 	 * @returns Validation object that contains information of row's validity.
 	 */
 	public Validation validate(String data) {
-		
-		data = "data=" + data;
-
-		URI url;
-
-		try {
-			url = new URI(apiService.getURLForPath("/ringing/validate/"));
-			url = new URI(url.getScheme(), url.getUserInfo(), url.getHost(),
-					url.getPort(), url.getPath(), data, url.getFragment());
-			System.out.println("URL WAS: " + url);
-		} catch (URISyntaxException e) {
-			throw new Error(e);
-		}
-		
-		return apiService.getRestTemplate().getForObject(url, Validation.class);
+		System.out.println(data);
+		return apiService
+				.getRestTemplate()
+				.getForObject(
+						apiService.getURLForPath("/ringing/validate?data=" + data),
+						Validation.class,
+						data);
 	}
 }

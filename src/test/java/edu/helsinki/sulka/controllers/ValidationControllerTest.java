@@ -67,7 +67,7 @@ public class ValidationControllerTest {
 	@Test
 	public void testControllerReturnsJSON() throws Exception {
 		mockMvc.perform(get("/api/validate?data={}").session(lokkiHttpSession))
-		.andExpect(content().contentType(MediaType.APPLICATION_JSON)).andReturn();
+		.andExpect(content().contentType(MediaType.APPLICATION_JSON + ";charset=UTF-8")).andReturn();
 	}
 	
 	@Test

@@ -39,7 +39,18 @@
 
 	</beans:bean>
 
-	<beans:bean id="springSecurityFilterChain"
+<beans:bean id="jacksonMessageConverter"
+    class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter"></beans:bean>
+    <beans:bean
+        class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+        <beans:property name="messageConverters">
+            <beans:list>
+                <beans:ref bean="jacksonMessageConverter" />
+            </beans:list>
+        </beans:property>
+    </beans:bean> 
+    
+    	<beans:bean id="springSecurityFilterChain"
 		class="org.springframework.security.web.FilterChainProxy">
 		<!-- properties -->
 	</beans:bean>

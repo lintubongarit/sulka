@@ -47,12 +47,10 @@ classes should alter those!
   display: inline-block;
   width: 8px;
   height: 5px;
-  margin-left: 10px;
+  margin-left: 4px;
   margin-top: 6px;
-  float: right;
+  float: left;
 }
-
-
 
 .slick-sort-indicator-desc {
   background: url(images/sort-desc.gif);

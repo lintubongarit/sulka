@@ -101,6 +101,26 @@ sulka.API = function(API) {
 				error : API._jQueryErrorHandler(onError)
 			});
 		},
+		
+		
+		
+		saveRingingRow: function(onSuccess, onError){
+			
+			
+			
+			
+			$.ajax({
+				url : API.BASE + "/rows" + type + filterString,
+				dataType : 'json',
+				success : function(results) {
+					if (onSuccess) {
+						onSuccess(results.objects);
+					}
+				},
+				error : API._jQueryErrorHandler(onError)
+			});
+		},
+		
 
 		/**
 		 * Creates and returns a jQuery AJAX error handler function that will
@@ -131,18 +151,14 @@ sulka.API = function(API) {
 			};
 		},
 		
-		validate : function(row, onError) {
-			
-			console.log(API.BASE + "/validate?data=" + row);
-			
+		validate : function(row, onSuccess, onError) {
 			$.ajax({
-				url : API.BASE + "/validate?data=" + row,
+				url : API.BASE + "/validate",
+				type: "GET",
 				dataType : 'json',
-				error : API._jQueryErrorHandler(onError)
-			}).done(function( data ) {
-				if ( console && console.log ) {
-					console.log( data.passes );
-					}
+				data: { data: JSON.stringify(row) },
+				error : API._jQueryErrorHandler(onError),
+				success: onSuccess
 			});
 		}
 	};
