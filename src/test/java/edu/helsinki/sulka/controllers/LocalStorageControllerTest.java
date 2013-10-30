@@ -132,6 +132,37 @@ public class LocalStorageControllerTest {
 	}
 	
 	@Test
+	public void testDeleteRingingStatusIsOk() throws Exception {
+		mockMvc.perform(delete("/api/storage/ringing")
+					.session(lokkiHttpSession)
+					.contentType(MediaType.APPLICATION_JSON)
+					.content("{\"id\":\"1\", \"row\":\"asdflökjasd\"}".getBytes()))
+			.andExpect(status().isOk())
+			.andReturn();
+	}
+	
+	@Test
+	public void testDeleteRingingReturnsJSON() throws Exception {
+		mockMvc.perform(delete("/api/storage/ringing")
+						.session(lokkiHttpSession)
+						.contentType(MediaType.APPLICATION_JSON)
+						.content("{\"id\":\"1\", \"row\":\"asdflökjasd\"}".getBytes()))
+				.andExpect(status().isOk())
+				.andExpect(content().contentType("application/json;charset=UTF-8"))
+				.andReturn();
+	}
+	
+	@Test
+	public void testDeleteRingingReturnsErrorIfDeleteDataIsntJSON() throws Exception {
+		mockMvc.perform(delete("/api/storage/ringing")
+						.session(lokkiHttpSession)
+						.contentType(MediaType.APPLICATION_XML)
+						.content("{\"id\":\"1\", \"row\":\"asdflökjasd\"}".getBytes()))
+				.andExpect(status().isUnsupportedMediaType())
+				.andReturn();
+	}
+	
+	@Test
 	public void testSaveRecoveryStatusIsOk() throws Exception {
 		mockMvc.perform(post("/api/storage/recovery/save")
 						.session(lokkiHttpSession)
