@@ -472,9 +472,7 @@ sulka = {
 					sulka.helpers.hideLoaderAndUnsetError();
 				}
 				
-				if (rows.length > 0) {
-					sulka.adjustFlexibleCols(rows);
-				}
+				sulka.adjustFlexibleCols(rows);
 				sulka.grid.setData(rows);
 				sulka.grid.render();
 			},
