@@ -8,6 +8,7 @@
 		<title>Sulka - Selaa rivejä</title>
 		<link rel="stylesheet" href="resources/css/lib/slick.grid.css" type="text/css" />
 		<link rel="stylesheet" href="resources/css/sulka.css" type="text/css" />
+		<link rel="stylesheet" href="resources/css/examples.css" type="text/css" />
    		<script src="resources/js/lib/jquery-1.10.2.min.js"></script>
     	<script src="resources/js/lib/jquery-ui-1.10.3.custom.min.js"></script>
    		<script src="resources/js/lib/jquery.event.drag-2.2.js"></script>

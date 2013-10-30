@@ -36,7 +36,7 @@ public class LocalStorageController extends JSONController {
 	}
 	
 	@PreAuthorize("hasRole('USER')")
-	@RequestMapping(value = "/api/storage/ringing/save", method = RequestMethod.POST, produces = "application/json;charset=UTF-8", consumes="application/json")
+	@RequestMapping(value = "/api/storage/ringing", method = RequestMethod.POST, produces = "application/json;charset=UTF-8", consumes="application/json")
 	@ResponseBody
 	public ObjectResponse<DatabaseRow> saveRinging(Locale locale,
 			Model model, HttpSession session,
@@ -51,7 +51,26 @@ public class LocalStorageController extends JSONController {
 	}
 	
 	@PreAuthorize("hasRole('USER')")
-	@RequestMapping(value = "/api/storage/recovery/save", method = RequestMethod.POST, produces = "application/json;charset=UTF-8", consumes="application/json")
+	@RequestMapping(value = "/api/storage/ringing", method = RequestMethod.DELETE, produces = "application/json;charset=UTF-8", consumes="application/json")
+	@ResponseBody
+	public ObjectResponse<String> deleteRinging(Locale locale,
+			Model model, HttpSession session,
+			@RequestBody DatabaseRow ringing,
+			BindingResult bindingResult) throws LocalStorageException {
+		if(bindingResult.hasErrors()){
+			throw new LocalStorageException("Database update failed.");
+		}
+		if(!((User) session.getAttribute("user")).getLogin_id().equals(ringing.getUserId()))
+			throw new LocalStorageException("Database update failed. User id and row owner id doesn't match.");
+
+		localDatabaseService.removeRinging(ringing);
+		
+		return new ObjectResponse<String>("Database updated.");
+	}
+	
+	
+	@PreAuthorize("hasRole('USER')")
+	@RequestMapping(value = "/api/storage/recovery", method = RequestMethod.POST, produces = "application/json;charset=UTF-8", consumes="application/json")
 	@ResponseBody
 	public ObjectResponse<DatabaseRow> saveRecovery(Locale locale,
 			Model model, HttpSession session,

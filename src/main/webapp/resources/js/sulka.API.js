@@ -101,6 +101,26 @@ sulka.API = function(API) {
 				error : API._jQueryErrorHandler(onError)
 			});
 		},
+		
+		
+		
+		saveRingingRow: function(onSuccess, onError){
+			
+			
+			
+			
+			$.ajax({
+				url : API.BASE + "/rows" + type + filterString,
+				dataType : 'json',
+				success : function(results) {
+					if (onSuccess) {
+						onSuccess(results.objects);
+					}
+				},
+				error : API._jQueryErrorHandler(onError)
+			});
+		},
+		
 
 		/**
 		 * Creates and returns a jQuery AJAX error handler function that will

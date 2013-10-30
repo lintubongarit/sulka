@@ -33,4 +33,8 @@ public class LocalDatabaseService {
 	public DatabaseRow addRecovery(DatabaseRow recoveryRow) {
 		return recoveriesRepository.save(recoveryRow);
 	}
+
+	public void removeRinging(DatabaseRow ringingRow) {
+		ringingRepository.delete(ringingRow);
+	}
 }

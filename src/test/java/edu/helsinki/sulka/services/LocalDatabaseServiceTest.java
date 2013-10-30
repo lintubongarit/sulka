@@ -68,6 +68,17 @@ public class LocalDatabaseServiceTest {
 	}
 
 	@Test
+	public void testRemoveRingingDeletesRowFromDatabase(){
+		DatabaseRow row = new DatabaseRow();
+		row.setUserId("1");
+		row.setRow("Testi4");
+		row = localDatabaseService.addRinging(row);
+		localDatabaseService.removeRinging(row);
+		List<DatabaseRow> rows = localDatabaseService.getRingings("1");
+		assertTrue(rows.isEmpty());
+	}
+	
+	@Test
 	public void testAddRecoveryReturnsSomething(){
 		DatabaseRow row = new DatabaseRow();
 		row.setUserId("1");
