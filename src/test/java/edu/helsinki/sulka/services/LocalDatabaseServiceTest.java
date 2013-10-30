@@ -26,24 +26,21 @@ public class LocalDatabaseServiceTest {
 	private LocalDatabaseService localDatabaseService;
 	
 	@Test
-	public void testAddRingingGrowsSizeOfReturnedList(){
-		DatabaseRow row = new DatabaseRow();
-		row.setUserId("1");
-		row.setRow("TESTI");
-		localDatabaseService.addRinging(row);
-		List<DatabaseRow> rows = localDatabaseService.getRingings("1");
-		assertEquals(rows.size(), 1);
+	public void testGetRingingsReturnsEmptyListWithUnknownUser(){
+		List<DatabaseRow> rows = localDatabaseService.getRingings("1ASDF");
+		assertTrue(rows.isEmpty());
 	}
 
 	@Test
-	public void testOnlyUsersRowsAreReturned(){
+	public void testOnlyUsersRingingsAreReturned(){
 		for(int i=0; i < 500; i++){
 			DatabaseRow row = new DatabaseRow();
 			row.setUserId(Integer.toString(i%10));
 			row.setRow("Testi: " + i);
+			localDatabaseService.addRinging(row);
 		}
 		String wantedUserId = "4";
-		List<DatabaseRow> rows = localDatabaseService.getRingings("4");
+		List<DatabaseRow> rows = localDatabaseService.getRingings(wantedUserId);
 		for(DatabaseRow row: rows){
 			assertEquals(row.getUserId(), wantedUserId);
 		}
@@ -76,6 +73,27 @@ public class LocalDatabaseServiceTest {
 		localDatabaseService.removeRinging(row);
 		List<DatabaseRow> rows = localDatabaseService.getRingings("1");
 		assertTrue(rows.isEmpty());
+	}
+	
+	@Test
+	public void testGetRecoveryReturnsEmptyListWithUnknownUser(){
+		List<DatabaseRow> rows = localDatabaseService.getRecoveries("1ASDF");
+		assertTrue(rows.isEmpty());
+	}
+	
+	@Test
+	public void testOnlyUsersRecoveriesAreReturned(){
+		for(int i=0; i < 500; i++){
+			DatabaseRow row = new DatabaseRow();
+			row.setUserId(Integer.toString(i%10));
+			row.setRow("Testi: " + i);
+			localDatabaseService.addRecovery(row);
+		}
+		String wantedUserId = "5";
+		List<DatabaseRow> rows = localDatabaseService.getRecoveries(wantedUserId);
+		for(DatabaseRow row: rows){
+			assertEquals(row.getUserId(), wantedUserId);
+		}
 	}
 	
 	@Test
