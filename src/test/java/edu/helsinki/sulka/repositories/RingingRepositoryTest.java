@@ -9,7 +9,7 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import edu.helsinki.sulka.models.DbRowRingings;
+import edu.helsinki.sulka.models.DatabaseRow;
 import edu.helsinki.sulka.repositories.RingingRepository;
 
 @RunWith(SpringJUnit4ClassRunner.class)  
@@ -26,7 +26,7 @@ public class RingingRepositoryTest {
 	 @Test  
     @Rollback(false)  
 	public void testCreate() {  
-		DbRowRingings p = new DbRowRingings();  
+		DatabaseRow p = new DatabaseRow();  
 		p.setRow("asd");  
 		  
 		p = ringingRepository.save(p);  

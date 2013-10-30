@@ -11,7 +11,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name="Ringings")
-public class DbRowRingings implements Serializable {
+public class DatabaseRow implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	@Id
@@ -47,8 +47,8 @@ public class DbRowRingings implements Serializable {
 	
 	@Override
 	public boolean equals(Object obj){
-		if(obj instanceof DbRowRingings)
-			return id == ((DbRowRingings)obj).id;
+		if(obj instanceof DatabaseRow)
+			return id == ((DatabaseRow)obj).id;
 		return false;
 	}
 }
