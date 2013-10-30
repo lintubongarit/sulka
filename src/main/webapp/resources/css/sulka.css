@@ -214,6 +214,10 @@ span#last-error {
 	-webkit-box-shadow: 2px 2px 2px silver;
 	z-index: 99999;
 	overflow-y: scroll;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
 }
 .context-menu li.context-menu-item {
 	padding: 4px 4px 4px 4px;
@@ -235,6 +239,9 @@ span#last-error {
 	padding: 4px;
 	list-style: none;
 	font-weight: bold;
+}
+.context-menu li.context-menu-item-selected {
+	background-color: #eee;
 }
 #text-width-tester {
 	position: absolute;
