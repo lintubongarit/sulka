@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import edu.helsinki.sulka.models.DatabaseRow;
+import edu.helsinki.sulka.repositories.RecoveriesRepository;
 import edu.helsinki.sulka.repositories.RingingRepository;
 
 
@@ -18,11 +19,18 @@ public class LocalDatabaseService {
 	@Autowired
 	private RingingRepository ringingRepository;
 	
+	@Autowired
+	private RecoveriesRepository recoveriesRepository;
+	
 	public DatabaseRow addRinging(DatabaseRow ringingRow){	
 		return ringingRepository.save(ringingRow);
 	}
 
 	public List<DatabaseRow> getRingings(String userId) {
 		return (List<DatabaseRow>) ringingRepository.findByUserId(userId);
+	}
+
+	public DatabaseRow addRecovery(DatabaseRow recoveryRow) {
+		return recoveriesRepository.save(recoveryRow);
 	}
 }

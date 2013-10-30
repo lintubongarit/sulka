@@ -67,5 +67,22 @@ public class LocalDatabaseServiceTest {
 		assertNotNull(row.getId());
 	}
 
+	@Test
+	public void testAddRecoveryReturnsSomething(){
+		DatabaseRow row = new DatabaseRow();
+		row.setUserId("1");
+		row.setRow("TESTI");
+		row = localDatabaseService.addRecovery(row);
+		assertNotNull(row);
+	}
+	
+	@Test
+	public void testAddRecoveryReturnsRowWithId(){
+		DatabaseRow row = new DatabaseRow();
+		row.setUserId("1");
+		row.setRow("TESTI");
+		row = localDatabaseService.addRecovery(row);
+		assertNotNull(row.getId());
+	}
 
 }
