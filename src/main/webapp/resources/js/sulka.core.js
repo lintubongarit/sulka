@@ -195,7 +195,6 @@ sulka = {
 				
 				sulka.grid.setSelectionModel(new Slick.CellSelectionModel());
 
-				sulka.grid.onCellChange.subscribe(sulka.onCellChange());
 				
 				sulka.grid.registerPlugin(new Slick.AutoTooltips());
 
@@ -204,9 +203,7 @@ sulka = {
 				
 				sulka.copyManager = new Slick.CellCopyManager();
 				sulka.grid.registerPlugin(sulka.copyManager);
-				
-				
-				
+												
 				sulka.initColumnGroups();
 				sulka.grid.onHeaderContextMenu.subscribe(sulka.showColumnHeaderContextMenu);
 				$headerContextMenu.find("li.context-menu-item").click(sulka.headerContextMenuItemClicked);
@@ -217,6 +214,12 @@ sulka = {
 				
 				sulka.grid.onSort.subscribe(sulka.onGridSort);
 				
+				
+				
+				
+				
+				sulka.grid.onCellChange.subscribe(sulka.onCellChange);
+
 				
 				sulka.grid.onAddNewRow.subscribe(sulka.onAddNewRow);
 				
@@ -504,7 +507,7 @@ sulka = {
 			var data = args.grid.getData();
 	        var item = args.item;
 	        $.extend(item, {
-	            _status: "inputrow"
+	        	rowStatus: "inputrow"
 	          });
 	        var column = args.column;
 	        args.grid.invalidateRow(data.length);
@@ -595,36 +598,31 @@ sulka = {
 	
 	
 	onCellChange: function(e, args){
-		    var item = args.item;
-		    var column = args.cell;       
-		    var row = args.row;
-		    var value = data[args.row][grid.getColumns()[args.cell].field];
-		    var id = args.item.id;
-		    var field = grid.getColumns()[args.cell].field;
-		    var dataString = "id="+id+"&field="+field+"&value="+value;
-		    var status = false;
-		    $.ajax({
-		        type: "POST",
-		        url: "/en/<?php echo $this->controller; ?>/updateattribute/&callback=?'",
-		        data: dataString,
-		        dataType: "json",
-		        success: function(a) {  
-		            console.log(data);              
-		            if(a.status == true) {                  
-		                status = true;
-		            } else {
-		                status = false;             
-		            }       
-		            return false; 
-		        }
-		    });    
-		    if(!status) {
-		        return false;
-		    }             
-		    grid.invalidateRow(data.length);
-		    data.push(item);
-		    grid.updateRowCount();
-		    grid.render();
+		    //var item = args.item;
+		    //var column = args.cell;       
+		    //var row = args.row;
+		    var data = sulka.grid.getData();
+
+		    var value = data[args.row];
+		    var rowStatus = args.item.rowStatus;
+		    var dataString = JSON.stringify(value);
+		    
+		    var JSONData = {		   
+		    		userId: value.ringer,
+		    		row: dataString
+		    }
+		    
+		    if (rowStatus == "inputrow"){
+		    	sulka.API.addRingingRow();
+		    }
+		    else{
+		    	return;
+		    }
+		    
+//		    grid.invalidateRow(data.length);
+//		    data.push(item);
+//		    grid.updateRowCount();
+//		    grid.render();
 	},
 	
 	/**
@@ -651,3 +649,4 @@ return sulka; }();
 
 /* Launch sulka.init() on DOM complete */
 $(sulka.init);
+

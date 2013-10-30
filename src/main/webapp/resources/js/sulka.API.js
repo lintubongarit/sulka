@@ -104,7 +104,7 @@ sulka.API = function(API) {
 		
 		
 		
-		addRingingRow: function(row, onSuccess, onError){
+		addRingingRow: function(status, row, onSuccess, onError){
 			
 			$.ajax({
 				url : API.BASE + "/storage/ringing" ,
