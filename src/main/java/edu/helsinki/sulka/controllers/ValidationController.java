@@ -15,8 +15,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import edu.helsinki.sulka.models.Validation;
-import edu.helsinki.sulka.services.ValidateService;
+import edu.helsinki.sulka.services.ValidationService;
 
+
+/*
+ * Handles requests for validation
+ */
 @Controller
 public class ValidationController {
 	
@@ -24,14 +28,16 @@ public class ValidationController {
 	private Logger logger;
 	
 	@Autowired
-	private ValidateService validateService;
+	private ValidationService validateService;
 	
+	/*
+	 * @returns Validation of row
+	 */
 	@PreAuthorize("hasRole('USER')")
 	@RequestMapping(value = "/api/validate", method = RequestMethod.GET, produces="application/json")
 	@ResponseBody
 	public Validation validate(Locale locale, Model model, HttpSession session,
-			@RequestParam(value="data", required=false) String data){
-		System.out.println("controller");
+			@RequestParam(value="data", required=true) String data){
 		return validateService.validate(data);
 	}
 

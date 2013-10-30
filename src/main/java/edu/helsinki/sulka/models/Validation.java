@@ -1,5 +1,8 @@
 package edu.helsinki.sulka.models;
 
+import java.util.List;
+import java.util.Map;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -7,29 +10,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class Validation {
 	
 	@JsonProperty("errors")
-	private Error errors;
+	private Map<String, Error[]> errors;
 	
 	@JsonProperty("passes")
 	private boolean passes;
 	
 	@JsonIgnoreProperties(ignoreUnknown=true)
 	private static class Error {
-		
-		@JsonProperty("eventDate")
-		private EventDate[] eventDate;
-		
-		public EventDate[] getEventDate() {
-			return eventDate;
-		}
-
-		public void setEventDate(EventDate[] eventDate) {
-			this.eventDate = eventDate;
-		}
-		
-	}
-	
-	@JsonIgnoreProperties(ignoreUnknown=true)
-	private static class EventDate {
 		
 		@JsonProperty("localizedErrorText")
 		private String localizedErrorText;
@@ -64,11 +51,11 @@ public class Validation {
 		this.passes = passes;
 	}
 
-	public Error getErrors() {
+	public Map<String, Error[]> getErrors() {
 		return errors;
 	}
 
-	public void setErrors(Error errors) {
+	public void setErrors(Map<String, Error[]> errors) {
 		this.errors = errors;
 	}
 	

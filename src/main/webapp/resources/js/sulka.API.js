@@ -141,7 +141,7 @@ sulka.API = function(API) {
 				error : API._jQueryErrorHandler(onError)
 			}).done(function( data ) {
 				if ( console && console.log ) {
-					console.log( "Sample of data:", data );
+					console.log( data.passes );
 					}
 			});
 		}
