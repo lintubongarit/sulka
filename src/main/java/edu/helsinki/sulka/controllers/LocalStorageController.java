@@ -4,6 +4,7 @@ import java.util.Locale;
 
 import javax.servlet.http.HttpSession;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -17,10 +18,16 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import edu.helsinki.sulka.models.DbRowRingings;
+import edu.helsinki.sulka.models.User;
+import edu.helsinki.sulka.services.LocalDatabaseService;
 
 
 @Controller
 public class LocalStorageController extends JSONController {
+	
+	@Autowired
+	private LocalDatabaseService localDatabaseService;
+	
 	public static class LocalStorageException extends Exception {
 		private static final long serialVersionUID = 1L;
 		LocalStorageException(String message) {
@@ -38,6 +45,8 @@ public class LocalStorageController extends JSONController {
 		if(bindingResult.hasErrors()){
 			throw new LocalStorageException("Database update failed");
 		}
+		ringing.setUserId(((User) session.getAttribute("user")).getLogin_id());
+		localDatabaseService.addRinging(ringing);
 		
 		return new ObjectResponse<String>("Database updated successfully.");
 	}
