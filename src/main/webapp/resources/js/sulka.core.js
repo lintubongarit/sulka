@@ -128,46 +128,7 @@ sulka = {
 						};
 						columns.push(column);
 						
-						  /***
-						   * A proof-of-concept cell editor with Excel-like range selection and insertion.
-						   */
-						  function FormulaEditor(args) {
-						    var _self = this;
-						    var _editor = new Slick.Editors.Text(args);
-						    var _selector;
-
-						    $.extend(this, _editor);
-
-						    function initFormulaEditor() {
-						      // register a plugin to select a range and append it to the textbox
-						      // since events are fired in reverse orderx (most recently added are executed first),
-						      // this will override other plugins like moverows or selection model and will
-						      // not require the grid to not be in the edit mode
-						      _selector = new Slick.CellRangeSelector();
-						      _selector.onCellRangeSelected.subscribe(_self.handleCellRangeSelected);
-						      sulka.grid.registerPlugin(_selector);
-						    }
-
-						    this.destroy = function () {
-						      _selector.onCellRangeSelected.unsubscribe(_self.handleCellRangeSelected);
-						      sulka.grid.unregisterPlugin(_selector);
-						      _editor.destroy();
-						    };
-
-						    this.handleCellRangeSelected = function (e, args) {
-						      _editor.setValue(
-						          _editor.getValue() +
-						              grid.getColumns()[args.range.fromCell].name +
-						              args.range.fromRow +
-						              ":" +
-						              grid.getColumns()[args.range.toCell].name +
-						              args.range.toRow
-						      );
-						    };
-
-
-						    initFormulaEditor();
-						  }
+		
 						
 						var contextItem = $("<li></li>")
 							.addClass("context-menu-item")
@@ -187,10 +148,54 @@ sulka = {
 				});
 				sulka.columns = columns;
 				
+				
+			  /***
+			   * A proof-of-concept cell editor with Excel-like range selection and insertion.
+			   */
+			  function FormulaEditor(args) {
+			    var _self = this;
+			    var _editor = new Slick.Editors.Text(args);
+			    var _selector;
+
+			    $.extend(this, _editor);
+
+			    function initFormulaEditor() {
+			      // register a plugin to select a range and append it to the textbox
+			      // since events are fired in reverse orderx (most recently added are executed first),
+			      // this will override other plugins like moverows or selection model and will
+			      // not require the grid to not be in the edit mode
+			      _selector = new Slick.CellRangeSelector();
+			      _selector.onCellRangeSelected.subscribe(_self.handleCellRangeSelected);
+			      sulka.grid.registerPlugin(_selector);
+			    }
+
+			    this.destroy = function () {
+			      _selector.onCellRangeSelected.unsubscribe(_self.handleCellRangeSelected);
+			      sulka.grid.unregisterPlugin(_selector);
+			      _editor.destroy();
+			    };
+
+			    this.handleCellRangeSelected = function (e, args) {
+			      _editor.setValue(
+			          _editor.getValue() +
+			              grid.getColumns()[args.range.fromCell].name +
+			              args.range.fromRow +
+			              ":" +
+			              grid.getColumns()[args.range.toCell].name +
+			              args.range.toRow
+			      );
+			    };
+
+
+			    initFormulaEditor();
+			  }
+				
 				// We are now ready to actually initialize the grid
 				sulka.grid = new Slick.Grid("#slick-grid", [], sulka.getVisibleColumns(), sulka.gridOptions);
 				
 				sulka.grid.setSelectionModel(new Slick.CellSelectionModel());
+
+				sulka.grid.onCellChange.subscribe(sulka.onCellChange());
 				
 				sulka.grid.registerPlugin(new Slick.AutoTooltips());
 
@@ -492,14 +497,20 @@ sulka = {
 	},
 	
 	
+	
+	
+	
 	onAddNewRow: function(event, args){
-			var data = sulka.grid.getData();
+			var data = args.grid.getData();
 	        var item = args.item;
+	        $.extend(item, {
+	            _status: "inputrow"
+	          });
 	        var column = args.column;
-	        sulka.grid.invalidateRow(data.length);
+	        args.grid.invalidateRow(data.length);
 	        data.push(item);
-	        sulka.grid.updateRowCount();
-	        sulka.grid.render();
+	        args.grid.updateRowCount();
+	        args.grid.render();
 	},
 	
 	/**
@@ -580,6 +591,40 @@ sulka = {
 		}
 			
 		return filters;
+	},
+	
+	
+	onCellChange: function(e, args){
+		    var item = args.item;
+		    var column = args.cell;       
+		    var row = args.row;
+		    var value = data[args.row][grid.getColumns()[args.cell].field];
+		    var id = args.item.id;
+		    var field = grid.getColumns()[args.cell].field;
+		    var dataString = "id="+id+"&field="+field+"&value="+value;
+		    var status = false;
+		    $.ajax({
+		        type: "POST",
+		        url: "/en/<?php echo $this->controller; ?>/updateattribute/&callback=?'",
+		        data: dataString,
+		        dataType: "json",
+		        success: function(a) {  
+		            console.log(data);              
+		            if(a.status == true) {                  
+		                status = true;
+		            } else {
+		                status = false;             
+		            }       
+		            return false; 
+		        }
+		    });    
+		    if(!status) {
+		        return false;
+		    }             
+		    grid.invalidateRow(data.length);
+		    data.push(item);
+		    grid.updateRowCount();
+		    grid.render();
 	},
 	
 	/**

@@ -77,7 +77,7 @@ sulka.API = function(API) {
 			} else {
 				type = "";
 			}
-
+			
 			var filterString = "";
 			for ( var filter in filters)
 				if (filters.hasOwnProperty(filter)) {
@@ -104,14 +104,14 @@ sulka.API = function(API) {
 		
 		
 		
-		saveRingingRow: function(onSuccess, onError){
-			
-			
-			
+		addRingingRow: function(row, onSuccess, onError){
 			
 			$.ajax({
-				url : API.BASE + "/rows" + type + filterString,
+				url : API.BASE + "/storage/ringing" ,
 				dataType : 'json',
+				data: JSON.stringify(row),
+				type: "POST",
+						
 				success : function(results) {
 					if (onSuccess) {
 						onSuccess(results.objects);
