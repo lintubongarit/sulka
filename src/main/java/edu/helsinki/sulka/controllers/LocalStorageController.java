@@ -36,6 +36,15 @@ public class LocalStorageController extends JSONController {
 	}
 	
 	@PreAuthorize("hasRole('USER')")
+	@RequestMapping(value = "/api/storage/ringing", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+	@ResponseBody
+	public ListResponse<DatabaseRow> getRingings(Locale locale,
+			Model model, HttpSession session) {
+		String userId = ((User) session.getAttribute("user")).getLogin_id();
+		return new ListResponse<DatabaseRow>(localDatabaseService.getRingings(userId));
+	}
+		
+	@PreAuthorize("hasRole('USER')")
 	@RequestMapping(value = "/api/storage/ringing", method = RequestMethod.POST, produces = "application/json;charset=UTF-8", consumes="application/json")
 	@ResponseBody
 	public ObjectResponse<DatabaseRow> saveRinging(Locale locale,
@@ -68,6 +77,14 @@ public class LocalStorageController extends JSONController {
 		return new ObjectResponse<String>("Database updated.");
 	}
 	
+	@PreAuthorize("hasRole('USER')")
+	@RequestMapping(value = "/api/storage/recovery", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+	@ResponseBody
+	public ListResponse<DatabaseRow> getRecoveries(Locale locale,
+			Model model, HttpSession session) {
+		String userId = ((User) session.getAttribute("user")).getLogin_id();
+		return new ListResponse<DatabaseRow>(localDatabaseService.getRecoveries(userId));
+	}
 	
 	@PreAuthorize("hasRole('USER')")
 	@RequestMapping(value = "/api/storage/recovery", method = RequestMethod.POST, produces = "application/json;charset=UTF-8", consumes="application/json")
