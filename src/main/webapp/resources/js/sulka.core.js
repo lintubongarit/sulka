@@ -227,7 +227,7 @@ sulka = {
 		setTimeout(function () {
 			var y = $("#row-status-box-container").offset().top + $("#row-status-box-container").outerHeight();
 			var width = $(window).width() - sulka.freeze.getWidth();
-				
+			
 			$("#slick-grid").css({
 				top: y + "px",
 				width: width + "px"
