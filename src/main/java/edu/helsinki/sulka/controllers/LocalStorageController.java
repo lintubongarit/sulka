@@ -60,6 +60,9 @@ public class LocalStorageController extends JSONController {
 		if(bindingResult.hasErrors()){
 			throw new LocalStorageException("Database update failed.");
 		}
+		if(!((User) session.getAttribute("user")).getLogin_id().equals(ringing.getUserId()))
+			throw new LocalStorageException("Database update failed. User id and row owner id doesn't match.");
+
 		localDatabaseService.removeRinging(ringing);
 		
 		return new ObjectResponse<String>("Database updated.");

@@ -134,19 +134,19 @@ public class LocalStorageControllerTest {
 	@Test
 	public void testDeleteRingingStatusIsOk() throws Exception {
 		mockMvc.perform(delete("/api/storage/ringing")
-					.session(lokkiHttpSession)
-					.contentType(MediaType.APPLICATION_JSON)
-					.content("{\"id\":\"1\", \"row\":\"asdflökjasd\"}".getBytes()))
-			.andExpect(status().isOk())
-			.andReturn();
-	}
+						.session(lokkiHttpSession)
+						.contentType(MediaType.APPLICATION_JSON)
+						.content("{\"id\":\"1\", \"userId\":\"846\", \"row\":\"asdflökjasd\"}".getBytes()))
+				.andExpect(status().isOk())
+				.andReturn();
+		}
 	
 	@Test
 	public void testDeleteRingingReturnsJSON() throws Exception {
 		mockMvc.perform(delete("/api/storage/ringing")
 						.session(lokkiHttpSession)
 						.contentType(MediaType.APPLICATION_JSON)
-						.content("{\"id\":\"1\", \"row\":\"asdflökjasd\"}".getBytes()))
+						.content("{\"id\":\"1\", \"userId\":\"846\", \"row\":\"asdflökjasd\"}".getBytes()))
 				.andExpect(status().isOk())
 				.andExpect(content().contentType("application/json;charset=UTF-8"))
 				.andReturn();
@@ -157,7 +157,17 @@ public class LocalStorageControllerTest {
 		mockMvc.perform(delete("/api/storage/ringing")
 						.session(lokkiHttpSession)
 						.contentType(MediaType.APPLICATION_XML)
-						.content("{\"id\":\"1\", \"row\":\"asdflökjasd\"}".getBytes()))
+						.content("{\"id\":\"1\", \"userId\":\"846\", \"row\":\"asdflökjasd\"}".getBytes()))
+				.andExpect(status().isUnsupportedMediaType())
+				.andReturn();
+	}
+	
+	@Test
+	public void testDeleteRingingReturnsErrorIfUserIdDoesNotMatchRowUserId() throws Exception {
+		mockMvc.perform(delete("/api/storage/ringing")
+						.session(lokkiHttpSession)
+						.contentType(MediaType.APPLICATION_XML)
+						.content("{\"id\":\"1\", \"userId\":\"123\", \"row\":\"asdflökjasd\"}".getBytes()))
 				.andExpect(status().isUnsupportedMediaType())
 				.andReturn();
 	}
