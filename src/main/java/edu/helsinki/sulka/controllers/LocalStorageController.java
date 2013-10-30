@@ -50,6 +50,22 @@ public class LocalStorageController extends JSONController {
 		return new ObjectResponse<DatabaseRow>(localDatabaseService.addRinging(ringing));
 	}
 	
+	@PreAuthorize("hasRole('USER')")
+	@RequestMapping(value = "/api/storage/recovery/save", method = RequestMethod.POST, produces = "application/json;charset=UTF-8", consumes="application/json")
+	@ResponseBody
+	public ObjectResponse<DatabaseRow> saveRecovery(Locale locale,
+			Model model, HttpSession session,
+			@RequestBody DatabaseRow recovery,
+			BindingResult bindingResult) throws LocalStorageException {
+		if(bindingResult.hasErrors()){
+			throw new LocalStorageException("Database update failed");
+		}
+		recovery.setUserId(((User) session.getAttribute("user")).getLogin_id());
+		
+		return new ObjectResponse<DatabaseRow>(localDatabaseService.addRecovery(recovery));
+	}
+	
+	
 	/**
 	 * Handles storage exceptions gracefully.
 	 */

@@ -130,4 +130,79 @@ public class LocalStorageControllerTest {
 		.andExpect(jsonPath("$.object.row").value(notNullValue()))
 		.andReturn();
 	}
+	
+	@Test
+	public void testSaveRecoveryStatusIsOk() throws Exception {
+		mockMvc.perform(post("/api/storage/recovery/save")
+						.session(lokkiHttpSession)
+						.contentType(MediaType.APPLICATION_JSON)
+						.content("{\"row\":\"asdflkaöjö\"}".getBytes()))
+				.andExpect(status().isOk())
+				.andReturn();
+	}
+	
+	@Test
+	public void testSaveRecoveryReturnsJSON() throws Exception {
+		mockMvc.perform(post("/api/storage/recovery/save")
+						.session(lokkiHttpSession)
+						.contentType(MediaType.APPLICATION_JSON)
+						.content("{\"row\":\"asdflkaöjö\"}".getBytes()))
+				.andExpect(status().isOk())
+				.andExpect(content().contentType("application/json;charset=UTF-8"))
+				.andReturn();
+	}
+	
+	@Test
+	public void testSaveRecoveryReturnsErrorIfPostDataIsntJSON() throws Exception {
+		mockMvc.perform(post("/api/storage/recovery/save")
+						.session(lokkiHttpSession)
+						.contentType(MediaType.APPLICATION_XML)
+						.content("{\"id\":\"1234\", \"row\":\"asdflkaöjö\"}".getBytes()))
+				.andExpect(status().isUnsupportedMediaType())
+				.andReturn();
+	}
+	
+	@Test
+	public void testSaveRecoveryReturnsErrorWithWronglyNamedIdField() throws Exception {
+		mockMvc.perform(post("/api/storage/recovery/save")
+				.session(lokkiHttpSession)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("{\"JOTAIN\":\"1234\", \"row\":\"asdflkaöjö\"}".getBytes()))
+		.andExpect(status().isBadRequest()) // Should be internal server error
+		.andReturn();
+	}
+
+	@Test
+	public void testSaveRecoveryReturnsErrorWithWronglyNamedRowField() throws Exception {
+		mockMvc.perform(post("/api/storage/recovery/save")
+				.session(lokkiHttpSession)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("{\"ABCD\":\"asdflkaöjö\"}".getBytes()))
+		.andExpect(status().isBadRequest()) // Should be internal server error
+		.andReturn();
+	}
+
+	@Test
+	public void testSaveRecoveryAcceptsContentWithoutId() throws Exception {
+		mockMvc.perform(post("/api/storage/recovery/save")
+				.session(lokkiHttpSession)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("{\"row\":\"asdflkaöjö\"}".getBytes()))
+		.andExpect(status().isOk()) // Should be internal server error
+		.andReturn();
+	}
+	
+	@Test
+	public void testSaveRecoveryReturnsRowWithCorrectColumns() throws Exception {
+		mockMvc.perform(post("/api/storage/recovery/save")
+				.session(lokkiHttpSession)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("{\"row\":\"asdflkaöjö\"}".getBytes()))
+		.andExpect(status().isOk())
+		.andExpect(jsonPath("$.object.id").value(notNullValue()))
+		.andExpect(jsonPath("$.object.userId").value(notNullValue()))
+		.andExpect(jsonPath("$.object.row").value(notNullValue()))
+		.andReturn();
+	}
+	
 }
