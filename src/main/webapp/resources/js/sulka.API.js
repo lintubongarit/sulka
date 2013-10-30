@@ -104,7 +104,7 @@ sulka.API = function(API) {
 		
 		
 		
-		saveRingingRow: function(type, filters, onSuccess, onError){
+		saveRingingRow: function(onSuccess, onError){
 			
 			
 			
