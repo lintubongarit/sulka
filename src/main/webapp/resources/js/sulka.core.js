@@ -38,6 +38,7 @@ sulka = {
 	 * Called at start, when the document has fully loaded.
 	 */
 	init: function () {
+		sulka.helpers.disableSelection($(".context-menu"));
 		sulka.initEventHandlers();
 		sulka.initColumns(); // Calls initGrid when done
 	},
@@ -174,7 +175,9 @@ sulka = {
 		sulka.copyManager = new Slick.CellCopyManager();
 		sulka.grid.registerPlugin(sulka.copyManager);
 		
-		sulka.initColumnGroups();
+		sulka.grid.$columnGroups = new sulka.groups(sulka.grid);
+		
+		sulka.freeze.init();
 		
 		sulka.grid.onHeaderContextMenu.subscribe(sulka.showColumnHeaderContextMenu);
 		$("#header-context-menu li.context-menu-item").click(sulka.headerContextMenuItemClicked);
@@ -339,89 +342,13 @@ sulka = {
 		}
 	},
 	
-	columnGroupsDiv: null,
-	/**
-	 * Called once at start to initialize column group rendering after columns have been
-	 * fetched.
-	 */
-	initColumnGroups: function () {
-		sulka.columnGroupsDiv = $(
-			'<div></div>'
-		).addClass(
-			'column-group-headers'
-		).insertBefore(
-			'#slick-grid div.slick-header div.slick-header-columns:first-child'
-		);
-		sulka.helpers.disableSelection(sulka.columnGroupsDiv);
-		sulka.grid.onColumnsResized.subscribe(sulka.renderColumnGroups);
-		sulka.grid.onColumnsReordered.subscribe(sulka.renderColumnGroups);
-		sulka.renderColumnGroups();
-	},
-	
-	COL_GROUP_OUTSIDE_WIDTH: 9,
-	/**
-	 * Create column group element. 
-	 */
-	_makeColumnGroup: function (name, description, width) {
-		return $(
-			'<div></div>'
-		).addClass(
-			'column-group-header'
-		).append(
-			$(
-				'<span></span>'
-			).addClass(
-				'column-group-name'
-			).text(
-				description
-			).attr(
-				"title",
-				description
-			)
-		).css(
-				"width",
-				(width - sulka.COL_GROUP_OUTSIDE_WIDTH) + "px"
-		).data(
-			"sulka.group.id",
-			name
-		);
-	},
-	
-	SLICK_WIDTH_ADJUST: -1000,
 	/**
 	 * Called whenever column groups need to be re-rendered.
 	 */
 	renderColumnGroups: function () {
-		var columns = sulka.grid.getColumns(),
-			groupDivs = [];
-		
-		var currentGroup = null,
-			currentGroupWidth = 0;
-		
-		$.each(columns, function () {
-			if (currentGroup === this.$sulkaGroup) {
-				currentGroupWidth += this.width;
-			} else {
-				if (currentGroup !== null) {
-					groupDivs.push(sulka._makeColumnGroup(currentGroup.name, currentGroup.description, currentGroupWidth));
-				}
-				currentGroup = this.$sulkaGroup;
-				currentGroupWidth = this.width;
-			}
-		});
-		if (currentGroup !== null) {
-			groupDivs.push(sulka._makeColumnGroup(currentGroup.name, currentGroup.description, currentGroupWidth));
-		}
-		
-		sulka.columnGroupsDiv.empty().css(
-			"width",
-			($(".slick-header-columns").width() + sulka.SLICK_WIDTH_ADJUST) + "px" 
-		).append(
-			groupDivs
-		);
+		if (sulka.grid && sulka.grid.$columnGroups) sulka.grid.$columnGroups.render();
+		sulka.freeze.renderColumnGroups();
 	},
-	
-    	
 	
 	/**
 	 * Reload all data to table, applying new filters etc.

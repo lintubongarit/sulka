@@ -7,11 +7,19 @@ sulka.freeze = (function (freeze) { freeze = {
 	viewport: null,
 	mainViewport: null,
 	
-	initFreeze: function (columns) {
-		freeze.columns = columns;
-		if (freeze.columns.length > 0) {
-			freeze.showFreeze();
-		}
+	gridOptions: {
+		enableCellNavigation: true,
+		enableColumnReorder: false
+	},
+
+	RIGHT_TRIANGLE: "▶",
+	init: function () {
+		var freezeButton = $("<div></div>")
+			.addClass("header-freeze-button")
+			.text(freeze.RIGHT_TRIANGLE)
+			.click(sulka.freeze.freezeLeftColumn);
+		sulka.helpers.disableSelection(freezeButton);
+		$("#slick-grid .slick-header-columns").first().before(freezeButton);
 	},
 	
 	rows: [],
@@ -22,13 +30,27 @@ sulka.freeze = (function (freeze) { freeze = {
 		freeze.grid.setData(freeze.rows);
 	},
 	
-	freezeColumn: function (col) {
-		freeze.columns.push(col);
+	freezeLeftColumn: function () {
+		if (!sulka.grid) return;
+		
+		var cols = sulka.grid.getColumns();
+		
+		if (cols.length == 0) {
+			return;
+		}
+		
+		var clone = $.extend({}, cols.shift());
+		
+		clone.resizable = false;
+		freeze.columns.push(clone);
+		
 		if (!freeze.visible) {
 			freeze.showFreeze();
 		} else {
-			freeze.setColumns(freeze.columns);
+			freeze.grid.setColumns(freeze.columns);
 		}
+		sulka.grid.setColumns(cols);
+		sulka.renderColumnGroups();
 	},
 	
 	unfreezeColumn: function (col) {
@@ -84,6 +106,10 @@ sulka.freeze = (function (freeze) { freeze = {
 		freezeContainer.show();
 		
 		freeze.visible = true;
+	},
+	
+	renderColumnGroups: function () {
+		if (freeze.visible && freeze.grid.$columnGroups) freeze.grid.$columnGroups.render();
 	},
 	
 	onMainScroll: function (event, args) {

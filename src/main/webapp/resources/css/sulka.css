@@ -237,10 +237,6 @@ span#last-error {
 	-webkit-box-shadow: 2px 2px 2px silver;
 	z-index: 99999;
 	overflow-y: scroll;
-	-moz-user-select: none;
-	-webkit-user-select: none;
-	-ms-user-select: none;
-	user-select: none;
 }
 
 .context-menu li.context-menu-item {
@@ -292,4 +288,21 @@ span#last-error {
 
 .slick-row.odd {
   background: #fafafa;
+}
+
+.header-freeze-button {
+	position: absolute;
+	height: 15px;
+	border-right: 1px solid silver;
+	z-index: 100;
+	color: black;
+	background-color: darkcyan;
+	padding: 4px 2px;
+	line-height: 16px;
+	opacity: 0.3;
+	font-weight: bold;
+	cursor: pointer;
+}
+.header-freeze-button:hover {
+	opacity: 1;
 }
