@@ -88,8 +88,7 @@ sulka.freeze = (function (freeze) { freeze = {
 	showFreeze: function () {
 		if (freeze.columns.length == 0 || freeze.visible) return;
 		
-		var mainContainer = $(freeze.mainContainer),
-			freezeContainer = $(freeze.freezeContainer);
+		var freezeContainer = $(freeze.freezeContainer);
 		
 		if (freeze.grid === null) {
 			freeze.grid = new Slick.Grid(freeze.freezeContainer, sulka.grid.getData(), freeze.columns, 
