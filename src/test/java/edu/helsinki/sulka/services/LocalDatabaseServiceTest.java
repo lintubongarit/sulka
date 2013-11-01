@@ -11,7 +11,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import edu.helsinki.sulka.models.DbRowRingings;
+import edu.helsinki.sulka.models.DatabaseRow;
 
 @RunWith(SpringJUnit4ClassRunner.class)  
 @ContextConfiguration({
@@ -26,31 +26,103 @@ public class LocalDatabaseServiceTest {
 	private LocalDatabaseService localDatabaseService;
 	
 	@Test
-	public void testAddRingingGrowsSizeOfReturnedList(){
-		DbRowRingings row = new DbRowRingings();
-		row.setUserId("1");
-		row.setRow("TESTI");
-		localDatabaseService.addRinging(row);
-		List<DbRowRingings> rows = localDatabaseService.getRingings("1");
-		assertEquals(rows.size(), 1);
+	public void testGetRingingsReturnsEmptyListWithUnknownUser(){
+		List<DatabaseRow> rows = localDatabaseService.getRingings("1ASDF");
+		assertTrue(rows.isEmpty());
 	}
 
-	
 	@Test
-	public void testOnlyUsersRowsAreReturned(){
+	public void testOnlyUsersRingingsAreReturned(){
 		for(int i=0; i < 500; i++){
-			DbRowRingings row = new DbRowRingings();
+			DatabaseRow row = new DatabaseRow();
 			row.setUserId(Integer.toString(i%10));
 			row.setRow("Testi: " + i);
+			localDatabaseService.addRinging(row);
 		}
 		String wantedUserId = "4";
-		List<DbRowRingings> rows = localDatabaseService.getRingings("4");
-		for(DbRowRingings row: rows){
+		List<DatabaseRow> rows = localDatabaseService.getRingings(wantedUserId);
+		for(DatabaseRow row: rows){
 			assertEquals(row.getUserId(), wantedUserId);
 		}
-		
-		
+	}
+	
+	@Test
+	public void testAddRingingReturnsSomething(){
+		DatabaseRow row = new DatabaseRow();
+		row.setUserId("1");
+		row.setRow("TESTI");
+		row = localDatabaseService.addRinging(row);
+		assertNotNull(row);
+	}
+	
+	@Test
+	public void testAddRingingReturnsRowWithId(){
+		DatabaseRow row = new DatabaseRow();
+		row.setUserId("1");
+		row.setRow("TESTI");
+		row = localDatabaseService.addRinging(row);
+		assertNotNull(row.getId());
 	}
 
+	@Test
+	public void testRemoveRingingDeletesRowFromDatabase(){
+		DatabaseRow row = new DatabaseRow();
+		row.setUserId("1");
+		row.setRow("Testi4");
+		row = localDatabaseService.addRinging(row);
+		localDatabaseService.removeRinging(row);
+		List<DatabaseRow> rows = localDatabaseService.getRingings("1");
+		assertTrue(rows.isEmpty());
+	}
+	
+	@Test
+	public void testGetRecoveryReturnsEmptyListWithUnknownUser(){
+		List<DatabaseRow> rows = localDatabaseService.getRecoveries("1ASDF");
+		assertTrue(rows.isEmpty());
+	}
+	
+	@Test
+	public void testOnlyUsersRecoveriesAreReturned(){
+		for(int i=0; i < 500; i++){
+			DatabaseRow row = new DatabaseRow();
+			row.setUserId(Integer.toString(i%10));
+			row.setRow("Testi: " + i);
+			localDatabaseService.addRecovery(row);
+		}
+		String wantedUserId = "5";
+		List<DatabaseRow> rows = localDatabaseService.getRecoveries(wantedUserId);
+		for(DatabaseRow row: rows){
+			assertEquals(row.getUserId(), wantedUserId);
+		}
+	}
+	
+	@Test
+	public void testAddRecoveryReturnsSomething(){
+		DatabaseRow row = new DatabaseRow();
+		row.setUserId("1");
+		row.setRow("TESTI");
+		row = localDatabaseService.addRecovery(row);
+		assertNotNull(row);
+	}
+	
+	@Test
+	public void testAddRecoveryReturnsRowWithId(){
+		DatabaseRow row = new DatabaseRow();
+		row.setUserId("1");
+		row.setRow("TESTI");
+		row = localDatabaseService.addRecovery(row);
+		assertNotNull(row.getId());
+	}
+	
+	@Test
+	public void testRemoveRecoveryDeletesRowFromDatabase(){
+		DatabaseRow row = new DatabaseRow();
+		row.setUserId("1");
+		row.setRow("Testi4");
+		row = localDatabaseService.addRecovery(row);
+		localDatabaseService.removeRecovery(row);
+		List<DatabaseRow> rows = localDatabaseService.getRecoveries("1");
+		assertTrue(rows.isEmpty());
+	}
 
 }

@@ -77,7 +77,7 @@ sulka.API = function(API) {
 			} else {
 				type = "";
 			}
-
+			
 			var filterString = "";
 			for ( var filter in filters)
 				if (filters.hasOwnProperty(filter)) {
@@ -101,6 +101,10 @@ sulka.API = function(API) {
 				error : API._jQueryErrorHandler(onError)
 			});
 		},
+		
+		
+
+		
 
 		/**
 		 * Creates and returns a jQuery AJAX error handler function that will
@@ -129,8 +133,18 @@ sulka.API = function(API) {
 				}
 				errorHandler();
 			};
+		},
+		
+		validate : function(row, onSuccess, onError) {
+			$.ajax({
+				url : API.BASE + "/validate",
+				type: "GET",
+				dataType : 'json',
+				data: { data: JSON.stringify(row) },
+				error : API._jQueryErrorHandler(onError),
+				success: onSuccess
+			});
 		}
 	};
-
 	return API;
 }();
