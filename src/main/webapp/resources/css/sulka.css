@@ -188,6 +188,11 @@ span#last-error {
 	color: red;
 }
 
+.slick-cell.selected {
+	background-color: rgba(255, 255, 255, 1); /* show selected row background */
+}
+
+
 .slick-header-columns {
 	background: url("../img/header-columns-bg.gif");
 	border-bottom: 1px solid #C2C3C9;

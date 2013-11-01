@@ -70,7 +70,20 @@ public class LoginController implements AuthenticationEntryPoint {
 			
 		User user = loginService.login(iv, key, data);
 		
+//		User user = new User();
+//		user.setPass(true);
+//		user.setLogin_id("846");
+//		user.setName("Heikki Lokki");
+//		user.refreshSession();
+		
 		model.addAttribute("user", user);
+		
+		List<GrantedAuthority> grantedAuths = new ArrayList<GrantedAuthority>();
+		grantedAuths.add(new SimpleGrantedAuthority("USER"));
+		Authentication authentication = new UsernamePasswordAuthenticationToken(
+				user.getName(), user.getEmail(), grantedAuths);
+		SecurityContextHolder.getContext()
+				.setAuthentication(authentication);
 
 		if (user.accessStatus() == 0) {
 			return "redirect:/";

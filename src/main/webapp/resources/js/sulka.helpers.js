@@ -21,8 +21,8 @@ helpers = {
 	 */
 	setError: function (errorMsg) {
 		if (errorMsg) {
-			if (errorMsg.length > 50) {
-				errorMsg = errorMsg.substring(0, 50) + "...";
+			if (errorMsg.length > 500) {
+				errorMsg = errorMsg.substring(0, 500) + "...";
 			} 
 			$("#last-error").text(errorMsg);
 		} else {
