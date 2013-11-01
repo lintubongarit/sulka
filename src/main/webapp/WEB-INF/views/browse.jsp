@@ -11,7 +11,8 @@
 		<link rel="stylesheet" href="resources/css/sulka.css" type="text/css" />
    		<script src="resources/js/lib/jquery-1.10.2.min.js"></script>
     	<script src="resources/js/lib/jquery-ui-1.10.3.custom.min.js"></script>
-   		<script src="resources/js/lib/jquery.event.drag-2.2.js"></script>
+   		<script src="resources/js/lib/plugins/jquery.event.drag-2.2.js"></script>
+   		<script src="resources/js/lib/plugins/jquery.mousewheel.js"></script>
 		<script src="resources/js/lib/moment.min.js"></script>
 		<script src="resources/js/lib/plugins/slick.autotooltips.js"></script>
 		<script src="resources/js/lib/plugins/slick.cellrangedecorator.js"></script>

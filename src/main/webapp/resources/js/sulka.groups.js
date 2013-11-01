@@ -74,6 +74,7 @@ sulka.groups = function (grid, container) {
 	
 	grid.onColumnsResized.subscribe(render);
 	grid.onColumnsReordered.subscribe(render);
+	render();
 	
 	$.extend(this, {
 		render: render

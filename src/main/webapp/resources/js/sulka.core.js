@@ -14,10 +14,8 @@ sulka = {
 	gridOptions: {
 		enableCellNavigation: true,
 		enableColumnReorder: true,
-		multiColumnSort: true,
 	    editable: false,
 	    enableAddRow: false,
-	    enableCellNavigation: true,
 	    asyncEditorLoading: false,
 	    autoEdit: false
 	},
@@ -165,12 +163,14 @@ sulka = {
 		// We are now ready to actually initialize the grid
 		sulka.grid = new Slick.Grid("#slick-grid", [], sulka.getVisibleColumns(), sulka.gridOptions);
 		
+		sulka.viewport = $("#slick-grid").find(".slick-viewport");
+		
 		sulka.grid.setSelectionModel(new Slick.CellSelectionModel());
 		
 		sulka.grid.registerPlugin(new Slick.AutoTooltips());
 
 	    // set keyboard focus on the grid
-		sulka.grid.getCanvasNode().focus();
+		$(sulka.grid.getCanvasNode()).focus();
 		
 		sulka.copyManager = new Slick.CellCopyManager();
 		sulka.grid.registerPlugin(sulka.copyManager);
@@ -182,7 +182,7 @@ sulka = {
 		sulka.grid.onHeaderContextMenu.subscribe(sulka.showColumnHeaderContextMenu);
 		$("#header-context-menu li.context-menu-item").click(sulka.headerContextMenuItemClicked);
 		
-		sulka.grid.setSelectionModel(new Slick.RowSelectionModel());
+		//sulka.grid.setSelectionModel(new Slick.RowSelectionModel());
 		
 		sulka.copyManager.onPasteCells.subscribe(sulka.onPasteCells);
 		
@@ -192,6 +192,8 @@ sulka = {
 		
 		$(window).resize(sulka.resizeGrid);
 		sulka.resizeGrid();
+		
+		$("#slick-grid").mousewheel(sulka.onMouseWheel);
 		
 		sulka.reloadData();
 	},
@@ -218,6 +220,21 @@ sulka = {
 		}, 100);
 	},
 	
+	viewport: null,
+	
+	MOUSE_WHEEL_ROW_HEIGHT: 25,
+	MOUSE_WHEEL_SCROLL_ROWS: 3,
+	/**
+	 * Handle mouse wheel events.
+	 */
+	onMouseWheel: function (event, delta, deltaX, deltaY) {
+		event.preventDefault();
+		if (deltaY !== 0) {
+			sulka.viewport.scrollTop(Math.max(0, sulka.viewport.scrollTop() - 
+					deltaY*sulka.MOUSE_WHEEL_SCROLL_ROWS*sulka.MOUSE_WHEEL_ROW_HEIGHT));
+		}
+	},
+	
 	/**
 	 * Return currently visible columns (even those not currently on grid)
 	 */
@@ -235,22 +252,24 @@ sulka = {
 	 * Called by SlickGrid when the grid needs to be sorted. 
 	 */
 	onGridSort: function (event, args) {
+		sulka.freeze.removeSortMarkers();
+		sulka.sort(args);
+	},
+	
+	/**
+	 * Sort grid by cols.
+	 */
+	sort: function (args) {
 		var data = sulka.grid.getData();
-	    var cols = args.sortCols;
 	    
+		var sign = args.sortAsc ? 1 : -1;
+		var field = args.sortCol.field;
 		data.sort(function (dataRow1, dataRow2) {
-			for (var i = 0, l = cols.length; i < l; i++) {
-				var field = cols[i].sortCol.field;
-				var sign = cols[i].sortAsc ? 1 : -1;
-				var value1 = dataRow1[field], value2 = dataRow2[field];
-				var result = (value1 == value2 ? 0 : (value1 > value2 ? 1 : -1)) * sign;
-				if (result != 0) {
-					return result;
-				}
-		    }
-		    return 0;
+			var value1 = dataRow1[field], value2 = dataRow2[field];
+			return (value1 == value2) ? 0 : (sign * (value1 > value2 ? 1 : -1));
 		});
 		sulka.grid.invalidate();
+		sulka.freeze.invalidate();
 	},
 	
 	
@@ -274,8 +293,6 @@ sulka = {
 	      grid.render();
 	    });
 	},
-	
-	
 	
 	CONTEXT_HEIGHT_ADJUST: 6,
 	/**
@@ -356,6 +373,15 @@ sulka = {
 	},
 	
 	/**
+	 * Set grid data and render.
+	 */
+	setData: function (rows) {
+		sulka.grid.setData(rows);
+		sulka.grid.render();
+		sulka.freeze.setData(rows);
+	},
+	
+	/**
 	 * Reload all data to table, applying new filters etc.
 	 */
 	reloadData: function () {
@@ -369,8 +395,7 @@ sulka = {
 		var filters = sulka.getFilters();
 		if (typeof(filters) === "string") {
 			sulka.helpers.hideLoaderAndSetError(filters);
-			sulka.grid.setData([]);
-			sulka.grid.render();
+			sulka.setData([]);
 			return;
 		}
 		
@@ -388,8 +413,7 @@ sulka = {
 				if (rows.length > 0) {
 					sulka.adjustFlexibleCols(rows);
 				}
-				sulka.grid.setData(rows);
-				sulka.grid.render();
+				sulka.setData(rows);
 			},
 			sulka.helpers.hideLoaderAndSetError
 		);
@@ -515,9 +539,9 @@ sulka = {
 				sulka.helpers.hideLoaderAndUnsetError();
 				
 				if (data.passes){
-					sulka.helpers.hideLoaderAndSetError('Rivi on validi');
+					sulka.helpers.hideLoaderAndSetError(sulka.strings.validRow);
 				} else {
-					var errorString = "RIVI EI OLE VALIDI: ";
+					var errorString = sulka.strings.invalidRow + ": ";
 					for (var errorField in data.errors) if (data.errors.hasOwnProperty(errorField)) {
 						var errorArray = data.errors[errorField];
 						console.log("field", errorField, "errorArray", errorArray);

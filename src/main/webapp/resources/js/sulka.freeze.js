@@ -9,7 +9,10 @@ sulka.freeze = (function (freeze) { freeze = {
 	
 	gridOptions: {
 		enableCellNavigation: true,
-		enableColumnReorder: false
+	    editable: false,
+	    enableAddRow: false,
+	    asyncEditorLoading: false,
+	    autoEdit: false
 	},
 	
 	freezeContainer: "#freeze-grid",
@@ -19,6 +22,7 @@ sulka.freeze = (function (freeze) { freeze = {
 	LEFT_TRIANGLE: "◀",
 	
 	init: function () {
+		if (sulka.viewMode != "browsing") return;
 		var freezeButton = $("<div></div>")
 			.addClass("header-freeze-button")
 			.text(freeze.RIGHT_TRIANGLE)
@@ -88,12 +92,15 @@ sulka.freeze = (function (freeze) { freeze = {
 			freezeContainer = $(freeze.freezeContainer);
 		
 		if (freeze.grid === null) {
-			freeze.grid = new Slick.Grid(freeze.freezeContainer, sulka.grid.getData(), freeze.columns, sulka.gridOptions);
+			freeze.grid = new Slick.Grid(freeze.freezeContainer, sulka.grid.getData(), freeze.columns, 
+					$.extend({}, freeze.gridOptions, sulka.gridOptions));
 			freeze.grid.$columnGroups = new sulka.groups(freeze.grid, freezeContainer);
 			freeze.grid.onColumnsResized.subscribe(sulka.resizeGrid);
+			freeze.grid.onSort.subscribe(freeze.onGridSort);
 			freeze.viewport = freezeContainer.find(".slick-viewport").first();
-			freeze.mainViewport = mainContainer.find(".slick-viewport").first();
+			freeze.mainViewport = sulka.viewport;
 			freeze.viewport.css("overflow", "hidden");
+			freezeContainer.mousewheel(freeze.onMouseWheel);
 			var unfreezeButton = $("<div></div>")
 				.addClass("header-unfreeze-button")
 				.text(freeze.LEFT_TRIANGLE)
@@ -107,6 +114,25 @@ sulka.freeze = (function (freeze) { freeze = {
 		
 		freezeContainer.show();
 		freeze.visible = true;
+	},
+	
+	/**
+	 * Scrolls main container on mouse wheel.
+	 */
+	onMouseWheel: function (event, delta, deltaX, deltaY) {
+		if (!freeze.visible) return;
+		sulka.onMouseWheel(event, delta, deltaX, deltaY);
+	},
+	
+	setData : function(rows) {
+		if (!freeze.visible)  return;
+		freeze.grid.setData(rows);
+		freeze.grid.render();
+	},
+	
+	invalidate: function () {
+		if (!freeze.visible)  return;
+		freeze.grid.invalidate();
 	},
 	
 	resize: function () {
@@ -141,5 +167,25 @@ sulka.freeze = (function (freeze) { freeze = {
 	getWidth: function () {
 		if (!freeze.visible) return 0;
 		return freeze.width;
+	},
+	
+	onGridSort: function (event, args) {
+		if (!freeze.visible) return;
+		
+		$(freeze.mainContainer).find(".slick-header-columns .slick-header-column-sorted").removeClass("slick-header-column-sorted");
+		$(freeze.mainContainer).find(".slick-header-columns .slick-sort-indicator-asc").removeClass("slick-sort-indicator-asc");
+		$(freeze.mainContainer).find(".slick-header-columns .slick-sort-indicator-desc").removeClass("slick-sort-indicator-desc");
+		
+		console.log($(freeze.mainContainer).find(".slick-header-columns .slick-sort-indicator-asc").length);
+		
+		sulka.sort(args);
+	},
+	
+	removeSortMarkers: function () {
+		if (!freeze.visible) return;
+		
+		$(freeze.freezeContainer).find(".slick-header-columns .slick-header-column-sorted").removeClass("slick-header-column-sorted");
+		$(freeze.freezeContainer).find(".slick-header-columns .slick-sort-indicator-asc").removeClass("slick-sort-indicator-asc");
+		$(freeze.freezeContainer).find(".slick-header-columns .slick-sort-indicator-desc").removeClass("slick-sort-indicator-desc");
 	}
 }; return freeze; })();
