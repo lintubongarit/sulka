@@ -11,15 +11,20 @@ sulka.freeze = (function (freeze) { freeze = {
 		enableCellNavigation: true,
 		enableColumnReorder: false
 	},
-
+	
+	freezeContainer: "#freeze-grid",
+	mainContainer: "#slick-grid",
+	
 	RIGHT_TRIANGLE: "▶",
+	LEFT_TRIANGLE: "◀",
+	
 	init: function () {
 		var freezeButton = $("<div></div>")
 			.addClass("header-freeze-button")
 			.text(freeze.RIGHT_TRIANGLE)
 			.click(sulka.freeze.freezeLeftColumn);
 		sulka.helpers.disableSelection(freezeButton);
-		$("#slick-grid .slick-header-columns").first().before(freezeButton);
+		$(freeze.mainContainer).append(freezeButton);
 	},
 	
 	rows: [],
@@ -39,73 +44,82 @@ sulka.freeze = (function (freeze) { freeze = {
 			return;
 		}
 		
-		var clone = $.extend({}, cols.shift());
+		freeze.columns.push(cols.shift());
 		
-		clone.resizable = false;
-		freeze.columns.push(clone);
-		
+		sulka.grid.setColumns(cols);
 		if (!freeze.visible) {
 			freeze.showFreeze();
 		} else {
 			freeze.grid.setColumns(freeze.columns);
 		}
-		sulka.grid.setColumns(cols);
+		sulka.resizeGrid();
 		sulka.renderColumnGroups();
 	},
 	
-	unfreezeColumn: function (col) {
-		if (!freeze.shown) {
-			return;
-		}
+	unfreezeRightColumn: function () {
+		if (!freeze.visible) return;
 		
-		for (var i=0; i<freeze.columns.length; i++) {
-			if (freeze.columns[i].id == col.id) {
-				freeze.columns.splice(i, 1);
-				if (freeze.columns.length > 0) {
-					freeze.grid.setColumns(freeze.columns);
-				} else {
-					freeze.hideFreeze();
-				}
-			}
+		var mainCols = sulka.grid.getColumns();
+		mainCols.unshift(freeze.columns.pop());
+		
+		sulka.grid.setColumns(mainCols);
+		if (freeze.columns.length === 0) {
+			freeze.hideFreeze();
+		} else {
+			freeze.grid.setColumns(freeze.columns);
 		}
+		sulka.resizeGrid();
+		sulka.renderColumnGroups();
 	},
 	
 	position: function (y) {
-		$("#freeze-grid").css({
+		$(freeze.freezeContainer).css({
 			top: y + "px"
 		});
 		if (freeze.visilbe) {
-			freeze.grid.resizeCanvas();
+			setTimeout(function () { freeze.grid.resizeCanvas(); }, 0);
 		}
 	},
 	
 	showFreeze: function () {
 		if (freeze.columns.length == 0 || freeze.visible) return;
 		
-		var freezeContainer = $("#freeze-grid");
-		var mainContainer = $("#slick-grid");
+		var mainContainer = $(freeze.mainContainer),
+			freezeContainer = $(freeze.freezeContainer);
 		
-		freeze.width = 0;
-		$.each(freeze.columns, function () {
-			freeze.width += this.width;
-		});
+		if (freeze.grid === null) {
+			freeze.grid = new Slick.Grid(freeze.freezeContainer, sulka.grid.getData(), freeze.columns, sulka.gridOptions);
+			freeze.grid.$columnGroups = new sulka.groups(freeze.grid, freezeContainer);
+			freeze.grid.onColumnsResized.subscribe(sulka.resizeGrid);
+			freeze.viewport = freezeContainer.find(".slick-viewport").first();
+			freeze.mainViewport = mainContainer.find(".slick-viewport").first();
+			freeze.viewport.css("overflow", "hidden");
+			var unfreezeButton = $("<div></div>")
+				.addClass("header-unfreeze-button")
+				.text(freeze.LEFT_TRIANGLE)
+				.click(sulka.freeze.unfreezeRightColumn);
+			sulka.helpers.disableSelection(unfreezeButton);
+			freezeContainer.append(unfreezeButton);
+		}
 		
-		mainContainer.css("left", freeze.width + "px");
-		mainContainer.css("width", mainContainer.width() - freeze.width + "px");
-		sulka.grid.resizeCanvas();
-		freezeContainer.width(freeze.width);
-		
-		freeze.grid = new Slick.Grid("#freeze-grid", sulka.grid.getData(), freeze.columns, sulka.gridOptions);
-		
-		freeze.viewport = freezeContainer.find(".slick-viewport").first();
-		freeze.mainViewport = mainContainer.find(".slick-viewport").first();
-		freeze.viewport.css("overflow", "hidden");
 		sulka.grid.onScroll.subscribe(freeze.onMainScroll);
 		freeze.onMainScroll();
 		
 		freezeContainer.show();
-		
 		freeze.visible = true;
+	},
+	
+	resize: function () {
+		if (!freeze.visible) return;
+		
+		var width = 0;
+		$.each(freeze.columns, function () {
+			width += this.width;
+		});
+		freeze.width = Math.min($(window).width(), width);
+		
+		$(freeze.freezeContainer).width(freeze.width);
+		setTimeout(function () { freeze.grid.resizeCanvas(); }, 0);
 	},
 	
 	renderColumnGroups: function () {
@@ -118,7 +132,10 @@ sulka.freeze = (function (freeze) { freeze = {
 	
 	hideFreeze: function () {
 		if (!freeze.visible) return;
+		
 		sulka.grid.onScroll.unsubscribe(freeze.onMainScroll);
+		$(freeze.freezeContainer).hide();
+		freeze.visible = false;
 	},
 	
 	getWidth: function () {

@@ -65,9 +65,8 @@ sulka.groups = function (grid, container) {
 			groupDivs.push(makeColumnGroup(currentGroup.name, currentGroup.description, currentGroupWidth));
 		}
 		
-		columnGroupsDiv.empty().css(
-			"width",
-			(container.find(".slick-header-columns").width() + SLICK_WIDTH_ADJUST) + "px" 
+		columnGroupsDiv.empty().width(
+			container.find(".slick-header-columns").width() + SLICK_WIDTH_ADJUST 
 		).append(
 			groupDivs
 		);
