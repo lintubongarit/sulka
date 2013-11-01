@@ -147,8 +147,18 @@ sulka.API = function(API) {
 				}
 				errorHandler();
 			};
+		},
+		
+		validate : function(row, onSuccess, onError) {
+			$.ajax({
+				url : API.BASE + "/validate",
+				type: "GET",
+				dataType : 'json',
+				data: { data: JSON.stringify(row) },
+				error : API._jQueryErrorHandler(onError),
+				success: onSuccess
+			});
 		}
 	};
-
 	return API;
 }();

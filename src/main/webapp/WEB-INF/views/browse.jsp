@@ -18,6 +18,7 @@
 		<script src="resources/js/lib/plugins/slick.cellrangeselector.js"></script>
 		<script src="resources/js/lib/plugins/slick.cellcopymanager.js"></script>
 		<script src="resources/js/lib/plugins/slick.cellselectionmodel.js"></script>
+		<script src="resources/js/lib/plugins/slick.rowselectionmodel.js"></script>
 		<script src="resources/js/lib/slick.core.js"></script>
 		<script src="resources/js/lib/slick.editors.js"></script>
 		<script src="resources/js/lib/slick.grid.js"></script>

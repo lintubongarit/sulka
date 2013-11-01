@@ -246,7 +246,13 @@
 			<version>2.2.3</version>
 		</dependency>
 
-		<!-- JsonPath support for tests -->
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-mapper-asl</artifactId>
+            <version>1.4.2</version>
+        </dependency>
+        
+        <!-- JsonPath support for tests -->
 
 		<!-- Hamcrest Matchers -->
 		<dependency>

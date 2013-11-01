@@ -179,6 +179,8 @@ sulka = {
 		sulka.grid.onHeaderContextMenu.subscribe(sulka.showColumnHeaderContextMenu);
 		$("#header-context-menu li.context-menu-item").click(sulka.headerContextMenuItemClicked);
 		
+		sulka.grid.setSelectionModel(new Slick.RowSelectionModel());
+		
 		sulka.copyManager.onPasteCells.subscribe(sulka.onPasteCells);
 		
 		sulka.grid.onSort.subscribe(sulka.onGridSort);
@@ -601,7 +603,36 @@ sulka = {
 		} else{
 			sulka.rowsMode = "all";
 		}
+	},
+	
+	validate: function() {
+		var selectedRows = sulka.grid.getSelectedRows();
+		if (selectedRows.length == 0) return;
+		console.log(selectedRows[0]);
+		sulka.helpers.unsetErrorAndShowLoader();
+		var selectedRow = sulka.grid.getData()[selectedRows[0]];
+		sulka.API.validate(
+			selectedRow, 
+			function (data) {
+				sulka.helpers.hideLoaderAndUnsetError();
+				
+				if (data.passes){
+					sulka.helpers.hideLoaderAndSetError('Rivi on validi');
+				} else {
+					var errorString = "RIVI EI OLE VALIDI: ";
+					for (var errorField in data.errors) if (data.errors.hasOwnProperty(errorField)) {
+						var errorArray = data.errors[errorField];
+						console.log("field", errorField, "errorArray", errorArray);
+						errorString = errorString.concat('(' + errorField + ': ' + errorArray[0].errorName + '), ');
+					}
+					sulka.helpers.hideLoaderAndSetError(errorString);
+				}
+			}, 
+			sulka.helpers.hideLoaderAndSetError
+		);
 	}
+	
+	
 };
 
 
