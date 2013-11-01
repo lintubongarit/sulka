@@ -21,8 +21,8 @@ helpers = {
 	 */
 	setError: function (errorMsg) {
 		if (errorMsg) {
-			if (errorMsg.length > 50) {
-				errorMsg = errorMsg.substring(0, 50) + "...";
+			if (errorMsg.length > 500) {
+				errorMsg = errorMsg.substring(0, 500) + "...";
 			} 
 			$("#last-error").text(errorMsg);
 		} else {
@@ -167,13 +167,16 @@ helpers = {
 	},
 	
     disableSelection: function ($target) {
-      if ($target && $target.jquery) {
-        $target
-            .attr("unselectable", "on")
-            .css("MozUserSelect", "none")
-            .bind("selectstart.ui", function () {
-              return false;
-            }); // from jquery:ui.core.js 1.7.2
+    	if ($target && $target.jquery) {
+    		$target
+	            .attr("unselectable", "on")
+	            .css("UserSelect", "none")
+	            .css("MozUserSelect", "none")
+	            .css("WebkitUserSelect", "none")
+	            .css("IeUserSelect", "none")
+	            .bind("selectstart.ui", function () {
+	            	return false;
+	            }); // from jquery:ui.core.js 1.7.2
       }
     }
 };
