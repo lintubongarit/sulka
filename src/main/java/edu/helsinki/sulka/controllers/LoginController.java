@@ -64,43 +64,34 @@ public class LoginController implements AuthenticationEntryPoint {
 			@RequestParam(value = "iv", required = false) String iv,
 			@RequestParam(value = "data", required = false) String data) {
 
-		if (key == null || iv == null || data == null)
+		if (key == null || iv == null || data == null) {
 			return "redirect:" + SSOLoginURL.getURL();
+		}
 			
 		User user = loginService.login(iv, key, data);
 		
+//		User user = new User();
+//		user.setPass(true);
+//		user.setLogin_id("846");
+//		user.setName("Heikki Lokki");
+//		user.refreshSession();
+		
 		model.addAttribute("user", user);
+		
+		List<GrantedAuthority> grantedAuths = new ArrayList<GrantedAuthority>();
+		grantedAuths.add(new SimpleGrantedAuthority("USER"));
+		Authentication authentication = new UsernamePasswordAuthenticationToken(
+				user.getName(), user.getEmail(), grantedAuths);
+		SecurityContextHolder.getContext()
+				.setAuthentication(authentication);
 
-		if (user.accessStatus() == 0)
+		if (user.accessStatus() == 0) {
 			return "redirect:/";
+		}
 
 		return "redirect:" + SSOLoginURL.getURL();
 	}
 
-	@RequestMapping(value = "/status/403", method = RequestMethod.GET)
-	public String accessDenied(Model model) {
-		model.addAttribute("msg",
-				"ERROR 403, You don't have privileges to view this page!!!");
-		return "/status/403";
-	}
-
-	
-	@RequestMapping(value = "/status/404", method = RequestMethod.GET)
-	public String notFound(Model model) {
-		model.addAttribute("msg",
-				"ERROR 404, content not found!");
-		return "/status/403";
-	}
-	
-	
-	@RequestMapping(value = "/status/401", method = RequestMethod.GET)
-	public String unauthorizedAccess(Model model) {
-		model.addAttribute("msg",
-				"ERROR 401, Unauthorized Access, you have to login first!");
-		return "/status/401";
-	}
-	
-	
 	/**
 	 * This value should be set from a bean and disabled for production.
 	 */
@@ -122,7 +113,6 @@ public class LoginController implements AuthenticationEntryPoint {
 			user.setPass(true);
 			user.setLogin_id("846");
 			user.setName("Heikki Lokki");
-			user.refreshSession();
 			model.addAttribute("user", user);
 
 			List<GrantedAuthority> grantedAuths = new ArrayList<GrantedAuthority>();
@@ -132,11 +122,11 @@ public class LoginController implements AuthenticationEntryPoint {
 			SecurityContextHolder.getContext()
 					.setAuthentication(authentication);
 
+			return "redirect:/";
 		} else {
 			response.setStatus(403);
-			return "login";
+			return "/status/403";
 		}
-		return "login";
 	}
 
 	/**
@@ -152,7 +142,6 @@ public class LoginController implements AuthenticationEntryPoint {
 			user.setPass(true);
 			user.setLogin_id("846");
 			user.setName("Heikki Lokki");
-			user.refreshSession();
 			model.addAttribute("user", user);
 
 			List<GrantedAuthority> grantedAuths = new ArrayList<GrantedAuthority>();
@@ -163,11 +152,11 @@ public class LoginController implements AuthenticationEntryPoint {
 			SecurityContextHolder.getContext()
 					.setAuthentication(authentication);
 
+			return "redirect:/";
 		} else {
 			response.setStatus(403);
-			return "login";
+			return "/status/403";
 		}
-		return "login";
 	}
 
 	@Override

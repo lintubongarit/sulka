@@ -1,19 +1,12 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<%@ page pageEncoding="UTF-8" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<!DOCTYPE HTML>
 <html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Insert title here</title>
-</head>
-<body>
-
-	<c:out value="${msg}"></c:out>
-	<br/>
-	<img alt="404-bird" src="${pageContext.request.contextPath}/resources/img/404-bird.jpg">
-	<br/>
-	<a href="http://lintuvaara.ihku.fi">Click here to authenticate in Lintuvaara</a>
-</body>
+	<head>
+		<title>Sulka - Kirjaudu sisään</title>
+	</head>
+	<body>
+		<img alt="404-bird" src="<c:url value="/resources/img/404-bird.jpg" />" style="float:right">
+		<h1>Virhe 401: Kirjaudu sisään ensin</h1>
+	</body>
 </html>

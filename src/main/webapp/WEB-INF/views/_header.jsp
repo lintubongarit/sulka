@@ -1,6 +1,6 @@
 <%@ page pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<div class="global-toolbar">
+<div id="global-toolbar">
 	<img src="<c:url value="/resources/img/luonnontieteellinen_keskusmuseo.gif"/>" class="global-toolbar-lumo" />
 	<img src="<c:url value="/resources/img/sulka_logo.png"/>" class="global-toolbar-logo" />
 	<div class="global-toolbar-user">

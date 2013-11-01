@@ -34,10 +34,10 @@
 
     function wrapHandler(handler) {
       return function () {
-        if (!sulka.inHandler) {
-          sulka.inHandler = true;
+        if (!_inHandler) {
+          _inHandler = true;
           handler.apply(this, arguments);
-          sulka.inHandler = false;
+          _inHandler = false;
         }
       };
     }
@@ -54,7 +54,7 @@
 
     function rowsToRanges(rows) {
       var ranges = [];
-      var lastCell = sulka.grid.getColumns().length - 1;
+      var lastCell = _grid.getColumns().length - 1;
       for (var i = 0; i < rows.length; i++) {
         ranges.push(new Slick.Range(rows[i], 0, rows[i], lastCell));
       }
@@ -90,17 +90,17 @@
     }
 
     function handleActiveCellChange(e, data) {
-      if (sulka.options.selectActiveRow && data.row != null) {
-        setSelectedRanges([new Slick.Range(data.row, 0, data.row, sulka.grid.getColumns().length - 1)]);
+      if (_options.selectActiveRow && data.row != null) {
+        setSelectedRanges([new Slick.Range(data.row, 0, data.row, _grid.getColumns().length - 1)]);
       }
     }
 
     function handleKeyDown(e) {
-      var activeRow = sulka.grid.getActiveCell();
+      var activeRow = _grid.getActiveCell();
       if (activeRow && e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey && (e.which == 38 || e.which == 40)) {
         var selectedRows = getSelectedRows();
         selectedRows.sort(function (x, y) {
-          return x - y;
+          return x - y
         });
 
         if (!selectedRows.length) {
@@ -117,8 +117,8 @@
           active = activeRow.row < bottom ? --bottom : --top;
         }
 
-        if (active >= 0 && active < sulka.grid.getDataLength()) {
-          sulka.grid.scrollRowIntoView(active);
+        if (active >= 0 && active < _grid.getDataLength()) {
+          _grid.scrollRowIntoView(active);
           _ranges = rowsToRanges(getRowsRange(top, bottom));
           setSelectedRanges(_ranges);
         }
@@ -129,12 +129,12 @@
     }
 
     function handleClick(e) {
-      var cell = sulka.grid.getCellFromEvent(e);
-      if (!cell || !sulka.grid.canCellBeActive(cell.row, cell.cell)) {
+      var cell = _grid.getCellFromEvent(e);
+      if (!cell || !_grid.canCellBeActive(cell.row, cell.cell)) {
         return false;
       }
 
-      if (!sulka.grid.getOptions().multiSelect || (
+      if (!_grid.getOptions().multiSelect || (
           !e.ctrlKey && !e.shiftKey && !e.metaKey)) {
         return false;
       }
@@ -144,12 +144,12 @@
 
       if (idx === -1 && (e.ctrlKey || e.metaKey)) {
         selection.push(cell.row);
-        sulka.grid.setActiveCell(cell.row, cell.cell);
+        _grid.setActiveCell(cell.row, cell.cell);
       } else if (idx !== -1 && (e.ctrlKey || e.metaKey)) {
         selection = $.grep(selection, function (o, i) {
           return (o !== cell.row);
         });
-        sulka.grid.setActiveCell(cell.row, cell.cell);
+        _grid.setActiveCell(cell.row, cell.cell);
       } else if (selection.length && e.shiftKey) {
         var last = selection.pop();
         var from = Math.min(cell.row, last);
@@ -161,7 +161,7 @@
           }
         }
         selection.push(last);
-        sulka.grid.setActiveCell(cell.row, cell.cell);
+        _grid.setActiveCell(cell.row, cell.cell);
       }
 
       _ranges = rowsToRanges(selection);
