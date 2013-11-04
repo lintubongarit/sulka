@@ -469,7 +469,7 @@ sulka = {
 			var data = args.grid.getData();
 	        var item = args.item;
 	        $.extend(item, {
-	        	rowStatus: "inputrow"
+	        	rowStatus: "inputRow"
 	          });
 	        var column = args.column;
 	        args.grid.invalidateRow(data.length);
@@ -558,33 +558,31 @@ sulka = {
 		return filters;
 	},
 	
-	
+	/**
+	 * When cell is changed, this function is called.
+	 * Adds row to SULKA-database
+	 */
 	onCellChange: function(e, args){
-		    //var item = args.item;
-		    //var column = args.cell;       
-		    //var row = args.row;
 		    var data = sulka.grid.getData();
-
-		    var value = data[args.row];
+		    var actualRowData = data[args.row];
 		    var rowStatus = args.item.rowStatus;
-		    var dataString = JSON.stringify(value);
 		    
-		    var JSONData = {		   
-		    		userId: value.ringer,
-		    		row: dataString
-		    }
-		    
-		    if (rowStatus == "inputrow"){
-		    	sulka.API.addRingingRow();
+		    if (rowStatus == "inputRow"){
+		    	var testObject = {};
+		    	if(actualRowData.hasOwnProperty("databaseID")){
+		    		testObject.id = actualRowData.databaseID;
+		    		testObject.userId = actualRowData.ringer;
+		    	}
+		    	testObject.row = JSON.stringify(actualRowData);
+		    	
+		    	sulka.API.addRingingRow(
+		    			testObject,
+		    			args.row
+		    	);
 		    }
 		    else{
 		    	return;
 		    }
-		    
-//		    grid.invalidateRow(data.length);
-//		    data.push(item);
-//		    grid.updateRowCount();
-//		    grid.render();
 	},
 	
 	/**
@@ -605,6 +603,9 @@ sulka = {
 		}
 	},
 	
+	/**
+	 * Gets the wanted rows mode from the checkboxes in filters-form
+	 */
 	validate: function() {
 		var selectedRows = sulka.grid.getSelectedRows();
 		if (selectedRows.length == 0) return;
