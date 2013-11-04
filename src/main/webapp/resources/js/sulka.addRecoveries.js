@@ -2,6 +2,8 @@ sulka.addRecovery = function(addRecovery) {
 
 	sulka.viewMode = "recoveries";
 	
+	sulka.addMode = "recovery";
+	
 	sulka.gridOptions.editable = true;
 	sulka.gridOptions.enableAddRow = true;
 	sulka.gridOptions.autoEdit = false;

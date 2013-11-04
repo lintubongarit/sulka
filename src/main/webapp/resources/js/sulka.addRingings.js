@@ -2,6 +2,8 @@ sulka.addRinging = function(addRinging) {
 
 	sulka.viewMode = "ringings";
 	
+	sulka.addMode = "ringing";
+	
 	sulka.gridOptions.editable = true;
 	sulka.gridOptions.enableAddRow = true;
 	sulka.gridOptions.autoEdit = false;

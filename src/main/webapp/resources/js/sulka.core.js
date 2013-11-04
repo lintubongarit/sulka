@@ -531,7 +531,7 @@ sulka = {
 	 * Adds row to sulka-database
 	 */
 	addToSulkaDB: function (args) {
-		var data = sulka.grid.getData();
+		var data = sulka.grid.getData();		
 		var actualRowData = data[args.row];
 	    var rowStatus = args.item.rowStatus;
 	    
@@ -543,7 +543,7 @@ sulka = {
 	    	}
 	    	testObject.row = JSON.stringify(actualRowData);
 	    	
-	    	sulka.API.addRingingRow(
+	    	sulka.API.addRow(
 	    			testObject,
 	    			args.row
 	    	);
@@ -574,7 +574,6 @@ sulka = {
 	validate: function() {
 		var selectedRows = sulka.grid.getSelectedRows();
 		if (selectedRows.length == 0) return;
-		console.log(selectedRows[0]);
 		sulka.helpers.unsetErrorAndShowLoader();
 		var selectedRow = sulka.grid.getData()[selectedRows[0]];
 		sulka.API.validate(
@@ -588,7 +587,6 @@ sulka = {
 					var errorString = sulka.strings.invalidRow + ": ";
 					for (var errorField in data.errors) if (data.errors.hasOwnProperty(errorField)) {
 						var errorArray = data.errors[errorField];
-						console.log("field", errorField, "errorArray", errorArray);
 						errorString = errorString.concat('(' + errorField + ': ' + errorArray[0].errorName + '), ');
 					}
 					sulka.helpers.hideLoaderAndSetError(errorString);
