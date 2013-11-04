@@ -32,7 +32,7 @@ public class RingingRepositoryTest {
 	
 	@Test
 	public void testDefinedRowDataIsKept(){
-		String rowData = "asdölkjaeoårids";
+		String rowData = "asdfasdfasdf";
 		DatabaseRow row = new DatabaseRow();
 		row.setRow(rowData);  
 		  
