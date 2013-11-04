@@ -9,17 +9,24 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+@JsonIgnoreProperties(ignoreUnknown=false)
 @Entity
 @Table(name="Ringings")
 public class DatabaseRow implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
+	@JsonProperty("id")
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "id")
 	private Long id;
+	@JsonProperty("userId")
 	@Column(name = "userId")
 	private String userId;
+	@JsonProperty("row")
 	@Column(name = "row")
 	private String row;
 	

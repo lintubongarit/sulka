@@ -2,9 +2,11 @@ sulka.addRinging = function(addRinging) {
 
 	sulka.viewMode = "ringings";
 	
+	sulka.addMode = "ringing";
+	
 	sulka.gridOptions.editable = true;
 	sulka.gridOptions.enableAddRow = true;
-	sulka.gridOptions.autoEdit = true;
+	sulka.gridOptions.autoEdit = false;
 	
 	sulka.columnOptions.editor = Slick.Editors.Text;
 	

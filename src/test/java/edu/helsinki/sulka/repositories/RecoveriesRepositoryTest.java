@@ -33,7 +33,7 @@ public class RecoveriesRepositoryTest {
 	
 	@Test
 	public void testDefinedRowDataIsKept(){
-		String rowData = "asdölkjaeoårids";
+		String rowData = "asdolkjaeoprids";
 		DatabaseRow row = new DatabaseRow();
 		row.setRow(rowData);  
 		  

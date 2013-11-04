@@ -14,10 +14,8 @@ sulka = {
 	gridOptions: {
 		enableCellNavigation: true,
 		enableColumnReorder: true,
-		multiColumnSort: true,
 	    editable: false,
 	    enableAddRow: false,
-	    enableCellNavigation: true,
 	    asyncEditorLoading: false,
 	    autoEdit: false
 	},
@@ -38,6 +36,7 @@ sulka = {
 	 * Called at start, when the document has fully loaded.
 	 */
 	init: function () {
+		sulka.helpers.disableSelection($(".context-menu"));
 		sulka.initEventHandlers();
 		sulka.initColumns(); // Calls initGrid when done
 	},
@@ -136,7 +135,7 @@ sulka = {
 							$sulkaFlexible: isFlexible,
 						}, sulka.columnOptions);
 						columns.push(column);
-						
+
 						var contextItem = $("<li></li>")
 							.addClass("context-menu-item")
 							.append(
@@ -167,6 +166,8 @@ sulka = {
 		// We are now ready to actually initialize the grid
 		sulka.grid = new Slick.Grid("#slick-grid", [], sulka.getVisibleColumns(), sulka.gridOptions);
 		
+		sulka.viewport = $("#slick-grid").find(".slick-viewport");
+		
 		sulka.grid.setSelectionModel(new Slick.CellSelectionModel());
 		
 	
@@ -174,17 +175,19 @@ sulka = {
 		sulka.grid.registerPlugin(new Slick.AutoTooltips());
 
 	    // set keyboard focus on the grid
-		sulka.grid.getCanvasNode().focus();
+		$(sulka.grid.getCanvasNode()).focus();
 		
 		sulka.copyManager = new Slick.CellCopyManager();
 		sulka.grid.registerPlugin(sulka.copyManager);
 		
-		sulka.initColumnGroups();
+		sulka.grid.$columnGroups = new sulka.groups(sulka.grid, $("#slick-grid"));
+		
+		sulka.freeze.init();
 		
 		sulka.grid.onHeaderContextMenu.subscribe(sulka.showColumnHeaderContextMenu);
 		$("#header-context-menu li.context-menu-item").click(sulka.headerContextMenuItemClicked);
 		
-		sulka.grid.setSelectionModel(new Slick.RowSelectionModel());
+		//sulka.grid.setSelectionModel(new Slick.RowSelectionModel());
 		
 		sulka.copyManager.onPasteCells.subscribe(sulka.onPasteCells);
 		
@@ -192,8 +195,12 @@ sulka = {
 		
 		sulka.grid.onAddNewRow.subscribe(sulka.onAddNewRow);
 		
+		sulka.grid.onCellChange.subscribe(sulka.onCellChange);
+		
 		$(window).resize(sulka.resizeGrid);
 		sulka.resizeGrid();
+		
+		$("#slick-grid").mousewheel(sulka.onMouseWheel);
 		
 		sulka.reloadData();
 	},
@@ -203,16 +210,36 @@ sulka = {
 	 */
 	resizeGrid: function () {
 		setTimeout(function () {
+			sulka.freeze.resize();
+			
 			var y = $("#row-status-box-container").offset().top + $("#row-status-box-container").outerHeight();
-			var width = $(window).width();
-				
+			var x = sulka.freeze.getWidth(); 
+			var width = $(window).width() - x;
+			
 			$("#slick-grid").css({
+				left: x + "px",
 				top: y + "px",
 				width: width + "px"
 			});
 			
+			sulka.freeze.position(y);
 			sulka.grid.resizeCanvas();
 		}, 100);
+	},
+	
+	viewport: null,
+	
+	MOUSE_WHEEL_ROW_HEIGHT: 25,
+	MOUSE_WHEEL_SCROLL_ROWS: 3,
+	/**
+	 * Handle mouse wheel events.
+	 */
+	onMouseWheel: function (event, delta, deltaX, deltaY) {
+		event.preventDefault();
+		if (deltaY !== 0) {
+			sulka.viewport.scrollTop(Math.max(0, sulka.viewport.scrollTop() - 
+					deltaY*sulka.MOUSE_WHEEL_SCROLL_ROWS*sulka.MOUSE_WHEEL_ROW_HEIGHT));
+		}
 	},
 	
 	/**
@@ -232,22 +259,24 @@ sulka = {
 	 * Called by SlickGrid when the grid needs to be sorted. 
 	 */
 	onGridSort: function (event, args) {
+		sulka.freeze.removeSortMarkers();
+		sulka.sort(args);
+	},
+	
+	/**
+	 * Sort grid by cols.
+	 */
+	sort: function (args) {
 		var data = sulka.grid.getData();
-	    var cols = args.sortCols;
 	    
+		var sign = args.sortAsc ? 1 : -1;
+		var field = args.sortCol.field;
 		data.sort(function (dataRow1, dataRow2) {
-			for (var i = 0, l = cols.length; i < l; i++) {
-				var field = cols[i].sortCol.field;
-				var sign = cols[i].sortAsc ? 1 : -1;
-				var value1 = dataRow1[field], value2 = dataRow2[field];
-				var result = (value1 == value2 ? 0 : (value1 > value2 ? 1 : -1)) * sign;
-				if (result != 0) {
-					return result;
-				}
-		    }
-		    return 0;
+			var value1 = dataRow1[field], value2 = dataRow2[field];
+			return (value1 == value2) ? 0 : (sign * (value1 > value2 ? 1 : -1));
 		});
 		sulka.grid.invalidate();
+		sulka.freeze.invalidate();
 	},
 	
 	
@@ -271,8 +300,6 @@ sulka = {
 	      grid.render();
 	    });
 	},
-	
-	
 	
 	CONTEXT_HEIGHT_ADJUST: 6,
 	/**
@@ -344,89 +371,22 @@ sulka = {
 		}
 	},
 	
-	columnGroupsDiv: null,
-	/**
-	 * Called once at start to initialize column group rendering after columns have been
-	 * fetched.
-	 */
-	initColumnGroups: function () {
-		sulka.columnGroupsDiv = $(
-			'<div></div>'
-		).addClass(
-			'column-group-headers'
-		).insertBefore(
-			'#slick-grid div.slick-header div.slick-header-columns:first-child'
-		);
-		sulka.helpers.disableSelection(sulka.columnGroupsDiv);
-		sulka.grid.onColumnsResized.subscribe(sulka.renderColumnGroups);
-		sulka.grid.onColumnsReordered.subscribe(sulka.renderColumnGroups);
-		sulka.renderColumnGroups();
-	},
-	
-	COL_GROUP_OUTSIDE_WIDTH: 9,
-	/**
-	 * Create column group element. 
-	 */
-	_makeColumnGroup: function (name, description, width) {
-		return $(
-			'<div></div>'
-		).addClass(
-			'column-group-header'
-		).append(
-			$(
-				'<span></span>'
-			).addClass(
-				'column-group-name'
-			).text(
-				description
-			).attr(
-				"title",
-				description
-			)
-		).css(
-				"width",
-				(width - sulka.COL_GROUP_OUTSIDE_WIDTH) + "px"
-		).data(
-			"sulka.group.id",
-			name
-		);
-	},
-	
-	SLICK_WIDTH_ADJUST: -1000,
 	/**
 	 * Called whenever column groups need to be re-rendered.
 	 */
 	renderColumnGroups: function () {
-		var columns = sulka.grid.getColumns(),
-			groupDivs = [];
-		
-		var currentGroup = null,
-			currentGroupWidth = 0;
-		
-		$.each(columns, function () {
-			if (currentGroup === this.$sulkaGroup) {
-				currentGroupWidth += this.width;
-			} else {
-				if (currentGroup !== null) {
-					groupDivs.push(sulka._makeColumnGroup(currentGroup.name, currentGroup.description, currentGroupWidth));
-				}
-				currentGroup = this.$sulkaGroup;
-				currentGroupWidth = this.width;
-			}
-		});
-		if (currentGroup !== null) {
-			groupDivs.push(sulka._makeColumnGroup(currentGroup.name, currentGroup.description, currentGroupWidth));
-		}
-		
-		sulka.columnGroupsDiv.empty().css(
-			"width",
-			($(".slick-header-columns").width() + sulka.SLICK_WIDTH_ADJUST) + "px" 
-		).append(
-			groupDivs
-		);
+		if (sulka.grid && sulka.grid.$columnGroups) sulka.grid.$columnGroups.render();
+		sulka.freeze.renderColumnGroups();
 	},
 	
-    	
+	/**
+	 * Set grid data and render.
+	 */
+	setData: function (rows) {
+		sulka.grid.setData(rows);
+		sulka.grid.render();
+		sulka.freeze.setData(rows);
+	},
 	
 	/**
 	 * Reload all data to table, applying new filters etc.
@@ -442,8 +402,7 @@ sulka = {
 		var filters = sulka.getFilters();
 		if (typeof(filters) === "string") {
 			sulka.helpers.hideLoaderAndSetError(filters);
-			sulka.grid.setData([]);
-			sulka.grid.render();
+			sulka.setData([]);
 			return;
 		}
 		
@@ -461,21 +420,10 @@ sulka = {
 				if (rows.length > 0) {
 					sulka.adjustFlexibleCols(rows);
 				}
-				sulka.grid.setData(rows);
-				sulka.grid.render();
+				sulka.setData(rows);
 			},
 			sulka.helpers.hideLoaderAndSetError
 		);
-	},
-	
-	onAddNewRow: function(event, args){
-			var data = sulka.grid.getData();
-	        var item = args.item;
-	        var column = args.column;
-	        sulka.grid.invalidateRow(data.length);
-	        data.push(item);
-	        sulka.grid.updateRowCount();
-	        sulka.grid.render();
 	},
 	
 	/**
@@ -559,6 +507,55 @@ sulka = {
 	},
 	
 	/**
+	 * When new row is added, this function is called.
+	 * uses addToSulkaDB() to add row to sulka-database
+	 */
+	onAddNewRow: function(event, args){
+			var data = sulka.grid.getData();
+	        var item = args.item;
+	        item.rowStatus = "inputRow";
+	        args.row = sulka.grid.getData().length;
+	        
+	        sulka.grid.invalidateRow(data.length);
+	        data.push(item);
+	        sulka.grid.updateRowCount();
+	        sulka.grid.render();
+	        
+	        sulka.addToSulkaDB(args);
+	},
+	
+	/**
+	 * When cell is changed, this function is called.
+	 * uses addToSulkaDB() to add row to sulka-database
+	 */
+	onCellChange: function(event, args){
+		sulka.addToSulkaDB(args);
+	},
+	
+	/**
+	 * Adds row to sulka-database
+	 */
+	addToSulkaDB: function (args) {
+		var data = sulka.grid.getData();		
+		var actualRowData = data[args.row];
+	    var rowStatus = args.item.rowStatus;
+	    
+	    if (rowStatus == "inputRow"){
+	    	var testObject = {};
+	    	if(actualRowData.hasOwnProperty("databaseID")){
+	    		testObject.id = actualRowData.databaseID;
+	    		testObject.userId = actualRowData.ringer;
+	    	}
+	    	testObject.row = JSON.stringify(actualRowData);
+	    	
+	    	sulka.API.addRow(
+	    			testObject,
+	    			args.row
+	    	);
+	    }
+	},
+	
+	/**
 	 * Gets the wanted rows mode from the checkboxes in filters-form
 	 */
 	getRowMode: function () {
@@ -576,10 +573,12 @@ sulka = {
 		}
 	},
 	
+	/**
+	 * validates selected row
+	 */
 	validate: function() {
 		var selectedRows = sulka.grid.getSelectedRows();
 		if (selectedRows.length == 0) return;
-		console.log(selectedRows[0]);
 		sulka.helpers.unsetErrorAndShowLoader();
 		var selectedRow = sulka.grid.getData()[selectedRows[0]];
 		sulka.API.validate(
@@ -588,12 +587,11 @@ sulka = {
 				sulka.helpers.hideLoaderAndUnsetError();
 				
 				if (data.passes){
-					sulka.helpers.hideLoaderAndSetError('Rivi on validi');
+					sulka.helpers.hideLoaderAndSetError(sulka.strings.validRow);
 				} else {
-					var errorString = "RIVI EI OLE VALIDI: ";
+					var errorString = sulka.strings.invalidRow + ": ";
 					for (var errorField in data.errors) if (data.errors.hasOwnProperty(errorField)) {
 						var errorArray = data.errors[errorField];
-						console.log("field", errorField, "errorArray", errorArray);
 						errorString = errorString.concat('(' + errorField + ': ' + errorArray[0].errorName + '), ');
 					}
 					sulka.helpers.hideLoaderAndSetError(errorString);
@@ -611,3 +609,4 @@ return sulka; }();
 
 /* Launch sulka.init() on DOM complete */
 $(sulka.init);
+
