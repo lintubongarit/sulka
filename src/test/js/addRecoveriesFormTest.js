@@ -1,6 +1,6 @@
 var moment = require('lib/moment.min.js');
 
-casper.test.begin('addRecoveries pages form tests', 11, function suite(test) {
+casper.test.begin('addRecoveries pages form tests', 12, function suite(test) {
     browse('/addRecoveries', function () {
     	// Data loading and filtering
 		
@@ -46,6 +46,10 @@ casper.test.begin('addRecoveries pages form tests', 11, function suite(test) {
 		}).then(function (){
 			this.test.assertExists('button#validate', 
 			'The "validate" button exists.');
+		}).then(function (){
+			this.test.assertExists('button#remove', 
+			'The "poistarivi" button exists.');
+
 		});
 
 	    });

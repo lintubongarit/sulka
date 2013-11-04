@@ -20,10 +20,11 @@
 		<script src="resources/js/lib/plugins/slick.cellselectionmodel.js"></script>
 		<script src="resources/js/lib/plugins/slick.cellcopymanager.js"></script>
 		<script src="resources/js/lib/plugins/slick.rowselectionmodel.js"></script>
+		<script src="resources/js/lib/slick.core.js"></script>
 		<script src="resources/js/lib/slick.editors.js"></script>
 		<script src="resources/js/lib/slick.core.js"></script>
 		<script src="resources/js/lib/slick.grid.js"></script>
-		<script src="resources/js/lib/slick.rowselectionmodel.js"></script>
+		<script src="resources/js/lib/slick.editors.js"></script>
 		<script src="resources/js/sulka.core.js"></script>
 		<script src="resources/js/sulka.strings.js"></script>
 		<script src="resources/js/sulka.helpers.js"></script>
@@ -49,6 +50,7 @@
 				<td>
 					<button type="button"  id="validate" class="local-toolbar-menu" onclick="sulka.validate();">Validoi</button>
 					<button type="button" class="local-toolbar-menu" value="new row" onclick="sulka.addRow();">Lisää rivi</button>
+					<button type="button" id="remove" class="local-toolbar-menu" value="remove row" onclick="sulka.removeRow();">Poista rivi</button>
 				</td>
 			</tr>
 		</table>

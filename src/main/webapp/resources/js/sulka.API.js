@@ -138,16 +138,15 @@ sulka.API = function(API) {
 		},
 		
 				
-		addRingingRow: function(row, slickRowId){
+		addRow: function(row, slickRowId){
 			$.ajax({
-				url : API.BASE + "/storage/ringing" ,
+				url : API.BASE + "/storage/" + sulka.addMode ,
 				dataType : 'json',
 				data: JSON.stringify(row),
 				contentType: "application/json;charset=UTF-8",
 				type: "POST",
 				success : function(data){
 					sulka.grid.getData()[slickRowId].databaseID = data.object.id;
-					console.log(sulka.grid.getData()[slickRowId].databaseID);
 				},
 				error : API._jQueryErrorHandler("Riviä ei voitu lisätä"),
 			});

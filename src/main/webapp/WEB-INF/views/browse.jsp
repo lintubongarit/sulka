@@ -19,10 +19,13 @@
 		<script src="resources/js/lib/plugins/slick.cellrangeselector.js"></script>
 		<script src="resources/js/lib/plugins/slick.cellcopymanager.js"></script>
 		<script src="resources/js/lib/plugins/slick.cellselectionmodel.js"></script>
+		<script src="resources/js/lib/plugins/slick.checkboxselectcolumn.js"></script>
 		<script src="resources/js/lib/plugins/slick.rowselectionmodel.js"></script>
+		<script src="resources/js/lib/plugins/slick.columnpicker.js"></script>
 		<script src="resources/js/lib/slick.core.js"></script>
 		<script src="resources/js/lib/slick.editors.js"></script>
 		<script src="resources/js/lib/slick.grid.js"></script>
+		<script src="resources/js/lib/slick.editors.js"></script>
 		<script src="resources/js/sulka.core.js"></script>
 		<script src="resources/js/sulka.strings.js"></script>
 		<script src="resources/js/sulka.helpers.js"></script>
@@ -37,8 +40,8 @@
 				<td>
 					<form id="filters">
 					    <sec:authorize access="hasRole('ADMIN')">
-        					Rengastaja: <input type="text" id="filters-ringer" name="ringer" />
-    					</sec:authorize>
+        				Rengastaja: <input type="text" id="filters-ringer" name="ringer"/>
+        				</sec:authorize>
 						Aika (esim. 2005 tai 2005-2006): <input type="text" id="filters-date" name="date" />
 						Laji: <input type="text" id="filters-species" name="species" />
 						Kunta: <input type="text" id="filters-municipality" name="municipality" />

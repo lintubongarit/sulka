@@ -86,10 +86,11 @@ sulka = {
 			sulka.viewMode,
 			function (fieldGroups) {
 				sulka.helpers.hideLoaderAndUnsetError();
-				
-				sulka.fieldGroups = fieldGroups;
 				var columns = [];
+				sulka.fieldGroups = fieldGroups;
+				
 				var $headerContextMenu = $("#header-context-menu");
+				
 				$.each(fieldGroups, function () {
 					var group = this;
 					
@@ -120,7 +121,7 @@ sulka = {
 							width = Math.min(
 									sulka.COL_MAX_WIDTH, sulka.getRenderedTextWidth(field.name) + sulka.COL_PADDING);
 						}
-						
+					
 						var column = $.extend({
 							id: id,
 							field: field.field,
@@ -129,6 +130,8 @@ sulka = {
 							width: width,
 							$sulkaGroup: group,
 							// Flexible columns are resized on next data fetch
+							$sulkaFlexible: isFlexible,
+							editor: Slick.Editors.Text,
 							$sulkaFlexible: isFlexible,
 						}, sulka.columnOptions);
 						columns.push(column);
@@ -153,7 +156,7 @@ sulka = {
 				sulka.initGrid();
 			},
 			sulka.helpers.hideLoaderAndSetError
-		);
+		); 
 	},
 	
 	/**
@@ -167,6 +170,8 @@ sulka = {
 		
 		sulka.grid.setSelectionModel(new Slick.CellSelectionModel());
 		
+	
+	    
 		sulka.grid.registerPlugin(new Slick.AutoTooltips());
 
 	    // set keyboard focus on the grid
@@ -402,10 +407,6 @@ sulka = {
 		}
 		
 		sulka.helpers.unsetErrorAndShowLoader();
-		sulka.fetchRows();
-	},
-	
-	fetchRows: function () {
 		sulka.API.fetchRows(
 				sulka.rowsMode,
 				filters,
@@ -423,19 +424,6 @@ sulka = {
 				},
 				sulka.helpers.hideLoaderAndSetError
 			);
-	},
-	
-	onAddNewRow: function(event, args){
-			var data = args.grid.getData();
-	        var item = args.item;
-	        $.extend(item, {
-	        	rowStatus: "inputRow"
-	          });
-	        //var column = args.column;
-	        args.grid.invalidateRow(data.length);
-	        data.push(item);
-	        args.grid.updateRowCount();
-	        args.grid.render();
 	},
 	
 	/**
@@ -519,30 +507,52 @@ sulka = {
 	},
 	
 	/**
-	 * When cell is changed, this function is called.
-	 * Adds row to SULKA-database
+	 * When new row is added, this function is called.
+	 * uses addToSulkaDB() to add row to sulka-database
 	 */
-	onCellChange: function(e, args){
-		    var data = sulka.grid.getData();
-		    var actualRowData = data[args.row];
-		    var rowStatus = args.item.rowStatus;
-		    
-		    if (rowStatus == "inputRow"){
-		    	var testObject = {};
-		    	if(actualRowData.hasOwnProperty("databaseID")){
-		    		testObject.id = actualRowData.databaseID;
-		    		testObject.userId = actualRowData.ringer;
-		    	}
-		    	testObject.row = JSON.stringify(actualRowData);
-		    	
-		    	sulka.API.addRingingRow(
-		    			testObject,
-		    			args.row
-		    	);
-		    }
-		    else{
-		    	return;
-		    }
+	onAddNewRow: function(event, args){
+			var data = sulka.grid.getData();
+	        var item = args.item;
+	        item.rowStatus = "inputRow";
+	        args.row = sulka.grid.getData().length;
+	        
+	        sulka.grid.invalidateRow(data.length);
+	        data.push(item);
+	        sulka.grid.updateRowCount();
+	        sulka.grid.render();
+	        
+	        sulka.addToSulkaDB(args);
+	},
+	
+	/**
+	 * When cell is changed, this function is called.
+	 * uses addToSulkaDB() to add row to sulka-database
+	 */
+	onCellChange: function(event, args){
+		sulka.addToSulkaDB(args);
+	},
+	
+	/**
+	 * Adds row to sulka-database
+	 */
+	addToSulkaDB: function (args) {
+		var data = sulka.grid.getData();		
+		var actualRowData = data[args.row];
+	    var rowStatus = args.item.rowStatus;
+	    
+	    if (rowStatus == "inputRow"){
+	    	var testObject = {};
+	    	if(actualRowData.hasOwnProperty("databaseID")){
+	    		testObject.id = actualRowData.databaseID;
+	    		testObject.userId = actualRowData.ringer;
+	    	}
+	    	testObject.row = JSON.stringify(actualRowData);
+	    	
+	    	sulka.API.addRow(
+	    			testObject,
+	    			args.row
+	    	);
+	    }
 	},
 	
 	/**
@@ -564,12 +574,11 @@ sulka = {
 	},
 	
 	/**
-	 * Gets the wanted rows mode from the checkboxes in filters-form
+	 * validates selected row
 	 */
 	validate: function() {
 		var selectedRows = sulka.grid.getSelectedRows();
 		if (selectedRows.length == 0) return;
-		console.log(selectedRows[0]);
 		sulka.helpers.unsetErrorAndShowLoader();
 		var selectedRow = sulka.grid.getData()[selectedRows[0]];
 		sulka.API.validate(
@@ -583,7 +592,6 @@ sulka = {
 					var errorString = sulka.strings.invalidRow + ": ";
 					for (var errorField in data.errors) if (data.errors.hasOwnProperty(errorField)) {
 						var errorArray = data.errors[errorField];
-						console.log("field", errorField, "errorArray", errorArray);
 						errorString = errorString.concat('(' + errorField + ': ' + errorArray[0].errorName + '), ');
 					}
 					sulka.helpers.hideLoaderAndSetError(errorString);

@@ -2,11 +2,13 @@ sulka.addRecovery = function(addRecovery) {
 
 	sulka.viewMode = "recoveries";
 	
+	sulka.addMode = "recovery";
+	
 	sulka.gridOptions.editable = true;
 	sulka.gridOptions.enableAddRow = true;
 	sulka.gridOptions.autoEdit = false;
 	
-	sulka.columnOptions.editor = Slick.Editors.LongText;
+	sulka.columnOptions.editor = Slick.Editors.Text;
 	
 	sulka.getRowMode = function() {
 		sulka.rowsMode = "recoveries";

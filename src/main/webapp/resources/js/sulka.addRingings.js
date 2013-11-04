@@ -2,11 +2,13 @@ sulka.addRinging = function(addRinging) {
 
 	sulka.viewMode = "ringings";
 	
+	sulka.addMode = "ringing";
+	
 	sulka.gridOptions.editable = true;
 	sulka.gridOptions.enableAddRow = true;
 	sulka.gridOptions.autoEdit = false;
 	
-	sulka.columnOptions.editor = Slick.Editors.LongText;
+	sulka.columnOptions.editor = Slick.Editors.Text;
 	
 	sulka.getRowMode = function() {
 		sulka.rowsMode = "ringings";
@@ -20,12 +22,31 @@ sulka.addRinging = function(addRinging) {
 		sulka.grid.render();
 	};
 	
-	sulka.fetchRows = function () {
+	
+	
+	/**
+	 * Reload all data to table, applying new filters etc.
+	 */
+	sulka.reloadData =  function () {
+		// Grid not yet initialised?
+		if (sulka.grid === null) return;
+		
+		sulka.helpers.unsetErrorAndShowLoader();
+		
+		sulka.getRowMode();
+		
+		var filters = sulka.getFilters();
+		if (typeof(filters) === "string") {
+			sulka.helpers.hideLoaderAndSetError(filters);
+			sulka.setData([]);
+			return;
+		}
+		
+		sulka.helpers.unsetErrorAndShowLoader();
 		sulka.API.fetchSulkaDBRows(
 				sulka.rowsMode,
 				filters,
 				function (rows) {
-					
 					//console.log(JSON.stringify(rows));
 					
 					if (rows.length == 0) {
@@ -51,30 +72,6 @@ sulka.addRinging = function(addRinging) {
 				},
 				sulka.helpers.hideLoaderAndSetError
 			);
-	};
-	
-	
-	
-	/**
-	 * Reload all data to table, applying new filters etc.
-	 */
-	sulka.reloadData =  function () {
-		// Grid not yet initialised?
-		if (sulka.grid === null) return;
-		
-		sulka.helpers.unsetErrorAndShowLoader();
-		
-		sulka.getRowMode();
-		
-		var filters = sulka.getFilters();
-		if (typeof(filters) === "string") {
-			sulka.helpers.hideLoaderAndSetError(filters);
-			sulka.setData([]);
-			return;
-		}
-		
-		sulka.helpers.unsetErrorAndShowLoader();
-		sulka.fetchRows();
 	};
 	
 }();
