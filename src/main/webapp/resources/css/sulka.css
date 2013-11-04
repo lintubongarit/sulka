@@ -293,3 +293,10 @@ span#last-error {
 .slick-row.odd {
   background: #fafafa;
 }
+
+.slick-cell-checkboxsel {
+      background: #f0f0f0;
+      border-right-color: silver;
+      border-right-style: solid;
+}
+  

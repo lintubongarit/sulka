@@ -87,10 +87,11 @@ sulka = {
 			sulka.viewMode,
 			function (fieldGroups) {
 				sulka.helpers.hideLoaderAndUnsetError();
-				
-				sulka.fieldGroups = fieldGroups;
 				var columns = [];
+				sulka.fieldGroups = fieldGroups;
+				
 				var $headerContextMenu = $("#header-context-menu");
+				
 				$.each(fieldGroups, function () {
 					var group = this;
 					
@@ -121,7 +122,7 @@ sulka = {
 							width = Math.min(
 									sulka.COL_MAX_WIDTH, sulka.getRenderedTextWidth(field.name) + sulka.COL_PADDING);
 						}
-						
+					
 						var column = $.extend({
 							id: id,
 							field: field.field,
@@ -153,20 +154,6 @@ sulka = {
 					});
 				});
 				sulka.columns = columns;
-				
-				// We are now ready to actually initialize the grid
-				sulka.grid = new Slick.Grid("#slick-grid", [], sulka.getVisibleColumns(), sulka.gridOptions);
-				
-				sulka.initColumnGroups();
-				sulka.grid.onHeaderContextMenu.subscribe(sulka.columnHeaderContextMenu);
-				$headerContextMenu.find("li.context-menu-item").click(sulka.headerContextMenuItemClicked);
-				sulka.reloadData();
-				sulka.grid.setSelectionModel(new Slick.CellSelectionModel());
-				
-				sulka.grid.onSort.subscribe(sulka.onGridSort);
-				
-				$(window).resize(sulka.resizeGrid);
-				sulka.resizeGrid();
 				sulka.initGrid();
 			},
 			sulka.helpers.hideLoaderAndSetError
@@ -182,6 +169,8 @@ sulka = {
 		
 		sulka.grid.setSelectionModel(new Slick.CellSelectionModel());
 		
+	
+	    
 		sulka.grid.registerPlugin(new Slick.AutoTooltips());
 
 	    // set keyboard focus on the grid
