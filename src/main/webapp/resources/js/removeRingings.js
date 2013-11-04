@@ -8,11 +8,7 @@ sulka.removeRinging = function(removeRinging) {
 
 	sulka.removeRow = function() {
 		//grid.invalidateRow();
-		var data = sulka.grid.getData();
-		data.unshift({});
-		sulka.grid.setData(data);
-		sulka.grid.updateRowCount();
-		sulka.grid.render();
+		
 	};
 
 }();
