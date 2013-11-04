@@ -87,10 +87,11 @@ sulka = {
 			sulka.viewMode,
 			function (fieldGroups) {
 				sulka.helpers.hideLoaderAndUnsetError();
-				
-				sulka.fieldGroups = fieldGroups;
 				var columns = [];
+				sulka.fieldGroups = fieldGroups;
+				
 				var $headerContextMenu = $("#header-context-menu");
+				
 				$.each(fieldGroups, function () {
 					var group = this;
 					
@@ -121,7 +122,7 @@ sulka = {
 							width = Math.min(
 									sulka.COL_MAX_WIDTH, sulka.getRenderedTextWidth(field.name) + sulka.COL_PADDING);
 						}
-						
+					
 						var column = $.extend({
 							id: id,
 							field: field.field,
@@ -170,6 +171,8 @@ sulka = {
 		
 		sulka.grid.setSelectionModel(new Slick.CellSelectionModel());
 		
+	
+	    
 		sulka.grid.registerPlugin(new Slick.AutoTooltips());
 
 	    // set keyboard focus on the grid
