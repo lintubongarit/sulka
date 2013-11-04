@@ -36,12 +36,4 @@
 			<li><a id="add-recoveries-tab" href="<c:url value="/addRecoveries"/>">Kontrollien syöttö</a></li>
 		</c:otherwise>
 	</c:choose>	
-	<c:choose>
-		<c:when test="${selectedTab.equals('removeRingings')}">
-			<li class="current-feature-item"><a id="remove-ringings-tab" href="<c:url value="/removeRingings"/>">Rengastusten poisto</a></li>
-		</c:when>
-		<c:otherwise>
-			<li><a id="remove-ringings-tab" href="<c:url value="/removeRingings"/>">Rengastusten poisto</a></li>
-		</c:otherwise>
-	</c:choose>	
 </ul>
