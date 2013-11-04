@@ -4,7 +4,7 @@ sulka.addRecovery = function(addRecovery) {
 	
 	sulka.gridOptions.editable = true;
 	sulka.gridOptions.enableAddRow = true;
-	sulka.gridOptions.autoEdit = true;
+	sulka.gridOptions.autoEdit = false;
 	
 	sulka.columnOptions.editor = Slick.Editors.Text;
 	

@@ -421,19 +421,6 @@ sulka = {
 		);
 	},
 	
-	onAddNewRow: function(event, args){
-			var data = args.grid.getData();
-	        var item = args.item;
-	        $.extend(item, {
-	        	rowStatus: "inputRow"
-	          });
-	        var column = args.column;
-	        args.grid.invalidateRow(data.length);
-	        data.push(item);
-	        args.grid.updateRowCount();
-	        args.grid.render();
-	},
-	
 	/**
 	 * Adjust flexible columns for new data. 
 	 */
@@ -515,30 +502,52 @@ sulka = {
 	},
 	
 	/**
-	 * When cell is changed, this function is called.
-	 * Adds row to SULKA-database
+	 * When new row is added, this function is called.
+	 * uses addToSulkaDB() to add row to sulka-database
 	 */
-	onCellChange: function(e, args){
-		    var data = sulka.grid.getData();
-		    var actualRowData = data[args.row];
-		    var rowStatus = args.item.rowStatus;
-		    
-		    if (rowStatus == "inputRow"){
-		    	var testObject = {};
-		    	if(actualRowData.hasOwnProperty("databaseID")){
-		    		testObject.id = actualRowData.databaseID;
-		    		testObject.userId = actualRowData.ringer;
-		    	}
-		    	testObject.row = JSON.stringify(actualRowData);
-		    	
-		    	sulka.API.addRingingRow(
-		    			testObject,
-		    			args.row
-		    	);
-		    }
-		    else{
-		    	return;
-		    }
+	onAddNewRow: function(event, args){
+			var data = sulka.grid.getData();
+	        var item = args.item;
+	        item.rowStatus = "inputRow";
+	        args.row = sulka.grid.getData().length;
+	        
+	        sulka.grid.invalidateRow(data.length);
+	        data.push(item);
+	        sulka.grid.updateRowCount();
+	        sulka.grid.render();
+	        
+	        sulka.addToSulkaDB(args);
+	},
+	
+	/**
+	 * When cell is changed, this function is called.
+	 * uses addToSulkaDB() to add row to sulka-database
+	 */
+	onCellChange: function(event, args){
+		sulka.addToSulkaDB(args);
+	},
+	
+	/**
+	 * Adds row to sulka-database
+	 */
+	addToSulkaDB: function (args) {
+		var data = sulka.grid.getData();
+		var actualRowData = data[args.row];
+	    var rowStatus = args.item.rowStatus;
+	    
+	    if (rowStatus == "inputRow"){
+	    	var testObject = {};
+	    	if(actualRowData.hasOwnProperty("databaseID")){
+	    		testObject.id = actualRowData.databaseID;
+	    		testObject.userId = actualRowData.ringer;
+	    	}
+	    	testObject.row = JSON.stringify(actualRowData);
+	    	
+	    	sulka.API.addRingingRow(
+	    			testObject,
+	    			args.row
+	    	);
+	    }
 	},
 	
 	/**
@@ -560,7 +569,7 @@ sulka = {
 	},
 	
 	/**
-	 * Gets the wanted rows mode from the checkboxes in filters-form
+	 * validates selected row
 	 */
 	validate: function() {
 		var selectedRows = sulka.grid.getSelectedRows();

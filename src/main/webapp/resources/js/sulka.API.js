@@ -112,6 +112,7 @@ sulka.API = function(API) {
 				type: "POST",
 				success : function(data){
 					sulka.grid.getData()[slickRowId].databaseID = data.object.id;
+					console.log('slickgrid row: ' +slickRowId);
 					console.log(sulka.grid.getData()[slickRowId].databaseID);
 				},
 				error : API._jQueryErrorHandler("Riviä ei voitu lisätä"),
