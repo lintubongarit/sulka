@@ -6,7 +6,7 @@ sulka.addRecovery = function(addRecovery) {
 	sulka.gridOptions.enableAddRow = true;
 	sulka.gridOptions.autoEdit = false;
 	
-	sulka.columnOptions.editor = Slick.Editors.Text;
+	sulka.columnOptions.editor = Slick.Editors.LongText;
 	
 	sulka.getRowMode = function() {
 		sulka.rowsMode = "recoveries";
@@ -20,6 +20,12 @@ sulka.addRecovery = function(addRecovery) {
 	};
 	
 }();
+
+
+
+
+
+
 
 $(function () {
 	var now = moment();

@@ -102,6 +102,41 @@ sulka.API = function(API) {
 			});
 		},
 		
+		
+		
+		fetchSulkaDBRows :function(type, filters, onSuccess, onError) {
+			if (type && type.toLowerCase() != "all") {
+				type = "/" + type;
+			} else {
+				type = "";
+			}
+			
+			var filterString = "";
+			for ( var filter in filters)
+				if (filters.hasOwnProperty(filter)) {
+					if (filterString == "") {
+						filterString = "?";
+					} else {
+						filterString += "&";
+					}
+					filterString += encodeURIComponent(filter) + "="
+							+ encodeURIComponent(filters[filter]);
+				}
+			
+			
+			$.ajax({
+				url : API.BASE + "/storage/ringing",
+				dataType : 'json',
+				type: "GET",
+				success : function(results) {
+					if (onSuccess) {
+						onSuccess(results.objects);
+					}
+				},
+				error : API._jQueryErrorHandler(onError)
+			});
+		},
+		
 				
 		addRingingRow: function(row, slickRowId){
 			$.ajax({

@@ -25,6 +25,7 @@ public class LocalDatabaseServiceTest {
 	@Autowired
 	private LocalDatabaseService localDatabaseService;
 	
+			
 	@Test
 	public void testGetRingingsReturnsEmptyListWithUnknownUser(){
 		List<DatabaseRow> rows = localDatabaseService.getRingings("1ASDF");

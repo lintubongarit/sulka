@@ -402,23 +402,27 @@ sulka = {
 		}
 		
 		sulka.helpers.unsetErrorAndShowLoader();
+		sulka.fetchRows();
+	},
+	
+	fetchRows: function () {
 		sulka.API.fetchRows(
-			sulka.rowsMode,
-			filters,
-			function (rows) {
-				if (rows.length == 0) {
-					sulka.helpers.hideLoaderAndSetError(sulka.strings.noResults);
-				} else {
-					sulka.helpers.hideLoaderAndUnsetError();
-				}
-				
-				if (rows.length > 0) {
-					sulka.adjustFlexibleCols(rows);
-				}
-				sulka.setData(rows);
-			},
-			sulka.helpers.hideLoaderAndSetError
-		);
+				sulka.rowsMode,
+				filters,
+				function (rows) {
+					if (rows.length == 0) {
+						sulka.helpers.hideLoaderAndSetError(sulka.strings.noResults);
+					} else {
+						sulka.helpers.hideLoaderAndUnsetError();
+					}
+					
+					if (rows.length > 0) {
+						sulka.adjustFlexibleCols(rows);
+					}
+					sulka.setData(rows);
+				},
+				sulka.helpers.hideLoaderAndSetError
+			);
 	},
 	
 	onAddNewRow: function(event, args){
@@ -427,7 +431,7 @@ sulka = {
 	        $.extend(item, {
 	        	rowStatus: "inputRow"
 	          });
-	        var column = args.column;
+	        //var column = args.column;
 	        args.grid.invalidateRow(data.length);
 	        data.push(item);
 	        args.grid.updateRowCount();
