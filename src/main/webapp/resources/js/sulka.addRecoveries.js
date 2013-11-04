@@ -15,9 +15,8 @@ sulka.addRecovery = function(addRecovery) {
 	sulka.addRow = function() {
 		var data = sulka.grid.getData();
 		data.unshift({});
-		sulka.grid.setData(data);
+		sulka.setData(data);
 		sulka.grid.updateRowCount();
-		sulka.grid.render();
 	};
 	
 }();

@@ -167,13 +167,16 @@ helpers = {
 	},
 	
     disableSelection: function ($target) {
-      if ($target && $target.jquery) {
-        $target
-            .attr("unselectable", "on")
-            .css("MozUserSelect", "none")
-            .bind("selectstart.ui", function () {
-              return false;
-            }); // from jquery:ui.core.js 1.7.2
+    	if ($target && $target.jquery) {
+    		$target
+	            .attr("unselectable", "on")
+	            .css("UserSelect", "none")
+	            .css("MozUserSelect", "none")
+	            .css("WebkitUserSelect", "none")
+	            .css("IeUserSelect", "none")
+	            .bind("selectstart.ui", function () {
+	            	return false;
+	            }); // from jquery:ui.core.js 1.7.2
       }
     }
 };
