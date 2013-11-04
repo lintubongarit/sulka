@@ -132,7 +132,7 @@ sulka = {
 							$sulkaFlexible: isFlexible,
 						}, sulka.columnOptions);
 						columns.push(column);
-						
+
 						var contextItem = $("<li></li>")
 							.addClass("context-menu-item")
 							.append(
@@ -189,6 +189,8 @@ sulka = {
 		sulka.grid.onSort.subscribe(sulka.onGridSort);
 		
 		sulka.grid.onAddNewRow.subscribe(sulka.onAddNewRow);
+		
+		sulka.grid.onCellChange.subscribe(sulka.onCellChange);
 		
 		$(window).resize(sulka.resizeGrid);
 		sulka.resizeGrid();
@@ -420,13 +422,16 @@ sulka = {
 	},
 	
 	onAddNewRow: function(event, args){
-			var data = sulka.grid.getData();
+			var data = args.grid.getData();
 	        var item = args.item;
+	        $.extend(item, {
+	        	rowStatus: "inputRow"
+	          });
 	        var column = args.column;
-	        sulka.grid.invalidateRow(data.length);
+	        args.grid.invalidateRow(data.length);
 	        data.push(item);
-	        sulka.grid.updateRowCount();
-	        sulka.grid.render();
+	        args.grid.updateRowCount();
+	        args.grid.render();
 	},
 	
 	/**
@@ -510,6 +515,33 @@ sulka = {
 	},
 	
 	/**
+	 * When cell is changed, this function is called.
+	 * Adds row to SULKA-database
+	 */
+	onCellChange: function(e, args){
+		    var data = sulka.grid.getData();
+		    var actualRowData = data[args.row];
+		    var rowStatus = args.item.rowStatus;
+		    
+		    if (rowStatus == "inputRow"){
+		    	var testObject = {};
+		    	if(actualRowData.hasOwnProperty("databaseID")){
+		    		testObject.id = actualRowData.databaseID;
+		    		testObject.userId = actualRowData.ringer;
+		    	}
+		    	testObject.row = JSON.stringify(actualRowData);
+		    	
+		    	sulka.API.addRingingRow(
+		    			testObject,
+		    			args.row
+		    	);
+		    }
+		    else{
+		    	return;
+		    }
+	},
+	
+	/**
 	 * Gets the wanted rows mode from the checkboxes in filters-form
 	 */
 	getRowMode: function () {
@@ -527,6 +559,9 @@ sulka = {
 		}
 	},
 	
+	/**
+	 * Gets the wanted rows mode from the checkboxes in filters-form
+	 */
 	validate: function() {
 		var selectedRows = sulka.grid.getSelectedRows();
 		if (selectedRows.length == 0) return;
@@ -562,3 +597,4 @@ return sulka; }();
 
 /* Launch sulka.init() on DOM complete */
 $(sulka.init);
+

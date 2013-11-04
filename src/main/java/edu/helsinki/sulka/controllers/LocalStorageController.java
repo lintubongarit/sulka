@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -36,21 +37,25 @@ public class LocalStorageController extends JSONController {
 	}
 	
 	@PreAuthorize("hasRole('USER')")
-	@RequestMapping(value = "/api/storage/ringing", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+	@RequestMapping(value = "/api/storage/ringing",
+					method = RequestMethod.GET,
+					produces = "application/json;charset=UTF-8")
 	@ResponseBody
-	public ListResponse<DatabaseRow> getRingings(Locale locale,
-			Model model, HttpSession session) {
+	public ListResponse<DatabaseRow> getRingings(HttpSession session) {
 		String userId = ((User) session.getAttribute("user")).getLogin_id();
 		return new ListResponse<DatabaseRow>(localDatabaseService.getRingings(userId));
 	}
 		
 	@PreAuthorize("hasRole('USER')")
-	@RequestMapping(value = "/api/storage/ringing", method = RequestMethod.POST, produces = "application/json;charset=UTF-8", consumes="application/json")
+	@RequestMapping(value = "/api/storage/ringing",
+					method = RequestMethod.POST,
+					produces = "application/json;charset=UTF-8",
+					consumes="application/json")
 	@ResponseBody
-	public ObjectResponse<DatabaseRow> saveRinging(Locale locale,
-			Model model, HttpSession session,
+	public ObjectResponse<DatabaseRow> saveRinging(HttpSession session,
 			@RequestBody DatabaseRow ringing,
 			BindingResult bindingResult) throws LocalStorageException {
+		
 		if(bindingResult.hasErrors()){
 			throw new LocalStorageException("Database update failed");
 		}
@@ -60,10 +65,12 @@ public class LocalStorageController extends JSONController {
 	}
 	
 	@PreAuthorize("hasRole('USER')")
-	@RequestMapping(value = "/api/storage/ringing", method = RequestMethod.DELETE, produces = "application/json;charset=UTF-8", consumes="application/json")
+	@RequestMapping(value = "/api/storage/ringing",
+					method = RequestMethod.DELETE,
+					produces = "application/json;charset=UTF-8",
+					consumes="application/json")
 	@ResponseBody
-	public ObjectResponse<String> deleteRinging(Locale locale,
-			Model model, HttpSession session,
+	public ObjectResponse<String> deleteRinging(HttpSession session,
 			@RequestBody DatabaseRow ringing,
 			BindingResult bindingResult) throws LocalStorageException {
 		if(bindingResult.hasErrors()){
@@ -78,19 +85,22 @@ public class LocalStorageController extends JSONController {
 	}
 	
 	@PreAuthorize("hasRole('USER')")
-	@RequestMapping(value = "/api/storage/recovery", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+	@RequestMapping(value = "/api/storage/recovery",
+					method = RequestMethod.GET,
+					produces = "application/json;charset=UTF-8")
 	@ResponseBody
-	public ListResponse<DatabaseRow> getRecoveries(Locale locale,
-			Model model, HttpSession session) {
+	public ListResponse<DatabaseRow> getRecoveries(HttpSession session) {
 		String userId = ((User) session.getAttribute("user")).getLogin_id();
 		return new ListResponse<DatabaseRow>(localDatabaseService.getRecoveries(userId));
 	}
 	
 	@PreAuthorize("hasRole('USER')")
-	@RequestMapping(value = "/api/storage/recovery", method = RequestMethod.POST, produces = "application/json;charset=UTF-8", consumes="application/json")
+	@RequestMapping(value = "/api/storage/recovery",
+					method = RequestMethod.POST,
+					produces = "application/json;charset=UTF-8",
+					consumes="application/json")
 	@ResponseBody
-	public ObjectResponse<DatabaseRow> saveRecovery(Locale locale,
-			Model model, HttpSession session,
+	public ObjectResponse<DatabaseRow> saveRecovery(HttpSession session,
 			@RequestBody DatabaseRow recovery,
 			BindingResult bindingResult) throws LocalStorageException {
 		if(bindingResult.hasErrors()){
@@ -102,10 +112,12 @@ public class LocalStorageController extends JSONController {
 	}
 	
 	@PreAuthorize("hasRole('USER')")
-	@RequestMapping(value = "/api/storage/recovery", method = RequestMethod.DELETE, produces = "application/json;charset=UTF-8", consumes="application/json")
+	@RequestMapping(value = "/api/storage/recovery",
+					method = RequestMethod.DELETE,
+					produces = "application/json;charset=UTF-8",
+					consumes="application/json")
 	@ResponseBody
-	public ObjectResponse<String> deleteRecovery(Locale locale,
-			Model model, HttpSession session,
+	public ObjectResponse<String> deleteRecovery(HttpSession session,
 			@RequestBody DatabaseRow recovery,
 			BindingResult bindingResult) throws LocalStorageException {
 		if(bindingResult.hasErrors()){
