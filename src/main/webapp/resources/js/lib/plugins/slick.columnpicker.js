@@ -15,7 +15,7 @@
       $menu = $("<span class='slick-columnpicker' style='display:none;position:absolute;z-index:20;' />").appendTo(document.body);
 
       $menu.bind("mouseleave", function (e) {
-        $(this).fadeOut(options.fadeSpeed)
+        $(this).fadeOut(options.fadeSpeed);
       });
       $menu.bind("click", updateColumn);
 
