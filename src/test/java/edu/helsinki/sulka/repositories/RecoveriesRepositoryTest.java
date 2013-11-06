@@ -2,6 +2,8 @@ package edu.helsinki.sulka.repositories;
 
 import static org.junit.Assert.*;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,22 +23,29 @@ public class RecoveriesRepositoryTest {
 
 	@Autowired  
 	private RecoveriesRepository recoveriesRepository;
+	
+	private RecoveryDatabaseRow row;
+	private String rowData = "asdolkjaeoprids";
+	
+	@Before
+	public void setUp(){
+		row = new RecoveryDatabaseRow();
+		row.setRow(rowData);  
+	}
+	
+	@After
+	public void tearDown(){
+		recoveriesRepository.delete(row);
+	}
 
 	@Test
 	public void testNewRowsGetIdFromRepository() {  
-		RecoveryDatabaseRow row = new RecoveryDatabaseRow();
-		row.setRow("asd");  
-		  
 		row = recoveriesRepository.save(row);
 		assertNotNull(row.getId());
 	}     
 	
 	@Test
 	public void testDefinedRowDataIsKept(){
-		String rowData = "asdolkjaeoprids";
-		RecoveryDatabaseRow row = new RecoveryDatabaseRow();
-		row.setRow(rowData);  
-		  
 		row = recoveriesRepository.save(row);
 		assertEquals(row.getRow(), rowData);
 	}
