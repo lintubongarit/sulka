@@ -525,6 +525,12 @@ sulka = {
 	        sulka.grid.updateRowCount();
 	        sulka.grid.render();
 	        
+	        console.log('args')
+	        console.log(args);
+	        
+	        console.log('item')
+	        console.log(item);
+	        
 	        sulka.addToSulkaDB(args);
 	},
 	

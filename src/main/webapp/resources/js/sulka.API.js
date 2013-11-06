@@ -104,7 +104,7 @@ sulka.API = function(API) {
 		
 		
 		
-		fetchSulkaDBRows :function(type, filters, onSuccess, onError) {
+		fetchSulkaDBRows : function(type, filters, onSuccess, onError) {
 			if (type && type.toLowerCase() != "all") {
 				type = "/" + type;
 			} else {
@@ -138,7 +138,7 @@ sulka.API = function(API) {
 		},
 		
 				
-		addRow: function(row, slickRowId){
+		addRow : function(row, slickRowId){
 			$.ajax({
 				url : API.BASE + "/storage/" + sulka.viewMode ,
 				dataType : 'json',
