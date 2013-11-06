@@ -140,7 +140,6 @@ ul.feature-list-tabs li.current-feature-item:hover {
 }
 
 .local-toolbar-menu {
-	vertical-align: right;
 	float: right;
 }
 
@@ -270,7 +269,7 @@ span#last-error {
 
 #text-width-tester {
 	position: absolute;
-	visibility: invisible;
+	visibility: hidden;
 	width: auto;
 	height: auto;
 	left: -1000px;
@@ -295,6 +294,7 @@ span#last-error {
       background: #f0f0f0;
       border-right-color: silver;
       border-right-style: solid;
+}
 
 .header-freeze-button, .header-unfreeze-button {
 	position: absolute;

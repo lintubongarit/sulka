@@ -46,7 +46,6 @@ public class FieldsControllerTest {
     	mockHttpSession = SecuritySessionHelper.createUserSession();
     }
 
-    @SuppressWarnings("unchecked")
 	@Test
     public void testAllGroups() throws Exception {
     	mockMvc.perform(get("/api/fields/groups").session(mockHttpSession))
@@ -63,7 +62,6 @@ public class FieldsControllerTest {
 			.andReturn();
 	}
     
-    @SuppressWarnings("unchecked")
 	@Test
     public void testAllFields() throws Exception {
     	mockMvc.perform(get("/api/fields/all").session(mockHttpSession))
@@ -79,7 +77,6 @@ public class FieldsControllerTest {
 			.andReturn();
 	}
     
-    @SuppressWarnings("unchecked")
 	@Test
     public void testBrowsingGroups() throws Exception {
     	mockMvc.perform(get("/api/fields/groups/browsing").session(mockHttpSession))
@@ -96,7 +93,6 @@ public class FieldsControllerTest {
 			.andReturn();
 	}
     
-    @SuppressWarnings("unchecked")
 	@Test
     public void testBrowsingFields() throws Exception {
     	mockMvc.perform(get("/api/fields/all/browsing").session(mockHttpSession))
@@ -112,7 +108,6 @@ public class FieldsControllerTest {
 			.andReturn();
 	}
     
-    @SuppressWarnings("unchecked")
 	@Test
     public void testRingingsGroups() throws Exception {
     	mockMvc.perform(get("/api/fields/groups/ringings").session(mockHttpSession))
@@ -128,7 +123,6 @@ public class FieldsControllerTest {
 			.andReturn();
 	}
     
-    @SuppressWarnings("unchecked")
 	@Test
     public void testRingingsFields() throws Exception {
     	mockMvc.perform(get("/api/fields/all/ringings").session(mockHttpSession))

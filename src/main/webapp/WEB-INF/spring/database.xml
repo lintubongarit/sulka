@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:tx="http://www.springframework.org/schema/tx"
        xmlns:jdbc="http://www.springframework.org/schema/jdbc"
@@ -15,11 +16,19 @@
  
     <jpa:repositories base-package="edu.helsinki.sulka" />
     
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="location" value="classpath:database.properties"/>
+    </bean>
     <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
-        <property name="persistenceUnitName" value="persistenceUnitDev" /> 
-        <property name="dataSource" ref="dataSource" />
+        <property name="persistenceUnitName" value="persistenceUnitProduction" /> 
+        <property name="dataSource" ref="productionSource" />
         <property name="jpaVendorAdapter">
-            <bean class="org.springframework.orm.jpa.vendor.EclipseLinkJpaVendorAdapter"/>
+            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+                <property name="generateDdl" value="true" />
+                <property name="showSql" value="true" />
+                <property name="databasePlatform" value="org.hibernate.dialect.Oracle10gDialect" />
+                
+            </bean>
         </property>
     </bean>
     
@@ -32,6 +41,13 @@
     <bean class="org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor"/>
     <bean class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor"/>
     
-    <jdbc:embedded-database id="dataSource" type="H2" />
+   <bean id="productionSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+        <property name="driverClass" value="oracle.jdbc.driver.OracleDriver" />
+	    <property name="jdbcUrl" value="${database.host}" />
+	    <property name="user" value="${database.username}" />
+	    <property name="password" value="${database.password}" />
+	    <property name="initialPoolSize" value="5"/>
+	    <property name="minPoolSize" value="5"/>
+   </bean>
 </beans>
 

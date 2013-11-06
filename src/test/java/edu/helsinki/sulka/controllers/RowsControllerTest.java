@@ -66,7 +66,6 @@ public class RowsControllerTest {
     	testUserHttpSession = SecuritySessionHelper.createUserSession(testUser);
     }
 
-    @SuppressWarnings("unchecked")
 	@Test
     public void testAll() throws Exception {
     	/* These tests need to run as Heikki Lokki */
@@ -226,7 +225,6 @@ public class RowsControllerTest {
 			.andReturn();
 	}
     
-    @SuppressWarnings("unchecked")
 	@Test
     public void testRingings() throws Exception {
     	/* These tests need to run as Heikki Lokki */
@@ -268,7 +266,6 @@ public class RowsControllerTest {
 			.andReturn();
 	}
     
-    @SuppressWarnings("unchecked")
 	@Test
     public void testRecoveries() throws Exception {
     	mockMvc.perform(get("/api/rows/recoveries?municipality=INKOO").session(testUserHttpSession))
