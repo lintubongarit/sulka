@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import edu.helsinki.sulka.models.DatabaseRow;
+import edu.helsinki.sulka.models.RecoveryDatabaseRow;
 import edu.helsinki.sulka.repositories.RecoveriesRepository;
 
 @RunWith(SpringJUnit4ClassRunner.class)  
@@ -24,7 +24,7 @@ public class RecoveriesRepositoryTest {
 
 	@Test
 	public void testNewRowsGetIdFromRepository() {  
-		DatabaseRow row = new DatabaseRow();
+		RecoveryDatabaseRow row = new RecoveryDatabaseRow();
 		row.setRow("asd");  
 		  
 		row = recoveriesRepository.save(row);
@@ -34,7 +34,7 @@ public class RecoveriesRepositoryTest {
 	@Test
 	public void testDefinedRowDataIsKept(){
 		String rowData = "asdolkjaeoprids";
-		DatabaseRow row = new DatabaseRow();
+		RecoveryDatabaseRow row = new RecoveryDatabaseRow();
 		row.setRow(rowData);  
 		  
 		row = recoveriesRepository.save(row);

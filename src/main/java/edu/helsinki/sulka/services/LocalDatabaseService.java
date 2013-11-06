@@ -5,7 +5,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import edu.helsinki.sulka.models.DatabaseRow;
+import edu.helsinki.sulka.models.RecoveryDatabaseRow;
+import edu.helsinki.sulka.models.RingingDatabaseRow;
 import edu.helsinki.sulka.repositories.RecoveriesRepository;
 import edu.helsinki.sulka.repositories.RingingRepository;
 
@@ -22,27 +23,27 @@ public class LocalDatabaseService {
 	@Autowired
 	private RecoveriesRepository recoveryRepository;
 
-	public List<DatabaseRow> getRingings(String userId) {
-		return (List<DatabaseRow>) ringingRepository.findByUserId(userId);
+	public List<RingingDatabaseRow> getRingings(String userId) {
+		return (List<RingingDatabaseRow>) ringingRepository.findByUserId(userId);
 	}
 	
-	public List<DatabaseRow> getRecoveries(String userId) {
-		return (List<DatabaseRow>) recoveryRepository.findByUserId(userId);
+	public List<RecoveryDatabaseRow> getRecoveries(String userId) {
+		return (List<RecoveryDatabaseRow>) recoveryRepository.findByUserId(userId);
 	}
 	
-	public DatabaseRow addRinging(DatabaseRow ringingRow){	
+	public RingingDatabaseRow addRinging(RingingDatabaseRow ringingRow){	
 		return ringingRepository.save(ringingRow);
 	}
 	
-	public DatabaseRow addRecovery(DatabaseRow recoveryRow) {
+	public RecoveryDatabaseRow addRecovery(RecoveryDatabaseRow recoveryRow) {
 		return recoveryRepository.save(recoveryRow);
 	}
 
-	public void removeRinging(DatabaseRow ringingRow) {
+	public void removeRinging(RingingDatabaseRow ringingRow) {
 		ringingRepository.delete(ringingRow);
 	}
 
-	public void removeRecovery(DatabaseRow recoveryRow) {
+	public void removeRecovery(RecoveryDatabaseRow recoveryRow) {
 		recoveryRepository.delete(recoveryRow);
 		
 	}
