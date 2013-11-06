@@ -21,7 +21,6 @@ sulka.fetchRows = function (filters) {
 				if (tipuRows.length > 0) {
 					sulka.adjustFlexibleCols(tipuRows);
 				}
-				console.log(tipuRows);
 				sulka.setData(sulka.grid.getData().concat(tipuRows));
 			},
 			sulka.helpers.hideLoaderAndSetError
@@ -53,3 +52,5 @@ sulka.fetchRows = function (filters) {
 	};
 	
 }();
+
+ 

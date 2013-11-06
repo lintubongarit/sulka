@@ -104,6 +104,25 @@ sulka.API = function(API) {
 		
 		
 		
+		deleteSulkaDBRow: function(type,onSuccess, onError){
+			$.ajax({
+				url : API.BASE + "/storage/"  + sulka.viewMode ,
+				dataType : 'json',
+				type: "DELETE",
+				contentType: "application/json;charset=UTF-8",
+				success : function(results){console.log(results);}, 
+					
+//				function(results) {
+//					if (onSuccess) {
+//						onSuccess();
+//					}
+//				},
+				error : function(results){console.log(results);}
+//					API._jQueryErrorHandler(onError)
+			});
+		},
+		
+		
 		fetchSulkaDBRows :function(type, filters, onSuccess, onError) {
 			if (type && type.toLowerCase() != "all") {
 				type = "/" + type;
