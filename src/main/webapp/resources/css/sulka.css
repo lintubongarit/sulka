@@ -294,6 +294,7 @@ span#last-error {
       background: #f0f0f0;
       border-right-color: silver;
       border-right-style: solid;
+}
 
 .header-freeze-button, .header-unfreeze-button {
 	position: absolute;
