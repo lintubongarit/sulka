@@ -1,6 +1,5 @@
 package edu.helsinki.sulka.models;
 
-import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -24,18 +23,22 @@ public class Validation {
 		@JsonProperty("errorName")
 		private String errorName;
 
+		@SuppressWarnings("unused")
 		public String getLocalizedErrorText() {
 			return localizedErrorText;
 		}
 
+		@SuppressWarnings("unused")
 		public void setLocalizedErrorText(String localizedErrorText) {
 			this.localizedErrorText = localizedErrorText;
 		}
 
+		@SuppressWarnings("unused")
 		public String getErrorName() {
 			return errorName;
 		}
 
+		@SuppressWarnings("unused")
 		public void setErrorName(String errorName) {
 			this.errorName = errorName;
 		}
