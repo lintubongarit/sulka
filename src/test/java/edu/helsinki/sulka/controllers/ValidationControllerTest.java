@@ -1,8 +1,6 @@
 package edu.helsinki.sulka.controllers;
 
-import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -23,7 +21,6 @@ import org.springframework.web.context.WebApplicationContext;
 
 import edu.helsinki.sulka.SecuritySessionHelper;
 import edu.helsinki.sulka.models.User;
-import edu.helsinki.sulka.models.Validation;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
