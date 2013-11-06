@@ -7,10 +7,12 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
+import java.util.List;
+
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,9 +26,11 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
-
 import edu.helsinki.sulka.SecuritySessionHelper;
+import edu.helsinki.sulka.models.RecoveryDatabaseRow;
+import edu.helsinki.sulka.models.RingingDatabaseRow;
 import edu.helsinki.sulka.models.User;
+import edu.helsinki.sulka.services.LocalDatabaseService;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
@@ -43,11 +47,19 @@ public class LocalStorageControllerTest {
 	
 	@Autowired
 	private FilterChainProxy springSecurityFilterChain;
+	
+	@Autowired
+	private LocalDatabaseService localDatabaseService;
 
 	private MockMvc mockMvc;
 	private MockHttpSession lokkiHttpSession;
 	
-	private static final int LOKKI_ID = 846;
+	private static final String USER_ID = "LocalStorageControllerTestUserId_123456789";
+	private static final byte[] validOnlyRow = "{\"row\":\"asdflkakgh\"}".getBytes();
+	private static final byte[] validRowAndId = "{\"id\":\"1234\", \"row\":\"asdflkakgh\"}".getBytes();
+	private static final byte[] invalidId = "{\"JOTAIN\":\"1234\", \"row\":\"asdflkakgh\"}".getBytes();
+	private static final byte[] invalidRow = "{\"id\":\"1234\", \"ABCD\":\"asdflkakgh\"}".getBytes();
+	private static final byte[]	validFullRow = "{\"id\":\"1\", \"userId\":\"LocalStorageControllerTestUserId_123456789\", \"row\":\"asdflkakgh\"}".getBytes();
 	
 	@Before
     public void setup() {
@@ -55,9 +67,20 @@ public class LocalStorageControllerTest {
     	
     	User lokki = new User();
     	lokki.setPass(true);
-    	lokki.setLogin_id(Integer.toString(LOKKI_ID));
+    	lokki.setLogin_id(USER_ID);
     	lokki.setExpires_at(System.currentTimeMillis() / 1000 + 60);
     	lokkiHttpSession = SecuritySessionHelper.createUserSession(lokki);
+	}
+	
+	@After
+	public void tearDown(){
+		List<RingingDatabaseRow> ringings = localDatabaseService.getRingings(USER_ID);
+		List<RecoveryDatabaseRow> recoveries = localDatabaseService.getRecoveries(USER_ID);
+		
+		for(RingingDatabaseRow toBeDeleted: ringings)
+			localDatabaseService.removeRinging(toBeDeleted);
+		for(RecoveryDatabaseRow toBeDeleted: recoveries)
+			localDatabaseService.removeRecovery(toBeDeleted);
 	}
 	
 	@Test
@@ -119,7 +142,7 @@ public class LocalStorageControllerTest {
 				.andExpect(jsonPath("$.success").value(true))
 				.andExpect(jsonPath("$.error").value(nullValue()))
 				.andExpect(jsonPath("$.objects").isArray())
-				.andExpect(jsonPath("$.objects[*].userId", everyItem(equalTo(Integer.toString(LOKKI_ID)))))
+				.andExpect(jsonPath("$.objects[*].userId", everyItem(equalTo(USER_ID))))
 				.andReturn();
 	}
 
@@ -128,7 +151,7 @@ public class LocalStorageControllerTest {
 		mockMvc.perform(post("/api/storage/ringings")
 						.session(lokkiHttpSession)
 						.contentType(MediaType.APPLICATION_JSON)
-						.content("{\"row\":\"asdflkakgh\"}".getBytes()))
+						.content(validOnlyRow))
 				.andExpect(status().isOk())
 				.andReturn();
 	}
@@ -137,7 +160,7 @@ public class LocalStorageControllerTest {
 		mockMvc.perform(post("/api/storage/ringings")
 						.session(lokkiHttpSession)
 						.contentType(MediaType.APPLICATION_JSON)
-						.content("{\"id\":\"1234\", \"row\":\"asdflkakgh\"}".getBytes()))
+						.content(validOnlyRow))
 				.andExpect(status().isOk())
 				.andExpect(content().contentType("application/json;charset=UTF-8"))
 				.andReturn();
@@ -148,7 +171,7 @@ public class LocalStorageControllerTest {
 		mockMvc.perform(post("/api/storage/ringings")
 						.session(lokkiHttpSession)
 						.contentType(MediaType.APPLICATION_XML)
-						.content("{\"id\":\"1234\", \"row\":\"asdflkakgh\"}".getBytes()))
+						.content(validRowAndId))
 				.andExpect(status().isUnsupportedMediaType())
 				.andReturn();
 	}
@@ -158,7 +181,7 @@ public class LocalStorageControllerTest {
 		mockMvc.perform(post("/api/storage/ringings")
 				.session(lokkiHttpSession)
 				.contentType(MediaType.APPLICATION_JSON)
-				.content("{\"JOTAIN\":\"1234\", \"row\":\"asdflkakgh\"}".getBytes()))
+				.content(invalidId))
 		.andExpect(status().isBadRequest()) // Should be internal server error
 		.andReturn();
 	}
@@ -168,7 +191,7 @@ public class LocalStorageControllerTest {
 		mockMvc.perform(post("/api/storage/ringings")
 				.session(lokkiHttpSession)
 				.contentType(MediaType.APPLICATION_JSON)
-				.content("{\"id\":\"1234\", \"ABCD\":\"asdflkakgh\"}".getBytes()))
+				.content(invalidRow))
 		.andExpect(status().isBadRequest()) // Should be internal server error
 		.andReturn();
 	}
@@ -178,7 +201,7 @@ public class LocalStorageControllerTest {
 		mockMvc.perform(post("/api/storage/ringings")
 				.session(lokkiHttpSession)
 				.contentType(MediaType.APPLICATION_JSON)
-				.content("{\"row\":\"asdflkakgh\"}".getBytes()))
+				.content(validOnlyRow))
 		.andExpect(status().isOk()) // Should be internal server error
 		.andReturn();
 	}
@@ -188,7 +211,7 @@ public class LocalStorageControllerTest {
 		mockMvc.perform(post("/api/storage/ringings")
 				.session(lokkiHttpSession)
 				.contentType(MediaType.APPLICATION_JSON)
-				.content("{\"row\":\"asdflkakgh\"}".getBytes()))
+				.content(validOnlyRow))
 		.andExpect(status().isOk())
 		.andExpect(jsonPath("$.object.id").value(notNullValue()))
 		.andExpect(jsonPath("$.object.userId").value(notNullValue()))
@@ -201,7 +224,7 @@ public class LocalStorageControllerTest {
 		mockMvc.perform(delete("/api/storage/ringings")
 						.session(lokkiHttpSession)
 						.contentType(MediaType.APPLICATION_JSON)
-						.content("{\"id\":\"1\", \"userId\":\"846\", \"row\":\"asdflkakgh\"}".getBytes()))
+						.content(validFullRow))
 				.andExpect(status().isOk())
 				.andReturn();
 		}
@@ -211,7 +234,7 @@ public class LocalStorageControllerTest {
 		mockMvc.perform(delete("/api/storage/ringings")
 						.session(lokkiHttpSession)
 						.contentType(MediaType.APPLICATION_JSON)
-						.content("{\"id\":\"1\", \"userId\":\"846\", \"row\":\"asdflkakgh\"}".getBytes()))
+						.content(validFullRow))
 				.andExpect(status().isOk())
 				.andExpect(content().contentType("application/json;charset=UTF-8"))
 				.andReturn();
@@ -222,7 +245,7 @@ public class LocalStorageControllerTest {
 		mockMvc.perform(delete("/api/storage/ringings")
 						.session(lokkiHttpSession)
 						.contentType(MediaType.APPLICATION_XML)
-						.content("{\"id\":\"1\", \"userId\":\"846\", \"row\":\"asdflkakgh\"}".getBytes()))
+						.content(validFullRow))
 				.andExpect(status().isUnsupportedMediaType())
 				.andReturn();
 	}
@@ -232,7 +255,7 @@ public class LocalStorageControllerTest {
 		mockMvc.perform(delete("/api/storage/ringings")
 						.session(lokkiHttpSession)
 						.contentType(MediaType.APPLICATION_XML)
-						.content("{\"id\":\"1\", \"userId\":\"123\", \"row\":\"asdflkakgh\"}".getBytes()))
+						.content(validFullRow))
 				.andExpect(status().isUnsupportedMediaType())
 				.andReturn();
 	}
@@ -296,7 +319,7 @@ public class LocalStorageControllerTest {
 				.andExpect(jsonPath("$.success").value(true))
 				.andExpect(jsonPath("$.error").value(nullValue()))
 				.andExpect(jsonPath("$.objects").isArray())
-				.andExpect(jsonPath("$.objects[*].userId", everyItem(equalTo(Integer.toString(LOKKI_ID)))))
+				.andExpect(jsonPath("$.objects[*].userId", everyItem(equalTo(USER_ID))))
 				.andReturn();
 	}
 	
@@ -305,7 +328,7 @@ public class LocalStorageControllerTest {
 		mockMvc.perform(post("/api/storage/recoveries")
 						.session(lokkiHttpSession)
 						.contentType(MediaType.APPLICATION_JSON)
-						.content("{\"row\":\"asdflkakgh\"}".getBytes()))
+						.content(validOnlyRow))
 				.andExpect(status().isOk())
 				.andReturn();
 	}
@@ -315,7 +338,7 @@ public class LocalStorageControllerTest {
 		mockMvc.perform(post("/api/storage/recoveries")
 						.session(lokkiHttpSession)
 						.contentType(MediaType.APPLICATION_JSON)
-						.content("{\"row\":\"asdflkakgh\"}".getBytes()))
+						.content(validOnlyRow))
 				.andExpect(status().isOk())
 				.andExpect(content().contentType("application/json;charset=UTF-8"))
 				.andReturn();
@@ -326,7 +349,7 @@ public class LocalStorageControllerTest {
 		mockMvc.perform(post("/api/storage/recoveries")
 						.session(lokkiHttpSession)
 						.contentType(MediaType.APPLICATION_XML)
-						.content("{\"id\":\"1234\", \"row\":\"asdflkakgh\"}".getBytes()))
+						.content(validRowAndId))
 				.andExpect(status().isUnsupportedMediaType())
 				.andReturn();
 	}
@@ -336,7 +359,7 @@ public class LocalStorageControllerTest {
 		mockMvc.perform(post("/api/storage/recoveries")
 				.session(lokkiHttpSession)
 				.contentType(MediaType.APPLICATION_JSON)
-				.content("{\"JOTAIN\":\"1234\", \"row\":\"asdflkakgh\"}".getBytes()))
+				.content(invalidId))
 		.andExpect(status().isBadRequest()) // Should be internal server error
 		.andReturn();
 	}
@@ -346,7 +369,7 @@ public class LocalStorageControllerTest {
 		mockMvc.perform(post("/api/storage/recoveries")
 				.session(lokkiHttpSession)
 				.contentType(MediaType.APPLICATION_JSON)
-				.content("{\"ABCD\":\"asdflkaojo\"}".getBytes()))
+				.content(invalidRow))
 		.andExpect(status().isBadRequest()) // Should be internal server error
 		.andReturn();
 	}
@@ -356,7 +379,7 @@ public class LocalStorageControllerTest {
 		mockMvc.perform(post("/api/storage/recoveries")
 				.session(lokkiHttpSession)
 				.contentType(MediaType.APPLICATION_JSON)
-				.content("{\"row\":\"asdflkaojo\"}".getBytes()))
+				.content(validOnlyRow))
 		.andExpect(status().isOk()) // Should be internal server error
 		.andReturn();
 	}
@@ -366,7 +389,7 @@ public class LocalStorageControllerTest {
 		mockMvc.perform(post("/api/storage/recoveries")
 				.session(lokkiHttpSession)
 				.contentType(MediaType.APPLICATION_JSON)
-				.content("{\"row\":\"asdflkaojo\"}".getBytes()))
+				.content(validOnlyRow))
 		.andExpect(status().isOk())
 		.andExpect(jsonPath("$.object.id").value(notNullValue()))
 		.andExpect(jsonPath("$.object.userId").value(notNullValue()))
@@ -379,7 +402,7 @@ public class LocalStorageControllerTest {
 		mockMvc.perform(delete("/api/storage/recoveries")
 						.session(lokkiHttpSession)
 						.contentType(MediaType.APPLICATION_JSON)
-						.content("{\"id\":\"1\", \"userId\":\"846\", \"row\":\"asdflkakgh\"}".getBytes()))
+						.content(validFullRow))
 				.andExpect(status().isOk())
 				.andReturn();
 		}
@@ -389,7 +412,7 @@ public class LocalStorageControllerTest {
 		mockMvc.perform(delete("/api/storage/recoveries")
 						.session(lokkiHttpSession)
 						.contentType(MediaType.APPLICATION_JSON)
-						.content("{\"id\":\"1\", \"userId\":\"846\", \"row\":\"asdflkakgh\"}".getBytes()))
+						.content(validFullRow))
 				.andExpect(status().isOk())
 				.andExpect(content().contentType("application/json;charset=UTF-8"))
 				.andReturn();
@@ -400,7 +423,7 @@ public class LocalStorageControllerTest {
 		mockMvc.perform(delete("/api/storage/recoveries")
 						.session(lokkiHttpSession)
 						.contentType(MediaType.APPLICATION_XML)
-						.content("{\"id\":\"1\", \"userId\":\"846\", \"row\":\"asdflkakgh\"}".getBytes()))
+						.content(validFullRow))
 				.andExpect(status().isUnsupportedMediaType())
 				.andReturn();
 	}
@@ -410,7 +433,7 @@ public class LocalStorageControllerTest {
 		mockMvc.perform(delete("/api/storage/recoveries")
 						.session(lokkiHttpSession)
 						.contentType(MediaType.APPLICATION_XML)
-						.content("{\"id\":\"1\", \"userId\":\"123\", \"row\":\"asdflkakgh\"}".getBytes()))
+						.content(validFullRow))
 				.andExpect(status().isUnsupportedMediaType())
 				.andReturn();
 	}

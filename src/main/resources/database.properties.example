@@ -1,0 +1,6 @@
+to.do=KatsoOikeatArvotAllaOleviinMuuttujiinDokumentaatiosta
+to.do2=JaLuoUusiTiedostoIlmanExamplePaatetta
+
+database.host=jdbc:oracle:thin:@TOPESECRETSERVICEURL
+database.username=THEUBERUSERNAME
+database.password=TOPSECRETPASSWORD
