@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import edu.helsinki.sulka.models.RecoveryDatabaseRow;
 import edu.helsinki.sulka.models.RingingDatabaseRow;
+import edu.helsinki.sulka.models.UserSettings;
 
 @RunWith(SpringJUnit4ClassRunner.class)  
 @ContextConfiguration({
@@ -30,20 +31,26 @@ public class LocalDatabaseServiceTest {
 	
 	private RingingDatabaseRow ringingRow;
 	private RecoveryDatabaseRow recoveryRow;
+	private UserSettings userSettings;
 	
 	private static final String USER_ID = "LOCAL_DATABASE_SERVICE_TEST_USER_12345";
-	private static final String rowData = "asdfhasdfasesdfawe";
+	private static final String ROW_DATA = "asdfhasdfasesdfawe";
+	private static final String COLUMN_DATA = "asdfawetraweasdf";
 	
 	@Before
 	public void setUp(){
 		ringingRow = new RingingDatabaseRow();
 		recoveryRow = new RecoveryDatabaseRow();
+		userSettings = new UserSettings();
 		
 		ringingRow.setUserId(USER_ID);
 		recoveryRow.setUserId(USER_ID);
 		
-		ringingRow.setRow(rowData);
-		recoveryRow.setRow(rowData);
+		ringingRow.setRow(ROW_DATA);
+		recoveryRow.setRow(ROW_DATA);
+		
+		userSettings.setUserId(USER_ID);
+		userSettings.setColumns(COLUMN_DATA);
 	}
 	
 	@After
@@ -148,5 +155,30 @@ public class LocalDatabaseServiceTest {
 		List<RecoveryDatabaseRow> rows = localDatabaseService.getRecoveries(USER_ID);
 		assertTrue(rows.isEmpty());
 	}
-
+	
+	@Test
+	public void testQueryingSettingsForNewUserReturnsEmptySettings(){
+		userSettings = localDatabaseService.getSettings(USER_ID);
+		assertTrue(userSettings.getColumns().length() == 0);
+	}
+	
+	@Test
+	public void testQueryingSettingsForNewUserReturnsSettingsWithCorrectUserId(){
+		userSettings = localDatabaseService.getSettings(USER_ID);
+		assertTrue(userSettings.getUserId() == USER_ID);
+	}
+	
+	@Test
+	public void testQueryingExistingUserReturnsPreviouslySetSettings(){
+		localDatabaseService.saveSettings(userSettings);
+		userSettings = localDatabaseService.getSettings(USER_ID);
+		assertTrue(userSettings.getColumns().equals(COLUMN_DATA));
+	}
+	
+	@Test
+	public void testQueryingExistingUserReturnsSettingsWithCorrectUserID(){
+		localDatabaseService.saveSettings(userSettings);
+		userSettings = localDatabaseService.getSettings(USER_ID);
+		assertTrue(userSettings.getUserId().equals(USER_ID));
+	}
 }

@@ -7,8 +7,10 @@ import org.springframework.stereotype.Service;
 
 import edu.helsinki.sulka.models.RecoveryDatabaseRow;
 import edu.helsinki.sulka.models.RingingDatabaseRow;
+import edu.helsinki.sulka.models.UserSettings;
 import edu.helsinki.sulka.repositories.RecoveriesRepository;
 import edu.helsinki.sulka.repositories.RingingRepository;
+import edu.helsinki.sulka.repositories.UserSettingsRepository;
 
 
 /**
@@ -22,6 +24,9 @@ public class LocalDatabaseService {
 	
 	@Autowired
 	private RecoveriesRepository recoveryRepository;
+	
+	@Autowired
+	private UserSettingsRepository userSettingsRepository;
 
 	public List<RingingDatabaseRow> getRingings(String userId) {
 		return (List<RingingDatabaseRow>) ringingRepository.findByUserId(userId);
@@ -46,5 +51,19 @@ public class LocalDatabaseService {
 	public void removeRecovery(RecoveryDatabaseRow recoveryRow) {
 		recoveryRepository.delete(recoveryRow);
 		
+	}
+
+	public UserSettings getSettings(String userId) {
+		UserSettings settings = userSettingsRepository.findOne(userId);
+		if(settings == null){
+			settings = new UserSettings();
+			settings.setUserId(userId);
+			settings.setColumns("");
+		}
+		return settings;
+	}
+
+	public void saveSettings(UserSettings userSettings) {
+		userSettingsRepository.save(userSettings);
 	}
 }
