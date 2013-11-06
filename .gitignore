@@ -55,4 +55,4 @@ local.properties
 # PDT-specific
 .buildpath
 #Secret Stuff
-src/main/resources/hibernate.cfg.xml
+src/main/resources/database.properties

@@ -14,7 +14,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown=false)
 @Entity
-@Table(name="Ringings")
+@Table(name="Ringings_TMP")
 public class DatabaseRow implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
@@ -27,7 +27,7 @@ public class DatabaseRow implements Serializable {
 	@Column(name = "userId")
 	private String userId;
 	@JsonProperty("row")
-	@Column(name = "row")
+	@Column(name = "rowJSON")
 	private String row;
 	
 	public Long getId() {
