@@ -1,10 +1,20 @@
-sulka.addRinging = function(addRinging) {
-
-	sulka.viewMode = "ringings";
+sulka.addCore = function() {
 	
-	sulka.rowsMode = "ringings";
+	sulka.gridOptions.editable = true;
+	sulka.gridOptions.enableAddRow = true;
 	
-sulka.fetchRows = function (filters) {
+	sulka.columnOptions.editor = Slick.Editors.Text;
+	
+	/*
+	 * Overrides sulka.cores sulka.getRowMode to use always rowsMode defined on this page ("ringings")
+	 */
+	sulka.getRowMode = function() {
+	};
+	
+	/*
+	 * Overrides sulka.cores sulka.fetchRows to fetch ringings from tipu-DB and sulka-DB
+	 */
+	sulka.fetchRows = function (filters) {
 		
 		sulka.grid.setData([]);
 		
@@ -21,7 +31,6 @@ sulka.fetchRows = function (filters) {
 				if (tipuRows.length > 0) {
 					sulka.adjustFlexibleCols(tipuRows);
 				}
-				console.log(tipuRows);
 				sulka.setData(sulka.grid.getData().concat(tipuRows));
 			},
 			sulka.helpers.hideLoaderAndSetError
@@ -46,10 +55,21 @@ sulka.fetchRows = function (filters) {
 				for (var i = 0; i < rows.length; i++) {
 					sulkaRows.push(JSON.parse(rows[i].row));
 				}
+				
 				sulka.setData(sulka.grid.getData().concat(sulkaRows));
 			},
 			sulka.helpers.hideLoaderAndSetError
 		);
 	};
-	
 }();
+
+/*
+ * Sets the date filter to be the last 12 months
+ */
+$(function () {
+	var now = moment();
+	var lastYear = now.clone().subtract("years", 1);
+	var dateFmt = "DD.MM.YYYY";
+	var dateSearch = lastYear.format(dateFmt) + "-" + now.format(dateFmt); 
+	$("#filters-date").val(dateSearch); 
+});
