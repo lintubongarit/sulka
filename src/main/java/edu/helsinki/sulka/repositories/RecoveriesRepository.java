@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.springframework.data.repository.CrudRepository;
 
-import edu.helsinki.sulka.models.RingingDatabaseRow;
+import edu.helsinki.sulka.models.RecoveryDatabaseRow;
 
-public interface RecoveriesRepository extends CrudRepository<RingingDatabaseRow, Long>{
-	List<RingingDatabaseRow> findByUserId(String userId);
+public interface RecoveriesRepository extends CrudRepository<RecoveryDatabaseRow, Long>{
+	List<RecoveryDatabaseRow> findByUserId(String userId);
 }

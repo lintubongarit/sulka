@@ -11,6 +11,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
+import edu.helsinki.sulka.models.RecoveryDatabaseRow;
 import edu.helsinki.sulka.models.RingingDatabaseRow;
 
 @RunWith(SpringJUnit4ClassRunner.class)  
@@ -78,28 +79,28 @@ public class LocalDatabaseServiceTest {
 	
 	@Test
 	public void testGetRecoveryReturnsEmptyListWithUnknownUser(){
-		List<RingingDatabaseRow> rows = localDatabaseService.getRecoveries("1ASDF");
+		List<RecoveryDatabaseRow> rows = localDatabaseService.getRecoveries("1ASDF");
 		assertTrue(rows.isEmpty());
 	}
 	
 	@Test
 	public void testOnlyUsersRecoveriesAreReturned(){
 		for(int i=0; i < 500; i++){
-			RingingDatabaseRow row = new RingingDatabaseRow();
+			RecoveryDatabaseRow row = new RecoveryDatabaseRow();
 			row.setUserId(Integer.toString(i%10));
 			row.setRow("Testi: " + i);
 			localDatabaseService.addRecovery(row);
 		}
 		String wantedUserId = "5";
-		List<RingingDatabaseRow> rows = localDatabaseService.getRecoveries(wantedUserId);
-		for(RingingDatabaseRow row: rows){
+		List<RecoveryDatabaseRow> rows = localDatabaseService.getRecoveries(wantedUserId);
+		for(RecoveryDatabaseRow row: rows){
 			assertEquals(row.getUserId(), wantedUserId);
 		}
 	}
 	
 	@Test
 	public void testAddRecoveryReturnsSomething(){
-		RingingDatabaseRow row = new RingingDatabaseRow();
+		RecoveryDatabaseRow row = new RecoveryDatabaseRow();
 		row.setUserId("1");
 		row.setRow("TESTI");
 		row = localDatabaseService.addRecovery(row);
@@ -108,7 +109,7 @@ public class LocalDatabaseServiceTest {
 	
 	@Test
 	public void testAddRecoveryReturnsRowWithId(){
-		RingingDatabaseRow row = new RingingDatabaseRow();
+		RecoveryDatabaseRow row = new RecoveryDatabaseRow();
 		row.setUserId("1");
 		row.setRow("TESTI");
 		row = localDatabaseService.addRecovery(row);
@@ -117,12 +118,12 @@ public class LocalDatabaseServiceTest {
 	
 	@Test
 	public void testRemoveRecoveryDeletesRowFromDatabase(){
-		RingingDatabaseRow row = new RingingDatabaseRow();
+		RecoveryDatabaseRow row = new RecoveryDatabaseRow();
 		row.setUserId("1");
 		row.setRow("Testi4");
 		row = localDatabaseService.addRecovery(row);
 		localDatabaseService.removeRecovery(row);
-		List<RingingDatabaseRow> rows = localDatabaseService.getRecoveries("1");
+		List<RecoveryDatabaseRow> rows = localDatabaseService.getRecoveries("1");
 		assertTrue(rows.isEmpty());
 	}
 

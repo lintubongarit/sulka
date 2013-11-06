@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import edu.helsinki.sulka.models.RecoveryDatabaseRow;
 import edu.helsinki.sulka.models.RingingDatabaseRow;
 import edu.helsinki.sulka.repositories.RecoveriesRepository;
 import edu.helsinki.sulka.repositories.RingingRepository;
@@ -26,15 +27,15 @@ public class LocalDatabaseService {
 		return (List<RingingDatabaseRow>) ringingRepository.findByUserId(userId);
 	}
 	
-	public List<RingingDatabaseRow> getRecoveries(String userId) {
-		return (List<RingingDatabaseRow>) recoveryRepository.findByUserId(userId);
+	public List<RecoveryDatabaseRow> getRecoveries(String userId) {
+		return (List<RecoveryDatabaseRow>) recoveryRepository.findByUserId(userId);
 	}
 	
 	public RingingDatabaseRow addRinging(RingingDatabaseRow ringingRow){	
 		return ringingRepository.save(ringingRow);
 	}
 	
-	public RingingDatabaseRow addRecovery(RingingDatabaseRow recoveryRow) {
+	public RecoveryDatabaseRow addRecovery(RecoveryDatabaseRow recoveryRow) {
 		return recoveryRepository.save(recoveryRow);
 	}
 
@@ -42,7 +43,7 @@ public class LocalDatabaseService {
 		ringingRepository.delete(ringingRow);
 	}
 
-	public void removeRecovery(RingingDatabaseRow recoveryRow) {
+	public void removeRecovery(RecoveryDatabaseRow recoveryRow) {
 		recoveryRepository.delete(recoveryRow);
 		
 	}

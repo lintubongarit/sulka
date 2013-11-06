@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import edu.helsinki.sulka.models.RecoveryDatabaseRow;
 import edu.helsinki.sulka.models.RingingDatabaseRow;
 import edu.helsinki.sulka.models.User;
 import edu.helsinki.sulka.services.LocalDatabaseService;
@@ -89,9 +90,9 @@ public class LocalStorageController extends JSONController {
 					method = RequestMethod.GET,
 					produces = "application/json;charset=UTF-8")
 	@ResponseBody
-	public ListResponse<RingingDatabaseRow> getRecoveries(HttpSession session) {
+	public ListResponse<RecoveryDatabaseRow> getRecoveries(HttpSession session) {
 		String userId = ((User) session.getAttribute("user")).getLogin_id();
-		return new ListResponse<RingingDatabaseRow>(localDatabaseService.getRecoveries(userId));
+		return new ListResponse<RecoveryDatabaseRow>(localDatabaseService.getRecoveries(userId));
 	}
 	
 	@PreAuthorize("hasRole('USER')")
@@ -100,15 +101,15 @@ public class LocalStorageController extends JSONController {
 					produces = "application/json;charset=UTF-8",
 					consumes="application/json")
 	@ResponseBody
-	public ObjectResponse<RingingDatabaseRow> saveRecovery(HttpSession session,
-			@RequestBody RingingDatabaseRow recovery,
+	public ObjectResponse<RecoveryDatabaseRow> saveRecovery(HttpSession session,
+			@RequestBody RecoveryDatabaseRow recovery,
 			BindingResult bindingResult) throws LocalStorageException {
 		if(bindingResult.hasErrors()){
 			throw new LocalStorageException("Database update failed");
 		}
 		recovery.setUserId(((User) session.getAttribute("user")).getLogin_id());
 		
-		return new ObjectResponse<RingingDatabaseRow>(localDatabaseService.addRecovery(recovery));
+		return new ObjectResponse<RecoveryDatabaseRow>(localDatabaseService.addRecovery(recovery));
 	}
 	
 	@PreAuthorize("hasRole('USER')")
@@ -118,7 +119,7 @@ public class LocalStorageController extends JSONController {
 					consumes="application/json")
 	@ResponseBody
 	public ObjectResponse<String> deleteRecovery(HttpSession session,
-			@RequestBody RingingDatabaseRow recovery,
+			@RequestBody RecoveryDatabaseRow recovery,
 			BindingResult bindingResult) throws LocalStorageException {
 		if(bindingResult.hasErrors()){
 			throw new LocalStorageException("Database update failed.");
@@ -126,7 +127,7 @@ public class LocalStorageController extends JSONController {
 		if(!((User) session.getAttribute("user")).getLogin_id().equals(recovery.getUserId()))
 			throw new LocalStorageException("Database update failed. User id and row owner id doesn't match.");
 
-		localDatabaseService.removeRinging(recovery);
+		localDatabaseService.removeRecovery(recovery);
 		
 		return new ObjectResponse<String>("Database updated.");
 	}

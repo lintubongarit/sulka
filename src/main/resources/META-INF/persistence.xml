@@ -6,6 +6,7 @@
     <persistence-unit name="persistenceUnitProduction" transaction-type="RESOURCE_LOCAL">
             <provider>org.hibernate.ejb.HibernatePersistence</provider>
             <class>edu.helsinki.sulka.models.RingingDatabaseRow</class>
+            <class>edu.helsinki.sulka.models.RecoveryDatabaseRow</class>
             <properties>
                 <property name="hibernate.show_sql" value="false" />
                 <property name="hibernate.hbm2ddl.auto" value="update" />
