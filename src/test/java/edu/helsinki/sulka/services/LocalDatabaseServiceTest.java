@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 
 import java.util.List;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +28,34 @@ public class LocalDatabaseServiceTest {
 	@Autowired
 	private LocalDatabaseService localDatabaseService;
 	
+	private RingingDatabaseRow ringingRow;
+	private RecoveryDatabaseRow recoveryRow;
+	
+	private static final String USER_ID = "LOCAL_DATABASE_SERVICE_TEST_USER_12345";
+	private static final String rowData = "asdfhasdfasesdfawe";
+	
+	@Before
+	public void setUp(){
+		ringingRow = new RingingDatabaseRow();
+		recoveryRow = new RecoveryDatabaseRow();
+		
+		ringingRow.setUserId(USER_ID);
+		recoveryRow.setUserId(USER_ID);
+		
+		ringingRow.setRow(rowData);
+		recoveryRow.setRow(rowData);
+	}
+	
+	@After
+	public void tearDown(){
+		List<RingingDatabaseRow> ringingRows = localDatabaseService.getRingings(USER_ID);
+		List<RecoveryDatabaseRow> recoveryRows = localDatabaseService.getRecoveries(USER_ID);
+		
+		for(RingingDatabaseRow toBeDeleted: ringingRows)
+			localDatabaseService.removeRinging(toBeDeleted);
+		for(RecoveryDatabaseRow toBeDeleted: recoveryRows)
+			localDatabaseService.removeRecovery(toBeDeleted);
+	}
 			
 	@Test
 	public void testGetRingingsReturnsEmptyListWithUnknownUser(){
@@ -46,34 +76,30 @@ public class LocalDatabaseServiceTest {
 		for(RingingDatabaseRow row: rows){
 			assertEquals(row.getUserId(), wantedUserId);
 		}
+		for(int i=0; i < 10; i++){
+			List<RingingDatabaseRow> usersRows = localDatabaseService.getRingings(Integer.toString(i));
+			for(RingingDatabaseRow toBeDeleted: usersRows)
+				localDatabaseService.removeRinging(toBeDeleted);
+		}
 	}
 	
 	@Test
 	public void testAddRingingReturnsSomething(){
-		RingingDatabaseRow row = new RingingDatabaseRow();
-		row.setUserId("1");
-		row.setRow("TESTI");
-		row = localDatabaseService.addRinging(row);
-		assertNotNull(row);
+		ringingRow = localDatabaseService.addRinging(ringingRow);
+		assertNotNull(ringingRow);
 	}
 	
 	@Test
 	public void testAddRingingReturnsRowWithId(){
-		RingingDatabaseRow row = new RingingDatabaseRow();
-		row.setUserId("1");
-		row.setRow("TESTI");
-		row = localDatabaseService.addRinging(row);
-		assertNotNull(row.getId());
+		ringingRow = localDatabaseService.addRinging(ringingRow);
+		assertNotNull(ringingRow.getId());
 	}
 
 	@Test
 	public void testRemoveRingingDeletesRowFromDatabase(){
-		RingingDatabaseRow row = new RingingDatabaseRow();
-		row.setUserId("1");
-		row.setRow("Testi4");
-		row = localDatabaseService.addRinging(row);
-		localDatabaseService.removeRinging(row);
-		List<RingingDatabaseRow> rows = localDatabaseService.getRingings("1");
+		ringingRow = localDatabaseService.addRinging(ringingRow);
+		localDatabaseService.removeRinging(ringingRow);
+		List<RingingDatabaseRow> rows = localDatabaseService.getRingings(USER_ID);
 		assertTrue(rows.isEmpty());
 	}
 	
@@ -96,34 +122,30 @@ public class LocalDatabaseServiceTest {
 		for(RecoveryDatabaseRow row: rows){
 			assertEquals(row.getUserId(), wantedUserId);
 		}
+		for(int i=0; i < 10; i++){
+			List<RecoveryDatabaseRow> usersRows = localDatabaseService.getRecoveries(Integer.toString(i));
+			for(RecoveryDatabaseRow toBeDeleted: usersRows)
+				localDatabaseService.removeRecovery(toBeDeleted);
+		}
 	}
 	
 	@Test
 	public void testAddRecoveryReturnsSomething(){
-		RecoveryDatabaseRow row = new RecoveryDatabaseRow();
-		row.setUserId("1");
-		row.setRow("TESTI");
-		row = localDatabaseService.addRecovery(row);
-		assertNotNull(row);
+		recoveryRow = localDatabaseService.addRecovery(recoveryRow);
+		assertNotNull(recoveryRow);
 	}
 	
 	@Test
 	public void testAddRecoveryReturnsRowWithId(){
-		RecoveryDatabaseRow row = new RecoveryDatabaseRow();
-		row.setUserId("1");
-		row.setRow("TESTI");
-		row = localDatabaseService.addRecovery(row);
-		assertNotNull(row.getId());
+		recoveryRow = localDatabaseService.addRecovery(recoveryRow);
+		assertNotNull(recoveryRow.getId());
 	}
 	
 	@Test
 	public void testRemoveRecoveryDeletesRowFromDatabase(){
-		RecoveryDatabaseRow row = new RecoveryDatabaseRow();
-		row.setUserId("1");
-		row.setRow("Testi4");
-		row = localDatabaseService.addRecovery(row);
-		localDatabaseService.removeRecovery(row);
-		List<RecoveryDatabaseRow> rows = localDatabaseService.getRecoveries("1");
+		recoveryRow = localDatabaseService.addRecovery(recoveryRow);
+		localDatabaseService.removeRecovery(recoveryRow);
+		List<RecoveryDatabaseRow> rows = localDatabaseService.getRecoveries(USER_ID);
 		assertTrue(rows.isEmpty());
 	}
 
