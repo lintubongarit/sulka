@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import edu.helsinki.sulka.models.DatabaseRow;
+import edu.helsinki.sulka.models.RingingDatabaseRow;
 import edu.helsinki.sulka.repositories.RingingRepository;
 
 @RunWith(SpringJUnit4ClassRunner.class)  
@@ -23,7 +23,7 @@ public class RingingRepositoryTest {
 
 	@Test
 	public void testNewRowsGetIdFromRepository() {  
-		DatabaseRow row = new DatabaseRow();
+		RingingDatabaseRow row = new RingingDatabaseRow();
 		row.setRow("asd");  
 		  
 		row = ringingRepository.save(row);
@@ -33,7 +33,7 @@ public class RingingRepositoryTest {
 	@Test
 	public void testDefinedRowDataIsKept(){
 		String rowData = "asdolkjaeoorids";
-		DatabaseRow row = new DatabaseRow();
+		RingingDatabaseRow row = new RingingDatabaseRow();
 		row.setRow(rowData);  
 		  
 		row = ringingRepository.save(row);
