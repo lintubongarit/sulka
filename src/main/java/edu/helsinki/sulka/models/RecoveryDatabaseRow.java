@@ -14,8 +14,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown=false)
 @Entity
-@Table(name="Ringings")
-public class DatabaseRow implements Serializable {
+@Table(name="Recoveries")
+public class RecoveryDatabaseRow implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	@JsonProperty("id")
@@ -27,7 +27,7 @@ public class DatabaseRow implements Serializable {
 	@Column(name = "userId")
 	private String userId;
 	@JsonProperty("row")
-	@Column(name = "row")
+	@Column(name = "rowJSON")
 	private String row;
 	
 	public Long getId() {
@@ -54,8 +54,8 @@ public class DatabaseRow implements Serializable {
 	
 	@Override
 	public boolean equals(Object obj){
-		if(obj instanceof DatabaseRow)
-			return id == ((DatabaseRow)obj).id;
+		if(obj instanceof RecoveryDatabaseRow)
+			return id == ((RecoveryDatabaseRow)obj).id;
 		return false;
 	}
 }
