@@ -30,6 +30,7 @@
 		<script src="resources/js/sulka.API.js"></script>
 		<script src="resources/js/sulka.groups.js"></script>
 		<script src="resources/js/sulka.freeze.js"></script>
+		<script src="resources/js/sulka.addCore.js"></script>
 		<script src="resources/js/sulka.addRingings.js"></script>
 	</head>
 	<body>
@@ -48,7 +49,6 @@
 				</td>
 				<td>
 					<button type="button" id="validate" class="local-toolbar-menu" onclick="sulka.validate();">Validoi</button>
-					<button type="button" class="local-toolbar-menu" value="new row" onclick="sulka.addInvalidRow();">Lisää invalidi rivi</button>
 					<button type="button" id="remove" class="local-toolbar-menu" value="remove row" onclick="sulka.removeRow();">Poista rivi</button>
 				</td>
 			</tr>

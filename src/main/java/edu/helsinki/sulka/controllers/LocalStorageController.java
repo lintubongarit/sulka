@@ -37,7 +37,7 @@ public class LocalStorageController extends JSONController {
 	}
 	
 	@PreAuthorize("hasRole('USER')")
-	@RequestMapping(value = "/api/storage/ringing",
+	@RequestMapping(value = "/api/storage/ringings",
 					method = RequestMethod.GET,
 					produces = "application/json;charset=UTF-8")
 	@ResponseBody
@@ -47,7 +47,7 @@ public class LocalStorageController extends JSONController {
 	}
 		
 	@PreAuthorize("hasRole('USER')")
-	@RequestMapping(value = "/api/storage/ringing",
+	@RequestMapping(value = "/api/storage/ringings",
 					method = RequestMethod.POST,
 					produces = "application/json;charset=UTF-8",
 					consumes="application/json")
@@ -65,7 +65,7 @@ public class LocalStorageController extends JSONController {
 	}
 	
 	@PreAuthorize("hasRole('USER')")
-	@RequestMapping(value = "/api/storage/ringing",
+	@RequestMapping(value = "/api/storage/ringings",
 					method = RequestMethod.DELETE,
 					produces = "application/json;charset=UTF-8",
 					consumes="application/json")
@@ -85,7 +85,7 @@ public class LocalStorageController extends JSONController {
 	}
 	
 	@PreAuthorize("hasRole('USER')")
-	@RequestMapping(value = "/api/storage/recovery",
+	@RequestMapping(value = "/api/storage/recoveries",
 					method = RequestMethod.GET,
 					produces = "application/json;charset=UTF-8")
 	@ResponseBody
@@ -95,7 +95,7 @@ public class LocalStorageController extends JSONController {
 	}
 	
 	@PreAuthorize("hasRole('USER')")
-	@RequestMapping(value = "/api/storage/recovery",
+	@RequestMapping(value = "/api/storage/recoveries",
 					method = RequestMethod.POST,
 					produces = "application/json;charset=UTF-8",
 					consumes="application/json")
@@ -112,7 +112,7 @@ public class LocalStorageController extends JSONController {
 	}
 	
 	@PreAuthorize("hasRole('USER')")
-	@RequestMapping(value = "/api/storage/recovery",
+	@RequestMapping(value = "/api/storage/recoveries",
 					method = RequestMethod.DELETE,
 					produces = "application/json;charset=UTF-8",
 					consumes="application/json")

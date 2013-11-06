@@ -407,6 +407,10 @@ sulka = {
 		}
 		
 		sulka.helpers.unsetErrorAndShowLoader();
+		sulka.fetchRows(filters);
+	},
+	
+	fetchRows: function (filters) {
 		sulka.API.fetchRows(
 				sulka.rowsMode,
 				filters,

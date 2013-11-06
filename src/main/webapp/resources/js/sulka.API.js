@@ -140,7 +140,7 @@ sulka.API = function(API) {
 				
 		addRow: function(row, slickRowId){
 			$.ajax({
-				url : API.BASE + "/storage/" + sulka.addMode ,
+				url : API.BASE + "/storage/" + sulka.viewMode ,
 				dataType : 'json',
 				data: JSON.stringify(row),
 				contentType: "application/json;charset=UTF-8",
