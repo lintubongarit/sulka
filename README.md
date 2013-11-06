@@ -15,6 +15,8 @@ Oracle .jar is found in the repo, but before Maven can find it you must run the 
     	-DgroupId=com.oracle -DartifactId=ojdbc7 -Dversion=12.1.0.1 \
     	-Dpackaging=jar
 
+Username and password is configured in ```src/main/resources/database.properties```.
+
 Frontend tests
 --------------
 Frontend tests are launched with ```mvn exec:exec``` and require the git-latest [CasperJS](http://casperjs.org/) and 
