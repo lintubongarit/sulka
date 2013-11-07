@@ -55,6 +55,7 @@ sulka.addCore = function() {
 				for (var i = 0; i < rows.length; i++) {
 					sulkaRows.push(JSON.parse(rows[i].row));
 				}
+				console.log(sulkaRows);
 				
 				sulka.setData(sulka.grid.getData().concat(sulkaRows));
 			},

@@ -72,7 +72,7 @@ casper.test.begin('Sulka-database tests', 1, function suite(test) {
 	    	var data = casper.evaluate(function () {
 				return sulka.grid.getData();
 	        });
-	    	test.assertEquals(data.length, 1, "sulka.API.addToSulkaDB and sulka.API.fetchSulkaDBRows work");
+	    	test.assertEquals(data[0].species, 'asd', "sulka.API.addToSulkaDB and sulka.API.fetchSulkaDBRows work");
 	    });
 	});
 

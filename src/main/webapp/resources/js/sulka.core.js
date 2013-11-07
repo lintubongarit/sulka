@@ -524,7 +524,7 @@ sulka = {
 	        data.push(item);
 	        sulka.grid.updateRowCount();
 	        sulka.grid.render();
-	        
+	        console.log(args);
 	        sulka.addToSulkaDB(args);
 	},
 	
@@ -533,6 +533,7 @@ sulka = {
 	 * uses addToSulkaDB() to add row to sulka-database
 	 */
 	onCellChange: function(event, args){
+		console.log(args);
 		sulka.addToSulkaDB(args);
 	},
 	
