@@ -8,7 +8,7 @@
 		<link rel="stylesheet" href="resources/css/lib/slick.grid.css" type="text/css" />
 		<link rel="stylesheet" href="resources/css/examples.css" type="text/css" />
 		<link rel="stylesheet" href="resources/css/sulka.css" type="text/css" />
-		<link rel="stylesheet" href="resources/css/examples.css" type="text/css" />
+		<link rel="stylesheet" href="resources/css/lib/slick.dragdrop.css" type="text/css" />
 		<script src="resources/js/lib/jquery-1.10.2.min.js"></script>
     	<script src="resources/js/lib/jquery-ui-1.10.3.custom.min.js"></script>
    		<script src="resources/js/lib/plugins/jquery.event.drag-2.2.js"></script>
@@ -51,7 +51,9 @@
 				<td>
 					<button type="button"  id="validate" class="local-toolbar-menu" onclick="sulka.validate();">Validoi</button>
 					<button type="button" class="local-toolbar-menu" value="new row" onclick="sulka.addRow();">Lisää rivi</button>
-					<button type="button" id="remove" class="local-toolbar-menu" value="remove row" onclick="sulka.removeRow();">Poista rivi</button>
+					<div id="dropzone" class="recycle-bin">
+					     Roskakori
+					</div>
 				</td>
 			</tr>
 		</table>

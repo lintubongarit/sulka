@@ -192,7 +192,6 @@ sulka = {
 			sulka.initDrop();
 		}
 		
-
 		
 		sulka.grid.registerPlugin(new Slick.AutoTooltips());
 
@@ -206,9 +205,6 @@ sulka = {
 		sulka.grid.$columnGroups = new sulka.groups(sulka.grid, $("#slick-grid"));
 		
 		sulka.freeze.init();
-		
-
-		
 
 		sulka.grid.onHeaderContextMenu.subscribe(sulka.showColumnHeaderContextMenu);
 		$("#header-context-menu li.context-menu-item").click(sulka.headerContextMenuItemClicked);
@@ -256,14 +252,38 @@ sulka = {
 		        
 		        var rowsToDelete = dd.rows.sort().reverse();
 		        for (var i = 0; i < rowsToDelete.length; i++) {
-		          data.splice(rowsToDelete[i], 1);
+		        	
+		        	//Delete data from the database.
+		        	sulka.deleteRow(data[rowsToDelete[i]]);
+		        	
+		        	//Delete data from the grid.
+		        	data.splice(rowsToDelete[i], 1);
 		        }
 		        sulka.grid.invalidate();
+	
 		        sulka.grid.setSelectedRows([]);
 		      });
-		
 	},
 	
+	deleteRow: function(data,args){
+		console.log(JSON.stringify(data));
+	    if (data.rowStatus == "inputRow"){
+	 	    	var testObject = {};
+	 	    	
+		 	   	if(data.hasOwnProperty("databaseId")){
+		    		testObject.id = data.id;
+		    		testObject.userId = data.UserId;
+		    	}
+		 	   	else
+		 	   	{
+		 	   		return;
+		 	   	}
+	 	    	testObject.row = JSON.stringify(data);
+	 	    	
+	 	    	sulka.API.deleteSulkaDBRow(testObject);
+	    }
+	    
+	},
 	
 	
 	
@@ -757,9 +777,9 @@ sulka = {
 	    
 	    if (rowStatus == "inputRow"){
 	    	var testObject = {};
-	    	if(actualRowData.hasOwnProperty("databaseID")){
-	    		testObject.id = actualRowData.databaseID;
-	    		testObject.userId = actualRowData.ringer;
+	    	if(actualRowData.hasOwnProperty("databaseId")){
+	    		testObject.id = actualRowData.databaseId;
+	    		testObject.userId = actualRowData.UserId;
 	    	}
 	    	testObject.row = JSON.stringify(actualRowData);
 	    	

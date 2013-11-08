@@ -104,11 +104,13 @@ sulka.API = function(API) {
 		
 		
 		
-		deleteSulkaDBRow: function(type,onSuccess, onError){
+		deleteSulkaDBRow: function(object, onSuccess, onError){
+			console.log(JSON.stringify(object));
 			$.ajax({
-				url : API.BASE + "/storage/"  + sulka.viewMode ,
+				url : API.BASE + "/storage/"  + sulka.viewMode,
 				dataType : 'json',
 				type: "DELETE",
+				data: JSON.stringify(object),
 				contentType: "application/json;charset=UTF-8",
 				success : function(results){console.log(results);}, 
 					
