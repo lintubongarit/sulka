@@ -120,15 +120,23 @@ public class FieldsService {
 		return allFields;
 	}
 	
+	private APIService.CachedData<Map<String, Field>> cachedFieldsByFieldNameValue =
+			new APIService.CachedData<Map<String, Field>>(CACHE_TIME_GROUPS) {
+		@Override
+		protected Map<String, Field> refresh() {
+			List<Field> allFields = getAllFields();
+			HashMap<String, Field> fieldsByFieldName = new HashMap<String, Field>(allFields.size());
+			for (Field f : allFields) {
+				fieldsByFieldName.put(f.getFieldName(), f);
+			}
+			return fieldsByFieldName;
+		}
+	};
+	
 	/**
 	 * @return all fields by field name
 	 */
 	public Map<String, Field> getAllFieldsByFieldName() {
-		List<Field> allFields = getAllFields();
-		HashMap<String, Field> fieldsByFieldName = new HashMap<String, Field>(allFields.size());
-		for (Field f : allFields) {
-			fieldsByFieldName.put(f.getFieldName(), f);
-		}
-		return fieldsByFieldName;
+		return cachedFieldsByFieldNameValue.get();
 	}
 }
