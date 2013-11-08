@@ -16,6 +16,14 @@ public class FieldGroup {
 	@JsonProperty("fields")
 	private List<Field> fields;
 	
+	public FieldGroup() {}
+	
+	public FieldGroup(String name, String description, List<Field> fields) {
+		this.name = name;
+		this.description = description;
+		this.fields = fields;
+	}
+	
 	/*
 	 * Accessors
 	 */
@@ -29,9 +37,5 @@ public class FieldGroup {
 	
 	public List<Field> getFields() {
 		return fields;
-	}
-	
-	public void setFields(List<Field> fields) {
-		this.fields = fields;
 	}
 }
