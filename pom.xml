@@ -226,12 +226,14 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- JUnit -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.7</version>
 			<scope>test</scope>
 			<exclusions>
+				<!-- Use own Hamcrest matchers instead -->
 				<exclusion>
 					<groupId>org.hamcrest</groupId>
 					<artifactId>hamcrest-core</artifactId>
@@ -271,8 +273,6 @@
         </dependency>
         
         <!-- JsonPath support for tests -->
-
-		<!-- Hamcrest Matchers -->
 		<dependency>
 			<groupId>com.jayway.jsonpath</groupId>
 			<artifactId>json-path</artifactId>
