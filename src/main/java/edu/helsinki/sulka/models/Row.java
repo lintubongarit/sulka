@@ -10,7 +10,7 @@ public class Row extends HashMap<String, String> {
 	/**
 	 * Construct new Row with given fields and values.
 	 * @param values Mapping from field names to field values.
-	 * @param values Mapping from field names to Field objects.
+	 * @param fieldMapper Mapping from field names to Field objects.
 	 */
 	public Row(Map<String, String> values, Map<String, Field> fieldMapper) {
 		super(values);

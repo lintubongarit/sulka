@@ -5,6 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import edu.helsinki.sulka.models.Row;
 import edu.helsinki.sulka.models.Validation;
 
 
@@ -21,16 +25,15 @@ public class ValidationService {
 	@Qualifier("StagingAPIConfiguration")
 	private APIService apiService;
 
-	/*
+	/**
 	 * @returns Validation object that contains information of row's validity.
 	 */
-	public Validation validate(String data) {
-		System.out.println(data);
+	public Validation validate(Row data) throws JsonProcessingException {
 		return apiService
 				.getRestTemplate()
 				.getForObject(
-						apiService.getURLForPath("/ringing/validate?data=" + data),
+						apiService.getURLForPath("/ringing/validate?data={data}"),
 						Validation.class,
-						data);
+						new ObjectMapper().writeValueAsString(data));
 	}
 }

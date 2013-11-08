@@ -47,7 +47,7 @@ public class LocalStorageController extends JSONController {
 	@RequestMapping(value = "/api/storage/ringings",
 					method = RequestMethod.POST,
 					produces = "application/json;charset=UTF-8",
-					consumes="application/json")
+					consumes = "application/json")
 	@ResponseBody
 	public ObjectResponse<RingingDatabaseRow> saveRinging(HttpSession session,
 			@RequestBody RingingDatabaseRow ringing,
