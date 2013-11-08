@@ -1,9 +1,8 @@
 package edu.helsinki.sulka.controllers;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -57,22 +56,21 @@ public class ValidationControllerTest {
 	@Test
 	public void testWithDataParameterRequestIsOK() throws Exception {
 		mockMvc.perform(get("/api/validate?data={}").session(lokkiHttpSession))
-		.andExpect(status().isOk())
-		.andReturn();
+			.andExpect(status().isOk())
+			.andReturn();
 	}
 	
 	@Test
 	public void testControllerReturnsJSON() throws Exception {
 		mockMvc.perform(get("/api/validate?data={}").session(lokkiHttpSession))
-		.andExpect(content().contentType(MediaType.APPLICATION_JSON + ";charset=UTF-8")).andReturn();
+			.andExpect(content().contentType(MediaType.APPLICATION_JSON + ";charset=UTF-8")).andReturn();
 	}
 	
 	@Test
 	public void testWithoutDataParameterRequestIsInternalServerError() throws Exception {
 		mockMvc.perform(get("/api/validate?").session(lokkiHttpSession))
-		.andDo(print())
-		.andExpect(status().isBadRequest())
-		.andReturn();
+			.andExpect(status().isBadRequest())
+			.andReturn();
 	}
 
 }

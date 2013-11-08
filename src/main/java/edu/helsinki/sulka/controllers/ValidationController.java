@@ -32,7 +32,6 @@ public class ValidationController extends JSONController {
 	@RequestMapping(value = "/api/validate", method = RequestMethod.GET)
 	@ResponseBody
 	public Validation validate(@RequestParam(value="data", required=true) String data) {
-		System.out.println(validationService.validate(data).isPasses());
 		return validationService.validate(data);
 	}
 

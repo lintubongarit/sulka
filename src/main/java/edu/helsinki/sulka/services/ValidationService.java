@@ -25,7 +25,6 @@ public class ValidationService {
 	 * @returns Validation object that contains information of row's validity.
 	 */
 	public Validation validate(String data) {
-		System.out.println(data);
 		return apiService
 				.getRestTemplate()
 				.getForObject(
