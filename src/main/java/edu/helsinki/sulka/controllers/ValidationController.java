@@ -38,7 +38,7 @@ public class ValidationController extends JSONController {
 	 * @returns Validation of row
 	 */
 	@PreAuthorize("hasRole('USER')")
-	@RequestMapping(value = "/api/validate", method = RequestMethod.POST)
+	@RequestMapping(value = "/api/validate", method = RequestMethod.POST, consumes="application/json")
 	@ResponseBody
 	public Validation validate(@RequestBody Map<String, String> data) throws JsonProcessingException {
 		logger.info("HARE" + data.toString());
