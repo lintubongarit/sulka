@@ -251,35 +251,40 @@ sulka = {
 		        var data = sulka.grid.getData();
 		        
 		        var rowsToDelete = dd.rows.sort().reverse();
+		        
+		        
+		        var toBeDeleted = new Array();
+		        
 		        for (var i = 0; i < rowsToDelete.length; i++) {
 		        	
 		        	//Delete data from the database.
-		        	sulka.deleteRow(data[rowsToDelete[i]]);
-
-
+		        	//sulka.deleteRow(data[rowsToDelete[i]]);
+		        	if (data[rowsToDelete[i]].rowStatus == "inputRow"){
+			 	    	var testObject = {};
+			 	    	//console.log("DATA ID: " + JSON.stringify(data));
+				    	testObject.id = data[rowsToDelete[i]].databaseId;
+				    	testObject.userId = data[rowsToDelete[i]].userId;
+				    	testObject.row = JSON.stringify(data[rowsToDelete[i]]);
+			 	    	//sulka.API.deleteSulkaDBRow(testObject);
+			 	    	
+			 	    	toBeDeleted.push(testObject);
+		        	}
 		        	//Delete data from the grid.
 		        	data.splice(rowsToDelete[i], 1);
-		        	
 		        }
+		        
+		        sulka.deleteRows(toBeDeleted);
+		        
 		        sulka.grid.invalidate();
 	
 		        sulka.grid.setSelectedRows([]);
 		      });
 	},
 	
-	deleteRow: function(data, onSuccess, onError){
-		if (data.rowStatus == "inputRow"){
-	 	    	var testObject = {};
-	 	    	//console.log("DATA ID: " + JSON.stringify(data));
-	 	    	
-		    	testObject.id = data.databaseId;
-		    	testObject.userId = data.userId;
+	deleteRows: function(toBeDeleted){
 		
-	 	    	testObject.row = JSON.stringify(data);
-	 	    	
-	 	    	
-	 	    	sulka.API.deleteSulkaDBRow(testObject);
-	    }
+		console.log(JSON.stringify(toBeDeleted));
+		sulka.API.deleteSulkaDBRow(toBeDeleted);
 	    
 	},
 	

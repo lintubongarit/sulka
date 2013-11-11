@@ -1,5 +1,8 @@
 package edu.helsinki.sulka.controllers;
 
+import java.awt.List;
+import java.util.Map;
+
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import edu.helsinki.sulka.models.RecoveryDatabaseRow;
 import edu.helsinki.sulka.models.RingingDatabaseRow;
+import edu.helsinki.sulka.models.RingingDatabaseRowList;
 import edu.helsinki.sulka.models.User;
 import edu.helsinki.sulka.services.LocalDatabaseService;
 
@@ -42,6 +46,7 @@ public class LocalStorageController extends JSONController {
 		String userId = ((User) session.getAttribute("user")).getLogin_id();
 		return new ListResponse<RingingDatabaseRow>(localDatabaseService.getRingings(userId));
 	}
+	
 		
 	@PreAuthorize("hasRole('USER')")
 	@RequestMapping(value = "/api/storage/ringings",
@@ -68,15 +73,20 @@ public class LocalStorageController extends JSONController {
 					consumes="application/json")
 	@ResponseBody
 	public ObjectResponse<String> deleteRinging(HttpSession session,
-			@RequestBody RingingDatabaseRow ringing,
+			@RequestBody RingingDatabaseRowList ringing,
 			BindingResult bindingResult) throws LocalStorageException {
 		if(bindingResult.hasErrors()){
 			throw new LocalStorageException("Database update failed.");
 		}
-		if(!((User) session.getAttribute("user")).getLogin_id().equals(ringing.getUserId()))
-			throw new LocalStorageException("Database update failed. User id and row owner id doesn't match.");
+		
+		for (RingingDatabaseRow ringingDatabaseRow : ringing) {
+			if(!((User) session.getAttribute("user")).getLogin_id().equals(ringingDatabaseRow.getUserId()))
+				throw new LocalStorageException("Database update failed. User id and row owner id doesn't match.");
+			localDatabaseService.removeRinging(ringingDatabaseRow);
 
-		localDatabaseService.removeRinging(ringing);
+		}
+		
+		
 		
 		return new ObjectResponse<String>("Database updated.");
 	}
