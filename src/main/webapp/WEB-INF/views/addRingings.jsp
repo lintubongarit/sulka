@@ -8,10 +8,11 @@
 		<link rel="stylesheet" href="resources/css/lib/slick.grid.css" type="text/css" />
 		<link rel="stylesheet" href="resources/css/examples.css" type="text/css" />
 		<link rel="stylesheet" href="resources/css/sulka.css" type="text/css" />
-		<link rel="stylesheet" href="resources/css/examples.css" type="text/css" />
+		<link rel="stylesheet" href="resources/css/lib/slick.dragdrop.css" type="text/css" />
 		<script src="resources/js/lib/jquery-1.10.2.min.js"></script>
     	<script src="resources/js/lib/jquery-ui-1.10.3.custom.min.js"></script>
    		<script src="resources/js/lib/plugins/jquery.event.drag-2.2.js"></script>
+   		<script src="resources/js/lib/plugins/jquery.event.drop-2.2.js"></script>
    		<script src="resources/js/lib/plugins/jquery.mousewheel.js"></script>
 		<script src="resources/js/lib/moment.min.js"></script>
 		<script src="resources/js/lib/plugins/slick.autotooltips.js"></script>
@@ -20,9 +21,11 @@
 		<script src="resources/js/lib/plugins/slick.cellselectionmodel.js"></script>
 		<script src="resources/js/lib/plugins/slick.cellcopymanager.js"></script>
 		<script src="resources/js/lib/plugins/slick.rowselectionmodel.js"></script>
+		<script src="resources/js/lib/plugins/slick.rowmovemanager.js"></script>
+		<script src="resources/js/lib/slick.editors.js"></script>
+		<script src="resources/js/lib/slick.formatters.js"></script>
 		<script src="resources/js/lib/slick.editors.js"></script>
 		<script src="resources/js/lib/slick.core.js"></script>
-		<script src="resources/js/lib/slick.editors.js"></script>
 		<script src="resources/js/lib/slick.grid.js"></script>
 		<script src="resources/js/sulka.core.js"></script>
 		<script src="resources/js/sulka.strings.js"></script>
@@ -32,7 +35,10 @@
 		<script src="resources/js/sulka.freeze.js"></script>
 		<script src="resources/js/sulka.addCore.js"></script>
 		<script src="resources/js/sulka.addRingings.js"></script>
-	</head>
+
+
+		
+</head>
 	<body>
 		<%@include file="_header.jsp" %>
 		<table class="local-toolbar">
@@ -49,7 +55,9 @@
 				</td>
 				<td>
 					<button type="button" id="validate" class="local-toolbar-menu" onclick="sulka.validate();">Validoi</button>
-					<button type="button" id="remove" class="local-toolbar-menu" value="remove row" onclick="sulka.removeRow();">Poista rivi</button>
+					<div id="dropzone" class="recycle-bin">
+					     Roskakori
+					</div>
 				</td>
 			</tr>
 		</table>

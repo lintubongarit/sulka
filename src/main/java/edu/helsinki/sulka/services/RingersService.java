@@ -35,26 +35,43 @@ public class RingersService {
 		public RingerResponseLevel2 ringers;
 	}
 	
+	private long CACHE_TIME_RINGERS = 60*60*1000;
+	private APIService.CachedData<RingersResponse> cachedRingersResponse =
+			new APIService.CachedData<RingersResponse>(CACHE_TIME_RINGERS) {
+		@Override
+		protected RingersResponse refresh() {
+			return apiService
+					.getRestTemplate()
+					.getForObject(
+							apiService.getURLForPath("/ringers?format=json"),
+							RingersResponse.class);
+		}
+	};
+	
 	/**
 	 * @return all ringers from the API.
 	 */
 	public Ringer[] getAllRingers() {
-		return apiService
-				.getRestTemplate()
-				.getForObject(
-						apiService.getURLForPath("/ringers?format=json"),
-						RingersResponse.class).ringers.ringer;
+		return cachedRingersResponse.get().ringers.ringer;
 	}
+	
+	private APIService.ParametizedCachedData<Long, RingerResponse> cachedRingerResponse =
+			new APIService.ParametizedCachedData<Long, RingerResponse>(CACHE_TIME_RINGERS) {
+		@Override
+		protected RingerResponse refresh(Long ID) {
+			return apiService
+					.getRestTemplate()
+					.getForObject(
+							apiService.getURLForPath("/ringers/{id}?format=json"),
+							RingerResponse.class,
+							Long.toString(ID));
+		}
+	};
 	
 	/**
 	 * @return ringer with ID from the API.
 	 */
 	public Ringer getRingerByID(long ID) {
-		return apiService
-				.getRestTemplate()
-				.getForObject(
-						apiService.getURLForPath("/ringers/{id}?format=json"),
-						RingerResponse.class,
-						Long.toString(ID)).ringers.ringer;
+		return cachedRingerResponse.get(ID).ringers.ringer;
 	}
 }

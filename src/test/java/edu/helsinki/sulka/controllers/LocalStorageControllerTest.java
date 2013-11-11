@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.security.web.FilterChainProxy;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -39,7 +40,7 @@ import edu.helsinki.sulka.services.LocalDatabaseService;
 	"file:src/main/webapp/WEB-INF/spring/security.xml",
 	"file:src/main/webapp/WEB-INF/spring/appServlet/servlet-context.xml"
 })
-
+@ActiveProfiles("dev")
 public class LocalStorageControllerTest {
 	
 	@Autowired
@@ -60,6 +61,7 @@ public class LocalStorageControllerTest {
 	private static final byte[] invalidId = "{\"JOTAIN\":\"1234\", \"row\":\"asdflkakgh\"}".getBytes();
 	private static final byte[] invalidRow = "{\"id\":\"1234\", \"ABCD\":\"asdflkakgh\"}".getBytes();
 	private static final byte[]	validFullRow = "{\"id\":\"1\", \"userId\":\"LocalStorageControllerTestUserId_123456789\", \"row\":\"asdflkakgh\"}".getBytes();
+	private static final byte[]	validFullRowToBeDeleted = "[{\"id\":\"1\", \"userId\":\"LocalStorageControllerTestUserId_123456789\", \"row\":\"asdflkakgh\"}]".getBytes();
 	
 	@Before
     public void setup() {
@@ -224,7 +226,7 @@ public class LocalStorageControllerTest {
 		mockMvc.perform(delete("/api/storage/ringings")
 						.session(lokkiHttpSession)
 						.contentType(MediaType.APPLICATION_JSON)
-						.content(validFullRow))
+						.content(validFullRowToBeDeleted))
 				.andExpect(status().isOk())
 				.andReturn();
 		}
@@ -234,7 +236,7 @@ public class LocalStorageControllerTest {
 		mockMvc.perform(delete("/api/storage/ringings")
 						.session(lokkiHttpSession)
 						.contentType(MediaType.APPLICATION_JSON)
-						.content(validFullRow))
+						.content(validFullRowToBeDeleted))
 				.andExpect(status().isOk())
 				.andExpect(content().contentType("application/json;charset=UTF-8"))
 				.andReturn();
@@ -402,7 +404,7 @@ public class LocalStorageControllerTest {
 		mockMvc.perform(delete("/api/storage/recoveries")
 						.session(lokkiHttpSession)
 						.contentType(MediaType.APPLICATION_JSON)
-						.content(validFullRow))
+						.content(validFullRowToBeDeleted))
 				.andExpect(status().isOk())
 				.andReturn();
 		}
@@ -412,7 +414,7 @@ public class LocalStorageControllerTest {
 		mockMvc.perform(delete("/api/storage/recoveries")
 						.session(lokkiHttpSession)
 						.contentType(MediaType.APPLICATION_JSON)
-						.content(validFullRow))
+						.content(validFullRowToBeDeleted))
 				.andExpect(status().isOk())
 				.andExpect(content().contentType("application/json;charset=UTF-8"))
 				.andReturn();

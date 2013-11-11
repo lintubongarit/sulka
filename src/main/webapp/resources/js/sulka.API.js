@@ -102,9 +102,25 @@ sulka.API = function(API) {
 			});
 		},
 		
+		deleteSulkaDBRow: function(object, onSuccess, onError){
+			
+			$.ajax({
+				url : API.BASE + "/storage/"  + sulka.viewMode,
+				dataType : 'json',
+				type: "DELETE",
+				data: JSON.stringify(object),
+				contentType: "application/json;charset=UTF-8",
+				success : function(results) {
+					if (onSuccess) {
+						onSuccess();
+					};
+				},
+				error : API._jQueryErrorHandler(onError)
+			});
+		},
 		
 		
-		fetchSulkaDBRows : function(type, filters, onSuccess, onError) {
+		fetchSulkaDBRows :function(type, filters, onSuccess, onError) {
 			if (type && type.toLowerCase() != "all") {
 				type = "/" + type;
 			} else {
@@ -140,18 +156,37 @@ sulka.API = function(API) {
 				
 		addRow : function(row, slickRowId){
 			$.ajax({
-				url : API.BASE + "/storage/" + sulka.viewMode ,
-				dataType : 'json',
+				url : API.BASE + "/storage/" + sulka.viewMode,
+				dataType : "json",
 				data: JSON.stringify(row),
-				contentType: "application/json;charset=UTF-8",
+				contentType: "application/json",
 				type: "POST",
-				success : function(data){
+				success: function(data) {
 					sulka.grid.getData()[slickRowId].databaseID = data.object.id;
 				},
 				error : API._jQueryErrorHandler("Riviä ei voitu lisätä"),
 			});
 		},
 
+		
+		/**
+		 * Validate a row object through the validation service.  
+		 * @param row The data to validate
+		 * @param onSuccess Handler for when we get a validation reply (irrespective of if validation was successful).
+		 * @param onError Handler for when we have a network error or such and no reply.
+		 */
+		validate: function(row, onSuccess, onError) {
+			$.ajax({
+				url : API.BASE + "/validate",
+				type: "POST",
+				contentType: "application/json",
+				dataType : "json",
+				data: JSON.stringify(row),
+				error : API._jQueryErrorHandler(onError),
+				success: onSuccess
+			});
+		},
+		
 		/**
 		 * Creates and returns a jQuery AJAX error handler function that will
 		 * call the given function with the API's returned error message, or
@@ -179,17 +214,6 @@ sulka.API = function(API) {
 				}
 				errorHandler();
 			};
-		},
-		
-		validate : function(row, onSuccess, onError) {
-			$.ajax({
-				url : API.BASE + "/validate",
-				type: "GET",
-				dataType : 'json',
-				data: { data: JSON.stringify(row) },
-				error : API._jQueryErrorHandler(onError),
-				success: onSuccess
-			});
 		}
 	};
 	return API;

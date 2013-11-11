@@ -12,10 +12,10 @@ public class Validation {
 	private Map<String, Error[]> errors;
 	
 	@JsonProperty("passes")
-	private boolean passes;
+	private boolean valid;
 	
 	@JsonIgnoreProperties(ignoreUnknown=true)
-	private static class Error {
+	public static class Error {
 		
 		@JsonProperty("localizedErrorText")
 		private String localizedErrorText;
@@ -23,35 +23,42 @@ public class Validation {
 		@JsonProperty("errorName")
 		private String errorName;
 
-		@SuppressWarnings("unused")
 		public String getLocalizedErrorText() {
 			return localizedErrorText;
 		}
 
-		@SuppressWarnings("unused")
 		public void setLocalizedErrorText(String localizedErrorText) {
 			this.localizedErrorText = localizedErrorText;
 		}
 
-		@SuppressWarnings("unused")
 		public String getErrorName() {
 			return errorName;
 		}
 
-		@SuppressWarnings("unused")
 		public void setErrorName(String errorName) {
 			this.errorName = errorName;
 		}
 		
+		@Override
+		public String toString() {
+			return "Error " + getErrorName() + ": '" + getLocalizedErrorText() + "'";
+		}
 	}
 	
 
-	public boolean isPasses() {
-		return passes;
+	public boolean isValid() {
+		return valid;
 	}
 
-	public void setPasses(boolean passes) {
-		this.passes = passes;
+	public void setValid(boolean valid) {
+		this.valid = valid;
+	}
+
+	public Error[] getErrorsForField(String fieldName) {
+		if (errors.containsKey(fieldName)) {
+			return errors.get(fieldName);
+		}
+		return new Error[]{};
 	}
 
 	public Map<String, Error[]> getErrors() {
@@ -61,6 +68,4 @@ public class Validation {
 	public void setErrors(Map<String, Error[]> errors) {
 		this.errors = errors;
 	}
-	
-	
 }

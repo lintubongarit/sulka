@@ -49,11 +49,14 @@ sulka.addCore = function() {
 					sulka.adjustFlexibleCols(rows);
 				}
 				
-				
 				var sulkaRows = [];
 				
 				for (var i = 0; i < rows.length; i++) {
-					sulkaRows.push(JSON.parse(rows[i].row));
+					
+					var rivi = JSON.parse(rows[i].row);
+					rivi.userId = rows[i].userId;
+					rivi.databaseId = rows[i].id;
+					sulkaRows.push(rivi);
 				}
 				
 				sulka.setData(sulka.grid.getData().concat(sulkaRows));
@@ -61,6 +64,7 @@ sulka.addCore = function() {
 			sulka.helpers.hideLoaderAndSetError
 		);
 	};
+	
 }();
 
 /*

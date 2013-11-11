@@ -80,7 +80,7 @@ sulka = {
 	 */
 	initColumns: function () {
 		sulka.helpers.showLoader();
-		
+
 		// Get view fields
 		sulka.API.fetchFieldGroups(
 			sulka.viewMode,
@@ -158,20 +158,41 @@ sulka = {
 			sulka.helpers.hideLoaderAndSetError
 		); 
 	},
-	
+	  
 	/**
 	 * Init grid. Called once at start after columns have been fetched.
 	 */
 	initGrid: function () {
 		// We are now ready to actually initialize the grid
+		  
 		sulka.grid = new Slick.Grid("#slick-grid", [], sulka.getVisibleColumns(), sulka.gridOptions);
 		
 		sulka.viewport = $("#slick-grid").find(".slick-viewport");
 		
 		sulka.grid.setSelectionModel(new Slick.CellSelectionModel());
+		sulka.grid.setSelectionModel(new Slick.RowSelectionModel());
 		
-	
-	    
+		
+		if (sulka.viewMode == "ringings" || sulka.viewMode == "recoveries"){
+			sulka.moveRowsPlugin = 
+				new Slick.RowMoveManager({   
+					cancelEditOnDrag: true
+				});
+			
+			sulka.grid.registerPlugin(sulka.moveRowsPlugin);
+			
+			//Row move, drag & drop features
+			sulka.moveRowsPlugin.onBeforeMoveRows.subscribe(sulka.onBeforeMoveRows); 	  
+			sulka.moveRowsPlugin.onMoveRows.subscribe(sulka.onMoveRows);
+			sulka.grid.onDragInit.subscribe(sulka.grid.onDragInit);
+			sulka.grid.onDragStart.subscribe(sulka.onDragStart);
+			sulka.grid.onDrag.subscribe(sulka.onDrag);
+			sulka.grid.onDragEnd.subscribe(sulka.onDragEnd);
+			
+			//Init drop events?
+			sulka.initDrop();
+		}
+		
 		sulka.grid.registerPlugin(new Slick.AutoTooltips());
 
 	    // set keyboard focus on the grid
@@ -180,10 +201,11 @@ sulka = {
 		sulka.copyManager = new Slick.CellCopyManager();
 		sulka.grid.registerPlugin(sulka.copyManager);
 		
+		
 		sulka.grid.$columnGroups = new sulka.groups(sulka.grid, $("#slick-grid"));
 		
 		sulka.freeze.init();
-		
+
 		sulka.grid.onHeaderContextMenu.subscribe(sulka.showColumnHeaderContextMenu);
 		$("#header-context-menu li.context-menu-item").click(sulka.headerContextMenuItemClicked);
 		
@@ -196,13 +218,72 @@ sulka = {
 		sulka.grid.onAddNewRow.subscribe(sulka.onAddNewRow);
 		
 		sulka.grid.onCellChange.subscribe(sulka.onCellChange);
-		
+				  
 		$(window).resize(sulka.resizeGrid);
 		sulka.resizeGrid();
 		
 		$("#slick-grid").mousewheel(sulka.onMouseWheel);
 		
 		sulka.reloadData();
+	},
+	
+	
+	
+	initDrop: function(){
+		 $.drop({mode: "mouse"});
+		  $("#dropzone")
+		      .bind("dropstart", function (e, dd) {
+		        if (dd.mode != "recycle") {
+		          return;
+		        }
+		        $(this).css("background", "yellow");
+		      })
+		      .bind("dropend", function (e, dd) {
+		        if (dd.mode != "recycle") {
+		          return;
+		        }
+		        $(dd.available).css("background", "pink");
+		      })
+		      .bind("drop", function (e, dd) {
+		        if (dd.mode != "recycle") {
+		          return;
+		        }
+		        var data = sulka.grid.getData();
+		        
+		        var rowsToDelete = dd.rows.sort().reverse();
+		        
+		        var toBeDeleted = new Array();
+		        
+		        for (var i = 0; i < rowsToDelete.length; i++) {
+		        
+		        	var plop = data.splice(rowsToDelete[i], 1);
+	        	
+		        	//Delete data from the database.
+		        	if (plop[0].rowStatus == "inputRow"){
+			 	    	var testObject = {};
+				    	testObject.id = plop[0].databaseId;
+				    	testObject.userId = plop[0].userId;
+				    	testObject.row = JSON.stringify(plop[0]);
+
+			 	    	toBeDeleted.push(testObject);
+		        	}
+		        	//Delete data from the grid.
+		        	
+		        }
+		        
+		        sulka.deleteRows(toBeDeleted);
+		        
+		        sulka.grid.invalidate();
+	
+		        sulka.grid.setSelectedRows([]);
+		      });
+	},
+	
+	deleteRows: function(toBeDeleted){
+		
+		console.log(JSON.stringify(toBeDeleted));
+		sulka.API.deleteSulkaDBRow(toBeDeleted);
+	    
 	},
 	
 	/**
@@ -280,11 +361,158 @@ sulka = {
 	},
 	
 	
+	
+	onBeforeMoveRows: function(e,data) {
+		sulka.moveRowsPlugin.onBeforeMoveRows.subscribe(function (e, data) {
+			    for (var i = 0; i < data.rows.length; i++) {
+			      // no point in moving before or after itself
+			      if (data.rows[i] == data.insertBefore || data.rows[i] == data.insertBefore - 1) {
+			        e.stopPropagation();
+			        return false;
+			      }
+		    }
+			    return true;
+		});
+	},
+	
+	
+	onMoveRows: function(e,args){
+		sulka.moveRowsPlugin.onMoveRows.subscribe(function (e, args) {
+		    var extractedRows = [], left, right;
+		    var rows = args.rows;
+		    var insertBefore = args.insertBefore;
+		    left = data.slice(0, insertBefore);
+		    right = data.slice(insertBefore, data.length);
+
+		    rows.sort(function(a,b) { return a-b; });
+
+		    for (var i = 0; i < rows.length; i++) {
+		      extractedRows.push(data[rows[i]]);
+		    }
+
+		    rows.reverse();
+
+		    for (var i = 0; i < rows.length; i++) {
+		      var row = rows[i];
+		      if (row < insertBefore) {
+		        left.splice(row, 1);
+		      } else {
+		        right.splice(row - insertBefore, 1);
+		      }
+		    }
+
+		    data = left.concat(extractedRows.concat(right));
+
+		    var selectedRows = [];
+		    for (var i = 0; i < rows.length; i++)
+		      selectedRows.push(left.length + i);
+
+		    sulka.grid.resetActiveCell();
+		    sulka.grid.setData(data);
+		    sulka.grid.setSelectedRows(selectedRows);
+		    sulka.grid.render();
+		  });
+		
+	},
+	
+	
+	onDragInit: function(e,dd){
+		sulka.grid.onDragInit.subscribe(function (e, dd) {
+		    // prevent the grid from cancelling drag'n'drop by default
+		    e.stopImmediatePropagation();
+		  });
+		
+	},
+	
+	
+	
+	onDragStart: function(e,dd){
+		sulka.grid.onDragStart.subscribe(function (e, dd) {
+			
+			var data = sulka.grid.getData();
+			
+		    var cell = sulka.grid.getCellFromEvent(e);
+		    if (!cell) {
+		      return;
+		    }
+
+		    dd.row = cell.row;
+		    if (!data[dd.row]) {
+		      return;
+		    }
+
+		    if (Slick.GlobalEditorLock.isActive()) {
+		      return;
+		    }
+
+		    e.stopImmediatePropagation();
+		    dd.mode = "recycle";
+
+		    var selectedRows = sulka.grid.getSelectedRows();
+
+		    if (!selectedRows.length || $.inArray(dd.row, selectedRows) == -1) {
+		      selectedRows = [dd.row];
+		      sulka.grid.setSelectedRows(selectedRows);
+		    }
+
+		    dd.rows = selectedRows;
+		    dd.count = selectedRows.length;
+
+		    var proxy = $("<span></span>")
+		        .css({
+		          position: "absolute",
+		          display: "inline-block",
+		          padding: "4px 10px",
+		          background: "#e0e0e0",
+		          border: "1px solid gray",
+		          "z-index": 99999,
+		          "-moz-border-radius": "8px",
+		          "-moz-box-shadow": "2px 2px 6px silver"
+		        })
+		        .text("Drag to Recycle Bin to delete " + dd.count + " selected row(s)")
+		        .appendTo("body");
+
+		    dd.helper = proxy;
+
+		    $(dd.available).css("background", "pink");
+
+		    return proxy;
+		  });
+		
+	},
+	
+	onDrag: function(e,dd){
+		  sulka.grid.onDrag.subscribe(function (e, dd) {
+			    if (dd.mode != "recycle") {
+			      return;
+			    }
+			    dd.helper.css({top: e.pageY + 5, left: e.pageX + 5});
+			  });
+	},
+	
+	
+	onDragEnd: function(e, dd){
+		sulka.grid.onDragEnd.subscribe(function (e, dd) {
+		    if (dd.mode != "recycle") {
+		        return;
+		      }
+		      dd.helper.remove();
+		      $(dd.available).css("background", "beige");
+		    });
+	},
+	
+		
+	
 	onPasteCells: function(event, args){
 		  sulka.copyManager.onPasteCells.subscribe(function (e, args) {
 	      if (args.from.length !== 1 || args.to.length !== 1) {
 	        throw "This implementation only supports single range copy and paste operations";
 	      }
+	      
+	      
+	      var data = sulka.grid.getData();
+	      
+	      var columns = sulka.grid.getColumns();
 	      var from = args.from[0];
 	      var to = args.to[0];
 	      var val;
@@ -297,7 +525,7 @@ sulka = {
 	          }
 	        }
 	      }
-	      grid.render();
+	      sulka.grid.render();
 	    });
 	},
 	
@@ -412,22 +640,54 @@ sulka = {
 	
 	fetchRows: function (filters) {
 		sulka.API.fetchRows(
-				sulka.rowsMode,
-				filters,
-				function (rows) {
-					if (rows.length == 0) {
-						sulka.helpers.hideLoaderAndSetError(sulka.strings.noResults);
-					} else {
-						sulka.helpers.hideLoaderAndUnsetError();
-					}
-					
-					if (rows.length > 0) {
-						sulka.adjustFlexibleCols(rows);
-					}
-					sulka.setData(rows);
-				},
-				sulka.helpers.hideLoaderAndSetError
-			);
+			sulka.rowsMode,
+			filters,
+			function (rows) {
+				if (rows.length == 0) {
+					sulka.helpers.hideLoaderAndSetError(sulka.strings.noResults);
+				} else {
+					sulka.helpers.hideLoaderAndUnsetError();
+				}
+				
+				if (rows.length > 0) {
+					sulka.adjustFlexibleCols(rows);
+				}
+				sulka.grid.setData(sulka.createNewDataView(rows));
+				sulka.grid.render();
+			},
+			sulka.helpers.hideLoaderAndSetError
+		);
+	},
+	
+	createNewDataView: function (data) {
+		return {
+			data: data,
+			getLength: function () {
+				return data.length;
+			},
+			getItem: function (index) {
+				return data[index];
+			},
+			getItemMetadata: function (index) {
+				var item = data[index];
+				if(item.databaseId==null){
+					return { "cssClasses": "tipu-row-color"};
+				}else{
+					return {"cssClasses" : "sulka-row-color"};
+				}
+				
+			}
+		};
+	},
+	
+	onAddNewRow: function(event, args){
+			var data = sulka.grid.getData();
+	        var item = args.item;
+	        var column = args.column;
+	        sulka.grid.invalidateRow(data.length);
+	        data.push(item);
+	        sulka.grid.updateRowCount();
+	        sulka.grid.render();
 	},
 	
 	/**
@@ -546,9 +806,9 @@ sulka = {
 	    
 	    if (rowStatus == "inputRow"){
 	    	var testObject = {};
-	    	if(actualRowData.hasOwnProperty("databaseID")){
-	    		testObject.id = actualRowData.databaseID;
-	    		testObject.userId = actualRowData.ringer;
+	    	if(actualRowData.hasOwnProperty("databaseId")){
+	    		testObject.id = actualRowData.databaseId;
+	    		testObject.userId = actualRowData.UserId;
 	    	}
 	    	testObject.row = JSON.stringify(actualRowData);
 	    	
@@ -604,7 +864,6 @@ sulka = {
 			sulka.helpers.hideLoaderAndSetError
 		);
 	}
-	
 	
 };
 
