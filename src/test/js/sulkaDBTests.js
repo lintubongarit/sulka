@@ -1,83 +1,117 @@
-
-var flag = false;
-
-var sulkaRows = [];
-
-casper.test.begin('Sulka-database tests', 1, function suite(test) {
+casper.test.begin('Sulka-database tests', 2, function suite(test) {
 	
 	
 	browse('/addRingings', function () {
 		
+		var randomSpecies = genRandomString();
 		
-		var rows = [];
+		var newRow = -1;
 
 		casper.then(function () {
 			
-			flag = false;
 			
-			casper.evaluate(function(){
+			dataAtStart = casper.evaluate(function(){
+				return sulka.grid.getData();
+			});
+			
+			casper.evaluate(function(randomSpecies){
 				
-				sulka.viewMode = "ringings";
-				
-				sulka.rowsMode = "ringings";
 				var args = {};
-				args.row = 0;
-				
 				args.item = {};
-				args.item.species = 'asd';
-				args.item.databaseID = 0;
-				args.item.rowStatus = 'inputRow';
+				args.item.species = randomSpecies;
 				
-				var item = args.item;
+				sulka.onAddNewRow(null, args);
 				
-				var data = sulka.grid.getData();
-				sulka.grid.invalidateRow(data.length);
-		        data.push(item);
-		        sulka.grid.updateRowCount();
-		        sulka.grid.render();
-				sulka.addToSulkaDB(args);
-			});
-			
-			casper.evaluate(function(){
-				sulka.API.fetchSulkaDBRows(
-						sulka.rowsMode,
-						filters,
-						function (rows) {
-							if (rows.length == 0) {
-								sulka.helpers.hideLoaderAndSetError(sulka.strings.noResults);
-							} else {
-								sulka.helpers.hideLoaderAndUnsetError();
-							}
+			}, randomSpecies);
 
-							if (rows.length > 0) {
-								sulka.adjustFlexibleCols(rows);
-							}
-
-							for (var i = 0; i < rows.length; i++) {
-								sulkaRows.push(JSON.parse(rows[i].row));
-							}
-							flag = true; 
-							return sulkaRows;
-							sulka.setData(sulka.grid.getData().concat(sulkaRows));
-						},
-						sulka.helpers.hideLoaderAndSetError
-				)
-			});
-		
 		}).then(function() {
 			this.reload(function() {
 	        });
 	    }).waitWhileVisible("#loader-animation"
 	    ).then(function () {
-	    	var data = casper.evaluate(function () {
+	    	var slickData = casper.evaluate(function () {
 				return sulka.grid.getData();
 	        });
-	    	test.assertEquals(data[0].species, 'asd', "sulka.API.addToSulkaDB and sulka.API.fetchSulkaDBRows work");
-	    });
+	    	
+	    	for (var i = 0; i < slickData.length; i++){
+				var row = casper.evaluate(function(i){
+					return sulka.grid.getData()[i];
+				}, i);
+				if (row.species !== undefined){
+					if (row.species.indexOf(randomSpecies) != -1){
+						newRow = i;
+						break;
+					}
+				}
+			}
+	    	
+	    	test.assertNotEquals(newRow, -1,
+	    	"sulka.core.onAddNewRow adds new row with wanted data to slickgrid and DB, and sulka.API.fetchSulkaDBRows fetches rows");
+	   
+	    }).then(function () {
+	    	var rowToEdit = {};
+	    	
+	    	casper.evaluate(function(){
+	    	
+				rowToEdit = sulka.grid.getData()[newRow];
+				
+				rowToEdit.municipalities = 'sdf';
+		        
+				var args = {};
+				
+				args.item = rowToEdit;
+				args.row = sulka.grid.getData().length - 1;
+				
+				sulka.onCellChange(null, args);
+	    	});
+	    	
+		}).then(function() {
+			this.reload(function() {
+	        });
+	    }).waitWhileVisible("#loader-animation"
+	    ).then(function () {
+	    	
+	    	var slickData = casper.evaluate(function () {
+				return sulka.grid.getData();
+	        });
+	    	
+	    	var editedRow = -1;
+	    	
+	    	for (var i = 0; i < slickData.length; i++){
+				var row = casper.evaluate(function(i){
+					return sulka.grid.getData()[i];
+				}, i);
+				if (row.species !== undefined){
+					if (row.species.indexOf(randomSpecies) != -1){
+						if (row.municipalities = 'sdf'){
+							editedRow = i;
+							break;
+						}
+					}
+				}
+			}
+	    	
+	    	test.assertNotEquals(editedRow, -1,
+	    	"sulka.core.onCellChange edits row in sulka-DB");
+		});
+		
 	});
-
+	
 	casper.run(function () {
 		test.done();
 	});
-
+	
+	
 });
+
+
+function genRandomString()
+{
+    var text = '';
+    var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+    for( var i=0; i < 5; i++ )
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+    return text;
+}
