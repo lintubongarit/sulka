@@ -193,6 +193,24 @@ sulka.API = function(API) {
 		},
 		
 		/**
+		 * Save users settings to database 
+		 * @param settings Settings to be saved
+		 * @param onSuccess Handler for succesful POST.
+		 * @param onError Handler for failed POST.
+		 */
+		saveSettings: function(settings, onSuccess, onError) {
+			$.ajax({
+				url: API.BASE  + "/storage/settings",
+				type: "POST",
+				contentType: "application/json",
+				dataType: "json",
+				data: JSON.stringify(settings),
+				success: onSuccess,
+				error: onError
+			});
+		},
+		
+		/**
 		 * Creates and returns a jQuery AJAX error handler function that will
 		 * call the given function with the API's returned error message, or
 		 * current HTTP error message, should an error occur.

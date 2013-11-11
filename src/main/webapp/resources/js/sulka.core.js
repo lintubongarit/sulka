@@ -171,6 +171,10 @@ sulka = {
 		sulka.grid.setSelectionModel(new Slick.CellSelectionModel());
 		sulka.grid.setSelectionModel(new Slick.RowSelectionModel());
 		
+		//Subscribe setting saving
+		sulka.grid.onColumnsReordered.subscribe(sulka.onColumnChange);
+		sulka.grid.onColumnsResized.subscribe(sulka.onColumnChange);
+		
 		
 		if (sulka.viewMode == ("ringings" || "recoveries")){
 			sulka.moveRowsPlugin = 
@@ -834,6 +838,26 @@ sulka = {
 			}, 
 			sulka.helpers.hideLoaderAndSetError
 		);
+	},
+	
+	onColumnChange: function() {
+		sulka.helpers.showLoader();
+		var columns = sulka.grid.getColumns();
+		var columnDataToBeSaved = {};
+		for(var index in columns){
+			var columnData = {
+					w: columns[index].width
+			};
+			columnDataToBeSaved[columns[index].field] = columnData;
+		}
+		var settings = {
+				columns: JSON.stringify(columnDataToBeSaved)
+		};
+		sulka.API.saveSettings(settings, function success() {
+			sulka.helpers.hideLoaderAndSetError("Asetukset tallennettu.");
+		}, function error(){
+			sulka.helpers.hideLoaderAndSetError("Asetusten tallennus epäonnistui.");
+		});
 	}
 	
 };
