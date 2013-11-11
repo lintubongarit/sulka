@@ -439,4 +439,32 @@ public class LocalStorageControllerTest {
 				.andReturn();
 	}
 	
+	@Test
+	public void testGetSettingsStatusIsOk() throws Exception {
+		mockMvc.perform(get("/api/storage/settings")
+						.session(lokkiHttpSession))
+				.andExpect(status().isOk())
+				.andReturn();
+	}
+	
+	@Test
+	public void testGetSettingsReturnsJSON() throws Exception {
+		mockMvc.perform(get("/api/storage/settings")
+						.session(lokkiHttpSession))
+				.andExpect(status().isOk())
+				.andExpect(content().contentType("application/json;charset=UTF-8"))
+				.andReturn();
+	}
+	
+	@Test
+	public void testGetSettingsReturnsJSONWithCorrectColumns() throws Exception {
+		mockMvc.perform(get("/api/storage/settings")
+						.session(lokkiHttpSession))
+				.andExpect(status().isOk())
+				.andExpect(content().contentType("application/json;charset=UTF-8"))
+				.andExpect(jsonPath("$.object.userId").value(notNullValue()))
+				.andExpect(jsonPath("$.object.columns").value(notNullValue()))
+				.andReturn();
+	}
+	
 }

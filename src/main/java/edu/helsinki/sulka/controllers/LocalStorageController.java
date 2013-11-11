@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import edu.helsinki.sulka.models.RecoveryDatabaseRow;
 import edu.helsinki.sulka.models.RingingDatabaseRow;
 import edu.helsinki.sulka.models.User;
+import edu.helsinki.sulka.models.UserSettings;
 import edu.helsinki.sulka.services.LocalDatabaseService;
 
 
@@ -126,6 +127,15 @@ public class LocalStorageController extends JSONController {
 		localDatabaseService.removeRecovery(recovery);
 		
 		return new ObjectResponse<String>("Database updated.");
+	}
+	
+	@PreAuthorize("hasRole('USER')")
+	@RequestMapping(value = "/api/storage/settings",
+					method = RequestMethod.GET)
+	@ResponseBody
+	public ObjectResponse<UserSettings> getSettings(HttpSession session) throws LocalStorageException {
+		String userId = ((User) session.getAttribute("user")).getLogin_id();
+		return new ObjectResponse<UserSettings>(localDatabaseService.getSettings(userId));
 	}
 	
 	
