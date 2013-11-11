@@ -80,7 +80,7 @@ sulka = {
 	 */
 	initColumns: function () {
 		sulka.helpers.showLoader();
-		
+
 		// Get view fields
 		sulka.API.fetchFieldGroups(
 			sulka.viewMode,
@@ -158,12 +158,13 @@ sulka = {
 			sulka.helpers.hideLoaderAndSetError
 		); 
 	},
-	
+	  
 	/**
 	 * Init grid. Called once at start after columns have been fetched.
 	 */
 	initGrid: function () {
 		// We are now ready to actually initialize the grid
+		  
 		sulka.grid = new Slick.Grid("#slick-grid", [], sulka.getVisibleColumns(), sulka.gridOptions);
 		
 		sulka.viewport = $("#slick-grid").find(".slick-viewport");
@@ -192,7 +193,6 @@ sulka = {
 			sulka.initDrop();
 		}
 		
-		
 		sulka.grid.registerPlugin(new Slick.AutoTooltips());
 
 	    // set keyboard focus on the grid
@@ -218,7 +218,7 @@ sulka = {
 		sulka.grid.onAddNewRow.subscribe(sulka.onAddNewRow);
 		
 		sulka.grid.onCellChange.subscribe(sulka.onCellChange);
-		
+				  
 		$(window).resize(sulka.resizeGrid);
 		sulka.resizeGrid();
 		
@@ -285,10 +285,6 @@ sulka = {
 		sulka.API.deleteSulkaDBRow(toBeDeleted);
 	    
 	},
-	
-	
-	
-	
 	
 	/**
 	 * Adjust grid positioning and size after window resize. 
@@ -644,22 +640,54 @@ sulka = {
 	
 	fetchRows: function (filters) {
 		sulka.API.fetchRows(
-				sulka.rowsMode,
-				filters,
-				function (rows) {
-					if (rows.length == 0) {
-						sulka.helpers.hideLoaderAndSetError(sulka.strings.noResults);
-					} else {
-						sulka.helpers.hideLoaderAndUnsetError();
-					}
-					
-					if (rows.length > 0) {
-						sulka.adjustFlexibleCols(rows);
-					}
-					sulka.setData(rows);
-				},
-				sulka.helpers.hideLoaderAndSetError
-			);
+			sulka.rowsMode,
+			filters,
+			function (rows) {
+				if (rows.length == 0) {
+					sulka.helpers.hideLoaderAndSetError(sulka.strings.noResults);
+				} else {
+					sulka.helpers.hideLoaderAndUnsetError();
+				}
+				
+				if (rows.length > 0) {
+					sulka.adjustFlexibleCols(rows);
+				}
+				sulka.grid.setData(sulka.createNewDataView(rows));
+				sulka.grid.render();
+			},
+			sulka.helpers.hideLoaderAndSetError
+		);
+	},
+	
+	createNewDataView: function (data) {
+		return {
+			data: data,
+			getLength: function () {
+				return data.length;
+			},
+			getItem: function (index) {
+				return data[index];
+			},
+			getItemMetadata: function (index) {
+				var item = data[index];
+				if(item.databaseId==null){
+					return { "cssClasses": "tipu-row-color"};
+				}else{
+					return {"cssClasses" : "sulka-row-color"};
+				}
+				
+			}
+		};
+	},
+	
+	onAddNewRow: function(event, args){
+			var data = sulka.grid.getData();
+	        var item = args.item;
+	        var column = args.column;
+	        sulka.grid.invalidateRow(data.length);
+	        data.push(item);
+	        sulka.grid.updateRowCount();
+	        sulka.grid.render();
 	},
 	
 	/**
