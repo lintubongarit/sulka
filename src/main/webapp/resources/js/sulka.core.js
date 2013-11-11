@@ -81,7 +81,7 @@ sulka = {
 	 */
 	initColumns: function () {
 		sulka.helpers.showLoader();
-		
+
 		// Get view fields
 		sulka.API.fetchFieldGroups(
 			sulka.viewMode,
@@ -161,18 +161,17 @@ sulka = {
 			sulka.helpers.hideLoaderAndSetError
 		); 
 	},
-	
+	  
 	/**
 	 * Init grid. Called once at start after columns have been fetched.
 	 */
 	initGrid: function () {
 		// We are now ready to actually initialize the grid
+		  
 		sulka.grid = new Slick.Grid("#slick-grid", [], sulka.getVisibleColumns(), sulka.gridOptions);
 		
 		sulka.grid.setSelectionModel(new Slick.CellSelectionModel());
-		
-	
-	    
+
 		sulka.grid.registerPlugin(new Slick.AutoTooltips());
 
 	    // set keyboard focus on the grid
@@ -193,7 +192,7 @@ sulka = {
 		sulka.grid.onSort.subscribe(sulka.onGridSort);
 		
 		sulka.grid.onAddNewRow.subscribe(sulka.onAddNewRow);
-		
+		  
 		$(window).resize(sulka.resizeGrid);
 		sulka.resizeGrid();
 		
@@ -237,7 +236,7 @@ sulka = {
 		var data = sulka.grid.getData();
 	    var cols = args.sortCols;
 	    
-		data.sort(function (dataRow1, dataRow2) {
+	    data.sort(function (dataRow1, dataRow2) {
 			for (var i = 0, l = cols.length; i < l; i++) {
 				var field = cols[i].sortCol.field;
 				var sign = cols[i].sortAsc ? 1 : -1;
@@ -463,11 +462,32 @@ sulka = {
 				if (rows.length > 0) {
 					sulka.adjustFlexibleCols(rows);
 				}
-				sulka.grid.setData(rows);
+				sulka.grid.setData(sulka.createNewDataView(rows));
 				sulka.grid.render();
 			},
 			sulka.helpers.hideLoaderAndSetError
 		);
+	},
+	
+	createNewDataView: function (data) {
+		return {
+			data: data,
+			getLength: function () {
+				return data.length;
+			},
+			getItem: function (index) {
+				return data[index];
+			},
+			getItemMetadata: function (index) {
+				var item = data[index];
+				if(item.databaseId==null){
+					return { "cssClasses": "tipu-row-color"};
+				}else{
+					return {"cssClasses" : "sulka-row-color"};
+				}
+				
+			}
+		};
 	},
 	
 	onAddNewRow: function(event, args){
