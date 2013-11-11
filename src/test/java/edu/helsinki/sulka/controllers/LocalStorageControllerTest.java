@@ -404,7 +404,7 @@ public class LocalStorageControllerTest {
 		mockMvc.perform(delete("/api/storage/recoveries")
 						.session(lokkiHttpSession)
 						.contentType(MediaType.APPLICATION_JSON)
-						.content(validFullRow))
+						.content(validFullRowToBeDeleted))
 				.andExpect(status().isOk())
 				.andReturn();
 		}
@@ -414,7 +414,7 @@ public class LocalStorageControllerTest {
 		mockMvc.perform(delete("/api/storage/recoveries")
 						.session(lokkiHttpSession)
 						.contentType(MediaType.APPLICATION_JSON)
-						.content(validFullRow))
+						.content(validFullRowToBeDeleted))
 				.andExpect(status().isOk())
 				.andExpect(content().contentType("application/json;charset=UTF-8"))
 				.andReturn();
