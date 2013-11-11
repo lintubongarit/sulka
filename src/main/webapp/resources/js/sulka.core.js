@@ -172,7 +172,7 @@ sulka = {
 		sulka.grid.setSelectionModel(new Slick.RowSelectionModel());
 		
 		
-		if (sulka.viewMode == ("ringings" || "recoveries")){
+		if (sulka.viewMode == "ringings" || sulka.viewMode == "recoveries"){
 			sulka.moveRowsPlugin = 
 				new Slick.RowMoveManager({   
 					cancelEditOnDrag: true
