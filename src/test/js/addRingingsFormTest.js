@@ -51,7 +51,7 @@ casper.test.begin('AddRinger pages form tests', 12, function suite(test) {
 			'The "validate" button exists.');
 		
 		}).then(function (){
-			this.test.assertExists('button#remove', 
+			this.test.assertExists('.recycle-bin', 
 			'The "poistarivi" button exists.');
 		});
 		

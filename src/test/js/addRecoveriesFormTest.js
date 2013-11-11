@@ -47,7 +47,7 @@ casper.test.begin('addRecoveries pages form tests', 12, function suite(test) {
 			this.test.assertExists('button#validate', 
 			'The "validate" button exists.');
 		}).then(function (){
-			this.test.assertExists('button#remove', 
+			this.test.assertExists('.recycle-bin', 
 			'The "poistarivi" button exists.');
 
 		});
