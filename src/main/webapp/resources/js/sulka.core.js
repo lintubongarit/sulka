@@ -853,10 +853,27 @@ sulka = {
 		var settings = {
 				columns: JSON.stringify(columnDataToBeSaved)
 		};
-		sulka.API.saveSettings(settings, function success() {
+		sulka.API.saveSettings(settings, function onSuccess() {
 			sulka.helpers.hideLoaderAndSetError("Asetukset tallennettu.");
-		}, function error(){
+		}, function onError(){
 			sulka.helpers.hideLoaderAndSetError("Asetusten tallennus epäonnistui.");
+		});
+	},
+	
+	fetchSettings: function() {
+		sulka.helpers.showLoader();
+		sulka.API.fetchSettings(function onSuccess(results){
+			console.log(results);
+			var settings = jQuery.parseJSON(results.object.columns);
+			console.log(settings);
+			var columns = sulka.grid.getColumns();
+			for(var index in columns){
+				columns[index].width = settings[columns[index].field].w;
+			}
+			sulka.grid.setColumns(columns);
+			sulka.helpers.hideLoaderAndSetError("Asetukset noudettu.");
+		}, function onError(){
+			sulka.helpers.hideLoaderAndSetError("Asetusten nouto epäonnistui.");
 		});
 	}
 	

@@ -195,7 +195,7 @@ sulka.API = function(API) {
 		/**
 		 * Save users settings to database 
 		 * @param settings Settings to be saved
-		 * @param onSuccess Handler for succesful POST.
+		 * @param onSuccess Handler for succesfull POST.
 		 * @param onError Handler for failed POST.
 		 */
 		saveSettings: function(settings, onSuccess, onError) {
@@ -205,6 +205,20 @@ sulka.API = function(API) {
 				contentType: "application/json",
 				dataType: "json",
 				data: JSON.stringify(settings),
+				success: onSuccess,
+				error: onError
+			});
+		},
+		
+		/**
+		 * Get user settings from database
+		 * @param onSuccess Handler for succesfull GET.
+		 * @param onError Handler for failed GET.
+		 */
+		fetchSettings: function(onSuccess, onError){
+			$.ajax({
+				url: API.BASE + "/storage/settings",
+				type: "GET",
 				success: onSuccess,
 				error: onError
 			});
