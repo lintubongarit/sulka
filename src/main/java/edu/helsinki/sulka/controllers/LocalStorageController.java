@@ -138,6 +138,23 @@ public class LocalStorageController extends JSONController {
 		return new ObjectResponse<UserSettings>(localDatabaseService.getSettings(userId));
 	}
 	
+	@PreAuthorize("hasRole('USER')")
+	@RequestMapping(value = "/api/storage/settings",
+					method = RequestMethod.POST,
+					consumes = "application/json")
+	@ResponseBody
+	public ObjectResponse<String> saveSettings(HttpSession session,
+			@RequestBody UserSettings settings,
+			BindingResult bindingResult) throws LocalStorageException {
+		if(bindingResult.hasErrors()){
+			throw new LocalStorageException("Database update failed.");
+		}
+		String userId = ((User) session.getAttribute("user")).getLogin_id();
+		settings.setUserId(userId);
+		localDatabaseService.saveSettings(settings);
+		return new ObjectResponse<String>("User settings saved.");
+	}
+	
 	
 	/**
 	 * Handles storage exceptions gracefully.

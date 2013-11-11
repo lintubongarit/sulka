@@ -61,6 +61,7 @@ public class LocalStorageControllerTest {
 	private static final byte[] invalidId = "{\"JOTAIN\":\"1234\", \"row\":\"asdflkakgh\"}".getBytes();
 	private static final byte[] invalidRow = "{\"id\":\"1234\", \"ABCD\":\"asdflkakgh\"}".getBytes();
 	private static final byte[]	validFullRow = "{\"id\":\"1\", \"userId\":\"LocalStorageControllerTestUserId_123456789\", \"row\":\"asdflkakgh\"}".getBytes();
+	private static final byte[] validSettings = "{\"columns\":\"asdfawerfasdasdfaasdf\"}".getBytes();
 	
 	@Before
     public void setup() {
@@ -467,4 +468,23 @@ public class LocalStorageControllerTest {
 				.andReturn();
 	}
 	
+	@Test
+	public void testSaveSettingsStatusIsOk() throws Exception {
+		mockMvc.perform(post("/api/storage/settings")
+						.session(lokkiHttpSession)
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(validSettings))
+				.andExpect(status().isOk())
+				.andReturn();
+	}
+	
+	@Test
+	public void testSaveSettingsReturnsErrorIfDataIsntJSON() throws Exception {
+		mockMvc.perform(post("/api/storage/settings")
+						.session(lokkiHttpSession)
+						.contentType(MediaType.APPLICATION_XML)
+						.content(validSettings))
+				.andExpect(status().isUnsupportedMediaType())
+				.andReturn();
+	}
 }
