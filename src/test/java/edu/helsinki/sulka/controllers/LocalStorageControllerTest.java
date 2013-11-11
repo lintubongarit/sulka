@@ -61,6 +61,7 @@ public class LocalStorageControllerTest {
 	private static final byte[] invalidId = "{\"JOTAIN\":\"1234\", \"row\":\"asdflkakgh\"}".getBytes();
 	private static final byte[] invalidRow = "{\"id\":\"1234\", \"ABCD\":\"asdflkakgh\"}".getBytes();
 	private static final byte[]	validFullRow = "{\"id\":\"1\", \"userId\":\"LocalStorageControllerTestUserId_123456789\", \"row\":\"asdflkakgh\"}".getBytes();
+	private static final byte[]	validFullRowToBeDeleted = "[{\"id\":\"1\", \"userId\":\"LocalStorageControllerTestUserId_123456789\", \"row\":\"asdflkakgh\"}]".getBytes();
 	
 	@Before
     public void setup() {
@@ -225,7 +226,7 @@ public class LocalStorageControllerTest {
 		mockMvc.perform(delete("/api/storage/ringings")
 						.session(lokkiHttpSession)
 						.contentType(MediaType.APPLICATION_JSON)
-						.content(validFullRow))
+						.content(validFullRowToBeDeleted))
 				.andExpect(status().isOk())
 				.andReturn();
 		}
@@ -235,7 +236,7 @@ public class LocalStorageControllerTest {
 		mockMvc.perform(delete("/api/storage/ringings")
 						.session(lokkiHttpSession)
 						.contentType(MediaType.APPLICATION_JSON)
-						.content(validFullRow))
+						.content(validFullRowToBeDeleted))
 				.andExpect(status().isOk())
 				.andExpect(content().contentType("application/json;charset=UTF-8"))
 				.andReturn();

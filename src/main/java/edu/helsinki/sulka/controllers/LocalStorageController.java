@@ -85,9 +85,6 @@ public class LocalStorageController extends JSONController {
 			localDatabaseService.removeRinging(ringingDatabaseRow);
 
 		}
-		
-		
-		
 		return new ObjectResponse<String>("Database updated.");
 	}
 	
