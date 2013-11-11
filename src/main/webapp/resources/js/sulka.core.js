@@ -252,25 +252,23 @@ sulka = {
 		        
 		        var rowsToDelete = dd.rows.sort().reverse();
 		        
-		        
 		        var toBeDeleted = new Array();
 		        
 		        for (var i = 0; i < rowsToDelete.length; i++) {
-		        	
+		        
+		        	var plop = data.splice(rowsToDelete[i], 1);
+	        	
 		        	//Delete data from the database.
-		        	//sulka.deleteRow(data[rowsToDelete[i]]);
-		        	if (data[rowsToDelete[i]].rowStatus == "inputRow"){
+		        	if (plop[0].rowStatus == "inputRow"){
 			 	    	var testObject = {};
-			 	    	//console.log("DATA ID: " + JSON.stringify(data));
-				    	testObject.id = data[rowsToDelete[i]].databaseId;
-				    	testObject.userId = data[rowsToDelete[i]].userId;
-				    	testObject.row = JSON.stringify(data[rowsToDelete[i]]);
-			 	    	//sulka.API.deleteSulkaDBRow(testObject);
-			 	    	
+				    	testObject.id = plop[0].databaseId;
+				    	testObject.userId = plop[0].userId;
+				    	testObject.row = JSON.stringify(plop[0]);
+
 			 	    	toBeDeleted.push(testObject);
 		        	}
 		        	//Delete data from the grid.
-		        	data.splice(rowsToDelete[i], 1);
+		        	
 		        }
 		        
 		        sulka.deleteRows(toBeDeleted);
