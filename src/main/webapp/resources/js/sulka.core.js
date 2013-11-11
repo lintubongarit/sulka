@@ -255,9 +255,11 @@ sulka = {
 		        	
 		        	//Delete data from the database.
 		        	sulka.deleteRow(data[rowsToDelete[i]]);
-		        	
+
+
 		        	//Delete data from the grid.
 		        	data.splice(rowsToDelete[i], 1);
+		        	
 		        }
 		        sulka.grid.invalidate();
 	
@@ -265,20 +267,16 @@ sulka = {
 		      });
 	},
 	
-	deleteRow: function(data,args){
-		console.log(JSON.stringify(data));
-	    if (data.rowStatus == "inputRow"){
+	deleteRow: function(data, onSuccess, onError){
+		if (data.rowStatus == "inputRow"){
 	 	    	var testObject = {};
+	 	    	//console.log("DATA ID: " + JSON.stringify(data));
 	 	    	
-		 	   	if(data.hasOwnProperty("databaseId")){
-		    		testObject.id = data.id;
-		    		testObject.userId = data.UserId;
-		    	}
-		 	   	else
-		 	   	{
-		 	   		return;
-		 	   	}
+		    	testObject.id = data.databaseId;
+		    	testObject.userId = data.userId;
+		
 	 	    	testObject.row = JSON.stringify(data);
+	 	    	
 	 	    	
 	 	    	sulka.API.deleteSulkaDBRow(testObject);
 	    }

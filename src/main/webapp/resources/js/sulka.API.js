@@ -105,22 +105,19 @@ sulka.API = function(API) {
 		
 		
 		deleteSulkaDBRow: function(object, onSuccess, onError){
-			console.log(JSON.stringify(object));
+			console.log("TAMMONEN OBJECTI" + JSON.stringify(object));
 			$.ajax({
 				url : API.BASE + "/storage/"  + sulka.viewMode,
 				dataType : 'json',
 				type: "DELETE",
 				data: JSON.stringify(object),
 				contentType: "application/json;charset=UTF-8",
-				success : function(results){console.log(results);}, 
-					
-//				function(results) {
-//					if (onSuccess) {
-//						onSuccess();
-//					}
-//				},
-				error : function(results){console.log(results);}
-//					API._jQueryErrorHandler(onError)
+				success : function(results) {
+					if (onSuccess) {
+						onSuccess();
+					};
+				},
+				error : API._jQueryErrorHandler(onError)
 			});
 		},
 		
