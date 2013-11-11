@@ -773,6 +773,8 @@ sulka = {
 	/**
 	 * When new row is added, this function is called.
 	 * uses addToSulkaDB() to add row to sulka-database
+	 * 
+	 * @returns slick grid row id where was added
 	 */
 	onAddNewRow: function(event, args){
 			var data = sulka.grid.getData();
@@ -784,7 +786,6 @@ sulka = {
 	        data.push(item);
 	        sulka.grid.updateRowCount();
 	        sulka.grid.render();
-	        
 	        sulka.addToSulkaDB(args);
 	},
 	
@@ -800,7 +801,7 @@ sulka = {
 	 * Adds row to sulka-database
 	 */
 	addToSulkaDB: function (args) {
-		var data = sulka.grid.getData();		
+		var data = sulka.grid.getData();
 		var actualRowData = data[args.row];
 	    var rowStatus = args.item.rowStatus;
 	    

@@ -58,6 +58,7 @@ sulka.addCore = function() {
 					rivi.databaseId = rows[i].id;
 					sulkaRows.push(rivi);
 				}
+				console.log(sulkaRows);
 				
 				sulka.setData(sulka.grid.getData().concat(sulkaRows));
 			},
