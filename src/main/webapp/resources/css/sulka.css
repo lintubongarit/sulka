@@ -286,14 +286,15 @@ span#last-error {
 	-webkit-transition: 0.5s background;
 }
 
-.slick-row.odd {
+/*.slick-row.odd {
   background: #fafafa;
-}
+}*/
 
-.slick-cell-checkboxsel {
-      background: #f0f0f0;
-      border-right-color: silver;
-      border-right-style: solid;
+.tipu-row-color {
+	background: #ACE9F8; 
+}
+.sulka-row-color {
+	background: #F9D0D0; 
 }
 
 .header-freeze-button, .header-unfreeze-button {
