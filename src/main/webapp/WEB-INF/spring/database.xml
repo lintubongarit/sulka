@@ -13,41 +13,56 @@
                 http://www.springframework.org/schema/tx/spring-tx.xsd
                 http://www.springframework.org/schema/data/jpa
                 http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
- 
-    <jpa:repositories base-package="edu.helsinki.sulka" />
-    
-    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+
+     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="location" value="classpath:database.properties"/>
     </bean>
-    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
-        <property name="persistenceUnitName" value="persistenceUnitProduction" /> 
-        <property name="dataSource" ref="productionSource" />
-        <property name="jpaVendorAdapter">
-            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
-                <property name="generateDdl" value="true" />
-                <property name="showSql" value="true" />
-                <property name="databasePlatform" value="org.hibernate.dialect.Oracle10gDialect" />
-                
-            </bean>
-        </property>
-    </bean>
-    
-    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
-        <property name="entityManagerFactory" ref="entityManagerFactory"/>
-    </bean>
-
-    <tx:annotation-driven transaction-manager="transactionManager" />
-    
+   
     <bean class="org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor"/>
     <bean class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor"/>
     
-   <bean id="productionSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
-        <property name="driverClass" value="oracle.jdbc.driver.OracleDriver" />
-	    <property name="jdbcUrl" value="${database.host}" />
-	    <property name="user" value="${database.username}" />
-	    <property name="password" value="${database.password}" />
-	    <property name="initialPoolSize" value="5"/>
-	    <property name="minPoolSize" value="5"/>
-   </bean>
+        <tx:annotation-driven transaction-manager="transactionManager" />
+    
+    <jpa:repositories base-package="edu.helsinki.sulka" />
+    
+    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory" ref="entityManagerFactory" />
+    </bean>
+    
+    <beans profile="production" >
+        <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+	        <property name="persistenceUnitName" value="persistenceUnitProduction" /> 
+	        <property name="dataSource" ref="productionSource" />
+	        <property name="jpaVendorAdapter">
+	            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+	                <property name="generateDdl" value="true" />
+	                <property name="showSql" value="true" />
+	                <property name="databasePlatform" value="org.hibernate.dialect.Oracle10gDialect" />
+	                
+	            </bean>
+	        </property>
+	    </bean>
+        
+	    <bean id="productionSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+	        <property name="driverClass" value="oracle.jdbc.driver.OracleDriver" />
+	        <property name="jdbcUrl" value="${database.host}" />
+	        <property name="user" value="${database.username}" />
+	        <property name="password" value="${database.password}" />
+	        <property name="initialPoolSize" value="5"/>
+	        <property name="minPoolSize" value="5"/>
+	    </bean>
+    </beans>
+    
+    <beans profile="dev">  
+        <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+	        <property name="persistenceUnitName" value="persistenceUnitH2" /> 
+	        <property name="dataSource" ref="h2DataSource" />
+	        <property name="jpaVendorAdapter">
+	            <bean class="org.springframework.orm.jpa.vendor.EclipseLinkJpaVendorAdapter"/>
+	        </property>
+	    </bean>
+
+	    <jdbc:embedded-database id="h2DataSource" type="H2" />    
+    </beans>
 </beans>
 

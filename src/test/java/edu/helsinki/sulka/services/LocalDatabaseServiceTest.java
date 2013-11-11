@@ -4,11 +4,14 @@ import static org.junit.Assert.*;
 
 import java.util.List;
 
+import javax.persistence.PersistenceContext;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +27,7 @@ import edu.helsinki.sulka.models.UserSettings;
 	"file:src/main/webapp/WEB-INF/spring/appServlet/servlet-context.xml"
 })
 @Transactional
+@ActiveProfiles("dev")
 public class LocalDatabaseServiceTest {
 
 	@Autowired
