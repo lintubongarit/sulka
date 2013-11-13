@@ -845,10 +845,10 @@ sulka = {
 		var columns = sulka.grid.getColumns();
 		var columnsDataToBeSaved = {};
 		for(var index in columns){
-			var columnData = {
-					width: columns[index].width,
-					position: index,
-			};
+			var columnData = [ // [position, width, visibility]
+					index,
+					columns[index].width,
+			];
 			columnsDataToBeSaved[columns[index].field] = columnData;
 		}
 		
@@ -877,9 +877,11 @@ sulka = {
 			var settings = jQuery.parseJSON(results.object.columns);
 			var oldColumns = sulka.grid.getColumns();
 			var updatedColumns = [];
-			for(var index in oldColumns){
-				oldColumns[index].width = settings[oldColumns[index].field].width;
-				updatedColumns[settings[oldColumns[index].field].position] = oldColumns[index];
+			for(var index in oldColumns){ 
+				// Data is in following format:
+				// "columnName": [position, width, visibility]
+				oldColumns[index].width = settings[oldColumns[index].field][1];
+				updatedColumns[settings[oldColumns[index].field][0]] = oldColumns[index];
 			}
 			sulka.grid.setColumns(updatedColumns);
 			
