@@ -659,7 +659,11 @@ sulka = {
 		);
 	},
 	
+	METADATA_SULKA_ROW: {"cssClasses" : "sulka-row-color"},
+	METADATA_TIPU_ROW: { "cssClasses": "tipu-row-color"},
 	createNewDataView: function (data) {
+		var METADATA_SULKA_ROW = sulka.METADATA_SULKA_ROW,
+			METADATA_TIPU_ROW = sulka.METADATA_TIPU_ROW;
 		return {
 			data: data,
 			getLength: function () {
@@ -669,13 +673,11 @@ sulka = {
 				return data[index];
 			},
 			getItemMetadata: function (index) {
-				var item = data[index];
-				if(item.databaseId==null){
-					return { "cssClasses": "tipu-row-color"};
-				}else{
-					return {"cssClasses" : "sulka-row-color"};
+				if (data[index].hasOwnProperty("databaseId")) {
+					return METADATA_SULKA_ROW;
+				} else {
+					return METADATA_TIPU_ROW;
 				}
-				
 			}
 		};
 	},
