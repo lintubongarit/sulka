@@ -3,7 +3,7 @@ casper.test.begin('Setting saving tests', 8, function suite(test) {
     	
     	casper.then(function () {
     		casper.evaluate(function() {
-    			sulka.onColumnChange();
+    			sulka.saveSettings();
     		});
     	}).waitWhileVisible("#loader-animation"
 		).then(function () {
@@ -13,7 +13,7 @@ casper.test.begin('Setting saving tests', 8, function suite(test) {
 			test.assertEquals(returnValue, "Asetukset tallennettu.", "Saving columns won't fail.");
 		}).then(function(){
 			casper.evaluate(function() {
-				sulka.onColumnChange();
+				sulka.saveSettings();
 				var gridColumns = sulka.grid.getColumns();
 				gridColumns[1].width = 700;
 				sulka.grid.setColumns(gridColumns);
@@ -28,7 +28,7 @@ casper.test.begin('Setting saving tests', 8, function suite(test) {
 			test.assertNotEquals(columnWidth, 700, "Column width is changed back to original with fetchSettings().");
 		}).then(function() {
 			casper.evaluate(function() {
-				sulka.onColumnChange();
+				sulka.saveSettings();
 				var gridColumns = sulka.grid.getColumns();
 				var tmp = gridColumns[0];
 				gridColumns[0] = gridColumns[1];
@@ -52,7 +52,7 @@ casper.test.begin('Setting saving tests', 8, function suite(test) {
 				recoveries: true
 				}, true);
 			casper.evaluate(function() {
-				sulka.onColumnChange();
+				sulka.saveSettings();
 			});
 			this.fill('form#filters', {
 				date: '',

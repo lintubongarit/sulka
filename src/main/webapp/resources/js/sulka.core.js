@@ -172,8 +172,8 @@ sulka = {
 		sulka.grid.setSelectionModel(new Slick.RowSelectionModel());
 		
 		//Subscribe setting saving
-		sulka.grid.onColumnsReordered.subscribe(sulka.onColumnChange);
-		sulka.grid.onColumnsResized.subscribe(sulka.onColumnChange);
+		sulka.grid.onColumnsReordered.subscribe(sulka.saveSettings);
+		sulka.grid.onColumnsResized.subscribe(sulka.saveSettings);
 		
 		
 		if (sulka.viewMode == ("ringings" || "recoveries")){
@@ -840,7 +840,7 @@ sulka = {
 		);
 	},
 	
-	onColumnChange: function() {
+	saveSettings: function() {
 		sulka.helpers.showLoader();
 		var columns = sulka.grid.getColumns();
 		var columnsDataToBeSaved = {};
