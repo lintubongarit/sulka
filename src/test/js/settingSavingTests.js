@@ -1,4 +1,4 @@
-casper.test.begin('Setting saving tests', 3, function suite(test) {
+casper.test.begin('Setting saving tests', 8, function suite(test) {
     browse('/', function () {
     	
     	casper.then(function () {
@@ -43,6 +43,36 @@ casper.test.begin('Setting saving tests', 3, function suite(test) {
 				return sulkaColumns[0].field;
 			});
 			test.assertEquals(columnName, "type", "Changed column order is restored back with fetchSettings().");
+		}).then(function() {
+			this.fill('form#filters', {
+				date: '1990',
+				species: 'BUBBUB',
+				municipality: 'VANTAA',
+				ringings: false,
+				recoveries: true
+				}, true);
+			casper.evaluate(function() {
+				sulka.onColumnChange();
+			});
+			this.fill('form#filters', {
+				date: '',
+				species: '',
+				municipality: '',
+				ringings: true,
+				recoveries: false
+				}, false);
+		}).waitWhileVisible("loader-animation"
+		).then(function() {
+			casper.evaluate(function() {
+				sulka.fetchSettings();
+			});
+		}).waitWhileVisible("loader-animation"
+		).then(function(){
+			test.assertField('date', '1990', "Date is restored.");
+			test.assertField('species', 'BUBBUB', "Species is restored.");
+			test.assertField('municipality', 'VANTAA', "Municipality is restored.");
+			test.assertField('ringings', false, "Ringings is restored.");
+			test.assertField('recoveries', true, "Recoveries is restored.");
 		});
     });
     

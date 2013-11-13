@@ -843,16 +843,26 @@ sulka = {
 	onColumnChange: function() {
 		sulka.helpers.showLoader();
 		var columns = sulka.grid.getColumns();
-		var columnDataToBeSaved = {};
+		var columnsDataToBeSaved = {};
 		for(var index in columns){
 			var columnData = {
 					width: columns[index].width,
 					position: index,
 			};
-			columnDataToBeSaved[columns[index].field] = columnData;
+			columnsDataToBeSaved[columns[index].field] = columnData;
 		}
+		
+		var filters =  {
+				date: $("#filters-date").val(),
+				species: $("#filters-species").val(),
+				municipality: $("#filters-municipality").val(),
+				ringings: $("#filters-ringings").prop("checked"),
+				recoveries: $("#filters-recoveries").prop("checked"),
+		};
+		
 		var settings = {
-				columns: JSON.stringify(columnDataToBeSaved)
+				columns: JSON.stringify(columnsDataToBeSaved),
+				filters: JSON.stringify(filters),
 		};
 		sulka.API.saveSettings(settings, function onSuccess() {
 			sulka.helpers.hideLoaderAndSetError("Asetukset tallennettu.");
@@ -872,6 +882,14 @@ sulka = {
 				updatedColumns[settings[oldColumns[index].field].position] = oldColumns[index];
 			}
 			sulka.grid.setColumns(updatedColumns);
+			
+			var filters = jQuery.parseJSON(results.object.filters);
+			$("#filters-date").val(filters.date);
+			$("#filters-species").val(filters.species);
+			$("#filters-municipality").val(filters.municipality);
+			$("#filters-ringings").prop('checked', filters.ringings);
+			$("#filters-recoveries").prop('checked', filters.recoveries);
+			
 			sulka.helpers.hideLoaderAndSetError("Asetukset noudettu.");
 		}, function onError(){
 			sulka.helpers.hideLoaderAndSetError("Asetusten nouto epäonnistui.");
