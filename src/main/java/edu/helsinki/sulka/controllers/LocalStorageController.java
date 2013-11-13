@@ -22,6 +22,7 @@ import edu.helsinki.sulka.models.RecoveryDatabaseRowList;
 import edu.helsinki.sulka.models.RingingDatabaseRow;
 import edu.helsinki.sulka.models.RingingDatabaseRowList;
 import edu.helsinki.sulka.models.User;
+import edu.helsinki.sulka.models.UserSettings;
 import edu.helsinki.sulka.services.LocalDatabaseService;
 
 
@@ -136,6 +137,32 @@ public class LocalStorageController extends JSONController {
 		}
 		
 		return new ObjectResponse<String>("Database updated.");
+	}
+	
+	@PreAuthorize("hasRole('USER')")
+	@RequestMapping(value = "/api/storage/settings",
+					method = RequestMethod.GET)
+	@ResponseBody
+	public ObjectResponse<UserSettings> getSettings(HttpSession session) throws LocalStorageException {
+		String userId = ((User) session.getAttribute("user")).getLogin_id();
+		return new ObjectResponse<UserSettings>(localDatabaseService.getSettings(userId));
+	}
+	
+	@PreAuthorize("hasRole('USER')")
+	@RequestMapping(value = "/api/storage/settings",
+					method = RequestMethod.POST,
+					consumes = "application/json")
+	@ResponseBody
+	public ObjectResponse<String> saveSettings(HttpSession session,
+			@RequestBody UserSettings settings,
+			BindingResult bindingResult) throws LocalStorageException {
+		if(bindingResult.hasErrors()){
+			throw new LocalStorageException("Database update failed.");
+		}
+		String userId = ((User) session.getAttribute("user")).getLogin_id();
+		settings.setUserId(userId);
+		localDatabaseService.saveSettings(settings);
+		return new ObjectResponse<String>("User settings saved.");
 	}
 	
 	
