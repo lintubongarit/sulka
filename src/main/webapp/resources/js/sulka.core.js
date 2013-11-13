@@ -846,7 +846,8 @@ sulka = {
 		var columnDataToBeSaved = {};
 		for(var index in columns){
 			var columnData = {
-					w: columns[index].width
+					width: columns[index].width,
+					position: index,
 			};
 			columnDataToBeSaved[columns[index].field] = columnData;
 		}
@@ -863,14 +864,14 @@ sulka = {
 	fetchSettings: function() {
 		sulka.helpers.showLoader();
 		sulka.API.fetchSettings(function onSuccess(results){
-			console.log(results);
 			var settings = jQuery.parseJSON(results.object.columns);
-			console.log(settings);
-			var columns = sulka.grid.getColumns();
-			for(var index in columns){
-				columns[index].width = settings[columns[index].field].w;
+			var oldColumns = sulka.grid.getColumns();
+			var updatedColumns = [];
+			for(var index in oldColumns){
+				oldColumns[index].width = settings[oldColumns[index].field].width;
+				updatedColumns[settings[oldColumns[index].field].position] = oldColumns[index];
 			}
-			sulka.grid.setColumns(columns);
+			sulka.grid.setColumns(updatedColumns);
 			sulka.helpers.hideLoaderAndSetError("Asetukset noudettu.");
 		}, function onError(){
 			sulka.helpers.hideLoaderAndSetError("Asetusten nouto epäonnistui.");
