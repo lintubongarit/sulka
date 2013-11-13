@@ -842,7 +842,7 @@ sulka = {
 	
 	saveSettings: function() {
 		sulka.helpers.showLoader();
-		var columns = sulka.grid.getColumns();
+		var columns = sulka.columns;
 		var columnsDataToBeSaved = {};
 		for(var index in columns){
 			var columnData = [ // [position, width, visibility]
@@ -875,7 +875,7 @@ sulka = {
 		sulka.helpers.showLoader();
 		sulka.API.fetchSettings(function onSuccess(results){
 			var settings = jQuery.parseJSON(results.object.columns);
-			var oldColumns = sulka.grid.getColumns();
+			var oldColumns = sulka.columns;
 			var updatedColumns = [];
 			for(var index in oldColumns){ 
 				// Data is in following format:
@@ -883,7 +883,9 @@ sulka = {
 				oldColumns[index].width = settings[oldColumns[index].field][1];
 				updatedColumns[settings[oldColumns[index].field][0]] = oldColumns[index];
 			}
-			sulka.grid.setColumns(updatedColumns);
+			sulka.columns = updatedColumns;
+			sulka.grid.setColumns(sulka.getVisibleColumns());
+			sulka.renderColumnGroups();
 			
 			var filters = jQuery.parseJSON(results.object.filters);
 			$("#filters-date").val(filters.date);
