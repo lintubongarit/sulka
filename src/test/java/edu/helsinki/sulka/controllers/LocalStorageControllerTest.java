@@ -62,6 +62,8 @@ public class LocalStorageControllerTest {
 	private static final byte[] invalidRow = "{\"id\":\"1234\", \"ABCD\":\"asdflkakgh\"}".getBytes();
 	private static final byte[]	validFullRow = "{\"id\":\"1\", \"userId\":\"LocalStorageControllerTestUserId_123456789\", \"row\":\"asdflkakgh\"}".getBytes();
 	private static final byte[]	validFullRowToBeDeleted = "[{\"id\":\"1\", \"userId\":\"LocalStorageControllerTestUserId_123456789\", \"row\":\"asdflkakgh\"}]".getBytes();
+	private static final byte[] validSettings = "{\"columns\":\"asdfawerfasdasdfaasdf\"}".getBytes();
+
 	
 	@Before
     public void setup() {
@@ -440,4 +442,51 @@ public class LocalStorageControllerTest {
 				.andReturn();
 	}
 	
+	@Test
+	public void testGetSettingsStatusIsOk() throws Exception {
+		mockMvc.perform(get("/api/storage/settings")
+						.session(lokkiHttpSession))
+				.andExpect(status().isOk())
+				.andReturn();
+	}
+	
+	@Test
+	public void testGetSettingsReturnsJSON() throws Exception {
+		mockMvc.perform(get("/api/storage/settings")
+						.session(lokkiHttpSession))
+				.andExpect(status().isOk())
+				.andExpect(content().contentType("application/json;charset=UTF-8"))
+				.andReturn();
+	}
+	
+	@Test
+	public void testGetSettingsReturnsJSONWithCorrectColumns() throws Exception {
+		mockMvc.perform(get("/api/storage/settings")
+						.session(lokkiHttpSession))
+				.andExpect(status().isOk())
+				.andExpect(content().contentType("application/json;charset=UTF-8"))
+				.andExpect(jsonPath("$.object.userId").value(notNullValue()))
+				.andExpect(jsonPath("$.object.columns").value(notNullValue()))
+				.andReturn();
+	}
+	
+	@Test
+	public void testSaveSettingsStatusIsOk() throws Exception {
+		mockMvc.perform(post("/api/storage/settings")
+						.session(lokkiHttpSession)
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(validSettings))
+				.andExpect(status().isOk())
+				.andReturn();
+	}
+	
+	@Test
+	public void testSaveSettingsReturnsErrorIfDataIsntJSON() throws Exception {
+		mockMvc.perform(post("/api/storage/settings")
+						.session(lokkiHttpSession)
+						.contentType(MediaType.APPLICATION_XML)
+						.content(validSettings))
+				.andExpect(status().isUnsupportedMediaType())
+				.andReturn();
+	}
 }

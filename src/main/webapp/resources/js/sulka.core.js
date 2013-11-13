@@ -172,6 +172,10 @@ sulka = {
 		sulka.grid.setSelectionModel(new Slick.CellSelectionModel());
 		sulka.grid.setSelectionModel(new Slick.RowSelectionModel());
 		
+		//Subscribe setting saving
+		sulka.grid.onColumnsReordered.subscribe(sulka.saveSettings);
+		sulka.grid.onColumnsResized.subscribe(sulka.saveSettings);
+		
 		
 		if (sulka.viewMode == "ringings" || sulka.viewMode == "recoveries"){
 			sulka.moveRowsPlugin = 
@@ -866,6 +870,68 @@ sulka = {
 			}, 
 			sulka.helpers.hideLoaderAndSetError
 		);
+	},
+	
+	saveSettings: function() {
+		sulka.helpers.showLoader();
+		var columns = sulka.columns;
+		var columnsDataToBeSaved = {};
+		for(var index in columns){
+			var columnData = [ // [position, width, visibility]
+					index,
+					columns[index].width,
+					columns[index].$sulkaVisible,
+			];
+			columnsDataToBeSaved[columns[index].field] = columnData;
+		}
+		
+		var filters =  {
+				date: $("#filters-date").val(),
+				species: $("#filters-species").val(),
+				municipality: $("#filters-municipality").val(),
+				ringings: $("#filters-ringings").prop("checked"),
+				recoveries: $("#filters-recoveries").prop("checked"),
+		};
+		
+		var settings = {
+				columns: JSON.stringify(columnsDataToBeSaved),
+				filters: JSON.stringify(filters),
+		};
+		sulka.API.saveSettings(settings, function onSuccess() {
+			sulka.helpers.hideLoaderAndSetError("Asetukset tallennettu.");
+		}, function onError(){
+			sulka.helpers.hideLoaderAndSetError("Asetusten tallennus epäonnistui.");
+		});
+	},
+	
+	fetchSettings: function() {
+		sulka.helpers.showLoader();
+		sulka.API.fetchSettings(function onSuccess(results){
+			var settings = jQuery.parseJSON(results.object.columns);
+			var oldColumns = sulka.columns;
+			var updatedColumns = [];
+			for(var index in oldColumns){ 
+				// Data is in following format:
+				// "columnName": [position, width, visibility]
+				oldColumns[index].width = settings[oldColumns[index].field][1];
+				oldColumns[index].$sulkaVisible = settings[oldColumns[index].field][2];
+				updatedColumns[settings[oldColumns[index].field][0]] = oldColumns[index];
+			}
+			sulka.columns = updatedColumns;
+			sulka.grid.setColumns(sulka.getVisibleColumns());
+			sulka.renderColumnGroups();
+			
+			var filters = jQuery.parseJSON(results.object.filters);
+			$("#filters-date").val(filters.date);
+			$("#filters-species").val(filters.species);
+			$("#filters-municipality").val(filters.municipality);
+			$("#filters-ringings").prop('checked', filters.ringings);
+			$("#filters-recoveries").prop('checked', filters.recoveries);
+			
+			sulka.helpers.hideLoaderAndSetError("Asetukset noudettu.");
+		}, function onError(){
+			sulka.helpers.hideLoaderAndSetError("Asetusten nouto epäonnistui.");
+		});
 	}
 	
 };
