@@ -102,20 +102,34 @@ sulka.API = function(API) {
 			});
 		},
 		
-		deleteSulkaDBRow: function(object, onSuccess, onError){
+		deleteSulkaDBRows: function(ids, onSuccess, onError) {
+			var rowsHandled = 0;
+			var errors = [];
+			var onRowHandled = function (error) {
+				rowsHandled++;
+				if (error) {
+					errors.push(error);
+				}
+				if (rowsHandled == ids.length) {
+					if (errors.length == 0) {
+						if (onSuccess) onSuccess();
+					} else {
+						if (onError) onError(errors.join(", "));
+					}
+				}
+			};
 			
-			$.ajax({
-				url : API.BASE + "/storage/"  + sulka.viewMode,
-				dataType : 'json',
-				type: "DELETE",
-				data: JSON.stringify(object),
-				contentType: "application/json;charset=UTF-8",
-				success : function(results) {
-					if (onSuccess) {
-						onSuccess();
-					};
-				},
-				error : API._jQueryErrorHandler(onError)
+			$.each(ids, function () {
+				$.ajax({
+					url : API.BASE + "/storage/"  + sulka.viewMode + "/" + this,
+					dataType : 'json',
+					type: "DELETE",
+					contentType: "application/json;charset=UTF-8",
+					success : function() {
+						onRowHandled();
+					},
+					error: API._jQueryErrorHandler(onRowHandled) 
+				});
 			});
 		},
 		
@@ -154,17 +168,19 @@ sulka.API = function(API) {
 		},
 		
 				
-		addRow : function(row, slickRowId){
+		addRow: function(row, onSuccess, onError) {
 			$.ajax({
 				url : API.BASE + "/storage/" + sulka.viewMode,
 				dataType : "json",
 				data: JSON.stringify(row),
 				contentType: "application/json",
 				type: "POST",
-				success: function(data) {
-					sulka.grid.getData()[slickRowId].databaseID = data.object.id;
+				success: function (data) {
+					if (onSuccess) {
+						onSuccess(data.object);
+					}
 				},
-				error : API._jQueryErrorHandler("Riviä ei voitu lisätä"),
+				error: onError
 			});
 		},
 
@@ -192,7 +208,7 @@ sulka.API = function(API) {
 		 * call the given function with the API's returned error message, or
 		 * current HTTP error message, should an error occur.
 		 */
-		_jQueryErrorHandler : function(errorHandler) {
+		_jQueryErrorHandler: function(errorHandler) {
 			if (!errorHandler)
 				return undefined;
 			return function(jqXHR, textStatus, errorThrown) {

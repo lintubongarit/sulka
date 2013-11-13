@@ -186,6 +186,14 @@ helpers = {
 	            	return false;
 	            }); // from jquery:ui.core.js 1.7.2
       }
+    },
+    
+    numericSort: function (item1, item2) {
+    	return item1 - item2;
+    },
+    
+    numericReverseSort: function (item1, item2) {
+    	return item2 - item1;
     }
 };
 
