@@ -24,6 +24,9 @@ public class UserSettings implements Serializable{
 	@JsonProperty("columns")
 	@Column(name = "columns", length = 3000)
 	private String columns;
+	@JsonProperty("filters")
+	@Column(name = "filters")
+	private String filters;
 	
 	public String getUserId() {
 		return userId;
@@ -36,5 +39,11 @@ public class UserSettings implements Serializable{
 	}
 	public void setColumns(String columns) {
 		this.columns = columns;
+	}
+	public String getFilters() {
+		return filters;
+	}
+	public void setFilters(String filters) {
+		this.filters = filters;
 	}
 }
