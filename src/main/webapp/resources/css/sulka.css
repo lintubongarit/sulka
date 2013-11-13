@@ -291,10 +291,23 @@ span#last-error {
 }*/
 
 .tipu-row-color {
-	background: #ACE9F8; 
+	background: #e6f3ff; 
 }
+
 .sulka-row-color {
-	background: #F9D0D0; 
+	background: #ffffff; 
+}
+
+.sulka-valid-row-color {
+	background: #ebffec; 
+}
+
+.sulka-invalid-row-color {
+	background: #fcebeb; 
+}
+
+.sulka-invalid-cell-color {
+	background: #f49696; 
 }
 
 .header-freeze-button, .header-unfreeze-button {
