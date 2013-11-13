@@ -950,9 +950,9 @@ sulka = {
 				filters: JSON.stringify(filters),
 		};
 		sulka.API.saveSettings(settings, function onSuccess() {
-			sulka.helpers.hideLoaderAndSetError("Asetukset tallennettu.");
+			console.log(sulka.string.settingsSaved);
 		}, function onError(){
-			sulka.helpers.hideLoaderAndSetError("Asetusten tallennus epäonnistui.");
+			sulka.helpers.hideLoaderAndSetError(sulka.string.settingsSaveFailed);
 		});
 	},
 	
