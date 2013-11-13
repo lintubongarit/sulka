@@ -10,5 +10,7 @@ sulka.strings = {
 	invalidRow: "RIVI EI OLE VALIDI",
 	couldNotInsert: "Riviä ei voitu lisätä",
 	settingsSaved: "Asetukset tallennettu.",
-	settingsSaveFailed: "Asetusten tallentaminen epäonnistui."
+	settingsSaveFailed: "Asetusten tallentaminen epäonnistui.",
+	settingsReceived: "Asetukset noudettu.",
+	settingsReceiveFailed: "Asetusten nouto epäonnistui."
 };

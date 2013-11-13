@@ -950,6 +950,7 @@ sulka = {
 				filters: JSON.stringify(filters),
 		};
 		sulka.API.saveSettings(settings, function onSuccess() {
+			sulka.helpers.hideLoader();
 			console.log(sulka.string.settingsSaved);
 		}, function onError(){
 			sulka.helpers.hideLoaderAndSetError(sulka.string.settingsSaveFailed);
@@ -959,6 +960,8 @@ sulka = {
 	fetchSettings: function() {
 		sulka.helpers.showLoader();
 		sulka.API.fetchSettings(function onSuccess(results){
+			sulka.helpers.hideLoader();
+			
 			var settings = jQuery.parseJSON(results.object.columns);
 			var oldColumns = sulka.columns;
 			var updatedColumns = [];
@@ -980,9 +983,9 @@ sulka = {
 			$("#filters-ringings").prop('checked', filters.ringings);
 			$("#filters-recoveries").prop('checked', filters.recoveries);
 			
-			sulka.helpers.hideLoaderAndSetError("Asetukset noudettu.");
+			console.log(sulka.strings.settingsReceived);
 		}, function onError(){
-			sulka.helpers.hideLoaderAndSetError("Asetusten nouto epäonnistui.");
+			sulka.helpers.hideLoaderAndSetError(sulka.strings.settingsReceiveFailed);
 		});
 	}
 	
