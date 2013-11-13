@@ -16,15 +16,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class UserSettings implements Serializable{
 	
 	private static final long serialVersionUID = -8338155036854013157L;
-	
 
 	@Id
 	@JsonProperty("userId")
 	@Column(name = "userId")
 	private String userId;
 	@JsonProperty("columns")
-	@Column(name = "columns")
+	@Column(name = "columns", length = 3000)
 	private String columns;
+	@JsonProperty("filters")
+	@Column(name = "filters")
+	private String filters;
 	
 	public String getUserId() {
 		return userId;
@@ -37,5 +39,11 @@ public class UserSettings implements Serializable{
 	}
 	public void setColumns(String columns) {
 		this.columns = columns;
+	}
+	public String getFilters() {
+		return filters;
+	}
+	public void setFilters(String filters) {
+		this.filters = filters;
 	}
 }
