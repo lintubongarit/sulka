@@ -26,7 +26,7 @@ sulka = {
 	columnOptions: {
 		sortable: true,
 		editable: true,
-		$sulkaVisible: true,
+		$sulkaVisible: true
 	},
 
 	viewMode: "browsing",
@@ -75,6 +75,7 @@ sulka = {
 	
 	COL_PADDING: 20,
 	COL_MAX_WIDTH: 200,
+	COL_TYPE_IMAGE_WIDTH: 19,
 	/**
 	 * Called at start to get columns. Calls initGrid() when done. 
 	 */
@@ -134,6 +135,13 @@ sulka = {
 							editor: Slick.Editors.Text,
 							$sulkaFlexible: isFlexible,
 						}, sulka.columnOptions);
+						
+						if (field.field == "type") {
+							column.$sulkaFlexible = false;
+							column.formatter = function () { return ""; };
+							column.width  = sulka.COL_TYPE_IMAGE_WIDTH + sulka.COL_PADDING;
+						}
+						
 						columns.push(column);
 
 						var contextItem = $("<li></li>")
@@ -663,11 +671,20 @@ sulka = {
 		);
 	},
 	
-	METADATA_SULKA_ROW: {"cssClasses" : "sulka-row-color"},
-	METADATA_TIPU_ROW: { "cssClasses": "tipu-row-color"},
+	METADATA_SULKA_RECOVERY: {"cssClasses" : "sulka-row-color recovery-row-color"},
+	METADATA_SULKA_RINGING: {"cssClasses" : "sulka-row-color ringing-row-color"},
+	METADATA_TIPU_RECOVERY: { "cssClasses": "tipu-row-color recovery-row-color"},
+	METADATA_TIPU_RINGING: { "cssClasses": "tipu-row-color ringing-row-color"},
+	
+	RINGING_TYPE: "Rengastus",
+	RECOVERY_TYPE: "Tapaaminen",
+	
 	createNewDataView: function (data) {
-		var METADATA_SULKA_ROW = sulka.METADATA_SULKA_ROW,
-			METADATA_TIPU_ROW = sulka.METADATA_TIPU_ROW;
+		var METADATA_SULKA_RECOVERY = sulka.METADATA_SULKA_RECOVERY,
+			METADATA_SULKA_RINGING = sulka.METADATA_SULKA_RINGING,
+			METADATA_TIPU_RECOVERY = sulka.METADATA_TIPU_RECOVERY,
+			METADATA_TIPU_RINGING = sulka.METADATA_TIPU_RINGING,
+			RINGING_TYPE = sulka.RINGING_TYPE;
 		return {
 			data: data,
 			getLength: function () {
@@ -677,10 +694,19 @@ sulka = {
 				return data[index];
 			},
 			getItemMetadata: function (index) {
-				if (data[index].hasOwnProperty("databaseId")) {
-					return METADATA_SULKA_ROW;
+				var row = data[index];
+				if (row.hasOwnProperty("databaseId")) {
+					if (row.type == RINGING_TYPE) {
+						return METADATA_SULKA_RINGING;
+					} else {
+						return METADATA_SULKA_RECOVERY;
+					}
 				} else {
-					return METADATA_TIPU_ROW;
+					if (row.type == RINGING_TYPE) {
+						return METADATA_TIPU_RINGING;
+					} else {
+						return METADATA_TIPU_RECOVERY;
+					}
 				}
 			}
 		};
