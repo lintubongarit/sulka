@@ -29,6 +29,8 @@ sulka = {
 		$sulkaVisible: true
 	},
 
+	/** In row inserting mode? */ 
+	addMode: false,
 	viewMode: "browsing",
 	rowsMode: "ringings",
 	
@@ -243,59 +245,43 @@ sulka = {
 	
 	initDrop: function(){
 		 $.drop({mode: "mouse"});
-		  $("#dropzone")
-		      .bind("dropstart", function (e, dd) {
-		        if (dd.mode != "recycle") {
-		          return;
-		        }
-		        $(this).css("background", "yellow");
-		      })
-		      .bind("dropend", function (e, dd) {
-		        if (dd.mode != "recycle") {
-		          return;
-		        }
-		        $(dd.available).css("background", "pink");
-		      })
-		      .bind("drop", function (e, dd) {
-		        if (dd.mode != "recycle") {
-		          return;
-		        }
-		        var data = sulka.grid.getData();
-		        
-		        var rowsToDelete = dd.rows.sort().reverse();
-		        
-		        var toBeDeleted = new Array();
-		        
-		        for (var i = 0; i < rowsToDelete.length; i++) {
-		        
-		        	var plop = data.splice(rowsToDelete[i], 1);
-	        	
-		        	//Delete data from the database.
-		        	if (plop[0].rowStatus == "inputRow"){
-			 	    	var testObject = {};
-				    	testObject.id = plop[0].databaseId;
-				    	testObject.userId = plop[0].userId;
-				    	testObject.row = JSON.stringify(plop[0]);
-
-			 	    	toBeDeleted.push(testObject);
-		        	}
-		        	//Delete data from the grid.
-		        	
-		        }
-		        
-		        sulka.deleteRows(toBeDeleted);
-		        
-		        sulka.grid.invalidate();
-	
-		        sulka.grid.setSelectedRows([]);
-		      });
-	},
-	
-	deleteRows: function(toBeDeleted){
-		
-		console.log(JSON.stringify(toBeDeleted));
-		sulka.API.deleteSulkaDBRow(toBeDeleted);
-	    
+		 $("#dropzone").bind("dropstart", function (e, dd) {
+	 		if (dd.mode != "recycle") {
+	 			return;
+	        }
+	        $(this).css("background", "yellow");
+	    }).bind("dropend", function (e, dd) {
+	    	if (dd.mode != "recycle") {
+	    		return;
+	        }
+	        $(dd.available).css("background", "pink");
+	    }).bind("drop", function (e, dd) {
+	    	if (dd.mode != "recycle") {
+	    		return;
+	        }
+	        var data = sulka.getData();
+	        
+	        var rowsToDelete = dd.rows.sort(sulka.helpers.numericReverseSort);
+	        var toBeDeleted = [];
+	        for (var i=0; i<rowsToDelete.length; i++) {
+	        	var deleteRow = data[rowsToDelete[i]];
+	        	if (deleteRow && deleteRow.rowStatus == "inputRow" && typeof(deleteRow.databaseId) === "number" ) {
+	        		data.splice(rowsToDelete[i], 1);
+		 	    	toBeDeleted.push(deleteRow.databaseId);
+	        	}
+	        }
+	        
+	        sulka.helpers.unsetErrorAndShowLoader();
+			sulka.API.deleteSulkaDBRows(
+				toBeDeleted,
+				sulka.helpers.hideLoaderAndUnsetError,
+				sulka.helpers.hideLoaderAndSetError
+			);
+	        
+	        sulka.setData(data);
+	        sulka.grid.invalidate();
+	        sulka.grid.setSelectedRows([]);
+      	});
 	},
 	
 	/**
@@ -360,7 +346,7 @@ sulka = {
 	 * Sort grid by cols.
 	 */
 	sort: function (args) {
-		var data = sulka.grid.getData();
+		var data = sulka.getData();
 	    
 		var sign = args.sortAsc ? 1 : -1;
 		var field = args.sortCol.field;
@@ -368,6 +354,7 @@ sulka = {
 			var value1 = dataRow1[field], value2 = dataRow2[field];
 			return (value1 == value2) ? 0 : (sign * (value1 > value2 ? 1 : -1));
 		});
+		sulka.setData(data);
 		sulka.grid.invalidate();
 		sulka.freeze.invalidate();
 	},
@@ -441,15 +428,13 @@ sulka = {
 	onDragStart: function(e,dd){
 		sulka.grid.onDragStart.subscribe(function (e, dd) {
 			
-			var data = sulka.grid.getData();
-			
 		    var cell = sulka.grid.getCellFromEvent(e);
 		    if (!cell) {
 		      return;
 		    }
 
 		    dd.row = cell.row;
-		    if (!data[dd.row]) {
+		    if (!sulka.getData()[dd.row]) {
 		      return;
 		    }
 
@@ -513,16 +498,14 @@ sulka = {
 		    });
 	},
 	
-		
-	
-	onPasteCells: function(event, args){
+	/*onPasteCells: function(event, args){
 		  sulka.copyManager.onPasteCells.subscribe(function (e, args) {
 	      if (args.from.length !== 1 || args.to.length !== 1) {
 	        throw "This implementation only supports single range copy and paste operations";
 	      }
 	      
 	      
-	      var data = sulka.grid.getData();
+	      var data = sulka.getData();
 	      
 	      var columns = sulka.grid.getColumns();
 	      var from = args.from[0];
@@ -539,7 +522,7 @@ sulka = {
 	      }
 	      sulka.grid.render();
 	    });
-	},
+	},*/
 	
 	CONTEXT_HEIGHT_ADJUST: 6,
 	/**
@@ -619,13 +602,23 @@ sulka = {
 		sulka.freeze.renderColumnGroups();
 	},
 	
+	currentData: [],
 	/**
 	 * Set grid data and render.
 	 */
 	setData: function (rows) {
-		sulka.grid.setData(rows);
+		sulka.currentData = rows;
+		var dataView = sulka.createNewDataView(rows);
+		sulka.grid.setData(dataView);
 		sulka.grid.render();
-		sulka.freeze.setData(rows);
+		sulka.freeze.setData(dataView);
+	},
+	
+	/**
+	 * Returned cached data.
+	 */
+	getData: function () {
+		return sulka.currentData;
 	},
 	
 	/**
@@ -651,24 +644,66 @@ sulka = {
 	},
 	
 	fetchRows: function (filters) {
+		var combinedRows = null;
+		var combineCalls = 0;
+		var N_CALLS = sulka.addMode ? 2 : 1;
+		
+		var combine = function (rows) {
+			combineCalls++;
+			if (combinedRows === null) {
+				combinedRows = rows;
+			} else {
+				combinedRows = combinedRows.concat(rows);
+			}
+			
+			if (combineCalls < N_CALLS) return;
+			
+			if (combinedRows.length == 0) {
+				sulka.helpers.hideLoaderAndSetError(sulka.strings.noResults);
+			} else {
+				sulka.helpers.hideLoaderAndUnsetError();
+			}
+			
+			sulka.setData(combinedRows);
+			if (combinedRows.length > 0) {
+				sulka.adjustFlexibleCols(combinedRows);
+			}
+			sulka.grid.render();
+		};
+		
 		sulka.API.fetchRows(
 			sulka.rowsMode,
 			filters,
-			function (rows) {
-				if (rows.length == 0) {
-					sulka.helpers.hideLoaderAndSetError(sulka.strings.noResults);
-				} else {
-					sulka.helpers.hideLoaderAndUnsetError();
-				}
-				
-				if (rows.length > 0) {
-					sulka.adjustFlexibleCols(rows);
-				}
-				sulka.grid.setData(sulka.createNewDataView(rows));
-				sulka.grid.render();
-			},
+			combine,
 			sulka.helpers.hideLoaderAndSetError
 		);
+		
+		if (sulka.addMode) {
+			sulka.API.fetchSulkaDBRows(
+				sulka.rowsMode,
+				filters,
+				function (rows) {
+					if (rows.length > 0) {
+						sulka.adjustFlexibleCols(rows);
+					}
+					
+					var sulkaRows = [];
+					for (var i=0; i<rows.length; i++) {
+						var row;
+						try {
+							row = JSON.parse(rows[i].row);
+						} catch (e) {
+							continue;
+						};
+						row.userId = rows[i].userId;
+						row.databaseId = rows[i].id;
+						sulkaRows.push(row);
+					}
+					combine(sulkaRows);
+				},
+				sulka.helpers.hideLoaderAndSetError
+			);
+		}
 	},
 	
 	METADATA_SULKA_RECOVERY: {"cssClasses" : "sulka-row-color recovery-row-color"},
@@ -694,6 +729,9 @@ sulka = {
 				return data[index];
 			},
 			getItemMetadata: function (index) {
+				if (data.length <= index) {
+					return METADATA_EMPTY; 
+				}
 				var row = data[index];
 				if (row.hasOwnProperty("databaseId")) {
 					if (row.type == RINGING_TYPE) {
@@ -713,13 +751,14 @@ sulka = {
 	},
 	
 	onAddNewRow: function(event, args){
-			var data = sulka.grid.getData();
-	        var item = args.item;
-	        var column = args.column;
-	        sulka.grid.invalidateRow(data.length);
-	        data.push(item);
-	        sulka.grid.updateRowCount();
-	        sulka.grid.render();
+		var data = sulka.getData();
+        var item = args.item;
+        var column = args.column;
+        data.push(item);
+        sulka.setData(data);
+        sulka.grid.invalidateRow(data.length);
+        sulka.grid.updateRowCount();
+        sulka.grid.render();
 	},
 	
 	/**
@@ -809,13 +848,14 @@ sulka = {
 	 * @returns slick grid row id where was added
 	 */
 	onAddNewRow: function(event, args){
-		var data = sulka.grid.getData();
+		var data = sulka.getData();
         var item = args.item;
         item.rowStatus = "inputRow";
-        args.row = sulka.grid.getData().length;
+        args.row = data.length;
         
         sulka.grid.invalidateRow(data.length);
         data.push(item);
+        sulka.setData(data);
         sulka.grid.updateRowCount();
         sulka.grid.render();
         sulka.addToSulkaDB(args);
@@ -833,21 +873,32 @@ sulka = {
 	 * Adds row to sulka-database
 	 */
 	addToSulkaDB: function (args) {
-		var data = sulka.grid.getData();
+		var data = sulka.getData();
 		var actualRowData = data[args.row];
+	    if (!actualRowData) return;
 	    var rowStatus = args.item.rowStatus;
 	    
 	    if (rowStatus == "inputRow"){
-	    	var testObject = {};
-	    	if(actualRowData.hasOwnProperty("databaseId")){
-	    		testObject.id = actualRowData.databaseId;
-	    		testObject.userId = actualRowData.UserId;
+	    	var localDbRow = {};
+	    	if (actualRowData.hasOwnProperty("databaseId")){
+	    		localDbRow.id = actualRowData.databaseId;
+	    		localDbRow.userId = actualRowData.userId;
 	    	}
-	    	testObject.row = JSON.stringify(actualRowData);
+	    	localDbRow.row = JSON.stringify(actualRowData);
 	    	
+	    	sulka.helpers.unsetErrorAndShowLoader();
 	    	sulka.API.addRow(
-	    			testObject,
-	    			args.row
+	    		localDbRow,
+    			function (row) {
+    				sulka.helpers.hideLoaderAndUnsetError();
+    				actualRowData.databaseId = row.id;
+    				actualRowData.userId = row.userId;
+					sulka.grid.invalidate();
+					sulka.grid.render();
+    			},
+    			function () {
+    				sulka.helpers.hideLoaderAndSetError(sulka.strings.couldNotInsert);
+    			}
 	    	);
 	    }
 	},
@@ -877,7 +928,7 @@ sulka = {
 		var selectedRows = sulka.grid.getSelectedRows();
 		if (selectedRows.length == 0) return;
 		sulka.helpers.unsetErrorAndShowLoader();
-		var selectedRow = sulka.grid.getData()[selectedRows[0]];
+		var selectedRow = sulka.getData()[selectedRows[0]];
 		sulka.API.validate(
 			selectedRow, 
 			function (data) {
@@ -924,15 +975,18 @@ sulka = {
 				filters: JSON.stringify(filters),
 		};
 		sulka.API.saveSettings(settings, function onSuccess() {
-			sulka.helpers.hideLoaderAndSetError("Asetukset tallennettu.");
+			sulka.helpers.hideLoader();
+			console.log(sulka.string.settingsSaved);
 		}, function onError(){
-			sulka.helpers.hideLoaderAndSetError("Asetusten tallennus epäonnistui.");
+			sulka.helpers.hideLoaderAndSetError(sulka.string.settingsSaveFailed);
 		});
 	},
 	
 	fetchSettings: function() {
 		sulka.helpers.showLoader();
 		sulka.API.fetchSettings(function onSuccess(results){
+			sulka.helpers.hideLoader();
+			
 			var settings = jQuery.parseJSON(results.object.columns);
 			var oldColumns = sulka.columns;
 			var updatedColumns = [];
@@ -954,9 +1008,9 @@ sulka = {
 			$("#filters-ringings").prop('checked', filters.ringings);
 			$("#filters-recoveries").prop('checked', filters.recoveries);
 			
-			sulka.helpers.hideLoaderAndSetError("Asetukset noudettu.");
+			console.log(sulka.strings.settingsReceived);
 		}, function onError(){
-			sulka.helpers.hideLoaderAndSetError("Asetusten nouto epäonnistui.");
+			sulka.helpers.hideLoaderAndSetError(sulka.strings.settingsReceiveFailed);
 		});
 	}
 	

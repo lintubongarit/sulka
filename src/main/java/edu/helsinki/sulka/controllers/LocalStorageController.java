@@ -1,8 +1,5 @@
 package edu.helsinki.sulka.controllers;
 
-import java.awt.List;
-import java.util.Map;
-
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -18,9 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import edu.helsinki.sulka.models.RecoveryDatabaseRow;
-import edu.helsinki.sulka.models.RecoveryDatabaseRowList;
 import edu.helsinki.sulka.models.RingingDatabaseRow;
-import edu.helsinki.sulka.models.RingingDatabaseRowList;
 import edu.helsinki.sulka.models.User;
 import edu.helsinki.sulka.models.UserSettings;
 import edu.helsinki.sulka.services.LocalDatabaseService;
@@ -69,24 +65,23 @@ public class LocalStorageController extends JSONController {
 	}
 	
 	@PreAuthorize("hasRole('USER')")
-	@RequestMapping(value = "/api/storage/ringings",
+	@RequestMapping(value = "/api/storage/ringings/{ringingId}",
 					method = RequestMethod.DELETE,
 					produces = "application/json;charset=UTF-8",
 					consumes="application/json")
 	@ResponseBody
 	public ObjectResponse<String> deleteRinging(HttpSession session,
-			@RequestBody RingingDatabaseRowList ringing,
-			BindingResult bindingResult) throws LocalStorageException {
-		if(bindingResult.hasErrors()){
-			throw new LocalStorageException("Database update failed.");
+			@PathVariable long ringingId) throws LocalStorageException, NotFoundException, UnauthorizedException {
+		RingingDatabaseRow ringing = localDatabaseService.getRinging(ringingId);
+		
+		if (ringing == null) {
+			throw new NotFoundException();
 		}
 		
-		for (RingingDatabaseRow ringingDatabaseRow : ringing) {
-			if(!((User) session.getAttribute("user")).getLogin_id().equals(ringingDatabaseRow.getUserId()))
-				throw new LocalStorageException("Database update failed. User id and row owner id doesn't match.");
-			localDatabaseService.removeRinging(ringingDatabaseRow);
-
+		if(!((User) session.getAttribute("user")).getLogin_id().equals(ringing.getUserId())) {
+			throw new UnauthorizedException("Database update failed. User id and row owner id don't match.");
 		}
+		localDatabaseService.removeRinging(ringing);
 		return new ObjectResponse<String>("Database updated.");
 	}
 	
@@ -118,24 +113,24 @@ public class LocalStorageController extends JSONController {
 	}
 	
 	@PreAuthorize("hasRole('USER')")
-	@RequestMapping(value = "/api/storage/recoveries",
+	@RequestMapping(value = "/api/storage/recoveries/{recoveryId}",
 					method = RequestMethod.DELETE,
 					produces = "application/json;charset=UTF-8",
 					consumes="application/json")
 	@ResponseBody
 	public ObjectResponse<String> deleteRecovery(HttpSession session,
-			@RequestBody RecoveryDatabaseRowList recovery,
-			BindingResult bindingResult) throws LocalStorageException {
-		if(bindingResult.hasErrors()){
-			throw new LocalStorageException("Database update failed.");
+			@PathVariable long recoveryId) throws LocalStorageException, NotFoundException, UnauthorizedException {
+		RecoveryDatabaseRow recovery = localDatabaseService.getRecovery(recoveryId);
+		
+		if (recovery == null) {
+			throw new NotFoundException();
 		}
 		
-		for (RecoveryDatabaseRow recoveryDatabaseRow : recovery) {
-			if(!((User) session.getAttribute("user")).getLogin_id().equals(recoveryDatabaseRow.getUserId()))
-				throw new LocalStorageException("Database update failed. User id and row owner id doesn't match.");
-			localDatabaseService.removeRecovery(recoveryDatabaseRow);
+		if(!((User) session.getAttribute("user")).getLogin_id().equals(recovery.getUserId())) {
+			throw new UnauthorizedException("Database update failed. User id and row owner id don't match.");
 		}
 		
+		localDatabaseService.removeRecovery(recovery);
 		return new ObjectResponse<String>("Database updated.");
 	}
 	
@@ -172,7 +167,7 @@ public class LocalStorageController extends JSONController {
 	@ExceptionHandler(LocalStorageException.class)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-	public ErrorResponse handleAPIException(Exception e) {
+	public ErrorResponse handleLocalStorageException(Exception e) {
 		return new ErrorResponse(e.getMessage());
 	}
 

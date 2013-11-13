@@ -8,4 +8,5 @@ import edu.helsinki.sulka.models.RecoveryDatabaseRow;
 
 public interface RecoveriesRepository extends CrudRepository<RecoveryDatabaseRow, Long>{
 	List<RecoveryDatabaseRow> findByUserId(String userId);
+	RecoveryDatabaseRow findById(long rowId);
 }

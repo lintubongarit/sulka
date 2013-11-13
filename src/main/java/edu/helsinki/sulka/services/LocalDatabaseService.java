@@ -36,7 +36,7 @@ public class LocalDatabaseService {
 		return (List<RecoveryDatabaseRow>) recoveryRepository.findByUserId(userId);
 	}
 	
-	public RingingDatabaseRow addRinging(RingingDatabaseRow ringingRow){	
+	public RingingDatabaseRow addRinging(RingingDatabaseRow ringingRow){
 		return ringingRepository.save(ringingRow);
 	}
 	
@@ -53,6 +53,14 @@ public class LocalDatabaseService {
 		
 	}
 
+	public RingingDatabaseRow getRinging(long ringingId) {
+		return (RingingDatabaseRow) ringingRepository.findById(ringingId);
+	}
+	
+	public RecoveryDatabaseRow getRecovery(long recoveryId) {
+		return (RecoveryDatabaseRow) recoveryRepository.findById(recoveryId);
+	}
+	
 	public UserSettings getSettings(String userId) {
 		UserSettings settings = userSettingsRepository.findOne(userId);
 		if(settings == null){

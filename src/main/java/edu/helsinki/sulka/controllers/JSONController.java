@@ -20,6 +20,25 @@ public abstract class JSONController {
 	@Autowired
 	private Logger logger;
 	
+	public static class NotFoundException extends Exception {
+		private static final long serialVersionUID = 1L;
+		public NotFoundException() {
+			super("Tietuetta ei löydy");
+		}
+		public NotFoundException(String message) {
+			super(message);
+		}
+	}
+	public static class UnauthorizedException extends Exception {
+		private static final long serialVersionUID = 1L;
+		public UnauthorizedException() {
+			super("Ei käyttöoikeutta");
+		}
+		public UnauthorizedException(String message) {
+			super(message);
+		}
+	}
+	
 	/**
 	 * The error response JSON
 	 */
@@ -60,12 +79,42 @@ public abstract class JSONController {
 	}
 	
 	/**
-	 * Handles API exceptions gracefully.
+	 * Handles 404 exceptions gracefully.
+	 */
+	@ExceptionHandler(NotFoundException.class)
+	@ResponseBody
+	@ResponseStatus(HttpStatus.NOT_FOUND)
+	public ErrorResponse handleNotFoundException(Exception e) {
+		return new ErrorResponse(e.getMessage());
+	}
+	
+	/**
+	 * Handles 401 exceptions gracefully.
+	 */
+	@ExceptionHandler(UnauthorizedException.class)
+	@ResponseBody
+	@ResponseStatus(HttpStatus.UNAUTHORIZED)
+	public ErrorResponse handleUnauthorizedException(Exception e) {
+		return new ErrorResponse(e.getMessage());
+	}
+	
+	/**
+	 * Handles API query exceptions gracefully.
 	 */
 	@ExceptionHandler(APIQueryException.class)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	public ErrorResponse handleAPIException(Exception e) {
 		return new ErrorResponse(e.getMessage());
+	}
+	
+	/**
+	 * Handles other errors gracefully.
+	 */
+	@ExceptionHandler(Throwable.class)
+	@ResponseBody
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	public ErrorResponse handleAPIException(Throwable t) {
+		return new ErrorResponse(t.getMessage());
 	}
 }
