@@ -848,6 +848,7 @@ sulka = {
 			var columnData = [ // [position, width, visibility]
 					index,
 					columns[index].width,
+					columns[index].$sulkaVisible,
 			];
 			columnsDataToBeSaved[columns[index].field] = columnData;
 		}
@@ -881,6 +882,7 @@ sulka = {
 				// Data is in following format:
 				// "columnName": [position, width, visibility]
 				oldColumns[index].width = settings[oldColumns[index].field][1];
+				oldColumns[index].$sulkaVisible = settings[oldColumns[index].field][2];
 				updatedColumns[settings[oldColumns[index].field][0]] = oldColumns[index];
 			}
 			sulka.columns = updatedColumns;

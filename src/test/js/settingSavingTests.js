@@ -1,4 +1,4 @@
-casper.test.begin('Setting saving tests', 8, function suite(test) {
+casper.test.begin('Setting saving tests', 9, function suite(test) {
     browse('/', function () {
     	
     	casper.then(function () {
@@ -73,6 +73,24 @@ casper.test.begin('Setting saving tests', 8, function suite(test) {
 			test.assertField('municipality', 'VANTAA', "Municipality is restored.");
 			test.assertField('ringings', false, "Ringings is restored.");
 			test.assertField('recoveries', true, "Recoveries is restored.");
+		}).then(function(){
+			casper.evaluate(function(){
+				sulka.columns[4].$sulkaVisible = false;
+				sulka.grid.setColumns(sulka.getVisibleColumns());
+				sulka.saveSettings();
+				sulka.columns[4].$sulkaVisible = true;
+			});
+		}).waitWhileVisible("loader-animation"
+		).then(function(){
+			casper.evaluate(function(){
+				sulka.fetchSettings();
+			});
+		}).waitWhileVisible("loader-animation"
+		).then(function(){
+			var isColumnVisible = casper.evaluate(function(){
+				return sulka.columns[4].$sulkaVisible;
+			});
+			test.assertFalse(isColumnVisible, "Column visibility status is restored.");
 		});
     });
     
