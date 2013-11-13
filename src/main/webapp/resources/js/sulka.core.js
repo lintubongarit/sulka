@@ -777,16 +777,16 @@ sulka = {
 	 * @returns slick grid row id where was added
 	 */
 	onAddNewRow: function(event, args){
-			var data = sulka.grid.getData();
-	        var item = args.item;
-	        item.rowStatus = "inputRow";
-	        args.row = sulka.grid.getData().length;
-	        
-	        sulka.grid.invalidateRow(data.length);
-	        data.push(item);
-	        sulka.grid.updateRowCount();
-	        sulka.grid.render();
-	        sulka.addToSulkaDB(args);
+		var data = sulka.grid.getData();
+        var item = args.item;
+        item.rowStatus = "inputRow";
+        args.row = sulka.grid.getData().length;
+        
+        sulka.grid.invalidateRow(data.length);
+        data.push(item);
+        sulka.grid.updateRowCount();
+        sulka.grid.render();
+        sulka.addToSulkaDB(args);
 	},
 	
 	/**
