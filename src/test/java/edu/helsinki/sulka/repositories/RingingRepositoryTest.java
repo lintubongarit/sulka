@@ -1,6 +1,7 @@
 package edu.helsinki.sulka.repositories;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import org.junit.After;
 import org.junit.Before;
@@ -11,10 +12,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import edu.helsinki.sulka.models.RingingDatabaseRow;
-import edu.helsinki.sulka.repositories.RingingRepository;
+import edu.helsinki.sulka.models.LocalDatabaseRow;
 
-@RunWith(SpringJUnit4ClassRunner.class)  
+@RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({
 	"file:src/main/webapp/WEB-INF/spring/root-context.xml",
 	"file:src/main/webapp/WEB-INF/spring/database.xml",
@@ -23,15 +23,15 @@ import edu.helsinki.sulka.repositories.RingingRepository;
 @ActiveProfiles("dev")
 public class RingingRepositoryTest {
 
-	@Autowired  
-	private RingingRepository ringingRepository;
+	@Autowired
+	private RingingsRepository ringingRepository;
 	
-	private RingingDatabaseRow row;
+	private LocalDatabaseRow row;
 	private String rowData = "asdolkjaeoorids";
 	
 	@Before
 	public void setUp(){
-		row = new RingingDatabaseRow();
+		row = new LocalDatabaseRow();
 		row.setRow(rowData);
 	}
 	
@@ -41,10 +41,10 @@ public class RingingRepositoryTest {
 	}
 
 	@Test
-	public void testNewRowsGetIdFromRepository() {  
+	public void testNewRowsGetIdFromRepository() {
 		row = ringingRepository.save(row);
 		assertNotNull(row.getId());
-	}     
+	}
 	
 	@Test
 	public void testDefinedRowDataIsKept(){

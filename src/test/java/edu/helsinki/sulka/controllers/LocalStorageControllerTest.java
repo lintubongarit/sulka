@@ -2,13 +2,15 @@ package edu.helsinki.sulka.controllers;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.everyItem;
-import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.hamcrest.Matchers.nullValue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 import java.util.List;
 
@@ -28,10 +30,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
 import edu.helsinki.sulka.SecuritySessionHelper;
-import edu.helsinki.sulka.models.RecoveryDatabaseRow;
-import edu.helsinki.sulka.models.RingingDatabaseRow;
+import edu.helsinki.sulka.models.LocalDatabaseRow;
 import edu.helsinki.sulka.models.User;
 import edu.helsinki.sulka.services.LocalDatabaseService;
+import edu.helsinki.sulka.services.LocalDatabaseService.Table;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
@@ -56,14 +58,34 @@ public class LocalStorageControllerTest {
 	private MockHttpSession lokkiHttpSession;
 	
 	private static final String USER_ID = "LocalStorageControllerTestUserId_123456789";
+	private static final String OTHER_USER_ID = "LocalStorageControllerTestUserId_123456789x";
 	private static final byte[] validOnlyRow = "{\"row\":\"asdflkakgh\"}".getBytes();
 	private static final byte[] validRowAndId = "{\"id\":\"1234\", \"row\":\"asdflkakgh\"}".getBytes();
 	private static final byte[] invalidId = "{\"JOTAIN\":\"1234\", \"row\":\"asdflkakgh\"}".getBytes();
 	private static final byte[] invalidRow = "{\"id\":\"1234\", \"ABCD\":\"asdflkakgh\"}".getBytes();
-	private static final byte[]	validFullRow = "{\"id\":\"1\", \"userId\":\"LocalStorageControllerTestUserId_123456789\", \"row\":\"asdflkakgh\"}".getBytes();
-	private static final byte[]	validFullRowToBeDeleted = "[{\"id\":\"1\", \"userId\":\"LocalStorageControllerTestUserId_123456789\", \"row\":\"asdflkakgh\"}]".getBytes();
 	private static final byte[] validSettings = "{\"columns\":\"asdfawerfasdasdfaasdf\"}".getBytes();
+	private long otherUserRecoveryId;
+	private long otherUserRingingId;
+	private long recoveryToBeDeletedId;
+	private long ringingToBeDeletedId;
 
+	/**
+	 * @return row id
+	 */
+	private long insertRecovery(String userId) {
+    	LocalDatabaseRow recovery = new LocalDatabaseRow();
+    	recovery.setUserId(userId);
+    	return localDatabaseService.addRow(Table.RECOVERIES, recovery).getId();
+	}
+	
+	/**
+	 * @return row id
+	 */
+	private long insertRinging(String userId) {
+		LocalDatabaseRow ringing = new LocalDatabaseRow();
+    	ringing.setUserId(userId);
+    	return localDatabaseService.addRow(Table.RINGINGS, ringing).getId();
+	}
 	
 	@Before
     public void setup() {
@@ -74,71 +96,53 @@ public class LocalStorageControllerTest {
     	lokki.setLogin_id(USER_ID);
     	lokki.setExpires_at(System.currentTimeMillis() / 1000 + 60);
     	lokkiHttpSession = SecuritySessionHelper.createUserSession(lokki);
+    	
+    	// Create mock data
+    	insertRecovery(USER_ID);
+    	insertRecovery(USER_ID);
+    	insertRecovery(USER_ID);
+    	
+    	insertRinging(USER_ID);
+    	insertRinging(USER_ID);
+    	insertRinging(USER_ID);
+    	
+    	insertRecovery(OTHER_USER_ID);
+    	insertRecovery(OTHER_USER_ID);
+    	otherUserRecoveryId = insertRecovery(OTHER_USER_ID);
+    	
+    	insertRinging(OTHER_USER_ID);
+    	insertRinging(OTHER_USER_ID);
+    	otherUserRingingId = insertRinging(OTHER_USER_ID);
+    	
+    	recoveryToBeDeletedId = insertRecovery(USER_ID);
+    	ringingToBeDeletedId = insertRecovery(USER_ID);
 	}
 	
 	@After
 	public void tearDown(){
-		List<RingingDatabaseRow> ringings = localDatabaseService.getRingings(USER_ID);
-		List<RecoveryDatabaseRow> recoveries = localDatabaseService.getRecoveries(USER_ID);
+		List<LocalDatabaseRow> ringings = localDatabaseService.getRowsByUserId(Table.RINGINGS, USER_ID);
+		List<LocalDatabaseRow> recoveries = localDatabaseService.getRowsByUserId(Table.RECOVERIES, USER_ID);
 		
-		for(RingingDatabaseRow toBeDeleted: ringings)
-			localDatabaseService.removeRinging(toBeDeleted);
-		for(RecoveryDatabaseRow toBeDeleted: recoveries)
-			localDatabaseService.removeRecovery(toBeDeleted);
+		for(LocalDatabaseRow toBeDeleted: ringings) {
+			localDatabaseService.removeRow(Table.RINGINGS, toBeDeleted);
+		}
+		for(LocalDatabaseRow toBeDeleted: recoveries) {
+			localDatabaseService.removeRow(Table.RECOVERIES, toBeDeleted);
+		}
+		
+		ringings = localDatabaseService.getRowsByUserId(Table.RINGINGS, OTHER_USER_ID);
+		recoveries = localDatabaseService.getRowsByUserId(Table.RECOVERIES, OTHER_USER_ID);
+		
+		for(LocalDatabaseRow toBeDeleted: ringings) {
+			localDatabaseService.removeRow(Table.RINGINGS, toBeDeleted);
+		}
+		for(LocalDatabaseRow toBeDeleted: recoveries) {
+			localDatabaseService.removeRow(Table.RECOVERIES, toBeDeleted);
+		}
 	}
 	
 	@Test
-	public void testGetRingingsStatusIsOk() throws Exception {
-		mockMvc.perform(get("/api/storage/ringings")
-						.session(lokkiHttpSession))
-				.andExpect(status().isOk())
-				.andReturn();
-	}
-	
-	@Test
-	public void testGetRingingsReturnsJSON() throws Exception {
-		mockMvc.perform(get("/api/storage/ringings")
-						.session(lokkiHttpSession))
-				.andExpect(status().isOk())
-				.andExpect(content().contentType("application/json;charset=UTF-8"))
-				.andReturn();
-	}
-	
-	@Test
-	public void testGetRingingsReturnJSONsSuccessIsTrue() throws Exception {
-		mockMvc.perform(get("/api/storage/ringings")
-						.session(lokkiHttpSession))
-				.andExpect(status().isOk())
-				.andExpect(content().contentType("application/json;charset=UTF-8"))
-				.andExpect(jsonPath("$.success").value(true))
-				.andReturn();
-	}
-	
-	@Test
-	public void testGetRingingsReturnJSONsContainsNoErrors() throws Exception {
-		mockMvc.perform(get("/api/storage/ringings")
-						.session(lokkiHttpSession))
-				.andExpect(status().isOk())
-				.andExpect(content().contentType("application/json;charset=UTF-8"))
-				.andExpect(jsonPath("$.success").value(true))
-				.andExpect(jsonPath("$.error").value(nullValue()))
-				.andReturn();
-	}
-	
-	@Test
-	public void testGetRingingsReturnJSONsObjectsIsArray() throws Exception {
-		mockMvc.perform(get("/api/storage/ringings")
-						.session(lokkiHttpSession))
-				.andExpect(status().isOk())
-				.andExpect(content().contentType("application/json;charset=UTF-8"))
-				.andExpect(jsonPath("$.success").value(true))
-				.andExpect(jsonPath("$.error").value(nullValue()))
-				.andExpect(jsonPath("$.objects").isArray())
-				.andReturn();
-	}
-	
-	@Test
-	public void testGetRingingsReturnJSONsObjectsUserIdIsCorrect() throws Exception {
+	public void testGetRingings() throws Exception {
 		mockMvc.perform(get("/api/storage/ringings")
 						.session(lokkiHttpSession))
 				.andExpect(status().isOk())
@@ -151,17 +155,32 @@ public class LocalStorageControllerTest {
 	}
 
 	@Test
-	public void testSaveRingingStatusIsOk() throws Exception {
+	public void testGetRecoveries() throws Exception {
+		mockMvc.perform(get("/api/storage/recoveries")
+						.session(lokkiHttpSession))
+				.andExpect(status().isOk())
+				.andExpect(content().contentType("application/json;charset=UTF-8"))
+				.andExpect(jsonPath("$.success").value(true))
+				.andExpect(jsonPath("$.error").value(nullValue()))
+				.andExpect(jsonPath("$.objects").isArray())
+				.andExpect(jsonPath("$.objects[*].userId", everyItem(equalTo(USER_ID))))
+				.andReturn();
+	}
+	
+	@Test
+	public void testSaveRinging() throws Exception {
 		mockMvc.perform(post("/api/storage/ringings")
 						.session(lokkiHttpSession)
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(validOnlyRow))
 				.andExpect(status().isOk())
+				.andExpect(content().contentType("application/json;charset=UTF-8"))
 				.andReturn();
 	}
+	
 	@Test
-	public void testSaveRingingReturnsJSON() throws Exception {
-		mockMvc.perform(post("/api/storage/ringings")
+	public void testSaveRecovery() throws Exception {
+		mockMvc.perform(post("/api/storage/recoveries")
 						.session(lokkiHttpSession)
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(validOnlyRow))
@@ -173,11 +192,21 @@ public class LocalStorageControllerTest {
 	@Test
 	public void testSaveRingingReturnsErrorIfPostDataIsntJSON() throws Exception {
 		mockMvc.perform(post("/api/storage/ringings")
-						.session(lokkiHttpSession)
-						.contentType(MediaType.APPLICATION_XML)
-						.content(validRowAndId))
+					.session(lokkiHttpSession)
+					.contentType(MediaType.APPLICATION_XML)
+					.content(validRowAndId))
 				.andExpect(status().isUnsupportedMediaType())
 				.andReturn();
+	}
+	
+	@Test
+	public void testSaveRecoveryReturnsErrorIfPostDataIsntJSON() throws Exception {
+		mockMvc.perform(post("/api/storage/recoveries")
+				.session(lokkiHttpSession)
+				.contentType(MediaType.APPLICATION_XML)
+				.content(validRowAndId))
+			.andExpect(status().isUnsupportedMediaType())
+			.andReturn();
 	}
 	
 	@Test
@@ -186,176 +215,8 @@ public class LocalStorageControllerTest {
 				.session(lokkiHttpSession)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(invalidId))
-		.andExpect(status().isBadRequest()) // Should be internal server error
-		.andReturn();
-	}
-
-	@Test
-	public void testSaveRingingReturnsErrorWithWronglyNamedRowField() throws Exception {
-		mockMvc.perform(post("/api/storage/ringings")
-				.session(lokkiHttpSession)
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(invalidRow))
-		.andExpect(status().isBadRequest()) // Should be internal server error
-		.andReturn();
-	}
-
-	@Test
-	public void testSaveRingingAcceptsContentWithoutId() throws Exception {
-		mockMvc.perform(post("/api/storage/ringings")
-				.session(lokkiHttpSession)
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(validOnlyRow))
-		.andExpect(status().isOk()) // Should be internal server error
-		.andReturn();
-	}
-	
-	@Test
-	public void testSaveRingingReturnsRowWithCorrectColumns() throws Exception {
-		mockMvc.perform(post("/api/storage/ringings")
-				.session(lokkiHttpSession)
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(validOnlyRow))
-		.andExpect(status().isOk())
-		.andExpect(jsonPath("$.object.id").value(notNullValue()))
-		.andExpect(jsonPath("$.object.userId").value(notNullValue()))
-		.andExpect(jsonPath("$.object.row").value(notNullValue()))
-		.andReturn();
-	}
-	
-	@Test
-	public void testDeleteRingingStatusIsOk() throws Exception {
-		mockMvc.perform(delete("/api/storage/ringings")
-						.session(lokkiHttpSession)
-						.contentType(MediaType.APPLICATION_JSON)
-						.content(validFullRowToBeDeleted))
-				.andExpect(status().isOk())
-				.andReturn();
-		}
-	
-	@Test
-	public void testDeleteRingingReturnsJSON() throws Exception {
-		mockMvc.perform(delete("/api/storage/ringings")
-						.session(lokkiHttpSession)
-						.contentType(MediaType.APPLICATION_JSON)
-						.content(validFullRowToBeDeleted))
-				.andExpect(status().isOk())
-				.andExpect(content().contentType("application/json;charset=UTF-8"))
-				.andReturn();
-	}
-	
-	@Test
-	public void testDeleteRingingReturnsErrorIfDeleteDataIsntJSON() throws Exception {
-		mockMvc.perform(delete("/api/storage/ringings")
-						.session(lokkiHttpSession)
-						.contentType(MediaType.APPLICATION_XML)
-						.content(validFullRow))
-				.andExpect(status().isUnsupportedMediaType())
-				.andReturn();
-	}
-	
-	@Test
-	public void testDeleteRingingReturnsErrorIfUserIdDoesNotMatchRowUserId() throws Exception {
-		mockMvc.perform(delete("/api/storage/ringings")
-						.session(lokkiHttpSession)
-						.contentType(MediaType.APPLICATION_XML)
-						.content(validFullRow))
-				.andExpect(status().isUnsupportedMediaType())
-				.andReturn();
-	}
-	
-	@Test
-	public void testGetRecoveryStatusIsOk() throws Exception {
-		mockMvc.perform(get("/api/storage/recoveries")
-						.session(lokkiHttpSession))
-				.andExpect(status().isOk())
-				.andReturn();
-	}
-	
-	@Test
-	public void testGetRecoveriesReturnsJSON() throws Exception {
-		mockMvc.perform(get("/api/storage/recoveries")
-						.session(lokkiHttpSession))
-				.andExpect(status().isOk())
-				.andExpect(content().contentType("application/json;charset=UTF-8"))
-				.andReturn();
-	}
-	
-	@Test
-	public void testGetRecoveriesReturnJSONsSuccessIsTrue() throws Exception {
-		mockMvc.perform(get("/api/storage/recoveries")
-						.session(lokkiHttpSession))
-				.andExpect(status().isOk())
-				.andExpect(content().contentType("application/json;charset=UTF-8"))
-				.andExpect(jsonPath("$.success").value(true))
-				.andReturn();
-	}
-	
-	@Test
-	public void testGetRecoveriesReturnJSONsContainsNoErrors() throws Exception {
-		mockMvc.perform(get("/api/storage/recoveries")
-						.session(lokkiHttpSession))
-				.andExpect(status().isOk())
-				.andExpect(content().contentType("application/json;charset=UTF-8"))
-				.andExpect(jsonPath("$.success").value(true))
-				.andExpect(jsonPath("$.error").value(nullValue()))
-				.andReturn();
-	}
-	
-	@Test
-	public void testGetRecoveriesReturnJSONsObjectsIsArray() throws Exception {
-		mockMvc.perform(get("/api/storage/recoveries")
-						.session(lokkiHttpSession))
-				.andExpect(status().isOk())
-				.andExpect(content().contentType("application/json;charset=UTF-8"))
-				.andExpect(jsonPath("$.success").value(true))
-				.andExpect(jsonPath("$.error").value(nullValue()))
-				.andExpect(jsonPath("$.objects").isArray())
-				.andReturn();
-	}
-	
-	@Test
-	public void testGetRecoveriesReturnJSONsObjectsUserIdIsCorrect() throws Exception {
-		mockMvc.perform(get("/api/storage/recoveries")
-						.session(lokkiHttpSession))
-				.andExpect(status().isOk())
-				.andExpect(content().contentType("application/json;charset=UTF-8"))
-				.andExpect(jsonPath("$.success").value(true))
-				.andExpect(jsonPath("$.error").value(nullValue()))
-				.andExpect(jsonPath("$.objects").isArray())
-				.andExpect(jsonPath("$.objects[*].userId", everyItem(equalTo(USER_ID))))
-				.andReturn();
-	}
-	
-	@Test
-	public void testSaveRecoveryStatusIsOk() throws Exception {
-		mockMvc.perform(post("/api/storage/recoveries")
-						.session(lokkiHttpSession)
-						.contentType(MediaType.APPLICATION_JSON)
-						.content(validOnlyRow))
-				.andExpect(status().isOk())
-				.andReturn();
-	}
-	
-	@Test
-	public void testSaveRecoveryReturnsJSON() throws Exception {
-		mockMvc.perform(post("/api/storage/recoveries")
-						.session(lokkiHttpSession)
-						.contentType(MediaType.APPLICATION_JSON)
-						.content(validOnlyRow))
-				.andExpect(status().isOk())
-				.andExpect(content().contentType("application/json;charset=UTF-8"))
-				.andReturn();
-	}
-	
-	@Test
-	public void testSaveRecoveryReturnsErrorIfPostDataIsntJSON() throws Exception {
-		mockMvc.perform(post("/api/storage/recoveries")
-						.session(lokkiHttpSession)
-						.contentType(MediaType.APPLICATION_XML)
-						.content(validRowAndId))
-				.andExpect(status().isUnsupportedMediaType())
-				.andReturn();
+			.andExpect(status().isBadRequest())
+			.andReturn();
 	}
 	
 	@Test
@@ -364,8 +225,18 @@ public class LocalStorageControllerTest {
 				.session(lokkiHttpSession)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(invalidId))
-		.andExpect(status().isBadRequest()) // Should be internal server error
-		.andReturn();
+			.andExpect(status().isBadRequest())
+			.andReturn();
+	}
+
+	@Test
+	public void testSaveRingingReturnsErrorWithWronglyNamedRowField() throws Exception {
+		mockMvc.perform(post("/api/storage/ringings")
+				.session(lokkiHttpSession)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(invalidRow))
+			.andExpect(status().isBadRequest())
+			.andReturn();
 	}
 
 	@Test
@@ -374,18 +245,21 @@ public class LocalStorageControllerTest {
 				.session(lokkiHttpSession)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(invalidRow))
-		.andExpect(status().isBadRequest()) // Should be internal server error
-		.andReturn();
+			.andExpect(status().isBadRequest())
+			.andReturn();
 	}
 
 	@Test
-	public void testSaveRecoveryAcceptsContentWithoutId() throws Exception {
-		mockMvc.perform(post("/api/storage/recoveries")
+	public void testSaveRingingReturnsRowWithCorrectColumns() throws Exception {
+		mockMvc.perform(post("/api/storage/ringings")
 				.session(lokkiHttpSession)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(validOnlyRow))
-		.andExpect(status().isOk()) // Should be internal server error
-		.andReturn();
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.object.id").value(notNullValue()))
+			.andExpect(jsonPath("$.object.userId").value(notNullValue()))
+			.andExpect(jsonPath("$.object.row").value(notNullValue()))
+			.andReturn();
 	}
 	
 	@Test
@@ -394,69 +268,45 @@ public class LocalStorageControllerTest {
 				.session(lokkiHttpSession)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(validOnlyRow))
-		.andExpect(status().isOk())
-		.andExpect(jsonPath("$.object.id").value(notNullValue()))
-		.andExpect(jsonPath("$.object.userId").value(notNullValue()))
-		.andExpect(jsonPath("$.object.row").value(notNullValue()))
-		.andReturn();
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.object.id").value(notNullValue()))
+			.andExpect(jsonPath("$.object.userId").value(notNullValue()))
+			.andExpect(jsonPath("$.object.row").value(notNullValue()))
+			.andReturn();
 	}
 	
 	@Test
-	public void testDeleteRecoveryStatusIsOk() throws Exception {
-		mockMvc.perform(delete("/api/storage/recoveries")
-						.session(lokkiHttpSession)
-						.contentType(MediaType.APPLICATION_JSON)
-						.content(validFullRowToBeDeleted))
-				.andExpect(status().isOk())
-				.andReturn();
-		}
-	
-	@Test
-	public void testDeleteRecoveryReturnsJSON() throws Exception {
-		mockMvc.perform(delete("/api/storage/recoveries")
-						.session(lokkiHttpSession)
-						.contentType(MediaType.APPLICATION_JSON)
-						.content(validFullRowToBeDeleted))
-				.andExpect(status().isOk())
-				.andExpect(content().contentType("application/json;charset=UTF-8"))
-				.andReturn();
-	}
-	
-	@Test
-	public void testDeleteRecoveryReturnsErrorIfDeleteDataIsntJSON() throws Exception {
-		mockMvc.perform(delete("/api/storage/recoveries")
-						.session(lokkiHttpSession)
-						.contentType(MediaType.APPLICATION_XML)
-						.content(validFullRow))
-				.andExpect(status().isUnsupportedMediaType())
-				.andReturn();
+	public void testDeleteRingingReturnsErrorIfUserIdDoesNotMatchRowUserId() throws Exception {
+		mockMvc.perform(delete("/api/storage/ringings/" + otherUserRingingId)
+				.session(lokkiHttpSession))
+			.andExpect(status().isUnauthorized())
+			.andReturn();
 	}
 	
 	@Test
 	public void testDeleteRecoveryReturnsErrorIfUserIdDoesNotMatchRowUserId() throws Exception {
-		mockMvc.perform(delete("/api/storage/recoveries")
-						.session(lokkiHttpSession)
-						.contentType(MediaType.APPLICATION_XML)
-						.content(validFullRow))
-				.andExpect(status().isUnsupportedMediaType())
-				.andReturn();
+		mockMvc.perform(delete("/api/storage/recoveries/" + otherUserRecoveryId)
+				.session(lokkiHttpSession))
+			.andExpect(status().isUnauthorized())
+			.andReturn();
 	}
 	
 	@Test
-	public void testGetSettingsStatusIsOk() throws Exception {
-		mockMvc.perform(get("/api/storage/settings")
-						.session(lokkiHttpSession))
+	public void testDeleteRingingStatusIsOk() throws Exception {
+		mockMvc.perform(delete("/api/storage/ringings/" + ringingToBeDeletedId)
+				.session(lokkiHttpSession))
 				.andExpect(status().isOk())
-				.andReturn();
+			.andExpect(content().contentType("application/json;charset=UTF-8"))
+			.andReturn();
 	}
 	
 	@Test
-	public void testGetSettingsReturnsJSON() throws Exception {
-		mockMvc.perform(get("/api/storage/settings")
-						.session(lokkiHttpSession))
+	public void testDeleteRecoveryStatusIsOk() throws Exception {
+		mockMvc.perform(delete("/api/storage/recoveries/" + recoveryToBeDeletedId)
+				.session(lokkiHttpSession))
 				.andExpect(status().isOk())
-				.andExpect(content().contentType("application/json;charset=UTF-8"))
-				.andReturn();
+			.andExpect(content().contentType("application/json;charset=UTF-8"))
+			.andReturn();
 	}
 	
 	@Test

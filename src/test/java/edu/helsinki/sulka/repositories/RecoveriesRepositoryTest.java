@@ -1,6 +1,7 @@
 package edu.helsinki.sulka.repositories;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import org.junit.After;
 import org.junit.Before;
@@ -11,10 +12,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import edu.helsinki.sulka.models.RecoveryDatabaseRow;
-import edu.helsinki.sulka.repositories.RecoveriesRepository;
+import edu.helsinki.sulka.models.LocalDatabaseRow;
 
-@RunWith(SpringJUnit4ClassRunner.class)  
+@RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({
 	"file:src/main/webapp/WEB-INF/spring/root-context.xml",
 	"file:src/main/webapp/WEB-INF/spring/database.xml",
@@ -23,16 +23,16 @@ import edu.helsinki.sulka.repositories.RecoveriesRepository;
 @ActiveProfiles("dev")
 public class RecoveriesRepositoryTest {
 
-	@Autowired  
+	@Autowired
 	private RecoveriesRepository recoveriesRepository;
 	
-	private RecoveryDatabaseRow row;
+	private LocalDatabaseRow row;
 	private String rowData = "asdolkjaeoprids";
 	
 	@Before
 	public void setUp(){
-		row = new RecoveryDatabaseRow();
-		row.setRow(rowData);  
+		row = new LocalDatabaseRow();
+		row.setRow(rowData);
 	}
 	
 	@After
@@ -41,10 +41,10 @@ public class RecoveriesRepositoryTest {
 	}
 
 	@Test
-	public void testNewRowsGetIdFromRepository() {  
+	public void testNewRowsGetIdFromRepository() {
 		row = recoveriesRepository.save(row);
 		assertNotNull(row.getId());
-	}     
+	}
 	
 	@Test
 	public void testDefinedRowDataIsKept(){
