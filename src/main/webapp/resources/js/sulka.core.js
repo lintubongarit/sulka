@@ -857,6 +857,7 @@ sulka = {
 		};
 		
 		var settings = {
+				viewMode: sulka.viewMode,
 				columns: JSON.stringify(columnsDataToBeSaved),
 				filters: JSON.stringify(filters),
 		};
@@ -869,32 +870,39 @@ sulka = {
 	
 	fetchSettings: function() {
 		sulka.helpers.showLoader();
-		sulka.API.fetchSettings(function onSuccess(results){
-			var settings = jQuery.parseJSON(results.object.columns);
-			var oldColumns = sulka.columns;
-			var updatedColumns = [];
-			for(var index in oldColumns){ 
-				// Data is in following format:
-				// "columnName": [position, width, visibility]
-				oldColumns[index].width = settings[oldColumns[index].field][1];
-				oldColumns[index].$sulkaVisible = settings[oldColumns[index].field][2];
-				updatedColumns[settings[oldColumns[index].field][0]] = oldColumns[index];
-			}
-			sulka.columns = updatedColumns;
-			sulka.grid.setColumns(sulka.getVisibleColumns());
-			sulka.renderColumnGroups();
-			
-			var filters = jQuery.parseJSON(results.object.filters);
-			$("#filters-date").val(filters.date);
-			$("#filters-species").val(filters.species);
-			$("#filters-municipality").val(filters.municipality);
-			$("#filters-ringings").prop('checked', filters.ringings);
-			$("#filters-recoveries").prop('checked', filters.recoveries);
-			
-			sulka.helpers.hideLoaderAndSetError("Asetukset noudettu.");
-		}, function onError(){
-			sulka.helpers.hideLoaderAndSetError("Asetusten nouto epäonnistui.");
-		});
+		sulka.API.fetchSettings(
+			sulka.viewMode,
+			function onSuccess(results){
+				
+				if(results.object.columns){
+					var settings = jQuery.parseJSON(results.object.columns);
+					var oldColumns = sulka.columns;
+					var updatedColumns = [];
+					for(var index in oldColumns){ 
+						// Data is in following format:
+						// "columnName": [position, width, visibility]
+						oldColumns[index].width = settings[oldColumns[index].field][1];
+						oldColumns[index].$sulkaVisible = settings[oldColumns[index].field][2];
+						updatedColumns[settings[oldColumns[index].field][0]] = oldColumns[index];
+					}
+					sulka.columns = updatedColumns;
+					sulka.grid.setColumns(sulka.getVisibleColumns());
+					sulka.renderColumnGroups();
+				}
+				
+				if(results.object.filters){
+					var filters = jQuery.parseJSON(results.object.filters);
+					$("#filters-date").val(filters.date);
+					$("#filters-species").val(filters.species);
+					$("#filters-municipality").val(filters.municipality);
+					$("#filters-ringings").prop('checked', filters.ringings);
+					$("#filters-recoveries").prop('checked', filters.recoveries);
+				}
+				
+				sulka.helpers.hideLoaderAndSetError("Asetukset noudettu.");
+			}, function onError(){
+				sulka.helpers.hideLoaderAndSetError("Asetusten nouto epäonnistui.");
+			});
 	}
 	
 };

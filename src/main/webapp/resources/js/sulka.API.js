@@ -215,9 +215,9 @@ sulka.API = function(API) {
 		 * @param onSuccess Handler for succesfull GET.
 		 * @param onError Handler for failed GET.
 		 */
-		fetchSettings: function(onSuccess, onError){
+		fetchSettings: function(viewMode, onSuccess, onError){
 			$.ajax({
-				url: API.BASE + "/storage/settings",
+				url: API.BASE + "/storage/settings/" + viewMode,
 				type: "GET",
 				success: onSuccess,
 				error: onError

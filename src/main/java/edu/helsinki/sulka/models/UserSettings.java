@@ -27,7 +27,16 @@ public class UserSettings implements Serializable{
 	@JsonProperty("filters")
 	@Column(name = "filters")
 	private String filters;
+	@JsonProperty("viewMode")
+	@Column(name = "viewMode")
+	private String viewMode;
 	
+	public String getViewMode() {
+		return viewMode;
+	}
+	public void setViewMode(String viewMode) {
+		this.viewMode = viewMode;
+	}
 	public String getUserId() {
 		return userId;
 	}

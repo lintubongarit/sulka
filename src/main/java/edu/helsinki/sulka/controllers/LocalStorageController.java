@@ -8,6 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -130,12 +131,13 @@ public class LocalStorageController extends JSONController {
 	}
 	
 	@PreAuthorize("hasRole('USER')")
-	@RequestMapping(value = "/api/storage/settings",
+	@RequestMapping(value = "/api/storage/settings/{viewMode}",
 					method = RequestMethod.GET)
 	@ResponseBody
-	public ObjectResponse<UserSettings> getSettings(HttpSession session) throws LocalStorageException {
+	public ObjectResponse<UserSettings> getSettings(HttpSession session,
+			@PathVariable String viewMode) throws LocalStorageException {
 		String userId = ((User) session.getAttribute("user")).getLogin_id();
-		return new ObjectResponse<UserSettings>(localDatabaseService.getSettings(userId));
+		return new ObjectResponse<UserSettings>(localDatabaseService.getSettings(userId, viewMode));
 	}
 	
 	@PreAuthorize("hasRole('USER')")
