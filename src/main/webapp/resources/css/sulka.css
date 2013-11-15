@@ -290,6 +290,17 @@ span#last-error {
   background: #fafafa;
 }*/
 
+.recovery-row-color .r0, .ringing-row-color .r0 {
+	background-repeat: no-repeat;
+	background-position: center;
+}
+.recovery-row-color .r0 {
+	background-image: url('../img/recovery.png');
+}
+.ringing-row-color .r0 {
+	background-image: url('../img/ringing.png');
+}
+
 .tipu-row-color {
 	background: #e6f3ff; 
 }
