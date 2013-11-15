@@ -118,7 +118,7 @@ public class LocalStorageControllerTest {
     	otherUserRingingId = insertRinging(OTHER_USER_ID);
     	
     	recoveryToBeDeletedId = insertRecovery(USER_ID);
-    	ringingToBeDeletedId = insertRecovery(USER_ID);
+    	ringingToBeDeletedId = insertRinging(USER_ID);
 	}
 	
 	@After
@@ -299,8 +299,7 @@ public class LocalStorageControllerTest {
 	public void testDeleteRingingStatusIsOk() throws Exception {
 		mockMvc.perform(delete("/api/storage/ringings/" + ringingToBeDeletedId)
 				.session(lokkiHttpSession))
-				.andExpect(status().isOk())
-			.andExpect(content().contentType("application/json;charset=UTF-8"))
+				.andExpect(status().isNoContent())
 			.andReturn();
 	}
 	
@@ -308,8 +307,7 @@ public class LocalStorageControllerTest {
 	public void testDeleteRecoveryStatusIsOk() throws Exception {
 		mockMvc.perform(delete("/api/storage/recoveries/" + recoveryToBeDeletedId)
 				.session(lokkiHttpSession))
-				.andExpect(status().isOk())
-			.andExpect(content().contentType("application/json;charset=UTF-8"))
+				.andExpect(status().isNoContent())
 			.andReturn();
 	}
 	
