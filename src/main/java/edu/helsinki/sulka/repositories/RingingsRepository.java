@@ -5,9 +5,10 @@ import java.util.List;
 import org.springframework.data.repository.CrudRepository;
 
 import edu.helsinki.sulka.models.LocalDatabaseRow;
-import edu.helsinki.sulka.models.RecoveryDatabaseRow;
+import edu.helsinki.sulka.models.RingingDatabaseRow;
 
-public interface RecoveriesRepository extends CrudRepository<RecoveryDatabaseRow, Long>, LocalDatabaseRowRepository {
+
+public interface RingingsRepository extends CrudRepository<RingingDatabaseRow, Long>, LocalDatabaseRowRepository {
 	List<LocalDatabaseRow> findByUserId(String userId);
 	LocalDatabaseRow findById(Long rowId);
 }

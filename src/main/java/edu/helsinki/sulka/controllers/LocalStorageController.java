@@ -15,8 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import edu.helsinki.sulka.models.RecoveryDatabaseRow;
-import edu.helsinki.sulka.models.RingingDatabaseRow;
+import edu.helsinki.sulka.models.LocalDatabaseRow;
 import edu.helsinki.sulka.models.User;
 import edu.helsinki.sulka.models.UserSettings;
 import edu.helsinki.sulka.services.LocalDatabaseService;
@@ -35,104 +34,72 @@ public class LocalStorageController extends JSONController {
 		}
 	}
 	
+	
+	private enum ServiceType {
+		ringings,
+		recoveries
+	}
+	
+	private LocalDatabaseService.Table serviceToTableType(ServiceType service) {
+		switch (service) {
+		case ringings:
+			return LocalDatabaseService.Table.RINGINGS;
+		case recoveries:
+		default:
+			return LocalDatabaseService.Table.RECOVERIES;
+		}
+	}
+	
 	@PreAuthorize("hasRole('USER')")
-	@RequestMapping(value = "/api/storage/ringings",
+	@RequestMapping(value = "/api/storage/{type}",
 					method = RequestMethod.GET,
 					produces = "application/json;charset=UTF-8")
 	@ResponseBody
-	public ListResponse<RingingDatabaseRow> getRingings(HttpSession session) {
+	public ListResponse<LocalDatabaseRow> getRows(HttpSession session, @PathVariable ServiceType type) {
 		String userId = ((User) session.getAttribute("user")).getLogin_id();
-		return new ListResponse<RingingDatabaseRow>(localDatabaseService.getRingings(userId));
+		return new ListResponse<LocalDatabaseRow>(localDatabaseService.getRowsByUserId(serviceToTableType(type), userId));
 	}
 	
-		
 	@PreAuthorize("hasRole('USER')")
-	@RequestMapping(value = "/api/storage/ringings",
+	@RequestMapping(value = "/api/storage/{type}",
 					method = RequestMethod.POST,
 					produces = "application/json;charset=UTF-8",
 					consumes = "application/json")
 	@ResponseBody
-	public ObjectResponse<RingingDatabaseRow> saveRinging(HttpSession session,
-			@RequestBody RingingDatabaseRow ringing,
+	public ObjectResponse<LocalDatabaseRow> saveRow(HttpSession session,
+			@PathVariable ServiceType type,
+			@RequestBody LocalDatabaseRow row,
 			BindingResult bindingResult) throws LocalStorageException {
 		
 		if(bindingResult.hasErrors()){
 			throw new LocalStorageException("Database update failed");
 		}
-		ringing.setUserId(((User) session.getAttribute("user")).getLogin_id());
+		row.setUserId(((User) session.getAttribute("user")).getLogin_id());
 		
-		return new ObjectResponse<RingingDatabaseRow>(localDatabaseService.addRinging(ringing));
+		return new ObjectResponse<LocalDatabaseRow>(localDatabaseService.addRow(serviceToTableType(type), row));
 	}
 	
+	
 	@PreAuthorize("hasRole('USER')")
-	@RequestMapping(value = "/api/storage/ringings/{ringingId}",
-					method = RequestMethod.DELETE,
-					produces = "application/json;charset=UTF-8",
-					consumes="application/json")
+	@RequestMapping(value = "/api/storage/{type}/{rowId}", method = RequestMethod.DELETE)
+	@ResponseStatus(value=HttpStatus.NO_CONTENT)
 	@ResponseBody
-	public ObjectResponse<String> deleteRinging(HttpSession session,
-			@PathVariable long ringingId) throws LocalStorageException, NotFoundException, UnauthorizedException {
-		RingingDatabaseRow ringing = localDatabaseService.getRinging(ringingId);
+	public String deleteRow(HttpSession session, @PathVariable ServiceType type, @PathVariable long rowId)
+			throws LocalStorageException, NotFoundException, UnauthorizedException {
+		LocalDatabaseRow row = localDatabaseService.getRow(serviceToTableType(type), rowId);
 		
-		if (ringing == null) {
+		if (row == null) {
 			throw new NotFoundException();
 		}
 		
-		if(!((User) session.getAttribute("user")).getLogin_id().equals(ringing.getUserId())) {
-			throw new UnauthorizedException("Database update failed. User id and row owner id don't match.");
-		}
-		localDatabaseService.removeRinging(ringing);
-		return new ObjectResponse<String>("Database updated.");
-	}
-	
-	@PreAuthorize("hasRole('USER')")
-	@RequestMapping(value = "/api/storage/recoveries",
-					method = RequestMethod.GET,
-					produces = "application/json;charset=UTF-8")
-	@ResponseBody
-	public ListResponse<RecoveryDatabaseRow> getRecoveries(HttpSession session) {
-		String userId = ((User) session.getAttribute("user")).getLogin_id();
-		return new ListResponse<RecoveryDatabaseRow>(localDatabaseService.getRecoveries(userId));
-	}
-	
-	@PreAuthorize("hasRole('USER')")
-	@RequestMapping(value = "/api/storage/recoveries",
-					method = RequestMethod.POST,
-					produces = "application/json;charset=UTF-8",
-					consumes="application/json")
-	@ResponseBody
-	public ObjectResponse<RecoveryDatabaseRow> saveRecovery(HttpSession session,
-			@RequestBody RecoveryDatabaseRow recovery,
-			BindingResult bindingResult) throws LocalStorageException {
-		if(bindingResult.hasErrors()){
-			throw new LocalStorageException("Database update failed");
-		}
-		recovery.setUserId(((User) session.getAttribute("user")).getLogin_id());
-		
-		return new ObjectResponse<RecoveryDatabaseRow>(localDatabaseService.addRecovery(recovery));
-	}
-	
-	@PreAuthorize("hasRole('USER')")
-	@RequestMapping(value = "/api/storage/recoveries/{recoveryId}",
-					method = RequestMethod.DELETE,
-					produces = "application/json;charset=UTF-8",
-					consumes="application/json")
-	@ResponseBody
-	public ObjectResponse<String> deleteRecovery(HttpSession session,
-			@PathVariable long recoveryId) throws LocalStorageException, NotFoundException, UnauthorizedException {
-		RecoveryDatabaseRow recovery = localDatabaseService.getRecovery(recoveryId);
-		
-		if (recovery == null) {
-			throw new NotFoundException();
-		}
-		
-		if(!((User) session.getAttribute("user")).getLogin_id().equals(recovery.getUserId())) {
+		if(!((User) session.getAttribute("user")).getLogin_id().equals(row.getUserId())) {
 			throw new UnauthorizedException("Database update failed. User id and row owner id don't match.");
 		}
 		
-		localDatabaseService.removeRecovery(recovery);
-		return new ObjectResponse<String>("Database updated.");
+		localDatabaseService.removeRow(serviceToTableType(type), row);
+		return "";
 	}
+	
 	
 	@PreAuthorize("hasRole('USER')")
 	@RequestMapping(value = "/api/storage/settings",
@@ -148,16 +115,15 @@ public class LocalStorageController extends JSONController {
 					method = RequestMethod.POST,
 					consumes = "application/json")
 	@ResponseBody
-	public ObjectResponse<String> saveSettings(HttpSession session,
-			@RequestBody UserSettings settings,
-			BindingResult bindingResult) throws LocalStorageException {
+	public String saveSettings(HttpSession session, @RequestBody UserSettings settings, BindingResult bindingResult)
+			throws LocalStorageException {
 		if(bindingResult.hasErrors()){
 			throw new LocalStorageException("Database update failed.");
 		}
 		String userId = ((User) session.getAttribute("user")).getLogin_id();
 		settings.setUserId(userId);
 		localDatabaseService.saveSettings(settings);
-		return new ObjectResponse<String>("User settings saved.");
+		return "User settings saved.";
 	}
 	
 	

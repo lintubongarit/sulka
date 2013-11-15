@@ -107,14 +107,4 @@ public abstract class JSONController {
 	public ErrorResponse handleAPIException(Exception e) {
 		return new ErrorResponse(e.getMessage());
 	}
-	
-	/**
-	 * Handles other errors gracefully.
-	 */
-	@ExceptionHandler(Throwable.class)
-	@ResponseBody
-	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-	public ErrorResponse handleAPIException(Throwable t) {
-		return new ErrorResponse(t.getMessage());
-	}
 }

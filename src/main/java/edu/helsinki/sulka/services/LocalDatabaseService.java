@@ -5,11 +5,11 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import edu.helsinki.sulka.models.RecoveryDatabaseRow;
-import edu.helsinki.sulka.models.RingingDatabaseRow;
+import edu.helsinki.sulka.models.LocalDatabaseRow;
 import edu.helsinki.sulka.models.UserSettings;
+import edu.helsinki.sulka.repositories.LocalDatabaseRowRepository;
 import edu.helsinki.sulka.repositories.RecoveriesRepository;
-import edu.helsinki.sulka.repositories.RingingRepository;
+import edu.helsinki.sulka.repositories.RingingsRepository;
 import edu.helsinki.sulka.repositories.UserSettingsRepository;
 
 
@@ -20,45 +20,43 @@ import edu.helsinki.sulka.repositories.UserSettingsRepository;
 public class LocalDatabaseService {
 
 	@Autowired
-	private RingingRepository ringingRepository;
+	private RingingsRepository ringingsRepository;
 	
 	@Autowired
-	private RecoveriesRepository recoveryRepository;
+	private RecoveriesRepository recoveriesRepository;
 	
+	public enum Table {
+		RINGINGS,
+		RECOVERIES
+	}
+	
+	private LocalDatabaseRowRepository getRepository(Table t) {
+		switch (t) {
+		case RINGINGS:
+			return ringingsRepository;
+		case RECOVERIES:
+		default:
+			return recoveriesRepository;
+		}
+	}
+
 	@Autowired
 	private UserSettingsRepository userSettingsRepository;
-
-	public List<RingingDatabaseRow> getRingings(String userId) {
-		return (List<RingingDatabaseRow>) ringingRepository.findByUserId(userId);
+	
+	public List<LocalDatabaseRow> getRowsByUserId(Table table, String userId) {
+		return getRepository(table).findByUserId(userId);
 	}
 	
-	public List<RecoveryDatabaseRow> getRecoveries(String userId) {
-		return (List<RecoveryDatabaseRow>) recoveryRepository.findByUserId(userId);
+	public LocalDatabaseRow addRow(Table table, LocalDatabaseRow row) {
+		return getRepository(table).save(row);
 	}
 	
-	public RingingDatabaseRow addRinging(RingingDatabaseRow ringingRow){
-		return ringingRepository.save(ringingRow);
-	}
-	
-	public RecoveryDatabaseRow addRecovery(RecoveryDatabaseRow recoveryRow) {
-		return recoveryRepository.save(recoveryRow);
+	public void removeRow(Table table, LocalDatabaseRow ringingRow) {
+		getRepository(table).delete(ringingRow);
 	}
 
-	public void removeRinging(RingingDatabaseRow ringingRow) {
-		ringingRepository.delete(ringingRow);
-	}
-
-	public void removeRecovery(RecoveryDatabaseRow recoveryRow) {
-		recoveryRepository.delete(recoveryRow);
-		
-	}
-
-	public RingingDatabaseRow getRinging(long ringingId) {
-		return (RingingDatabaseRow) ringingRepository.findById(ringingId);
-	}
-	
-	public RecoveryDatabaseRow getRecovery(long recoveryId) {
-		return (RecoveryDatabaseRow) recoveryRepository.findById(recoveryId);
+	public LocalDatabaseRow getRow(Table table, long rowId) {
+		return getRepository(table).findById(rowId);
 	}
 	
 	public UserSettings getSettings(String userId) {
