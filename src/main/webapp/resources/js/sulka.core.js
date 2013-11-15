@@ -171,11 +171,6 @@ sulka = {
 		sulka.grid.setSelectionModel(new Slick.CellSelectionModel());
 		sulka.grid.setSelectionModel(new Slick.RowSelectionModel());
 		
-		//Subscribe setting saving
-		sulka.grid.onColumnsReordered.subscribe(sulka.saveSettings);
-		sulka.grid.onColumnsResized.subscribe(sulka.saveSettings);
-		
-		
 		if (sulka.viewMode == ("ringings" || "recoveries")){
 			sulka.moveRowsPlugin = 
 				new Slick.RowMoveManager({   
