@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import edu.helsinki.sulka.models.LocalDatabaseRow;
+import edu.helsinki.sulka.models.LocalDatabaseRow.RowType;
 import edu.helsinki.sulka.models.User;
 import edu.helsinki.sulka.models.UserSettings;
 import edu.helsinki.sulka.services.LocalDatabaseService;
@@ -40,13 +41,13 @@ public class LocalStorageController extends JSONController {
 		recoveries
 	}
 	
-	private LocalDatabaseService.Table serviceToTableType(ServiceType service) {
+	private RowType serviceToRowType(ServiceType service) {
 		switch (service) {
 		case ringings:
-			return LocalDatabaseService.Table.RINGINGS;
+			return RowType.RINGING;
 		case recoveries:
 		default:
-			return LocalDatabaseService.Table.RECOVERIES;
+			return RowType.RECOVERY;
 		}
 	}
 	
@@ -57,7 +58,7 @@ public class LocalStorageController extends JSONController {
 	@ResponseBody
 	public ListResponse<LocalDatabaseRow> getRows(HttpSession session, @PathVariable ServiceType type) {
 		String userId = ((User) session.getAttribute("user")).getLogin_id();
-		return new ListResponse<LocalDatabaseRow>(localDatabaseService.getRowsByUserId(serviceToTableType(type), userId));
+		return new ListResponse<LocalDatabaseRow>(localDatabaseService.getRowsByUserId(serviceToRowType(type), userId));
 	}
 	
 	@PreAuthorize("hasRole('USER')")
@@ -71,12 +72,13 @@ public class LocalStorageController extends JSONController {
 			@RequestBody LocalDatabaseRow row,
 			BindingResult bindingResult) throws LocalStorageException {
 		
-		if(bindingResult.hasErrors()){
+		if (bindingResult.hasErrors()){
 			throw new LocalStorageException("Database update failed");
 		}
 		row.setUserId(((User) session.getAttribute("user")).getLogin_id());
+		row.setRowType(serviceToRowType(type));
 		
-		return new ObjectResponse<LocalDatabaseRow>(localDatabaseService.addRow(serviceToTableType(type), row));
+		return new ObjectResponse<LocalDatabaseRow>(localDatabaseService.addRow(row));
 	}
 	
 	
@@ -86,17 +88,17 @@ public class LocalStorageController extends JSONController {
 	@ResponseBody
 	public String deleteRow(HttpSession session, @PathVariable ServiceType type, @PathVariable long rowId)
 			throws LocalStorageException, NotFoundException, UnauthorizedException {
-		LocalDatabaseRow row = localDatabaseService.getRow(serviceToTableType(type), rowId);
+		LocalDatabaseRow row = localDatabaseService.getRow(serviceToRowType(type), rowId);
 		
 		if (row == null) {
 			throw new NotFoundException();
 		}
 		
-		if(!((User) session.getAttribute("user")).getLogin_id().equals(row.getUserId())) {
+		if (!((User) session.getAttribute("user")).getLogin_id().equals(row.getUserId())) {
 			throw new UnauthorizedException("Database update failed. User id and row owner id don't match.");
 		}
 		
-		localDatabaseService.removeRow(serviceToTableType(type), row);
+		localDatabaseService.removeRow(row);
 		return "";
 	}
 	
@@ -117,7 +119,7 @@ public class LocalStorageController extends JSONController {
 	@ResponseBody
 	public String saveSettings(HttpSession session, @RequestBody UserSettings settings, BindingResult bindingResult)
 			throws LocalStorageException {
-		if(bindingResult.hasErrors()){
+		if (bindingResult.hasErrors()){
 			throw new LocalStorageException("Database update failed.");
 		}
 		String userId = ((User) session.getAttribute("user")).getLogin_id();

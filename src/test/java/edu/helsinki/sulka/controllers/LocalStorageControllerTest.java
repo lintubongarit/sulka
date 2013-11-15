@@ -18,6 +18,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
@@ -31,9 +32,9 @@ import org.springframework.web.context.WebApplicationContext;
 
 import edu.helsinki.sulka.SecuritySessionHelper;
 import edu.helsinki.sulka.models.LocalDatabaseRow;
+import edu.helsinki.sulka.models.LocalDatabaseRow.RowType;
 import edu.helsinki.sulka.models.User;
 import edu.helsinki.sulka.services.LocalDatabaseService;
-import edu.helsinki.sulka.services.LocalDatabaseService.Table;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
@@ -44,6 +45,8 @@ import edu.helsinki.sulka.services.LocalDatabaseService.Table;
 })
 @ActiveProfiles("dev")
 public class LocalStorageControllerTest {
+	@Autowired
+	private Logger logger;
 	
 	@Autowired
 	private WebApplicationContext wac;
@@ -73,18 +76,18 @@ public class LocalStorageControllerTest {
 	 * @return row id
 	 */
 	private long insertRecovery(String userId) {
-    	LocalDatabaseRow recovery = new LocalDatabaseRow();
+    	LocalDatabaseRow recovery = new LocalDatabaseRow(RowType.RECOVERY);
     	recovery.setUserId(userId);
-    	return localDatabaseService.addRow(Table.RECOVERIES, recovery).getId();
+    	return localDatabaseService.addRow(recovery).getId();
 	}
 	
 	/**
 	 * @return row id
 	 */
 	private long insertRinging(String userId) {
-		LocalDatabaseRow ringing = new LocalDatabaseRow();
+		LocalDatabaseRow ringing = new LocalDatabaseRow(RowType.RINGING);
     	ringing.setUserId(userId);
-    	return localDatabaseService.addRow(Table.RINGINGS, ringing).getId();
+    	return localDatabaseService.addRow(ringing).getId();
 	}
 	
 	@Before
@@ -120,24 +123,24 @@ public class LocalStorageControllerTest {
 	
 	@After
 	public void tearDown(){
-		List<LocalDatabaseRow> ringings = localDatabaseService.getRowsByUserId(Table.RINGINGS, USER_ID);
-		List<LocalDatabaseRow> recoveries = localDatabaseService.getRowsByUserId(Table.RECOVERIES, USER_ID);
+		List<LocalDatabaseRow> ringings = localDatabaseService.getRowsByUserId(RowType.RINGING, USER_ID);
+		List<LocalDatabaseRow> recoveries = localDatabaseService.getRowsByUserId(RowType.RECOVERY, USER_ID);
 		
 		for(LocalDatabaseRow toBeDeleted: ringings) {
-			localDatabaseService.removeRow(Table.RINGINGS, toBeDeleted);
+			localDatabaseService.removeRow(toBeDeleted);
 		}
 		for(LocalDatabaseRow toBeDeleted: recoveries) {
-			localDatabaseService.removeRow(Table.RECOVERIES, toBeDeleted);
+			localDatabaseService.removeRow(toBeDeleted);
 		}
 		
-		ringings = localDatabaseService.getRowsByUserId(Table.RINGINGS, OTHER_USER_ID);
-		recoveries = localDatabaseService.getRowsByUserId(Table.RECOVERIES, OTHER_USER_ID);
+		ringings = localDatabaseService.getRowsByUserId(RowType.RINGING, OTHER_USER_ID);
+		recoveries = localDatabaseService.getRowsByUserId(RowType.RECOVERY, OTHER_USER_ID);
 		
 		for(LocalDatabaseRow toBeDeleted: ringings) {
-			localDatabaseService.removeRow(Table.RINGINGS, toBeDeleted);
+			localDatabaseService.removeRow(toBeDeleted);
 		}
 		for(LocalDatabaseRow toBeDeleted: recoveries) {
-			localDatabaseService.removeRow(Table.RECOVERIES, toBeDeleted);
+			localDatabaseService.removeRow(toBeDeleted);
 		}
 	}
 	
@@ -277,6 +280,7 @@ public class LocalStorageControllerTest {
 	
 	@Test
 	public void testDeleteRingingReturnsErrorIfUserIdDoesNotMatchRowUserId() throws Exception {
+		logger.error("" + otherUserRingingId);
 		mockMvc.perform(delete("/api/storage/ringings/" + otherUserRingingId)
 				.session(lokkiHttpSession))
 			.andExpect(status().isUnauthorized())

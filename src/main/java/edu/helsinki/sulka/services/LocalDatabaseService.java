@@ -6,10 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import edu.helsinki.sulka.models.LocalDatabaseRow;
+import edu.helsinki.sulka.models.LocalDatabaseRow.RowType;
 import edu.helsinki.sulka.models.UserSettings;
 import edu.helsinki.sulka.repositories.LocalDatabaseRowRepository;
-import edu.helsinki.sulka.repositories.RecoveriesRepository;
-import edu.helsinki.sulka.repositories.RingingsRepository;
 import edu.helsinki.sulka.repositories.UserSettingsRepository;
 
 
@@ -20,43 +19,25 @@ import edu.helsinki.sulka.repositories.UserSettingsRepository;
 public class LocalDatabaseService {
 
 	@Autowired
-	private RingingsRepository ringingsRepository;
+	private LocalDatabaseRowRepository localRowRepository;
 	
-	@Autowired
-	private RecoveriesRepository recoveriesRepository;
-	
-	public enum Table {
-		RINGINGS,
-		RECOVERIES
-	}
-	
-	private LocalDatabaseRowRepository getRepository(Table t) {
-		switch (t) {
-		case RINGINGS:
-			return ringingsRepository;
-		case RECOVERIES:
-		default:
-			return recoveriesRepository;
-		}
-	}
-
 	@Autowired
 	private UserSettingsRepository userSettingsRepository;
 	
-	public List<LocalDatabaseRow> getRowsByUserId(Table table, String userId) {
-		return getRepository(table).findByUserId(userId);
+	public List<LocalDatabaseRow> getRowsByUserId(RowType rowType, String userId) {
+		return localRowRepository.findByRowTypeAndUserId(rowType, userId);
 	}
 	
-	public LocalDatabaseRow addRow(Table table, LocalDatabaseRow row) {
-		return getRepository(table).save(row);
+	public LocalDatabaseRow addRow(LocalDatabaseRow row) {
+		return localRowRepository.save(row);
 	}
 	
-	public void removeRow(Table table, LocalDatabaseRow ringingRow) {
-		getRepository(table).delete(ringingRow);
+	public void removeRow(LocalDatabaseRow ringingRow) {
+		localRowRepository.delete(ringingRow);
 	}
 
-	public LocalDatabaseRow getRow(Table table, long rowId) {
-		return getRepository(table).findById(rowId);
+	public LocalDatabaseRow getRow(RowType rowType, long rowId) {
+		return localRowRepository.findByRowTypeAndId(rowType, rowId);
 	}
 	
 	public UserSettings getSettings(String userId) {

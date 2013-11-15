@@ -7,15 +7,25 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
+import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-@JsonIgnoreProperties(ignoreUnknown=false)
-@MappedSuperclass
 @Entity
+@Table(name="Recoveries")
+@JsonIgnoreProperties(ignoreUnknown=false)
 public class LocalDatabaseRow implements Serializable {
+	public LocalDatabaseRow() {}
+	
+	public LocalDatabaseRow(RowType rowType) {
+		this.rowType = rowType;
+	}
+	
+	public enum RowType {
+		RINGING,
+		RECOVERY
+	};
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -28,6 +38,10 @@ public class LocalDatabaseRow implements Serializable {
 	@JsonProperty("userId")
 	@Column(name = "userId")
 	private String userId;
+	
+	@JsonProperty("rowType")
+	@Column(name = "rowType")
+	private RowType rowType;
 	
 	@JsonProperty("row")
 	@Column(name = "rowJSON")
@@ -44,6 +58,12 @@ public class LocalDatabaseRow implements Serializable {
 	}
 	public void setUserId(String userId) {
 		this.userId = userId;
+	}
+	public RowType getRowType() {
+		return rowType;
+	}
+	public void setRowType(RowType rowType) {
+		this.rowType = rowType;
 	}
 	public String getRow() {
 		return row;

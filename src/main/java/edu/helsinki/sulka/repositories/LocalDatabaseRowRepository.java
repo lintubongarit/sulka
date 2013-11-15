@@ -2,11 +2,12 @@ package edu.helsinki.sulka.repositories;
 
 import java.util.List;
 
-import edu.helsinki.sulka.models.LocalDatabaseRow;
+import org.springframework.data.repository.CrudRepository;
 
-public interface LocalDatabaseRowRepository {
-	List<LocalDatabaseRow> findByUserId(String userId);
-	LocalDatabaseRow findById(Long rowId);
-	LocalDatabaseRow save(LocalDatabaseRow entity);
-	void delete(LocalDatabaseRow entity);
+import edu.helsinki.sulka.models.LocalDatabaseRow;
+import edu.helsinki.sulka.models.LocalDatabaseRow.RowType;
+
+public interface LocalDatabaseRowRepository extends CrudRepository<LocalDatabaseRow, Long> {
+	List<LocalDatabaseRow> findByRowTypeAndUserId(RowType type, String userId);
+	LocalDatabaseRow findByRowTypeAndId(RowType type, long id);
 }

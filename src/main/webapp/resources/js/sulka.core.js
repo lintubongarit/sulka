@@ -706,10 +706,11 @@ sulka = {
 		}
 	},
 	
-	METADATA_SULKA_RECOVERY: {"cssClasses" : "sulka-row-color recovery-row-color"},
-	METADATA_SULKA_RINGING: {"cssClasses" : "sulka-row-color ringing-row-color"},
-	METADATA_TIPU_RECOVERY: { "cssClasses": "tipu-row-color recovery-row-color"},
-	METADATA_TIPU_RINGING: { "cssClasses": "tipu-row-color ringing-row-color"},
+	METADATA_SULKA_RECOVERY: {"cssClasses" : "sulka-row-color recovery-row-color" },
+	METADATA_SULKA_RINGING: {"cssClasses" : "sulka-row-color ringing-row-color" },
+	METADATA_TIPU_RECOVERY: { "cssClasses": "tipu-row-color recovery-row-color" },
+	METADATA_TIPU_RINGING: { "cssClasses": "tipu-row-color ringing-row-color" },
+	METADATA_EMPTY: { },
 	
 	RINGING_TYPE: "Rengastus",
 	RECOVERY_TYPE: "Tapaaminen",
@@ -719,6 +720,7 @@ sulka = {
 			METADATA_SULKA_RINGING = sulka.METADATA_SULKA_RINGING,
 			METADATA_TIPU_RECOVERY = sulka.METADATA_TIPU_RECOVERY,
 			METADATA_TIPU_RINGING = sulka.METADATA_TIPU_RINGING,
+			METADATA_EMPTY = sulka.METADATA_EMPTY,
 			RINGING_TYPE = sulka.RINGING_TYPE;
 		return {
 			data: data,

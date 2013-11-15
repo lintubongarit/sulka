@@ -13,6 +13,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import edu.helsinki.sulka.models.LocalDatabaseRow;
+import edu.helsinki.sulka.models.LocalDatabaseRow.RowType;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({
@@ -21,37 +22,35 @@ import edu.helsinki.sulka.models.LocalDatabaseRow;
 	"file:src/main/webapp/WEB-INF/spring/appServlet/servlet-context.xml"
 })
 @ActiveProfiles("dev")
-public class RingingRepositoryTest {
+public class LocalDatabaseRowRepositoryTest {
 
 	@Autowired
-	private RingingsRepository ringingRepository;
+	private LocalDatabaseRowRepository recoveriesRepository;
 	
 	private LocalDatabaseRow row;
-	private String rowData = "asdolkjaeoorids";
+	private String rowData = "asdolkjaeoprids";
 	
 	@Before
 	public void setUp(){
-		row = new LocalDatabaseRow();
+		row = new LocalDatabaseRow(RowType.RINGING);
 		row.setRow(rowData);
 	}
 	
 	@After
 	public void tearDown(){
-		ringingRepository.delete(row);
+		recoveriesRepository.delete(row);
 	}
 
 	@Test
 	public void testNewRowsGetIdFromRepository() {
-		row = ringingRepository.save(row);
+		row = recoveriesRepository.save(row);
 		assertNotNull(row.getId());
 	}
 	
 	@Test
 	public void testDefinedRowDataIsKept(){
-		row = ringingRepository.save(row);
+		row = recoveriesRepository.save(row);
 		assertEquals(row.getRow(), rowData);
 	}
-	
+
 }
-
-
