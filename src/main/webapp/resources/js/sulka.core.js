@@ -860,15 +860,15 @@ sulka = {
 		};
 		
 		var settings = {
-				viewMode: sulka.viewMode,
 				columns: JSON.stringify(columnsDataToBeSaved),
 				filters: JSON.stringify(filters),
 		};
-		sulka.API.saveSettings(settings, function onSuccess() {
-			sulka.helpers.hideLoader();
-		}, function onError(){
-			sulka.helpers.hideLoaderAndSetError(sulka.strings.settingsSaveFailed);
-		});
+		sulka.API.saveSettings(sulka.viewMode, settings,
+			function onSuccess() {
+				sulka.helpers.hideLoader();
+			}, function onError(){
+				sulka.helpers.hideLoaderAndSetError(sulka.strings.settingsSaveFailed);
+			});
 	},
 	
 	fetchSettings: function() {

@@ -18,30 +18,21 @@ public class UserSettings implements Serializable{
 	private static final long serialVersionUID = -8338155036854013157L;
 
 	@Id
-	@JsonProperty("userId")
-	@Column(name = "userId")
-	private String userId;
+	@JsonProperty("userId_viewMode")
+	@Column(name = "userId_viewMode")
+	private String userId_viewMode;
 	@JsonProperty("columns")
 	@Column(name = "columns", length = 3000)
 	private String columns;
 	@JsonProperty("filters")
 	@Column(name = "filters")
 	private String filters;
-	@JsonProperty("viewMode")
-	@Column(name = "viewMode")
-	private String viewMode;
-	
-	public String getViewMode() {
-		return viewMode;
-	}
-	public void setViewMode(String viewMode) {
-		this.viewMode = viewMode;
-	}
+
 	public String getUserId() {
-		return userId;
+		return userId_viewMode;
 	}
 	public void setUserId(String userId) {
-		this.userId = userId;
+		this.userId_viewMode = userId;
 	}
 	public String getColumns() {
 		return columns;

@@ -5,5 +5,4 @@ import org.springframework.data.repository.CrudRepository;
 import edu.helsinki.sulka.models.UserSettings;
 
 public interface UserSettingsRepository extends CrudRepository<UserSettings, String> {
-	UserSettings findByUserIdAndViewMode(String userId, String viewMode);
 }

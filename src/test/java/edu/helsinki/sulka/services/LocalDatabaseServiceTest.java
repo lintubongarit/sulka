@@ -35,10 +35,9 @@ public class LocalDatabaseServiceTest {
 	private RecoveryDatabaseRow recoveryRow;
 	private UserSettings userSettings;
 	
-	private static final String USER_ID = "LOCAL_DATABASE_SERVICE_TEST_USER_12345";
+	private static final String USER_ID = "LOCAL_DATABASE_SERVICE_TEST_USER_12345_browsing";
 	private static final String ROW_DATA = "asdfhasdfasesdfawe";
 	private static final String COLUMN_DATA = "asdfawetraweasdf";
-	private static final String VIEW_MODE = "browsing";
 	
 	@Before
 	public void setUp(){
@@ -52,7 +51,6 @@ public class LocalDatabaseServiceTest {
 		ringingRow.setRow(ROW_DATA);
 		recoveryRow.setRow(ROW_DATA);
 		
-		userSettings.setViewMode(VIEW_MODE);
 		userSettings.setUserId(USER_ID);
 		userSettings.setColumns(COLUMN_DATA);
 	}
@@ -162,27 +160,27 @@ public class LocalDatabaseServiceTest {
 	
 	@Test
 	public void testQueryingSettingsForNewUserReturnsEmptySettings(){
-		userSettings = localDatabaseService.getSettings(USER_ID, VIEW_MODE);
+		userSettings = localDatabaseService.getSettings(USER_ID);
 		assertTrue(userSettings.getColumns().length() == 0);
 	}
 	
 	@Test
 	public void testQueryingSettingsForNewUserReturnsSettingsWithCorrectUserId(){
-		userSettings = localDatabaseService.getSettings(USER_ID, VIEW_MODE);
+		userSettings = localDatabaseService.getSettings(USER_ID);
 		assertTrue(userSettings.getUserId() == USER_ID);
 	}
 	
 	@Test
 	public void testQueryingExistingUserReturnsPreviouslySetSettings(){
 		localDatabaseService.saveSettings(userSettings);
-		userSettings = localDatabaseService.getSettings(USER_ID, VIEW_MODE);
+		userSettings = localDatabaseService.getSettings(USER_ID);
 		assertTrue(userSettings.getColumns().equals(COLUMN_DATA));
 	}
 	
 	@Test
 	public void testQueryingExistingUserReturnsSettingsWithCorrectUserID(){
 		localDatabaseService.saveSettings(userSettings);
-		userSettings = localDatabaseService.getSettings(USER_ID, VIEW_MODE);
+		userSettings = localDatabaseService.getSettings(USER_ID);
 		assertTrue(userSettings.getUserId().equals(USER_ID));
 	}
 }

@@ -53,13 +53,12 @@ public class LocalDatabaseService {
 		
 	}
 
-	public UserSettings getSettings(String userId, String viewMode) {
-		UserSettings settings = userSettingsRepository.findByUserIdAndViewMode(userId, viewMode);
+	public UserSettings getSettings(String userId_viewMode) {
+		UserSettings settings = userSettingsRepository.findOne(userId_viewMode);
 		if(settings == null){
 			settings = new UserSettings();
-			settings.setUserId(userId);
+			settings.setUserId(userId_viewMode);
 			settings.setColumns("");
-			settings.setViewMode(viewMode);
 			settings.setFilters("");
 		}
 		return settings;

@@ -470,7 +470,7 @@ public class LocalStorageControllerTest {
 	
 	@Test
 	public void testSaveSettingsStatusIsOk() throws Exception {
-		mockMvc.perform(post("/api/storage/settings")
+		mockMvc.perform(post("/api/storage/settings/browsing")
 						.session(lokkiHttpSession)
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(validSettings))
@@ -480,7 +480,7 @@ public class LocalStorageControllerTest {
 	
 	@Test
 	public void testSaveSettingsReturnsErrorIfDataIsntJSON() throws Exception {
-		mockMvc.perform(post("/api/storage/settings")
+		mockMvc.perform(post("/api/storage/settings/browsing")
 						.session(lokkiHttpSession)
 						.contentType(MediaType.APPLICATION_XML)
 						.content(validSettings))
