@@ -205,13 +205,14 @@ sulka.API = function(API) {
 		
 		/**
 		 * Save users settings to database 
+		 * @param viewMode Which mode is being saved
 		 * @param settings Settings to be saved
 		 * @param onSuccess Handler for succesfull POST.
 		 * @param onError Handler for failed POST.
 		 */
-		saveSettings: function(settings, onSuccess, onError) {
+		saveSettings: function(viewMode, settings, onSuccess, onError) {
 			$.ajax({
-				url: API.BASE  + "/storage/settings",
+				url: API.BASE  + "/storage/settings/" + viewMode,
 				type: "POST",
 				contentType: "application/json",
 				dataType: "json",
@@ -223,12 +224,13 @@ sulka.API = function(API) {
 		
 		/**
 		 * Get user settings from database
+		 * @param viewMode To which mode to get the settings
 		 * @param onSuccess Handler for succesfull GET.
 		 * @param onError Handler for failed GET.
 		 */
-		fetchSettings: function(onSuccess, onError){
+		fetchSettings: function(viewMode, onSuccess, onError){
 			$.ajax({
-				url: API.BASE + "/storage/settings",
+				url: API.BASE + "/storage/settings/" + viewMode,
 				type: "GET",
 				success: onSuccess,
 				error: onError

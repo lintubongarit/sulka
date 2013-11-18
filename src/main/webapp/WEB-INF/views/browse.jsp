@@ -52,6 +52,10 @@
 						<img src="resources/img/ajax-loader.gif" id="loader-animation" />
 					</form>
 				</td>
+				<td>
+				    <button type="button" id="saveSettings" class="local-toolbar-menu" onclick="sulka.saveSettings();">Tallenna asetukset</button>
+				    <button type="button" id="loadSettings" class="local-toolbar-menu" onclick="sulka.fetchSettings();">Lataa asetukset</button>
+				</td>
 			</tr>
 		</table>
 		<%@include file="_slickGrid.jsp" %>

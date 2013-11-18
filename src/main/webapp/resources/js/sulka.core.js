@@ -182,11 +182,6 @@ sulka = {
 		sulka.grid.setSelectionModel(new Slick.CellSelectionModel());
 		sulka.grid.setSelectionModel(new Slick.RowSelectionModel());
 		
-		//Subscribe setting saving
-		sulka.grid.onColumnsReordered.subscribe(sulka.saveSettings);
-		sulka.grid.onColumnsResized.subscribe(sulka.saveSettings);
-		
-		
 		if (sulka.viewMode == "ringings" || sulka.viewMode == "recoveries"){
 			sulka.moveRowsPlugin = 
 				new Slick.RowMoveManager({   
@@ -639,11 +634,7 @@ sulka = {
 			return;
 		}
 		
-		sulka.helpers.unsetErrorAndShowLoader();
-		sulka.fetchRows(filters);
-	},
-	
-	fetchRows: function (filters) {
+		// Fetch rows
 		var combinedRows = null;
 		var combineCalls = 0;
 		var N_CALLS = sulka.addMode ? 2 : 1;
@@ -934,8 +925,6 @@ sulka = {
 		sulka.API.validate(
 			selectedRow, 
 			function (data) {
-				sulka.helpers.hideLoaderAndUnsetError();
-				
 				if (data.passes){
 					sulka.helpers.hideLoaderAndSetError(sulka.strings.validRow);
 				} else {
@@ -953,15 +942,18 @@ sulka = {
 	
 	saveSettings: function() {
 		sulka.helpers.showLoader();
-		var columns = sulka.columns;
 		var columnsDataToBeSaved = {};
-		for(var index in columns){
+		for(var index in sulka.columns){
 			var columnData = [ // [position, width, visibility]
 					index,
-					columns[index].width,
-					columns[index].$sulkaVisible,
+					sulka.columns[index].width,
+					sulka.columns[index].$sulkaVisible,
 			];
-			columnsDataToBeSaved[columns[index].field] = columnData;
+			columnsDataToBeSaved[sulka.columns[index].field] = columnData;
+		}
+		var gridColumns = sulka.grid.getColumns();
+		for(var index in gridColumns){
+			columnsDataToBeSaved[gridColumns[index].field][1] = gridColumns[index].width;
 		}
 		
 		var filters =  {
@@ -976,44 +968,48 @@ sulka = {
 				columns: JSON.stringify(columnsDataToBeSaved),
 				filters: JSON.stringify(filters),
 		};
-		sulka.API.saveSettings(settings, function onSuccess() {
-			sulka.helpers.hideLoader();
-			console.log(sulka.string.settingsSaved);
-		}, function onError(){
-			sulka.helpers.hideLoaderAndSetError(sulka.string.settingsSaveFailed);
-		});
+		sulka.API.saveSettings(sulka.viewMode, settings,
+			function onSuccess() {
+				sulka.helpers.hideLoader();
+			}, function onError(){
+				sulka.helpers.hideLoaderAndSetError(sulka.strings.settingsSaveFailed);
+			});
 	},
 	
 	fetchSettings: function() {
 		sulka.helpers.showLoader();
-		sulka.API.fetchSettings(function onSuccess(results){
-			sulka.helpers.hideLoader();
-			
-			var settings = jQuery.parseJSON(results.object.columns);
-			var oldColumns = sulka.columns;
-			var updatedColumns = [];
-			for(var index in oldColumns){ 
-				// Data is in following format:
-				// "columnName": [position, width, visibility]
-				oldColumns[index].width = settings[oldColumns[index].field][1];
-				oldColumns[index].$sulkaVisible = settings[oldColumns[index].field][2];
-				updatedColumns[settings[oldColumns[index].field][0]] = oldColumns[index];
-			}
-			sulka.columns = updatedColumns;
-			sulka.grid.setColumns(sulka.getVisibleColumns());
-			sulka.renderColumnGroups();
-			
-			var filters = jQuery.parseJSON(results.object.filters);
-			$("#filters-date").val(filters.date);
-			$("#filters-species").val(filters.species);
-			$("#filters-municipality").val(filters.municipality);
-			$("#filters-ringings").prop('checked', filters.ringings);
-			$("#filters-recoveries").prop('checked', filters.recoveries);
-			
-			console.log(sulka.strings.settingsReceived);
-		}, function onError(){
-			sulka.helpers.hideLoaderAndSetError(sulka.strings.settingsReceiveFailed);
-		});
+		sulka.API.fetchSettings(
+			sulka.viewMode,
+			function onSuccess(results){
+				sulka.helpers.hideLoader();
+				
+				if(results.object.columns){
+					var settings = jQuery.parseJSON(results.object.columns);
+					var oldColumns = sulka.columns;
+					var updatedColumns = [];
+					for(var index in oldColumns){ 
+						// Data is in following format:
+						// "columnName": [position, width, visibility]
+						oldColumns[index].width = settings[oldColumns[index].field][1];
+						oldColumns[index].$sulkaVisible = settings[oldColumns[index].field][2];
+						updatedColumns[settings[oldColumns[index].field][0]] = oldColumns[index];
+					}
+					sulka.columns = updatedColumns;
+					sulka.grid.setColumns(sulka.getVisibleColumns());
+					sulka.renderColumnGroups();
+				}
+				
+				if(results.object.filters){
+					var filters = jQuery.parseJSON(results.object.filters);
+					$("#filters-date").val(filters.date);
+					$("#filters-species").val(filters.species);
+					$("#filters-municipality").val(filters.municipality);
+					$("#filters-ringings").prop('checked', filters.ringings);
+					$("#filters-recoveries").prop('checked', filters.recoveries);
+				}
+			}, function onError(){
+				sulka.helpers.hideLoaderAndSetError(sulka.strings.settingsReceivedFailed);
+			});
 	}
 	
 };
