@@ -1,0 +1,89 @@
+<!doctype html>
+<html>
+<head>
+    <title>IFrame-demo</title>
+    <link rel="stylesheet" href="https://www.luomus.fi/wkartta/css/main.css"/>
+    <style>
+        html, body {
+            height: 100%;
+        }
+        
+        #map {
+            width: 80%;
+            height: 50%;
+            min-height: 800px;
+        }
+    </style>
+    <script src="//ajax.googleapis.com/ajax/libs/prototype/1.6.0.3/prototype.js"></script>
+    <script src="https://www.luomus.fi/wkartta/lib/js/wkartta.js"></script>
+
+</head>
+<body>
+<iframe id="mapframe" name="map" src="https://www.luomus.fi/wkartta/map.html"></iframe>
+<script type="text/javascript">
+
+    function sendJSON() {
+        try {
+            map.update(JSONWK.parse(content.value));
+        } catch (err) {
+            window.alert("KentÃ¤n sisÃ¤ltÃ¶ ei ollut JSONia!");
+        }
+    }
+    function setView() {
+        map.setView([Number(valueForId('lat')), Number(valueForId('lon'))], valueForId('zoomLevel_setView'));
+    }
+
+    function geolocate() {
+        map.geocode(valueForId('geolocate'), Number(valueForId('zoomLevel_geolocate')));
+    }
+
+    function view() {
+        var data = JSONWK.parse(content.value);
+        window.location.href = 'https://www.luomus.fi/wkartta/view.html#' + JSONWK.stringify({options:{}, data: data});
+    }
+
+    function config() {
+    	konffi =  {
+    	  "simple": true,
+    	  "single": true,
+    	  "annotate": false,
+    	  "mapOptions": {
+    	    "scale": true,
+    	    "center": [
+    	      60,
+    	      20
+    	    ],
+    	    "maxBounds": null,
+    	    "maxZoom": 20,
+    	    "minZoom": null,
+    	    "zoom": 8
+    	  },
+    	  "locationTypes": {
+    	    "lineString": true,
+    	    "point": true,
+    	    "polygon": true,
+    	    "rectangle": true
+    	  },
+    	  "mapTypes": [
+    	    "osm",
+    	    "mm"
+    	  ]
+    	}
+    	
+        map = new (new WK()).Map('mapframe', konffi);
+        map.onChange(function (mapEntries) {
+            
+        	JSONWK.stringify(mapEntries[0].location, undefined, 2);
+            
+        });
+    }
+
+    config();
+</script>
+
+<textarea rows="20" cols="80" id="content"></textarea><br/>
+
+
+
+</body>
+</html>
