@@ -5,42 +5,39 @@
     <link rel="stylesheet" href="https://www.luomus.fi/wkartta/css/main.css"/>
     <style>
         html, body {
-            height: 100%;
+        	width: 99%;
+            height: 99%;
         }
-        
+    
         #map {
-            width: 80%;
-            height: 50%;
+            width: 100%;
+            height: 100%;
             min-height: 800px;
         }
+        #mapframe {
+		    width: 100%;
+		    height: 100%;
+		}
+        
     </style>
     <script src="//ajax.googleapis.com/ajax/libs/prototype/1.6.0.3/prototype.js"></script>
     <script src="https://www.luomus.fi/wkartta/lib/js/wkartta.js"></script>
-
 </head>
 <body>
 <iframe id="mapframe" name="map" src="https://www.luomus.fi/wkartta/map.html"></iframe>
 <script type="text/javascript">
+//     function setView() {
+//         map.setView([Number(valueForId('lat')), Number(valueForId('lon'))], valueForId('zoomLevel_setView'));
+//     }
 
-    function sendJSON() {
-        try {
-            map.update(JSONWK.parse(content.value));
-        } catch (err) {
-            window.alert("KentÃ¤n sisÃ¤ltÃ¶ ei ollut JSONia!");
-        }
-    }
-    function setView() {
-        map.setView([Number(valueForId('lat')), Number(valueForId('lon'))], valueForId('zoomLevel_setView'));
-    }
+//     function geolocate() {
+//         map.geocode(valueForId('geolocate'), Number(valueForId('zoomLevel_geolocate')));
+//     }
 
-    function geolocate() {
-        map.geocode(valueForId('geolocate'), Number(valueForId('zoomLevel_geolocate')));
-    }
-
-    function view() {
-        var data = JSONWK.parse(content.value);
-        window.location.href = 'https://www.luomus.fi/wkartta/view.html#' + JSONWK.stringify({options:{}, data: data});
-    }
+//     function view() {
+//         var data = JSONWK.parse(content.value);
+//         window.location.href = 'https://www.luomus.fi/wkartta/view.html#' + JSONWK.stringify({options:{}, data: data});
+//     }
 
     function config() {
     	konffi =  {
@@ -50,13 +47,13 @@
     	  "mapOptions": {
     	    "scale": true,
     	    "center": [
-    	      60,
-    	      20
+  	               62,
+  	               25
     	    ],
     	    "maxBounds": null,
-    	    "maxZoom": 20,
+    	    "maxZoom": 17,
     	    "minZoom": null,
-    	    "zoom": 8
+    	    "zoom": 7
     	  },
     	  "locationTypes": {
     	    "lineString": true,
@@ -70,20 +67,19 @@
     	  ]
     	}
     	
+    	map.testi = "jeejee";
+    	
+    	
         map = new (new WK()).Map('mapframe', konffi);
         map.onChange(function (mapEntries) {
-            
-        	JSONWK.stringify(mapEntries[0].location, undefined, 2);
-            
+        	parent.sulka.lastInputCoordinate = JSONWK.stringify(mapEntries, undefined, 2);
         });
+        
+       	if (parent.sulka.lastInputCoordinate) {
+           	map.update(JSONWK.parse(parent.sulka.lastInputCoordinate));
+       	}
     }
-
     config();
 </script>
-
-<textarea rows="20" cols="80" id="content"></textarea><br/>
-
-
-
 </body>
 </html>
