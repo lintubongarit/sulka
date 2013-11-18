@@ -1,9 +1,6 @@
 package edu.helsinki.sulka.controllers;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.everyItem;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -29,6 +26,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import edu.helsinki.sulka.SecuritySessionHelper;
 import edu.helsinki.sulka.models.LocalDatabaseRow;
@@ -67,28 +67,43 @@ public class LocalStorageControllerTest {
 	private static final byte[] invalidId = "{\"JOTAIN\":\"1234\", \"row\":\"asdflkakgh\"}".getBytes();
 	private static final byte[] invalidRow = "{\"id\":\"1234\", \"ABCD\":\"asdflkakgh\"}".getBytes();
 	private static final byte[] validSettings = "{\"columns\":\"asdfawerfasdasdfaasdf\"}".getBytes();
-	private long otherUserRecoveryId;
-	private long otherUserRingingId;
-	private long recoveryToBeDeletedId;
-	private long ringingToBeDeletedId;
+	
+	private int otherUserRingingId;
+	private int otherUserRecoveryId;
+	private int ringingToBeDeletedId;
+	private int recoveryToBeDeletedId;
+	
+	private LocalDatabaseRow saveRinging;
+	private LocalDatabaseRow saveRecovery;
+	
+	private LocalDatabaseRow ringingToBeEdited;
+	private LocalDatabaseRow recoveryToBeEdited;
 
-	/**
-	 * @return row id
-	 */
-	private long insertRecovery(String userId) {
-    	LocalDatabaseRow recovery = new LocalDatabaseRow(RowType.RECOVERY);
-    	recovery.setUserId(userId);
-    	return localDatabaseService.addRow(recovery).getId();
+	private LocalDatabaseRow insertRinging(String userId) {
+    	return insertRinging(userId, null);
 	}
 	
-	/**
-	 * @return row id
-	 */
-	private long insertRinging(String userId) {
+	private LocalDatabaseRow insertRecovery(String userId) {
+    	return insertRecovery(userId, null);
+	}
+	
+	private LocalDatabaseRow insertRinging(String userId, String rowContent) {
 		LocalDatabaseRow ringing = new LocalDatabaseRow(RowType.RINGING);
     	ringing.setUserId(userId);
-    	return localDatabaseService.addRow(ringing).getId();
+    	ringing.setRow(rowContent);
+    	return localDatabaseService.addRow(ringing);
 	}
+	
+	private LocalDatabaseRow insertRecovery(String userId, String rowContent) {
+    	LocalDatabaseRow recovery = new LocalDatabaseRow(RowType.RECOVERY);
+    	recovery.setUserId(userId);
+    	recovery.setRow(rowContent);
+    	return localDatabaseService.addRow(recovery);
+	}
+	
+	private static final String SAVE_CONTENT = "lintu";
+	private static final String BEFORE_EDIT_CONTENT = "foobar";
+	private static final String AFTER_EDIT_CONTENT = "barfoo";
 	
 	@Before
     public void setup() {
@@ -101,24 +116,30 @@ public class LocalStorageControllerTest {
     	lokkiHttpSession = SecuritySessionHelper.createUserSession(lokki);
     	
     	// Create mock data
-    	insertRecovery(USER_ID);
-    	insertRecovery(USER_ID);
-    	insertRecovery(USER_ID);
-    	
     	insertRinging(USER_ID);
     	insertRinging(USER_ID);
     	insertRinging(USER_ID);
     	
-    	insertRecovery(OTHER_USER_ID);
-    	insertRecovery(OTHER_USER_ID);
-    	otherUserRecoveryId = insertRecovery(OTHER_USER_ID);
+    	insertRecovery(USER_ID);
+    	insertRecovery(USER_ID);
+    	insertRecovery(USER_ID);
     	
     	insertRinging(OTHER_USER_ID);
     	insertRinging(OTHER_USER_ID);
-    	otherUserRingingId = insertRinging(OTHER_USER_ID);
+    	otherUserRingingId = insertRinging(OTHER_USER_ID).getId().intValue();
     	
-    	recoveryToBeDeletedId = insertRecovery(USER_ID);
-    	ringingToBeDeletedId = insertRinging(USER_ID);
+    	insertRecovery(OTHER_USER_ID);
+    	insertRecovery(OTHER_USER_ID);
+    	otherUserRecoveryId = insertRecovery(OTHER_USER_ID).getId().intValue();
+    	
+    	ringingToBeDeletedId = insertRinging(USER_ID).getId().intValue();
+    	recoveryToBeDeletedId = insertRecovery(USER_ID).getId().intValue();
+    	
+    	saveRinging = insertRinging(USER_ID, SAVE_CONTENT);
+    	saveRecovery = insertRecovery(USER_ID, SAVE_CONTENT);
+    	
+    	ringingToBeEdited = insertRinging(USER_ID, BEFORE_EDIT_CONTENT);
+    	recoveryToBeEdited = insertRecovery(USER_ID, BEFORE_EDIT_CONTENT);
 	}
 	
 	@After
@@ -144,6 +165,12 @@ public class LocalStorageControllerTest {
 		}
 	}
 	
+	
+	
+	private static byte[] toJSON(LocalDatabaseRow row) throws JsonProcessingException {
+		return new ObjectMapper().writer().writeValueAsBytes(row);
+	}
+	
 	@Test
 	public void testGetRingings() throws Exception {
 		mockMvc.perform(get("/api/storage/ringings")
@@ -154,6 +181,10 @@ public class LocalStorageControllerTest {
 				.andExpect(jsonPath("$.error").value(nullValue()))
 				.andExpect(jsonPath("$.objects").isArray())
 				.andExpect(jsonPath("$.objects[*].userId", everyItem(equalTo(USER_ID))))
+				.andExpect(jsonPath("$.objects[*].id", not(hasItem((equalTo(otherUserRingingId))))))
+				.andExpect(jsonPath("$.objects[*].id", not(hasItem((equalTo(otherUserRecoveryId))))))
+				.andExpect(jsonPath("$.objects[*].id", not(hasItem((equalTo(recoveryToBeDeletedId))))))
+				.andExpect(jsonPath("$.objects[*].id", not(hasItem((equalTo(recoveryToBeEdited.getId().intValue()))))))
 				.andReturn();
 	}
 
@@ -167,6 +198,10 @@ public class LocalStorageControllerTest {
 				.andExpect(jsonPath("$.error").value(nullValue()))
 				.andExpect(jsonPath("$.objects").isArray())
 				.andExpect(jsonPath("$.objects[*].userId", everyItem(equalTo(USER_ID))))
+				.andExpect(jsonPath("$.objects[*].id", not(hasItem((equalTo(otherUserRecoveryId))))))
+				.andExpect(jsonPath("$.objects[*].id", not(hasItem((equalTo(otherUserRingingId))))))
+				.andExpect(jsonPath("$.objects[*].id", not(hasItem((equalTo(ringingToBeDeletedId))))))
+				.andExpect(jsonPath("$.objects[*].id", not(hasItem((equalTo(ringingToBeEdited.getId().intValue()))))))
 				.andReturn();
 	}
 	
@@ -279,6 +314,186 @@ public class LocalStorageControllerTest {
 	}
 	
 	@Test
+	public void testSaveRingingAsIsSucceeds() throws Exception {
+		mockMvc.perform(post("/api/storage/ringings")
+				.session(lokkiHttpSession)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(toJSON(saveRinging)))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.object.id").value(saveRinging.getId().intValue()))
+			.andExpect(jsonPath("$.object.userId").value(USER_ID))
+			.andExpect(jsonPath("$.object.row").value(SAVE_CONTENT))
+			.andReturn();
+	}
+	
+	@Test
+	public void testSaveRecoveryAsIsSucceeds() throws Exception {
+		mockMvc.perform(post("/api/storage/recoveries")
+				.session(lokkiHttpSession)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(toJSON(saveRecovery)))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.object.id").value(saveRecovery.getId().intValue()))
+			.andExpect(jsonPath("$.object.userId").value(USER_ID))
+			.andExpect(jsonPath("$.object.row").value(SAVE_CONTENT))
+			.andReturn();
+	}
+	
+	@Test
+	public void testSaveRingingAsRecoveryFails() throws Exception {
+		mockMvc.perform(post("/api/storage/recoveries")
+				.session(lokkiHttpSession)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(toJSON(saveRinging)))
+			.andExpect(status().isNotFound())
+			.andReturn();
+	}
+	
+	@Test
+	public void testSaveRecoveryAsRingngFails() throws Exception {
+		mockMvc.perform(post("/api/storage/ringings")
+				.session(lokkiHttpSession)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(toJSON(saveRecovery)))
+			.andExpect(status().isNotFound())
+			.andReturn();
+	}
+	
+	@Test
+	public void testSaveOverOtherUserRingingFails() throws Exception {
+		LocalDatabaseRow saveRow = new LocalDatabaseRow();
+		saveRow.setUserId(OTHER_USER_ID);
+		saveRow.setId(otherUserRingingId);
+		mockMvc.perform(post("/api/storage/ringings")
+				.session(lokkiHttpSession)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(toJSON(saveRow)))
+			.andExpect(status().isUnauthorized())
+			.andReturn();
+	}
+	
+	@Test
+	public void testSaveOverOtherUserRecoveryFails() throws Exception {
+		LocalDatabaseRow saveRow = new LocalDatabaseRow();
+		saveRow.setUserId(OTHER_USER_ID);
+		saveRow.setId(otherUserRecoveryId);
+		mockMvc.perform(post("/api/storage/recoveries")
+				.session(lokkiHttpSession)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(toJSON(saveRow)))
+			.andExpect(status().isUnauthorized())
+			.andReturn();
+	}
+	
+	public void testSaveOverOtherUserRingingFails2() throws Exception {
+		LocalDatabaseRow saveRow = new LocalDatabaseRow();
+		saveRow.setUserId(USER_ID);
+		saveRow.setId(otherUserRingingId);
+		mockMvc.perform(post("/api/storage/ringings")
+				.session(lokkiHttpSession)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(toJSON(saveRow)))
+			.andExpect(status().isUnauthorized())
+			.andReturn();
+	}
+	
+	@Test
+	public void testSaveOverOtherUserRecoveryFails2() throws Exception {
+		LocalDatabaseRow saveRow = new LocalDatabaseRow();
+		saveRow.setUserId(USER_ID);
+		saveRow.setId(otherUserRecoveryId);
+		mockMvc.perform(post("/api/storage/recoveries")
+				.session(lokkiHttpSession)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(toJSON(saveRow)))
+			.andExpect(status().isUnauthorized())
+			.andReturn();
+	}
+	
+	@Test
+	public void testRingingEditingWorks() throws Exception {
+		ringingToBeEdited.setRow(AFTER_EDIT_CONTENT);
+		mockMvc.perform(get("/api/storage/ringings")
+				.session(lokkiHttpSession))
+			.andExpect(status().isOk())
+			.andExpect(content().contentType("application/json;charset=UTF-8"))
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.error").value(nullValue()))
+			.andExpect(jsonPath("$.objects").isArray())
+			.andExpect(jsonPath("$.objects[*].userId", everyItem(equalTo(USER_ID))))
+			.andExpect(jsonPath("$.objects[*].row", hasItem(equalTo(BEFORE_EDIT_CONTENT))))
+			.andExpect(jsonPath("$.objects[*].id", hasItem(equalTo(ringingToBeEdited.getId().intValue()))))
+			.andExpect(jsonPath("$.objects[*].id", not(hasItem((equalTo(otherUserRingingId))))))
+			.andExpect(jsonPath("$.objects[*].id", not(hasItem((equalTo(otherUserRecoveryId))))))
+			.andExpect(jsonPath("$.objects[*].id", not(hasItem((equalTo(recoveryToBeDeletedId))))))
+			.andExpect(jsonPath("$.objects[*].id", not(hasItem((equalTo(recoveryToBeEdited.getId().intValue()))))));
+		mockMvc.perform(post("/api/storage/ringings")
+				.session(lokkiHttpSession)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(toJSON(ringingToBeEdited)))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.object.id").value(ringingToBeEdited.getId().intValue()))
+			.andExpect(jsonPath("$.object.userId").value(USER_ID))
+			.andExpect(jsonPath("$.object.row").value(AFTER_EDIT_CONTENT));
+		mockMvc.perform(get("/api/storage/ringings")
+				.session(lokkiHttpSession))
+			.andExpect(status().isOk())
+			.andExpect(content().contentType("application/json;charset=UTF-8"))
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.error").value(nullValue()))
+			.andExpect(jsonPath("$.objects").isArray())
+			.andExpect(jsonPath("$.objects[*].userId", everyItem(equalTo(USER_ID))))
+			.andExpect(jsonPath("$.objects[*].row", hasItem(equalTo(AFTER_EDIT_CONTENT))))
+			.andExpect(jsonPath("$.objects[*].id", hasItem(equalTo(ringingToBeEdited.getId().intValue()))))
+			.andExpect(jsonPath("$.objects[*].id", not(hasItem((equalTo(otherUserRingingId))))))
+			.andExpect(jsonPath("$.objects[*].id", not(hasItem((equalTo(otherUserRecoveryId))))))
+			.andExpect(jsonPath("$.objects[*].id", not(hasItem((equalTo(recoveryToBeDeletedId))))))
+			.andExpect(jsonPath("$.objects[*].id", not(hasItem((equalTo(recoveryToBeEdited.getId().intValue()))))));
+	}
+	
+	@Test
+	public void testEditRecoverySuccess() throws Exception {
+		recoveryToBeEdited.setRow(AFTER_EDIT_CONTENT);
+		mockMvc.perform(get("/api/storage/recoveries")
+				.session(lokkiHttpSession))
+			.andExpect(status().isOk())
+			.andExpect(content().contentType("application/json;charset=UTF-8"))
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.error").value(nullValue()))
+			.andExpect(jsonPath("$.objects").isArray())
+			.andExpect(jsonPath("$.objects[*].userId", everyItem(equalTo(USER_ID))))
+			.andExpect(jsonPath("$.objects[*].row", hasItem(equalTo(BEFORE_EDIT_CONTENT))))
+			.andExpect(jsonPath("$.objects[*].id", hasItem(equalTo(recoveryToBeEdited.getId().intValue()))))
+			.andExpect(jsonPath("$.objects[*].id", not(hasItem((equalTo(otherUserRecoveryId))))))
+			.andExpect(jsonPath("$.objects[*].id", not(hasItem((equalTo(otherUserRingingId))))))
+			.andExpect(jsonPath("$.objects[*].id", not(hasItem((equalTo(ringingToBeDeletedId))))))
+			.andExpect(jsonPath("$.objects[*].id", not(hasItem((equalTo(ringingToBeEdited.getId().intValue()))))));
+		mockMvc.perform(post("/api/storage/recoveries")
+				.session(lokkiHttpSession)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(toJSON(recoveryToBeEdited)))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.object.id").value(recoveryToBeEdited.getId().intValue()))
+			.andExpect(jsonPath("$.object.userId").value(USER_ID))
+			.andExpect(jsonPath("$.object.row").value(AFTER_EDIT_CONTENT));
+		mockMvc.perform(get("/api/storage/recoveries")
+				.session(lokkiHttpSession))
+			.andExpect(status().isOk())
+			.andExpect(content().contentType("application/json;charset=UTF-8"))
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.error").value(nullValue()))
+			.andExpect(jsonPath("$.objects").isArray())
+			.andExpect(jsonPath("$.objects[*].userId", everyItem(equalTo(USER_ID))))
+			.andExpect(jsonPath("$.objects[*].row", hasItem(equalTo(AFTER_EDIT_CONTENT))))
+			.andExpect(jsonPath("$.objects[*].id", hasItem(equalTo(recoveryToBeEdited.getId().intValue()))))
+			.andExpect(jsonPath("$.objects[*].id", not(hasItem((equalTo(otherUserRecoveryId))))))
+			.andExpect(jsonPath("$.objects[*].id", not(hasItem((equalTo(otherUserRingingId))))))
+			.andExpect(jsonPath("$.objects[*].id", not(hasItem((equalTo(ringingToBeDeletedId))))))
+			.andExpect(jsonPath("$.objects[*].id", not(hasItem((equalTo(ringingToBeEdited.getId().intValue()))))))
+			.andReturn();
+	}
+	
+	@Test
 	public void testDeleteRingingReturnsErrorIfUserIdDoesNotMatchRowUserId() throws Exception {
 		logger.error("" + otherUserRingingId);
 		mockMvc.perform(delete("/api/storage/ringings/" + otherUserRingingId)
@@ -296,24 +511,110 @@ public class LocalStorageControllerTest {
 	}
 	
 	@Test
-	public void testDeleteRingingStatusIsOk() throws Exception {
+	public void testDeleteRinging() throws Exception {
+		mockMvc.perform(get("/api/storage/ringings")
+					.session(lokkiHttpSession))
+			.andExpect(status().isOk())
+			.andExpect(content().contentType("application/json;charset=UTF-8"))
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.error").value(nullValue()))
+			.andExpect(jsonPath("$.objects").isArray())
+			.andExpect(jsonPath("$.objects[*].userId", everyItem(equalTo(USER_ID))))
+			.andExpect(jsonPath("$.objects[*].id", hasItem(equalTo(ringingToBeDeletedId))))
+			.andExpect(jsonPath("$.objects[*].id", not(hasItem((equalTo(otherUserRingingId))))))
+			.andExpect(jsonPath("$.objects[*].id", not(hasItem((equalTo(otherUserRecoveryId))))))
+			.andExpect(jsonPath("$.objects[*].id", not(hasItem((equalTo(recoveryToBeDeletedId))))))
+			.andExpect(jsonPath("$.objects[*].id", not(hasItem((equalTo(recoveryToBeEdited.getId().intValue()))))));
+		// Can't delete as recovery
+		mockMvc.perform(delete("/api/storage/recoveries/" + ringingToBeDeletedId)
+				.session(lokkiHttpSession))
+			.andExpect(status().isNotFound());
+		// Can't delete with invalid ID
+		mockMvc.perform(delete("/api/storage/ringings/" + (ringingToBeDeletedId + 24))
+				.session(lokkiHttpSession))
+			.andExpect(status().isNotFound());
 		mockMvc.perform(delete("/api/storage/ringings/" + ringingToBeDeletedId)
 				.session(lokkiHttpSession))
-				.andExpect(status().isNoContent())
+			.andExpect(status().isNoContent());
+		mockMvc.perform(get("/api/storage/ringings")
+					.session(lokkiHttpSession))
+			.andExpect(status().isOk())
+			.andExpect(content().contentType("application/json;charset=UTF-8"))
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.error").value(nullValue()))
+			.andExpect(jsonPath("$.objects").isArray())
+			.andExpect(jsonPath("$.objects[*].userId", everyItem(equalTo(USER_ID))))
+			.andExpect(jsonPath("$.objects[*].id", not(hasItem(equalTo(ringingToBeDeletedId)))))
+			.andExpect(jsonPath("$.objects[*].id", not(hasItem((equalTo(otherUserRingingId))))))
+			.andExpect(jsonPath("$.objects[*].id", not(hasItem((equalTo(otherUserRecoveryId))))))
+			.andExpect(jsonPath("$.objects[*].id", not(hasItem((equalTo(recoveryToBeDeletedId))))))
+			.andExpect(jsonPath("$.objects[*].id", not(hasItem((equalTo(recoveryToBeEdited.getId().intValue()))))))
 			.andReturn();
 	}
 	
 	@Test
-	public void testDeleteRecoveryStatusIsOk() throws Exception {
+	public void testDeleteRecovery() throws Exception {
+		mockMvc.perform(get("/api/storage/recoveries")
+					.session(lokkiHttpSession))
+			.andExpect(status().isOk())
+			.andExpect(content().contentType("application/json;charset=UTF-8"))
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.error").value(nullValue()))
+			.andExpect(jsonPath("$.objects").isArray())
+			.andExpect(jsonPath("$.objects[*].userId", everyItem(equalTo(USER_ID))))
+			.andExpect(jsonPath("$.objects[*].id", hasItem((equalTo(recoveryToBeDeletedId)))))
+			.andExpect(jsonPath("$.objects[*].id", not(hasItem((equalTo(otherUserRecoveryId))))))
+			.andExpect(jsonPath("$.objects[*].id", not(hasItem((equalTo(otherUserRingingId))))))
+			.andExpect(jsonPath("$.objects[*].id", not(hasItem((equalTo(ringingToBeDeletedId))))))
+			.andExpect(jsonPath("$.objects[*].id", not(hasItem((equalTo(ringingToBeEdited.getId().intValue()))))))
+			.andReturn();
+		// Can't delete as ringing
+		mockMvc.perform(delete("/api/storage/ringings/" + recoveryToBeDeletedId)
+				.session(lokkiHttpSession))
+				.andExpect(status().isNotFound());
+		// Can't delete with invalid ID
+		mockMvc.perform(delete("/api/storage/recoveries/" + (recoveryToBeDeletedId + 42))
+				.session(lokkiHttpSession))
+				.andExpect(status().isNotFound());
 		mockMvc.perform(delete("/api/storage/recoveries/" + recoveryToBeDeletedId)
 				.session(lokkiHttpSession))
-				.andExpect(status().isNoContent())
-			.andReturn();
+				.andExpect(status().isNoContent());
+		mockMvc.perform(get("/api/storage/recoveries")
+						.session(lokkiHttpSession))
+				.andExpect(status().isOk())
+				.andExpect(content().contentType("application/json;charset=UTF-8"))
+				.andExpect(jsonPath("$.success").value(true))
+				.andExpect(jsonPath("$.error").value(nullValue()))
+				.andExpect(jsonPath("$.objects").isArray())
+				.andExpect(jsonPath("$.objects[*].userId", everyItem(equalTo(USER_ID))))
+				.andExpect(jsonPath("$.objects[*].id", not(hasItem((equalTo(recoveryToBeDeletedId))))))
+				.andExpect(jsonPath("$.objects[*].id", not(hasItem((equalTo(otherUserRecoveryId))))))
+				.andExpect(jsonPath("$.objects[*].id", not(hasItem((equalTo(otherUserRingingId))))))
+				.andExpect(jsonPath("$.objects[*].id", not(hasItem((equalTo(ringingToBeDeletedId))))))
+				.andExpect(jsonPath("$.objects[*].id", not(hasItem((equalTo(ringingToBeEdited.getId().intValue()))))))
+				.andReturn();
+	}
+
+	@Test
+	public void testGetSettingsStatusIsOk() throws Exception {
+		mockMvc.perform(get("/api/storage/settings/browsing")
+						.session(lokkiHttpSession))
+				.andExpect(status().isOk())
+				.andReturn();
+	}
+
+	@Test
+	public void testGetSettingsReturnsJSON() throws Exception {
+		mockMvc.perform(get("/api/storage/settings/browsing")
+						.session(lokkiHttpSession))
+				.andExpect(status().isOk())
+				.andExpect(content().contentType("application/json;charset=UTF-8"))
+				.andReturn();
 	}
 	
 	@Test
 	public void testGetSettingsReturnsJSONWithCorrectColumns() throws Exception {
-		mockMvc.perform(get("/api/storage/settings")
+		mockMvc.perform(get("/api/storage/settings/browsing")
 						.session(lokkiHttpSession))
 				.andExpect(status().isOk())
 				.andExpect(content().contentType("application/json;charset=UTF-8"))
@@ -324,7 +625,7 @@ public class LocalStorageControllerTest {
 	
 	@Test
 	public void testSaveSettingsStatusIsOk() throws Exception {
-		mockMvc.perform(post("/api/storage/settings")
+		mockMvc.perform(post("/api/storage/settings/browsing")
 						.session(lokkiHttpSession)
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(validSettings))
@@ -334,7 +635,7 @@ public class LocalStorageControllerTest {
 	
 	@Test
 	public void testSaveSettingsReturnsErrorIfDataIsntJSON() throws Exception {
-		mockMvc.perform(post("/api/storage/settings")
+		mockMvc.perform(post("/api/storage/settings/browsing")
 						.session(lokkiHttpSession)
 						.contentType(MediaType.APPLICATION_XML)
 						.content(validSettings))

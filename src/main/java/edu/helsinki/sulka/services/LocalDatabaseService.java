@@ -40,12 +40,18 @@ public class LocalDatabaseService {
 		return localRowRepository.findByRowTypeAndId(rowType, rowId);
 	}
 	
-	public UserSettings getSettings(String userId) {
-		UserSettings settings = userSettingsRepository.findOne(userId);
+	public LocalDatabaseRow getRowOfAnyType(long rowId) {
+		return localRowRepository.findOne(rowId);
+	}
+
+
+	public UserSettings getSettings(String userId_viewMode) {
+		UserSettings settings = userSettingsRepository.findOne(userId_viewMode);
 		if(settings == null){
 			settings = new UserSettings();
-			settings.setUserId(userId);
+			settings.setUserId(userId_viewMode);
 			settings.setColumns("");
+			settings.setFilters("");
 		}
 		return settings;
 	}

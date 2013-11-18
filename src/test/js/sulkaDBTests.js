@@ -9,11 +9,6 @@ casper.test.begin('Sulka-database tests', 2, function suite(test) {
 
 		casper.then(function () {
 			
-			
-			dataAtStart = casper.evaluate(function(){
-				return sulka.grid.getData();
-			});
-			
 			casper.evaluate(function(randomSpecies){
 				
 				var args = {};
@@ -29,13 +24,13 @@ casper.test.begin('Sulka-database tests', 2, function suite(test) {
 	        });
 	    }).waitWhileVisible("#loader-animation"
 	    ).then(function () {
-	    	var slickData = casper.evaluate(function () {
-				return sulka.grid.getData();
+	    	var slickDataLength = casper.evaluate(function () {
+				return sulka.grid.getData().getLength();
 	        });
 	    	
-	    	for (var i = 0; i < slickData.length; i++){
+	    	for (var i = 0; i < slickDataLength; i++){
 				var row = casper.evaluate(function(i){
-					return sulka.grid.getData()[i];
+					return sulka.grid.getData().getItem(i);
 				}, i);
 				if (row.species !== undefined){
 					if (row.species.indexOf(randomSpecies) != -1){
@@ -53,14 +48,14 @@ casper.test.begin('Sulka-database tests', 2, function suite(test) {
 	    	
 	    	casper.evaluate(function(){
 	    	
-				rowToEdit = sulka.grid.getData()[newRow];
+				rowToEdit = sulka.grid.getData().getItem(newRow);
 				
 				rowToEdit.municipalities = 'sdf';
 		        
 				var args = {};
 				
 				args.item = rowToEdit;
-				args.row = sulka.grid.getData().length - 1;
+				args.row = sulka.grid.getData().getLength() - 1;
 				
 				sulka.onCellChange(null, args);
 	    	});
@@ -71,15 +66,15 @@ casper.test.begin('Sulka-database tests', 2, function suite(test) {
 	    }).waitWhileVisible("#loader-animation"
 	    ).then(function () {
 	    	
-	    	var slickData = casper.evaluate(function () {
-				return sulka.grid.getData();
+	    	var slickDataLength = casper.evaluate(function () {
+				return sulka.grid.getData().getLength();
 	        });
 	    	
 	    	var editedRow = -1;
 	    	
-	    	for (var i = 0; i < slickData.length; i++){
+	    	for (var i = 0; i < slickDataLength; i++){
 				var row = casper.evaluate(function(i){
-					return sulka.grid.getData()[i];
+					return sulka.grid.getData().getItem(i);
 				}, i);
 				if (row.species !== undefined){
 					if (row.species.indexOf(randomSpecies) != -1){

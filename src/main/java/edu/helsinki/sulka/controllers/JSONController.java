@@ -23,7 +23,7 @@ public abstract class JSONController {
 	public static class NotFoundException extends Exception {
 		private static final long serialVersionUID = 1L;
 		public NotFoundException() {
-			super("Tietuetta ei löydy");
+			super("Record not found.");
 		}
 		public NotFoundException(String message) {
 			super(message);
@@ -32,7 +32,7 @@ public abstract class JSONController {
 	public static class UnauthorizedException extends Exception {
 		private static final long serialVersionUID = 1L;
 		public UnauthorizedException() {
-			super("Ei käyttöoikeutta");
+			super("Unauthorized access.");
 		}
 		public UnauthorizedException(String message) {
 			super(message);

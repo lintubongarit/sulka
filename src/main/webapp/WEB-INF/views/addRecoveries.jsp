@@ -51,11 +51,17 @@
 					</form>
 				</td>
 				<td>
+					<button type="button" id="saveSettings" class="local-toolbar-menu" onclick="sulka.saveSettings();">Tallenna asetukset</button>
+					<button type="button" id="loadSettings" class="local-toolbar-menu" onclick="sulka.fetchSettings();">Lataa asetukset</button>
+				</td>
+				<td>
 					<button type="button"  id="validate" class="local-toolbar-menu" onclick="sulka.validate();">Validoi</button>
 					<button type="button" class="local-toolbar-menu" value="new row" onclick="sulka.addRow();">Lisää rivi</button>
-					<div id="dropzone" class="recycle-bin">
-					     Roskakori
-					</div>
+				</td>
+				<td>
+				    <div id="dropzone" class="recycle-bin">
+				         Roskakori
+				    </div>
 				</td>
 			</tr>
 		</table>
