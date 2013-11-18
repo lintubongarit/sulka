@@ -7,5 +7,7 @@ sulka.strings = {
 	invalidDate: "Virheellinen päivämäärä!",
 	inverseDateRange: "Virheellinen päivämäärä (alku>loppu)!",
 	validRow: "Rivi on validi",
-	invlaidRow: "RIVI EI OLE VALIDI"
+	invlaidRow: "RIVI EI OLE VALIDI",
+	settingsSaveFailed: "Asetusten tallentaminen epäonnistui.",
+	settingsReceivedFailed: "Asetusten nouto epäonnistui."
 };

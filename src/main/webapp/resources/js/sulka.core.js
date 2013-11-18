@@ -862,9 +862,9 @@ sulka = {
 				filters: JSON.stringify(filters),
 		};
 		sulka.API.saveSettings(settings, function onSuccess() {
-			sulka.helpers.hideLoaderAndSetError("Asetukset tallennettu.");
+			sulka.helpers.hideLoader();
 		}, function onError(){
-			sulka.helpers.hideLoaderAndSetError("Asetusten tallennus epäonnistui.");
+			sulka.helpers.hideLoaderAndSetError(sulka.strings.settingsSaveFailed);
 		});
 	},
 	
@@ -873,6 +873,7 @@ sulka = {
 		sulka.API.fetchSettings(
 			sulka.viewMode,
 			function onSuccess(results){
+				sulka.helpers.hideLoader();
 				
 				if(results.object.columns){
 					var settings = jQuery.parseJSON(results.object.columns);
@@ -898,10 +899,8 @@ sulka = {
 					$("#filters-ringings").prop('checked', filters.ringings);
 					$("#filters-recoveries").prop('checked', filters.recoveries);
 				}
-				
-				sulka.helpers.hideLoaderAndSetError("Asetukset noudettu.");
 			}, function onError(){
-				sulka.helpers.hideLoaderAndSetError("Asetusten nouto epäonnistui.");
+				sulka.helpers.hideLoaderAndSetError(sulka.strings.settingsReceivedFailed);
 			});
 	}
 	

@@ -10,7 +10,7 @@ casper.test.begin('Setting saving tests', 9, function suite(test) {
 			returnValue = casper.evaluate(function() {
 				return sulka.helpers.getError();
 			});
-			test.assertEquals(returnValue, "Asetukset tallennettu.", "Saving columns won't fail.");
+			test.assertNotEquals(returnValue, "Asetusten tallentaminen epäonnistui.", "Saving columns won't fail.");
 		}).then(function(){
 			casper.evaluate(function() {
 				sulka.saveSettings();
