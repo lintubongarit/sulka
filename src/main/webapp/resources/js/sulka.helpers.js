@@ -3,6 +3,9 @@ sulka.helpers = function (helpers){
  * Helper function name space.
  */
 helpers = {
+		
+	loaderCounter: 0,
+		
 	/**
 	 * Just calls console.log with the same arguments, if it exists.
 	 * @param string Log message.
@@ -21,8 +24,8 @@ helpers = {
 	 */
 	setError: function (errorMsg) {
 		if (errorMsg) {
-			if (errorMsg.length > 50) {
-				errorMsg = errorMsg.substring(0, 50) + "...";
+			if (errorMsg.length > 500) {
+				errorMsg = errorMsg.substring(0, 500) + "...";
 			} 
 			$("#last-error").text(errorMsg);
 		} else {
@@ -48,6 +51,7 @@ helpers = {
 	 * Show the loader animation.
 	 */
 	showLoader: function () {
+		helpers.loaderCounter++;
 		$("#loader-animation").show();
 	},
 	
@@ -55,7 +59,12 @@ helpers = {
 	 * Hide the loader animation.
 	 */
 	hideLoader: function () {
-		$("#loader-animation").hide();
+		if (--helpers.loaderCounter <= 0) {
+			if (helpers.loaderCounter < 0) {
+				console.log("hideLoader called without preceding showLoader!");
+			}
+			$("#loader-animation").hide();
+		}
 	},
 	
 	/**
@@ -164,7 +173,37 @@ helpers = {
 		}
 		
 		return null;
-	}
+	},
+	
+	requiredFieldValidator: function ($value) {
+		if (value == null || value == undefined || !value.length) {
+				return {valid: false, msg: "This is a required field"};
+		} else {
+				return {valid: true, msg: null};
+			}
+	},
+	
+    disableSelection: function ($target) {
+    	if ($target && $target.jquery) {
+    		$target
+	            .attr("unselectable", "on")
+	            .css("UserSelect", "none")
+	            .css("MozUserSelect", "none")
+	            .css("WebkitUserSelect", "none")
+	            .css("IeUserSelect", "none")
+	            .bind("selectstart.ui", function () {
+	            	return false;
+	            }); // from jquery:ui.core.js 1.7.2
+      }
+    },
+    
+    numericSort: function (item1, item2) {
+    	return item1 - item2;
+    },
+    
+    numericReverseSort: function (item1, item2) {
+    	return item2 - item1;
+    }
 };
 
 return helpers; }();

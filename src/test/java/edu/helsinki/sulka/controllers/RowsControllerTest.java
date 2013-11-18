@@ -11,31 +11,39 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpSession;
+import org.springframework.security.web.FilterChainProxy;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import edu.helsinki.sulka.SecuritySessionHelper;
 import edu.helsinki.sulka.models.User;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
 @ContextConfiguration({
 	"file:src/main/webapp/WEB-INF/spring/root-context.xml",
+	"file:src/main/webapp/WEB-INF/spring/security.xml",
 	"file:src/main/webapp/WEB-INF/spring/appServlet/servlet-context.xml"
 })
+@ActiveProfiles("dev")
 public class RowsControllerTest {
     @Autowired
     private WebApplicationContext wac;
     
+	@Autowired
+	private FilterChainProxy springSecurityFilterChain;
+
     private MockMvc mockMvc;
     private MockHttpSession lokkiHttpSession;
     private MockHttpSession testUserHttpSession;
@@ -45,25 +53,21 @@ public class RowsControllerTest {
     
     @Before
     public void setup() {
-    	this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).build();
-    	this.lokkiHttpSession = new MockHttpSession();
+    	mockMvc = webAppContextSetup(wac).addFilters(springSecurityFilterChain).build();
     	
     	User lokki = new User();
     	lokki.setPass(true);
     	lokki.setLogin_id(Integer.toString(LOKKI_ID));
     	lokki.setExpires_at(System.currentTimeMillis() / 1000 + 60);
-    	this.lokkiHttpSession.setAttribute("user", lokki);
-    	
-    	this.testUserHttpSession = new MockHttpSession();
+    	lokkiHttpSession = SecuritySessionHelper.createUserSession(lokki);
     	
     	User testUser = new User();
     	testUser.setLogin_id(Integer.toString(TEST_ID));
     	testUser.setPass(true);
     	testUser.setExpires_at(System.currentTimeMillis() / 1000 + 60);
-    	this.testUserHttpSession.setAttribute("user", testUser);
+    	testUserHttpSession = SecuritySessionHelper.createUserSession(testUser);
     }
 
-    @SuppressWarnings("unchecked")
 	@Test
     public void testAll() throws Exception {
     	/* These tests need to run as Heikki Lokki */
@@ -187,9 +191,6 @@ public class RowsControllerTest {
 			.andReturn();
     	mockMvc.perform(get("/api/rows?municipality=MHAMN&municipality=INKOO&startDate=6.13.1974").session(testUserHttpSession))
 			.andExpect(status().isBadRequest())
-			.andExpect(content().contentType("application/json;charset=UTF-8"))
-    		.andExpect(jsonPath("$.success").value(false))
-    		.andExpect(jsonPath("$.error").value(notNullValue()))
 			.andReturn();
     	mockMvc.perform(get("/api/rows?municipality=MHAMN&municipality=INKOO&startDate=1.1.1970&endDate=1.1.2013").session(testUserHttpSession))
 			.andExpect(status().isOk())
@@ -213,9 +214,6 @@ public class RowsControllerTest {
 			.andReturn();
     	mockMvc.perform(get("/api/rows?municipality=MHAMN&municipality=INKOO&startDate=01.01.1970&endDate=1.20.2013").session(testUserHttpSession))
 			.andExpect(status().isBadRequest())
-			.andExpect(content().contentType("application/json;charset=UTF-8"))
-			.andExpect(jsonPath("$.success").value(false))
-			.andExpect(jsonPath("$.error").value(notNullValue()))
 			.andReturn();
     	mockMvc.perform(get("/api/rows?municipality=MHAMN&municipality=INKOO&startDate=01.01.1970&endDate=20.01.2013").session(testUserHttpSession))
 			.andExpect(status().isOk())
@@ -229,7 +227,6 @@ public class RowsControllerTest {
 			.andReturn();
 	}
     
-    @SuppressWarnings("unchecked")
 	@Test
     public void testRingings() throws Exception {
     	/* These tests need to run as Heikki Lokki */
@@ -271,7 +268,6 @@ public class RowsControllerTest {
 			.andReturn();
 	}
     
-    @SuppressWarnings("unchecked")
 	@Test
     public void testRecoveries() throws Exception {
     	mockMvc.perform(get("/api/rows/recoveries?municipality=INKOO").session(testUserHttpSession))
@@ -356,9 +352,6 @@ public class RowsControllerTest {
 			.andReturn();
     	mockMvc.perform(get("/api/rows/recoveries?municipality=MHAMN&municipality=INKOO&startDate=6.13.1974").session(testUserHttpSession))
 			.andExpect(status().isBadRequest())
-			.andExpect(content().contentType("application/json;charset=UTF-8"))
-    		.andExpect(jsonPath("$.success").value(false))
-    		.andExpect(jsonPath("$.error").value(notNullValue()))
 			.andReturn();
     	mockMvc.perform(get("/api/rows/recoveries?municipality=MHAMN&municipality=INKOO&startDate=1.1.1970&endDate=1.1.2013").session(testUserHttpSession))
 			.andExpect(status().isOk())
@@ -382,9 +375,6 @@ public class RowsControllerTest {
 			.andReturn();
     	mockMvc.perform(get("/api/rows/recoveries?municipality=MHAMN&municipality=INKOO&startDate=01.01.1970&endDate=1.20.2013").session(testUserHttpSession))
 			.andExpect(status().isBadRequest())
-			.andExpect(content().contentType("application/json;charset=UTF-8"))
-			.andExpect(jsonPath("$.success").value(false))
-			.andExpect(jsonPath("$.error").value(notNullValue()))
 			.andReturn();
     	mockMvc.perform(get("/api/rows/recoveries?municipality=MHAMN&municipality=INKOO&startDate=01.01.1970&endDate=20.01.2013").session(testUserHttpSession))
 			.andExpect(status().isOk())

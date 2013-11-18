@@ -1,0 +1,19 @@
+.recycle-bin {
+  width: 120px;
+  border: 1px solid gray;
+  background: beige;
+  padding: 4px;
+  font-size: 12pt;
+  font-weight: bold;
+  color: black;
+  text-align: center;
+  -moz-border-radius: 10px;
+}
+
+.red {
+  background: red;
+}
+
+.bold {
+  font-weight: bold;
+}

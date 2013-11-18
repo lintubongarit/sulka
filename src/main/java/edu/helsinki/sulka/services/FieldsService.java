@@ -32,44 +32,55 @@ public class FieldsService {
 		private FieldGroup[] groups;
 	}
 	
+	private static long CACHE_TIME_GROUPS = 60*60*1000; // 1 hour
+	private APIService.CachedData<FieldGroupsResponse> cachedGroupsResponse =
+			new APIService.CachedData<FieldGroupsResponse>(CACHE_TIME_GROUPS) {
+		@Override
+		protected FieldGroupsResponse refresh() {
+			FieldGroupsResponse resp = apiService
+					.getRestTemplate()
+					.getForObject(
+							apiService.getURLForPath("/ringing/fields"),
+							FieldGroupsResponse.class);
+			return resp;
+		}
+	};
+	
 	/**
 	 * @return all field groups from the API.
 	 */
 	public FieldGroup[] getAllFieldGroups() {
-		return apiService
-				.getRestTemplate()
-				.getForObject(
-						apiService.getURLForPath("/ringing/fields"),
-						FieldGroupsResponse.class).groups;
+		return cachedGroupsResponse.get().groups;
 	}
 	
-	private List<FieldGroup> filterByViewMode(Field.ViewMode viewMode, FieldGroup[] groups) {
-		ArrayList<FieldGroup> filteredGroups = new ArrayList<FieldGroup>(groups.length);
-		for (FieldGroup fg : groups) {
-			ArrayList<Field> filteredFields = new ArrayList<Field>(fg.getFields().size());
-			for (Field f : fg.getFields()) {
-				if (f.getViewModes().contains(viewMode)) {
-					filteredFields.add(f);
+	private APIService.ParametizedCachedData<Field.ViewMode, List<FieldGroup>> cachedGroupsByViewModeResponse =
+			new APIService.ParametizedCachedData<Field.ViewMode, List<FieldGroup>>(CACHE_TIME_GROUPS) {
+		@Override
+		protected List<FieldGroup> refresh(Field.ViewMode viewMode) {
+			// Filter by viewMode, remove empty groups
+			FieldGroup[] groups = getAllFieldGroups();
+			ArrayList<FieldGroup> filteredGroups = new ArrayList<FieldGroup>(groups.length);
+			for (FieldGroup fg : groups) {
+				ArrayList<Field> filteredFields = new ArrayList<Field>(fg.getFields().size());
+				for (Field f : fg.getFields()) {
+					if (f.getViewModes().contains(viewMode)) {
+						filteredFields.add(f);
+					}
+				}
+				if (!filteredFields.isEmpty()) {
+					filteredGroups.add(new FieldGroup(fg.getName(), fg.getDescription(), filteredFields));
 				}
 			}
-			if (!filteredFields.isEmpty()) {
-				fg.setFields(filteredFields);
-				filteredGroups.add(fg);
-			}
+			return filteredGroups;
 		}
-		return filteredGroups;
-	}
+	};
 	
 	/**
 	 * @param viewMode the view mode to filter displayed rows by.
 	 * @return all field groups from the API for the view mode.
 	 */
 	public List<FieldGroup> getAllFieldGroups(Field.ViewMode viewMode) {
-		return filterByViewMode(viewMode, apiService
-				.getRestTemplate()
-				.getForObject(
-						apiService.getURLForPath("/ringing/fields"),
-						FieldGroupsResponse.class).groups);
+		return cachedGroupsByViewModeResponse.get(viewMode);
 	}
 	
 	/**
@@ -109,15 +120,23 @@ public class FieldsService {
 		return allFields;
 	}
 	
+	private APIService.CachedData<Map<String, Field>> cachedFieldsByFieldNameValue =
+			new APIService.CachedData<Map<String, Field>>(CACHE_TIME_GROUPS) {
+		@Override
+		protected Map<String, Field> refresh() {
+			List<Field> allFields = getAllFields();
+			HashMap<String, Field> fieldsByFieldName = new HashMap<String, Field>(allFields.size());
+			for (Field f : allFields) {
+				fieldsByFieldName.put(f.getFieldName(), f);
+			}
+			return fieldsByFieldName;
+		}
+	};
+	
 	/**
 	 * @return all fields by field name
 	 */
 	public Map<String, Field> getAllFieldsByFieldName() {
-		List<Field> allFields = getAllFields();
-		HashMap<String, Field> fieldsByFieldName = new HashMap<String, Field>(allFields.size());
-		for (Field f : allFields) {
-			fieldsByFieldName.put(f.getFieldName(), f);
-		}
-		return fieldsByFieldName;
+		return cachedFieldsByFieldNameValue.get();
 	}
 }

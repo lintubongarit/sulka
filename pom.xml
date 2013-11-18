@@ -28,7 +28,24 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		
+
+
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-web</artifactId>
+			<version>3.1.4.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-config</artifactId>
+			<version>3.1.4.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-taglibs</artifactId>
+			<version>3.1.4.RELEASE</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.webflow</groupId>
 			<artifactId>spring-faces</artifactId>
@@ -46,12 +63,90 @@
 			<version>${org.springframework-version}</version>
 		</dependency>
 
+
+		<dependency>
+		      <groupId>org.springframework.data</groupId>
+		      <artifactId>spring-data-jpa</artifactId>
+		      <version>1.4.1.RELEASE</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.eclipse.persistence</groupId>
+			<artifactId>eclipselink</artifactId>
+			<version>2.5.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.eclipse.persistence</groupId>
+			<artifactId>javax.persistence</artifactId>
+			<version>2.1.0</version>
+		</dependency>
+		
+		<dependency>
+		      <groupId>c3p0</groupId>
+		      <artifactId>c3p0</artifactId>
+		      <version>0.9.0.4</version>
+		</dependency>
+
+
 		<!-- AspectJ -->
 		<dependency>
 			<groupId>org.aspectj</groupId>
 			<artifactId>aspectjrt</artifactId>
 			<version>${org.aspectj-version}</version>
 		</dependency>
+
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-core</artifactId>
+			<version>4.2.4.Final</version>
+		</dependency>
+		
+		<dependency>
+		      <groupId>org.hibernate</groupId>
+		      <artifactId>hibernate-entitymanager</artifactId>
+		      <version>4.2.4.Final</version>
+		</dependency>
+		
+		<dependency>
+		      <groupId>org.hibernate.javax.persistence</groupId>
+		      <artifactId>hibernate-jpa-2.0-api</artifactId>
+		      <version>1.0.1.Final</version>
+		</dependency>
+		
+		<!-- H2 database -->
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<version>1.3.174</version>
+		</dependency>
+
+		<!--  Oracle -->
+		<dependency>
+		    <groupId>com.oracle</groupId>
+		    <artifactId>ojdbc7</artifactId>
+		    <version>12.1.0.1</version>
+		    <scope>system</scope>
+		    <systemPath>${basedir}/lib/ojdbc7.jar</systemPath>
+		</dependency>
+
+		<!-- Spring JPA-tuki -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-orm</artifactId>
+			<version>${org.springframework-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-aop</artifactId>
+			<version>${org.springframework-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jdbc</artifactId>
+			<version>${org.springframework-version}</version>
+		</dependency>
+
 
 		<!-- Logging -->
 		<dependency>
@@ -130,19 +225,21 @@
 			<version>1.3</version>
 			<scope>test</scope>
 		</dependency>
-		
+
+		<!-- JUnit -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.7</version>
 			<scope>test</scope>
 			<exclusions>
-		        <exclusion>
-		            <groupId>org.hamcrest</groupId>
-		            <artifactId>hamcrest-core</artifactId>
-		        </exclusion>
-		    </exclusions>
-	    </dependency>        
+				<!-- Use own Hamcrest matchers instead -->
+				<exclusion>
+					<groupId>org.hamcrest</groupId>
+					<artifactId>hamcrest-core</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -168,17 +265,21 @@
 			<artifactId>jackson-databind</artifactId>
 			<version>2.2.3</version>
 		</dependency>
-		
-		<!-- JsonPath support for tests -->
 
-		<!-- Hamcrest Matchers -->
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-mapper-asl</artifactId>
+            <version>1.4.2</version>
+        </dependency>
+        
+        <!-- JsonPath support for tests -->
 		<dependency>
 			<groupId>com.jayway.jsonpath</groupId>
 			<artifactId>json-path</artifactId>
 			<version>0.8.1</version>
 			<scope>test</scope>
 		</dependency>
-		
+
 		<!-- JodaTime -->
 		<dependency>
 			<groupId>joda-time</groupId>

@@ -35,27 +35,43 @@ public class MunicipalitiesService {
 		public MunicipalityResponseLevel2 municipalities;
 	}
 	
+	private static long CACHE_TIME_MUNICIPALITIES = 60*60*1000; // 1 hour
+	private APIService.CachedData<MunicipalitiesResponse> cachedMunicipalitiesResponse =
+			new APIService.CachedData<MunicipalitiesResponse>(CACHE_TIME_MUNICIPALITIES) {
+		@Override
+		protected MunicipalitiesResponse refresh() {
+			return apiService
+					.getRestTemplate()
+					.getForObject(
+							apiService.getURLForPath("/municipalities?format=json"),
+							MunicipalitiesResponse.class);
+		}
+	};
+	
 	/**
 	 * @return all municipalities from the API.
 	 */
 	public Municipality[] getAllMunicipalities() {
-		return apiService
-				.getRestTemplate()
-				.getForObject(
-						apiService.getURLForPath("/municipalities?format=json"),
-						MunicipalitiesResponse.class).municipalities.municipality;
+		return cachedMunicipalitiesResponse.get().municipalities.municipality;
 	}
+	
+	private APIService.ParametizedCachedData<String, MunicipalityResponse> cachedMunicipalityByIDResponse =
+			new APIService.ParametizedCachedData<String, MunicipalityResponse>(CACHE_TIME_MUNICIPALITIES) {
+		@Override
+		protected MunicipalityResponse refresh(String ID) {
+			return apiService
+					.getRestTemplate()
+					.getForObject(
+							apiService.getURLForPath("/municipalities/{id}?format=json"),
+							MunicipalityResponse.class,
+							ID);
+		}
+	};
 	
 	/**
 	 * @return municipality with ID code from the API.
 	 */
 	public Municipality getMunicipalityByID(String ID) {
-		return apiService
-				.getRestTemplate()
-				.getForObject(
-						apiService.getURLForPath("/municipalities/{id}?format=json"),
-						MunicipalityResponse.class,
-						ID).municipalities.municipality;
+		return cachedMunicipalityByIDResponse.get(ID).municipalities.municipality;
 	}
-
 }

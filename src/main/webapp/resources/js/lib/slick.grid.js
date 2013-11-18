@@ -133,7 +133,6 @@ if (typeof Slick === "undefined") {
     var headerColumnWidthDiff = 0, headerColumnHeightDiff = 0, // border+padding
         cellWidthDiff = 0, cellHeightDiff = 0;
     var absoluteColumnMinWidth;
-    var numberOfRows = 0;
 
     var tabbingDirection = 1;
     var activePosX;
@@ -565,7 +564,10 @@ if (typeof Slick === "undefined") {
 
         if (m.sortable) {
           header.addClass("slick-header-sortable");
-          header.append("<span class='slick-sort-indicator' />");
+          // LOCAL SULKA FIX: SlickGrid bug
+          // See https://github.com/mleibman/SlickGrid/issues/653
+          //header.append("<span class='slick-sort-indicator' />");
+          header.prepend("<span class='slick-sort-indicator' />");
         }
 
         trigger(self.onHeaderCellRendered, {
@@ -1597,9 +1599,10 @@ if (typeof Slick === "undefined") {
     }
 
     function updateRowCount() {
-      var dataLength = getDataLength();
       if (!initialized) { return; }
-      numberOfRows = getDataLengthIncludingAddNew() +
+
+      var dataLengthIncludingAddNew = getDataLengthIncludingAddNew();
+      var numberOfRows = dataLengthIncludingAddNew +
           (options.leaveSpaceForNewRows ? numVisibleRows - 1 : 0);
 
       var oldViewportHasVScroll = viewportHasVScroll;
@@ -1608,7 +1611,7 @@ if (typeof Slick === "undefined") {
 
       // remove the rows that are now outside of the data range
       // this helps avoid redundant calls to .removeRow() when the size of the data decreased by thousands of rows
-      var l = getDataLengthIncludingAddNew() - 1;
+      var l = dataLengthIncludingAddNew - 1;
       for (var i in rowsCache) {
         if (i >= l) {
           removeRowFromCache(i);
@@ -2001,10 +2004,11 @@ if (typeof Slick === "undefined") {
     }
 
     function asyncPostProcessRows() {
+      var dataLength = getDataLength();
       while (postProcessFromRow <= postProcessToRow) {
         var row = (vScrollDir >= 0) ? postProcessFromRow++ : postProcessToRow--;
         var cacheEntry = rowsCache[row];
-        if (!cacheEntry || row >= getDataLength()) {
+        if (!cacheEntry || row >= dataLength) {
           continue;
         }
 
@@ -2490,13 +2494,14 @@ if (typeof Slick === "undefined") {
     }
 
     function isCellPotentiallyEditable(row, cell) {
+      var dataLength = getDataLength();
       // is the data for this row loaded?
-      if (row < getDataLength() && !getDataItem(row)) {
+      if (row < dataLength && !getDataItem(row)) {
         return false;
       }
 
       // are we in the Add New row?  can we create new from this cell?
-      if (columns[cell].cannotTriggerInsert && row >= getDataLength()) {
+      if (columns[cell].cannotTriggerInsert && row >= dataLength) {
         return false;
       }
 
@@ -2720,8 +2725,9 @@ if (typeof Slick === "undefined") {
 
       if (options.enableCellNavigation && activeRow != null) {
         var row = activeRow + deltaRows;
-        if (row >= getDataLengthIncludingAddNew()) {
-          row = getDataLengthIncludingAddNew() - 1;
+        var dataLengthIncludingAddNew = getDataLengthIncludingAddNew();
+        if (row >= dataLengthIncludingAddNew) {
+          row = dataLengthIncludingAddNew - 1;
         }
         if (row < 0) {
           row = 0;
@@ -2843,8 +2849,9 @@ if (typeof Slick === "undefined") {
 
     function gotoDown(row, cell, posX) {
       var prevCell;
+      var dataLengthIncludingAddNew = getDataLengthIncludingAddNew();
       while (true) {
-        if (++row >= getDataLengthIncludingAddNew()) {
+        if (++row >= dataLengthIncludingAddNew) {
           return null;
         }
 
@@ -2905,7 +2912,8 @@ if (typeof Slick === "undefined") {
       }
 
       var firstFocusableCell = null;
-      while (++row < getDataLengthIncludingAddNew()) {
+      var dataLengthIncludingAddNew = getDataLengthIncludingAddNew();
+      while (++row < dataLengthIncludingAddNew) {
         firstFocusableCell = findFirstFocusableCell(row);
         if (firstFocusableCell !== null) {
           return {

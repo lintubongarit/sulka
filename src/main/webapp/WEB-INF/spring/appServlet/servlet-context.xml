@@ -3,10 +3,22 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:beans="http://www.springframework.org/schema/beans"
 	xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:mapping="http://www.springframework.org/schema/mapping"
+	xmlns:security="http://www.springframework.org/schema/security"
 
 	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+      http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd">
+
+	<!-- Security global-method-security configuration has to be initialized 
+		here, in order to use @PreAuthorized annotations in @Component (Controller, 
+		Service, etc.) classes -->
+	<security:global-method-security
+		pre-post-annotations="enabled" />
+
+	<!-- This global-method-security configuration below should remain disabled 
+		for now -->
+	<!-- <security:global-method-security secured-annotations="enabled" /> -->
 
 	<!-- DispatcherServlet Context: defines this servlet's request-processing 
 		infrastructure -->
@@ -24,18 +36,27 @@
 		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
 		<beans:property name="prefix" value="/WEB-INF/views/" />
 		<beans:property name="suffix" value=".jsp" />
+
+	</beans:bean>
+
+<beans:bean id="jacksonMessageConverter"
+    class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter"></beans:bean>
+    <beans:bean
+        class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+        <beans:property name="messageConverters">
+            <beans:list>
+                <beans:ref bean="jacksonMessageConverter" />
+            </beans:list>
+        </beans:property>
+    </beans:bean> 
+    
+    	<beans:bean id="springSecurityFilterChain"
+		class="org.springframework.security.web.FilterChainProxy">
+		<!-- properties -->
 	</beans:bean>
 
 	<context:component-scan base-package="edu.helsinki.sulka" />
-	
+
 	<context:annotation-config />
 
-	<mvc:interceptors>
-		<mvc:interceptor>
-			<mvc:mapping path="/**"/>
-			<mvc:exclude-mapping path="/login"/>
-			<mvc:exclude-mapping path="/testLogin/*"/>
-			<beans:bean	class="edu.helsinki.sulka.interceptors.AuthenticationInterceptor" />
-		</mvc:interceptor>
-	</mvc:interceptors>
 </beans:beans>

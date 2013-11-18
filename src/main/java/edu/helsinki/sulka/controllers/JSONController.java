@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import edu.helsinki.sulka.services.APIQueryException;
+
 /**
  * Base class for Controllers that only return JSON.
  */
@@ -17,6 +19,25 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public abstract class JSONController {
 	@Autowired
 	private Logger logger;
+	
+	public static class NotFoundException extends Exception {
+		private static final long serialVersionUID = 1L;
+		public NotFoundException() {
+			super("Tietuetta ei löydy");
+		}
+		public NotFoundException(String message) {
+			super(message);
+		}
+	}
+	public static class UnauthorizedException extends Exception {
+		private static final long serialVersionUID = 1L;
+		public UnauthorizedException() {
+			super("Ei käyttöoikeutta");
+		}
+		public UnauthorizedException(String message) {
+			super(message);
+		}
+	}
 	
 	/**
 	 * The error response JSON
@@ -57,10 +78,33 @@ public abstract class JSONController {
 		public boolean success = true;
 	}
 	
-	@ExceptionHandler(Exception.class)
+	/**
+	 * Handles 404 exceptions gracefully.
+	 */
+	@ExceptionHandler(NotFoundException.class)
+	@ResponseBody
+	@ResponseStatus(HttpStatus.NOT_FOUND)
+	public ErrorResponse handleNotFoundException(Exception e) {
+		return new ErrorResponse(e.getMessage());
+	}
+	
+	/**
+	 * Handles 401 exceptions gracefully.
+	 */
+	@ExceptionHandler(UnauthorizedException.class)
+	@ResponseBody
+	@ResponseStatus(HttpStatus.UNAUTHORIZED)
+	public ErrorResponse handleUnauthorizedException(Exception e) {
+		return new ErrorResponse(e.getMessage());
+	}
+	
+	/**
+	 * Handles API query exceptions gracefully.
+	 */
+	@ExceptionHandler(APIQueryException.class)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	public ErrorResponse handleException(Exception e) {
+	public ErrorResponse handleAPIException(Exception e) {
 		return new ErrorResponse(e.getMessage());
 	}
 }

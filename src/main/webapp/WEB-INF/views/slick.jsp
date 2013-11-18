@@ -7,16 +7,40 @@
 		<link rel="stylesheet" href="resources/css/lib/slick.grid.css" type="text/css" />
 		<!-- <link rel="stylesheet" href="resources/css/examples.css" type="text/css" /> -->
 		<link rel="stylesheet" href="resources/css/sulka.css" type="text/css" />
-		<script src="resources/js/lib/jquery-1.7.min.js"></script>
-		<script src="resources/js/lib/jquery-ui-1.8.16.custom.min.js"></script>
-		<script src="resources/js/lib/jquery.event.drag-2.2.js"></script>
+   		<script src="resources/js/lib/jquery-1.10.2.min.js"></script>
+    	<script src="resources/js/lib/jquery-ui-1.10.3.custom.min.js"></script>
+   		<script src="resources/js/lib/jquery.event.drag-2.2.js"></script>
+		<script src="resources/js/lib/moment.min.js"></script>
 		<script src="resources/js/lib/slick.core.js"></script>
 		<script src="resources/js/lib/slick.grid.js"></script>
-		<script src="resources/js/lib/moment.min.js"></script>
+		<script src="resources/js/lib/slick.editors.js"></script>
+		<script src="resources/js/lib/slick.cellselectionmodel.js"></script>
+		<script src="resources/js/lib/slick.cellrangedecorator.js"></script>
+		<script src="resources/js/lib/slick.cellrangeselector.js"></script>
 		<script src="resources/js/sulka.core.js"></script>
 		<script src="resources/js/sulka.strings.js"></script>
 		<script src="resources/js/sulka.API.js"></script>
 		<script src="resources/js/sulka.helpers.js"></script>
+		
+		
+		
+		<script> 
+	
+  		var grid;
+  		var data = [];
+  		var columns = [
+    		{id: "type", name: "Tyyppi", field: "type", width: 100, validator: requiredFieldValidator},
+    		{id: "nameRing", name: "Nimirengas", field: "nameRing", width: 100, editor: Slick.Editors.Text, validator: requiredFieldValidator},
+    		{id: "ring", name: "Rengas", field: "ring", width: 100,  editor: Slick.Editors.Text, validator: requiredFieldValidator },
+    		{id: "ringEnd", name: "-rengas", field: "ringEnd", width: 100,  editor: Slick.Editors.Text},
+    		{id: "ringUse", name: "Hävinnyt/tuhottu?", field: "ringUse", width: 100, editor: Slick.Editors.Text },
+    		{id: "removedRing", name: "Poistettu rengas", field: "removedRing", width: 100, editor: Slick.Editors.Text },
+    		{id: "originalRing", name: "Jalkarengas", width: 100, width: 100, field: "originalRing", editor: Slick.Editors.Text }
+  		];
+
+    	grid = new Slick.Grid("#slick-grid", data, columns, options);</script>
+		
+		<c:set var="contextPath" value="${pageContext.request.contextPath}"/>
 	</head>
 	<body>
 		<table id="global-toolbar" class="global-toolbar">
@@ -46,19 +70,42 @@
 			</tr>
 		</table>
 		
-		<div class="local-toolbar">
-			<form id="filters">
-				Rengastaja: <input type="text" id="filters-ringer" name="ringer" />
-				Aika (esim. 2005 tai 2005-2006): <input type="text" id="filters-date" name="date" />
-				Laji: <input type="text" id="filters-species" name="species" />
-				Kunta: <input type="text" id="filters-municipality" name="municipality" />
-				<input type="submit" id="form-submit" value="OK" />
-				<input type="reset" id="form-reset" value="Tyhjennä" />
-				<input type="checkbox" id="filters-ringings" name="ringings" checked/> Rengastukset
- 				<input type="checkbox" id="filters-recoveries" name="recoveries" checked /> Tapaamiset
-				<img src="resources/img/ajax-loader.gif" id="loader-animation" />
-			</form>
-		</div>
+		<table class="local-toolbar">
+			<tr>
+				<td class="local-toolbar-menu">
+					<form action="${contextPath}">
+					    <input type="submit" id="browsing" value="Selaus">
+				    </form>
+				</td>
+				<td class="local-toolbar-menu">
+					<form action="${contextPath}/addringing">
+					    <input type="submit" id="addRinging" value="Rengastusten syöttö">
+					</form>
+				</td>
+				<td class="local-toolbar-menu">
+					    <button onclick="grid.setOptions({autoEdit:true})">Auto-edit ON</button>
+					    
+					    &nbsp;
+					    
+					    <button onclick="grid.setOptions({autoEdit:false})">Auto-edit OFF</button>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<form id="filters">
+						Rengastaja: <input type="text" id="filters-ringer" name="ringer" />
+						Aika (esim. 2005 tai 2005-2006): <input type="text" id="filters-date" name="date" />
+						Laji: <input type="text" id="filters-species" name="species" />
+						Kunta: <input type="text" id="filters-municipality" name="municipality" />
+						<input type="submit" id="form-submit" value="OK" />
+						<input type="reset" id="form-reset" value="Tyhjennä" />
+						<input type="checkbox" id="filters-ringings" name="ringings" checked/> Rengastukset
+		 				<input type="checkbox" id="filters-recoveries" name="recoveries" checked /> Tapaamiset
+						<img src="resources/img/ajax-loader.gif" id="loader-animation" />
+					</form>
+				</td>
+			</tr>
+		</table>
 	
 		<div id="row-status-box-container">
 			<div id="row-status-box" style="padding: 1px">
@@ -69,7 +116,6 @@
 		<div id="columns-pane">
 			<table id="columns-table"></table>
 		</div>
-		
-		<form id="tiedot"></form><!-- Added here just to make tests not fail -->
+		<ul id="header-context-menu" class="context-menu" style="display:none;position:absolute"></ul>
 	</body>
 </html>
