@@ -173,7 +173,7 @@ sulka.API = function(API) {
 				url : API.BASE + "/storage/" + sulka.viewMode,
 				dataType : "json",
 				data: JSON.stringify(row),
-				contentType: "application/json",
+				contentType: "application/json;charset=UTF-8",
 				type: "POST",
 				success: function (data) {
 					if (onSuccess) {
@@ -214,8 +214,7 @@ sulka.API = function(API) {
 			$.ajax({
 				url: API.BASE  + "/storage/settings/" + viewMode,
 				type: "POST",
-				contentType: "application/json",
-				dataType: "json",
+				contentType: "application/json;charset=UTF-8",
 				data: JSON.stringify(settings),
 				success: onSuccess,
 				error: onError
