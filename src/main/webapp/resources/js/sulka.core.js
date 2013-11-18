@@ -654,8 +654,8 @@ sulka = {
 		/*
 		 * SlickGrid Coordinate Columns
 		 * 
-		 * Latitude: coordinates/lat
-		 * Longitude: coordinates/lon 
+		 * Latitude: lat
+		 * Longitude: lon 
 		 * 
 		 */
 		var selectedRows = sulka.grid.getSelectedRows();
@@ -663,35 +663,18 @@ sulka = {
 		
 		if (selectedRows.length == 0) return;
 		
-		/*
-		console.log(JSON.stringify(selectedRows));
-		console.log(JSON.stringify(data));
-		console.log(JSON.stringify(sulka.lastInputCoordinate));
-		console.log(JSON.stringify(sulka.lastInputCoordinateLon));
-		console.log(JSON.stringify(sulka.lastInputCoordinateLat));
-		 */
-		
-		for (var i = 0; i < selectedRows.length; i++){
-			//console.log("RIVI " + selectedRows[i]);
-			
-			data[selectedRows[i]]["lat"] = sulka.lastInputCoordinateLon;
-			data[selectedRows[i]]["lon"] = sulka.lastInputCoordinateLat;
-			//console.log("RIVIN " + i + " DATA ROW STATUS" + JSON.stringify(data[selectedRows[i]]["coordinates/lat"]));
+
+		for (var i = 0; i < selectedRows.length; i++){		
+			data[selectedRows[i]]["lon"] = sulka.lastInputCoordinateLon;
+			data[selectedRows[i]]["lat"] = sulka.lastInputCoordinateLat;
 			sulka.addToSulkaDB(selectedRows[i]);
 		}
-		
-//		for (var i = 0; i < selectedRows.length; i++){
-//			console.log("RIVIN " + i + " DATA ROW " + JSON.stringify(data[selectedRows[i]]));
-//		}	
-		
+	
 		
         sulka.grid.invalidateRow(data.length);
         sulka.setData(data);
         sulka.grid.updateRowCount();
         sulka.grid.render();
-        
-        
-        
 	},
 	
 	

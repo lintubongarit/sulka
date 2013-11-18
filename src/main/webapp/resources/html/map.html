@@ -24,20 +24,8 @@
     <script src="https://www.luomus.fi/wkartta/lib/js/wkartta.js"></script>
 </head>
 <body>
-<iframe id="mapframe" name="map" src="https://www.luomus.fi/wkartta/map.html"></iframe>
-<script type="text/javascript">
-//     function setView() {
-//         map.setView([Number(valueForId('lat')), Number(valueForId('lon'))], valueForId('zoomLevel_setView'));
-//     }
-
-//     function geolocate() {
-//         map.geocode(valueForId('geolocate'), Number(valueForId('zoomLevel_geolocate')));
-//     }
-
-//     function view() {
-//         var data = JSONWK.parse(content.value);
-//         window.location.href = 'https://www.luomus.fi/wkartta/view.html#' + JSONWK.stringify({options:{}, data: data});
-//     }
+	<iframe id="mapframe" name="map" src="https://www.luomus.fi/wkartta/map.html"></iframe>
+	<script type="text/javascript">
 
     function config() {
     	konffi =  {
@@ -67,20 +55,17 @@
     	  ]
     	}
     	
-    	map.testi = "jeejee";
-    	
-    	
         map = new (new WK()).Map('mapframe', konffi);
         map.onChange(function (mapEntries) {
-        	//parent.sulka.lastInputCoordinate = JSONWK.stringify(mapEntries, undefined, 2);
+
         	parent.sulka.lastInputCoordinate = JSONWK.stringify(mapEntries, undefined, 2);
-        	parent.sulka.lastInputCoordinateLon = JSONWK.stringify(mapEntries[0].location[0], undefined, 2);
-        	parent.sulka.lastInputCoordinateLat = JSONWK.stringify(mapEntries[0].location[1], undefined, 2);
+        	parent.sulka.lastInputCoordinateLat = JSONWK.stringify(mapEntries[0].location[0], undefined, 2);
+        	parent.sulka.lastInputCoordinateLon = JSONWK.stringify(mapEntries[0].location[1], undefined, 2);
         });
         
        	if (parent.sulka.lastInputCoordinate) {
            	map.update(JSONWK.parse(parent.sulka.lastInputCoordinate));
-           	//map.update(parent.sulka.lastInputCoordinate);
+
        	}
     }
     config();

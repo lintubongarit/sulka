@@ -6,26 +6,21 @@ $(document).ready(function() {
 	});
 	$(".callbacks").colorbox({
 		onOpen : function() {
-			//alert('onOpen: colorbox is about to open');
 		},
 		onLoad : function() {
-			//alert('onLoad: colorbox has started to load the targeted content');
 		},
 		onComplete : function() {
-			//alert('onComplete: colorbox has displayed the loaded content');
 		},
 		onCleanup : function() {
-			//alert('onCleanup: colorbox has begun the close process');
 		},
 		onClosed : function() {
-			//alert('onClosed: colorbox has completely closed');
-			
-			confirmation();
-			
 			function confirmation() {
-				var answer = confirm("Haluatko varmasti kayttaa valitsemaasi koordinaattia?\n" + "Longitude: " + parent.sulka.lastInputCoordinateLon +"\nLatitude: " + parent.sulka.lastInputCoordinateLat);
-				
-				
+				var answer = confirm("" +
+						"Haluatko varmasti kayttaa valitsemaasi koordinaattia?" +
+						"\n" +
+						"Longitude: " + parent.sulka.lastInputCoordinateLon +
+						"\n" +
+						"Latitude: " + parent.sulka.lastInputCoordinateLat);
 				if (answer){
 					parent.sulka.setCoordinateToRows();
 				}
@@ -33,7 +28,9 @@ $(document).ready(function() {
 					
 				}
 			}
-			
+			if (parent.sulka.lastInputCoordinateLon != undefined && parent.sulka.lastInputCoordinateLat != undefined){
+				confirmation();
+			}
 		}
 	});
 });
