@@ -102,13 +102,14 @@ public class Field {
 		return viewModes;
 	}
 	
+	@JsonIgnore
+	private Map<String, String> enumerationDescriptionsMap = null;
+	
 	/**
 	 * Get map of enumeration descriptions by enumeration values.
 	 * Assumes getType() == FieldType.ENUMERATION
 	 * @return Map of enumeration value descriptions by possible enumeration values.
 	 */
-	@JsonIgnore
-	private Map<String, String> enumerationDescriptionsMap = null;
 	public Map<String, String> getEnumerationDescriptionsMap() {
 		if (this.enumerationDescriptionsMap != null) {
 			return this.enumerationDescriptionsMap;
