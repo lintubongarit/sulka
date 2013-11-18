@@ -19,8 +19,21 @@ $(document).ready(function() {
 		},
 		onClosed : function() {
 			//alert('onClosed: colorbox has completely closed');
-			//alert(sulka.koordinaatti);
-			sulka.setCoordinateToRows();
+			
+			confirmation();
+			
+			function confirmation() {
+				var answer = confirm("Haluatko varmasti kayttaa valitsemaasi koordinaattia?\n" + "Longitude: " + parent.sulka.lastInputCoordinateLon +"\nLatitude: " + parent.sulka.lastInputCoordinateLat);
+				
+				
+				if (answer){
+					parent.sulka.setCoordinateToRows();
+				}
+				else{
+					
+				}
+			}
+			
 		}
 	});
 });

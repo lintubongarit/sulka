@@ -643,6 +643,58 @@ sulka = {
 		sulka.fetchRows(filters);
 	},
 	
+	
+	
+	/**
+	 * Sets coordinates to selected rows, this function is called from the Colorbox
+	 */
+	setCoordinateToRows: function(){
+	
+		console.log("toimii");
+		/*
+		 * SlickGrid Coordinate Columns
+		 * 
+		 * Latitude: coordinates/lat
+		 * Longitude: coordinates/lon 
+		 * 
+		 */
+		var selectedRows = sulka.grid.getSelectedRows();
+		var data = sulka.getData();
+		
+		if (selectedRows.length == 0) return;
+		
+		/*
+		console.log(JSON.stringify(selectedRows));
+		console.log(JSON.stringify(data));
+		console.log(JSON.stringify(sulka.lastInputCoordinate));
+		console.log(JSON.stringify(sulka.lastInputCoordinateLon));
+		console.log(JSON.stringify(sulka.lastInputCoordinateLat));
+		 */
+		
+		for (var i = 0; i < selectedRows.length; i++){
+			//console.log("RIVI " + selectedRows[i]);
+			
+			data[selectedRows[i]]["lat"] = sulka.lastInputCoordinateLon;
+			data[selectedRows[i]]["lon"] = sulka.lastInputCoordinateLat;
+			//console.log("RIVIN " + i + " DATA ROW STATUS" + JSON.stringify(data[selectedRows[i]]["coordinates/lat"]));
+			sulka.addToSulkaDB(selectedRows[i]);
+		}
+		
+//		for (var i = 0; i < selectedRows.length; i++){
+//			console.log("RIVIN " + i + " DATA ROW " + JSON.stringify(data[selectedRows[i]]));
+//		}	
+		
+		
+        sulka.grid.invalidateRow(data.length);
+        sulka.setData(data);
+        sulka.grid.updateRowCount();
+        sulka.grid.render();
+        
+        
+        
+	},
+	
+	
 	fetchRows: function (filters) {
 		var combinedRows = null;
 		var combineCalls = 0;
@@ -868,17 +920,17 @@ sulka = {
 	 * uses addToSulkaDB() to add row to sulka-database
 	 */
 	onCellChange: function(event, args){
-		sulka.addToSulkaDB(args);
+		sulka.addToSulkaDB(args.row);
 	},
 	
 	/**
 	 * Adds row to sulka-database
 	 */
-	addToSulkaDB: function (args) {
+	addToSulkaDB: function (index) {
 		var data = sulka.getData();
-		var actualRowData = data[args.row];
+		var actualRowData = data[index];
 	    if (!actualRowData) return;
-	    var rowStatus = args.item.rowStatus;
+	    var rowStatus = actualRowData.rowStatus;
 	    
 	    if (rowStatus == "inputRow"){
 	    	var localDbRow = {};
