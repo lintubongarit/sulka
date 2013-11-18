@@ -837,15 +837,18 @@ sulka = {
 	
 	saveSettings: function() {
 		sulka.helpers.showLoader();
-		var columns = sulka.columns;
 		var columnsDataToBeSaved = {};
-		for(var index in columns){
+		for(var index in sulka.columns){
 			var columnData = [ // [position, width, visibility]
 					index,
-					columns[index].width,
-					columns[index].$sulkaVisible,
+					sulka.columns[index].width,
+					sulka.columns[index].$sulkaVisible,
 			];
-			columnsDataToBeSaved[columns[index].field] = columnData;
+			columnsDataToBeSaved[sulka.columns[index].field] = columnData;
+		}
+		var gridColumns = sulka.grid.getColumns();
+		for(var index in gridColumns){
+			columnsDataToBeSaved[gridColumns[index].field][1] = gridColumns[index].width;
 		}
 		
 		var filters =  {

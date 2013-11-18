@@ -13,19 +13,26 @@ casper.test.begin('Setting saving tests', 9, function suite(test) {
 			test.assertNotEquals(returnValue, "Asetusten tallentaminen epäonnistui.", "Saving columns won't fail.");
 		}).then(function(){
 			casper.evaluate(function() {
-				sulka.saveSettings();
 				var gridColumns = sulka.grid.getColumns();
-				gridColumns[1].width = 700;
+				gridColumns[2].width = 555;
+				sulka.grid.setColumns(gridColumns);
+				sulka.saveSettings();
+			});
+		}).waitWhileVisible("loader-animation"
+		).then(function(){
+			casper.evaluate(function() {
+				var gridColumns = sulka.grid.getColumns();
+				gridColumns[2].width = 23;
 				sulka.grid.setColumns(gridColumns);
 				sulka.fetchSettings();
 			});
 		}).waitWhileVisible("loader-animation"
 		).then(function(){
-			var columnWidth = casper.evaluate(function() {
+			var columnWidth = casper.evaluate(function(){
 				var gridColumns = sulka.grid.getColumns();
-				return gridColumns[1].width;
+				return gridColumns[2].width;
 			});
-			test.assertNotEquals(columnWidth, 700, "Column width is changed back to original with fetchSettings().");
+			test.assertEquals(columnWidth, 555, "Previously saved column width is restored.");
 		}).then(function() {
 			casper.evaluate(function() {
 				sulka.saveSettings();
