@@ -290,34 +290,34 @@ span#last-error {
   background: #fafafa;
 }*/
 
-.recovery-row-color .r0, .ringing-row-color .r0 {
+.recovery-row .rowtype-column, .ringing-row .rowtype-column {
 	background-repeat: no-repeat;
 	background-position: center;
 }
-.recovery-row-color .r0 {
+.recovery-row .rowtype-column {
 	background-image: url('../img/recovery.png');
 }
-.ringing-row-color .r0 {
+.ringing-row .rowtype-column {
 	background-image: url('../img/ringing.png');
 }
 
-.tipu-row-color {
+.tipu-row {
 	background: #e6f3ff; 
 }
 
-.sulka-row-color {
+.sulka-row {
 	background: #ffffff; 
 }
 
-.sulka-valid-row-color {
+.sulka-valid-row {
 	background: #ebffec; 
 }
 
-.sulka-invalid-row-color {
+.sulka-invalid-row {
 	background: #fcebeb; 
 }
 
-.sulka-invalid-cell-color {
+.sulka-invalid-cell {
 	background: #f49696; 
 }
 

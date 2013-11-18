@@ -142,6 +142,7 @@ sulka = {
 							column.$sulkaFlexible = false;
 							column.formatter = function () { return ""; };
 							column.width  = sulka.COL_TYPE_IMAGE_WIDTH + sulka.COL_PADDING;
+							column.cssClass = "rowtype-column";
 						}
 						
 						columns.push(column);
@@ -706,10 +707,10 @@ sulka = {
 		}
 	},
 	
-	METADATA_SULKA_RECOVERY: {"cssClasses" : "sulka-row-color recovery-row-color" },
-	METADATA_SULKA_RINGING: {"cssClasses" : "sulka-row-color ringing-row-color" },
-	METADATA_TIPU_RECOVERY: { "cssClasses": "tipu-row-color recovery-row-color" },
-	METADATA_TIPU_RINGING: { "cssClasses": "tipu-row-color ringing-row-color" },
+	METADATA_SULKA_RECOVERY: {"cssClasses" : "sulka-row recovery-row" },
+	METADATA_SULKA_RINGING: {"cssClasses" : "sulka-row ringing-row" },
+	METADATA_TIPU_RECOVERY: { "cssClasses": "tipu-row recovery-row" },
+	METADATA_TIPU_RINGING: { "cssClasses": "tipu-row ringing-row" },
 	METADATA_EMPTY: { },
 	
 	RINGING_TYPE: "Rengastus",
@@ -755,7 +756,7 @@ sulka = {
 	onAddNewRow: function(event, args){
 		var data = sulka.getData();
         var item = args.item;
-        var column = args.column;
+        //var column = args.column;
         data.push(item);
         sulka.setData(data);
         sulka.grid.invalidateRow(data.length);
