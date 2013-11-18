@@ -624,8 +624,6 @@ sulka = {
 		// Grid not yet initialised?
 		if (sulka.grid === null) return;
 		
-		sulka.helpers.unsetErrorAndShowLoader();
-		
 		sulka.getRowMode();
 		
 		var filters = sulka.getFilters();
@@ -636,45 +634,7 @@ sulka = {
 		}
 		
 		sulka.helpers.unsetErrorAndShowLoader();
-		sulka.fetchRows(filters);
-	},
-	
-	
-	
-	/**
-	 * Sets coordinates to selected rows, this function is called from the Colorbox
-	 */
-	setCoordinateToRows: function(){
-	
-		console.log("toimii");
-		/*
-		 * SlickGrid Coordinate Columns
-		 * 
-		 * Latitude: lat
-		 * Longitude: lon 
-		 * 
-		 */
-		var selectedRows = sulka.grid.getSelectedRows();
-		var data = sulka.getData();
 		
-		if (selectedRows.length == 0) return;
-		
-
-		for (var i = 0; i < selectedRows.length; i++){		
-			data[selectedRows[i]]["lon"] = sulka.lastInputCoordinateLon;
-			data[selectedRows[i]]["lat"] = sulka.lastInputCoordinateLat;
-			sulka.addToSulkaDB(selectedRows[i]);
-		}
-	
-		
-        sulka.grid.invalidateRow(data.length);
-        sulka.setData(data);
-        sulka.grid.updateRowCount();
-        sulka.grid.render();
-	},
-	
-	
-	fetchRows: function (filters) {
 		// Fetch rows
 		var combinedRows = null;
 		var combineCalls = 0;
@@ -736,6 +696,38 @@ sulka = {
 				sulka.helpers.hideLoaderAndSetError
 			);
 		}
+	},
+	
+	/**
+	 * Sets coordinates to selected rows, this function is called from the Colorbox
+	 */
+	setCoordinateToRows: function(){
+	
+		console.log("toimii");
+		/*
+		 * SlickGrid Coordinate Columns
+		 * 
+		 * Latitude: lat
+		 * Longitude: lon 
+		 * 
+		 */
+		var selectedRows = sulka.grid.getSelectedRows();
+		var data = sulka.getData();
+		
+		if (selectedRows.length == 0) return;
+		
+
+		for (var i = 0; i < selectedRows.length; i++){		
+			data[selectedRows[i]]["lon"] = sulka.lastInputCoordinateLon;
+			data[selectedRows[i]]["lat"] = sulka.lastInputCoordinateLat;
+			sulka.addToSulkaDB(selectedRows[i]);
+		}
+	
+		
+        sulka.grid.invalidateRow(data.length);
+        sulka.setData(data);
+        sulka.grid.updateRowCount();
+        sulka.grid.render();
 	},
 	
 	METADATA_SULKA_RECOVERY: {"cssClasses" : "sulka-row recovery-row" },
@@ -881,7 +873,7 @@ sulka = {
 	 * 
 	 * @returns slick grid row id where was added
 	 */
-	onAddNewRow: function(event, args){
+	onAddNewRow: function(event, args) {
 		var data = sulka.getData();
         var item = args.item;
         item.rowStatus = "inputRow";
@@ -892,7 +884,7 @@ sulka = {
         sulka.setData(data);
         sulka.grid.updateRowCount();
         sulka.grid.render();
-        sulka.addToSulkaDB(args);
+        sulka.addToSulkaDB(data.length-1);
 	},
 	
 	/**
@@ -909,6 +901,7 @@ sulka = {
 	addToSulkaDB: function (index) {
 		var data = sulka.getData();
 		var actualRowData = data[index];
+		console.log(data);
 	    if (!actualRowData) return;
 	    var rowStatus = actualRowData.rowStatus;
 	    
