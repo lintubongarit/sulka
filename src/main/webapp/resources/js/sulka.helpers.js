@@ -3,6 +3,9 @@ sulka.helpers = function (helpers){
  * Helper function name space.
  */
 helpers = {
+		
+	loaderCounter: 0,
+		
 	/**
 	 * Just calls console.log with the same arguments, if it exists.
 	 * @param string Log message.
@@ -48,6 +51,7 @@ helpers = {
 	 * Show the loader animation.
 	 */
 	showLoader: function () {
+		helpers.loaderCounter++;
 		$("#loader-animation").show();
 	},
 	
@@ -55,7 +59,12 @@ helpers = {
 	 * Hide the loader animation.
 	 */
 	hideLoader: function () {
-		$("#loader-animation").hide();
+		if (--helpers.loaderCounter <= 0) {
+			if (helpers.loaderCounter < 0) {
+				console.log("hideLoader called without preceding showLoader!");
+			}
+			$("#loader-animation").hide();
+		}
 	},
 	
 	/**

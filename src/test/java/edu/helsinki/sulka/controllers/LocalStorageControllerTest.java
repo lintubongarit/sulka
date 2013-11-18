@@ -594,10 +594,27 @@ public class LocalStorageControllerTest {
 				.andExpect(jsonPath("$.objects[*].id", not(hasItem((equalTo(ringingToBeEdited.getId().intValue()))))))
 				.andReturn();
 	}
+
+	@Test
+	public void testGetSettingsStatusIsOk() throws Exception {
+		mockMvc.perform(get("/api/storage/settings/browsing")
+						.session(lokkiHttpSession))
+				.andExpect(status().isOk())
+				.andReturn();
+	}
+
+	@Test
+	public void testGetSettingsReturnsJSON() throws Exception {
+		mockMvc.perform(get("/api/storage/settings/browsing")
+						.session(lokkiHttpSession))
+				.andExpect(status().isOk())
+				.andExpect(content().contentType("application/json;charset=UTF-8"))
+				.andReturn();
+	}
 	
 	@Test
 	public void testGetSettingsReturnsJSONWithCorrectColumns() throws Exception {
-		mockMvc.perform(get("/api/storage/settings")
+		mockMvc.perform(get("/api/storage/settings/browsing")
 						.session(lokkiHttpSession))
 				.andExpect(status().isOk())
 				.andExpect(content().contentType("application/json;charset=UTF-8"))
@@ -608,7 +625,7 @@ public class LocalStorageControllerTest {
 	
 	@Test
 	public void testSaveSettingsStatusIsOk() throws Exception {
-		mockMvc.perform(post("/api/storage/settings")
+		mockMvc.perform(post("/api/storage/settings/browsing")
 						.session(lokkiHttpSession)
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(validSettings))
@@ -618,7 +635,7 @@ public class LocalStorageControllerTest {
 	
 	@Test
 	public void testSaveSettingsReturnsErrorIfDataIsntJSON() throws Exception {
-		mockMvc.perform(post("/api/storage/settings")
+		mockMvc.perform(post("/api/storage/settings/browsing")
 						.session(lokkiHttpSession)
 						.contentType(MediaType.APPLICATION_XML)
 						.content(validSettings))

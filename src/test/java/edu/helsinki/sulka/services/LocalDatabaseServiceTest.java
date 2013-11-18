@@ -37,7 +37,7 @@ public class LocalDatabaseServiceTest {
 	private LocalDatabaseRow recoveryRow;
 	private UserSettings userSettings;
 	
-	private static final String USER_ID = "LOCAL_DATABASE_SERVICE_TEST_USER_12345";
+	private static final String USER_ID = "LOCAL_DATABASE_SERVICE_TEST_USER_12345_browsing";
 	private static final String ROW_DATA = "asdfhasdfasesdfawe";
 	private static final String COLUMN_DATA = "asdfawetraweasdf";
 	
