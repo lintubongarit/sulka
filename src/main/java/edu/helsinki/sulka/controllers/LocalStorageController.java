@@ -70,17 +70,30 @@ public class LocalStorageController extends JSONController {
 	public ObjectResponse<LocalDatabaseRow> saveRow(HttpSession session,
 			@PathVariable ServiceType type,
 			@RequestBody LocalDatabaseRow row,
-			BindingResult bindingResult) throws LocalStorageException {
+			BindingResult bindingResult) throws LocalStorageException, NotFoundException, UnauthorizedException {
+		RowType rowType = serviceToRowType(type);
 		
 		if (bindingResult.hasErrors()){
 			throw new LocalStorageException("Database update failed");
 		}
+		
+		String userId = ((User) session.getAttribute("user")).getLogin_id();
+		
+		if (row.getId() != null) {
+			LocalDatabaseRow existingRow = localDatabaseService.getRowOfAnyType(row.getId());
+			if (existingRow == null || existingRow.getRowType() != rowType) {
+				throw new NotFoundException("Row not found or row type mismatch.");
+			}
+			if (!existingRow.getUserId().equals(userId)) {
+				throw new UnauthorizedException("Database update failed. User id and row owner id don't match.");
+			}
+		}
+		
 		row.setUserId(((User) session.getAttribute("user")).getLogin_id());
 		row.setRowType(serviceToRowType(type));
 		
 		return new ObjectResponse<LocalDatabaseRow>(localDatabaseService.addRow(row));
 	}
-	
 	
 	@PreAuthorize("hasRole('USER')")
 	@RequestMapping(value = "/api/storage/{type}/{rowId}", method = RequestMethod.DELETE)
@@ -88,10 +101,12 @@ public class LocalStorageController extends JSONController {
 	@ResponseBody
 	public String deleteRow(HttpSession session, @PathVariable ServiceType type, @PathVariable long rowId)
 			throws LocalStorageException, NotFoundException, UnauthorizedException {
+		RowType rowType = serviceToRowType(type);
+		
 		LocalDatabaseRow row = localDatabaseService.getRow(serviceToRowType(type), rowId);
 		
-		if (row == null) {
-			throw new NotFoundException();
+		if (row == null || row.getRowType() != rowType) {
+			throw new NotFoundException("Row not found or row type mismatch.");
 		}
 		
 		if (!((User) session.getAttribute("user")).getLogin_id().equals(row.getUserId())) {

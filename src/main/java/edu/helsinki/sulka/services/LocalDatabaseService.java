@@ -40,6 +40,10 @@ public class LocalDatabaseService {
 		return localRowRepository.findByRowTypeAndId(rowType, rowId);
 	}
 	
+	public LocalDatabaseRow getRowOfAnyType(long rowId) {
+		return localRowRepository.findOne(rowId);
+	}
+	
 	public UserSettings getSettings(String userId) {
 		UserSettings settings = userSettingsRepository.findOne(userId);
 		if(settings == null){
