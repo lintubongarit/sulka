@@ -1,9 +1,10 @@
-casper.test.begin('Sulka-database tests', 2, function suite(test) {
-	
+casper.test.begin('Sulka-datab ase tests', 3, function suite(test) {
 	
 	browse('/addRingings', function () {
 		
 		var randomSpecies = genRandomString();
+		
+		var numberOfRows = -1;
 		
 		var newRow = -1;
 
@@ -88,15 +89,49 @@ casper.test.begin('Sulka-database tests', 2, function suite(test) {
 	    	
 	    	test.assertNotEquals(editedRow, -1,
 	    	"sulka.core.onCellChange edits row in sulka-DB");
+
+		}).then(function () {	  //DELETE TEST FOR SINGLE ROW BEGINS
+	    	var rowToDelete = {};
+	    	
+	    	casper.evaluate(function(){
+	    	
+	        
+	    		numberOfRows =sulka.grid.getData().getLength();
+	    		
+	    		rowToDelete = sulka.grid.getDataItem(numberOfRows-1);
+
+				
+				var toBeDeleted = [];
+				
+				toBeDeleted.push(rowToDelete.databaseId);
+				
+		        sulka.helpers.unsetErrorAndShowLoader();
+				sulka.API.deleteSulkaDBRows(
+					toBeDeleted,
+					sulka.helpers.hideLoaderAndUnsetError,
+					sulka.helpers.hideLoaderAndSetError
+				);
+				
+	    	});
+	    	
+		}).then(function() {
+			this.reload(function() {
+	        });
+	    }).waitWhileVisible("#loader-animation"
+	    ).then(function () {
+	    		    	
+	    	var slickDataLength = casper.evaluate(function () {
+				return sulka.grid.getData().getLength();
+	        });
+	    	    	
+	    	test.assertNotEquals(slickDataLength, numberOfRows,
+	    	"sulka.API.deleteSulkaDBRows deletes last row.");
 		});
-		
 	});
 	
 	casper.run(function () {
 		test.done();
 	});
-	
-	
 });
 
 
