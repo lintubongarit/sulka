@@ -355,8 +355,6 @@ sulka = {
 		sulka.freeze.invalidate();
 	},
 	
-	
-	
 	onBeforeMoveRows: function(e,data) {
 		sulka.moveRowsPlugin.onBeforeMoveRows.subscribe(function (e, data) {
 			    for (var i = 0; i < data.rows.length; i++) {
@@ -369,7 +367,6 @@ sulka = {
 			    return true;
 		});
 	},
-	
 	
 	onMoveRows: function(e,args){
 		sulka.moveRowsPlugin.onMoveRows.subscribe(function (e, args) {
@@ -410,7 +407,6 @@ sulka = {
 		
 	},
 	
-	
 	onDragInit: function(e,dd){
 		sulka.grid.onDragInit.subscribe(function (e, dd) {
 		    // prevent the grid from cancelling drag'n'drop by default
@@ -418,8 +414,6 @@ sulka = {
 		  });
 		
 	},
-	
-	
 	
 	onDragStart: function(e,dd){
 		sulka.grid.onDragStart.subscribe(function (e, dd) {
