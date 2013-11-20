@@ -715,14 +715,12 @@ sulka = {
 		
 		if (selectedRows.length == 0) return;
 		
-
 		for (var i = 0; i < selectedRows.length; i++){		
-			data[selectedRows[i]]["lon"] = sulka.lastInputCoordinateLon;
-			data[selectedRows[i]]["lat"] = sulka.lastInputCoordinateLat;
+			data[selectedRows[i]].lon = sulka.lastInputCoordinateLon;
+			data[selectedRows[i]].lat = sulka.lastInputCoordinateLat;
 			sulka.addToSulkaDB(selectedRows[i]);
 		}
 	
-		
         sulka.grid.invalidateRow(data.length);
         sulka.setData(data);
         sulka.grid.updateRowCount();
