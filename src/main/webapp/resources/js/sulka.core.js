@@ -453,8 +453,12 @@ sulka = {
 		          background: "#e0e0e0",
 		          border: "1px solid gray",
 		          "z-index": 99999,
+		          "border-radius": "8px",
+		          "box-shadow": "2px 2px 6px silver",
 		          "-moz-border-radius": "8px",
-		          "-moz-box-shadow": "2px 2px 6px silver"
+		          "-moz-box-shadow": "2px 2px 6px silver",
+		          "-webkit-border-radius": "8px",
+		          "-webkit-box-shadow": "2px 2px 6px silver"
 		        })
 		        .text("Drag to Recycle Bin to delete " + dd.count + " selected row(s)")
 		        .appendTo("body");
