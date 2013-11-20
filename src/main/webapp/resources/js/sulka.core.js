@@ -650,17 +650,18 @@ sulka = {
 			
 			if (combineCalls < N_CALLS) return;
 			
+			sulka.setData(combinedRows);
+			if (combinedRows.length > 0) {
+				sulka.adjustFlexibleCols(combinedRows);
+			}
+			
+			sulka.grid.render();
+			
 			if (combinedRows.length == 0) {
 				sulka.helpers.hideLoaderAndSetError(sulka.strings.noResults);
 			} else {
 				sulka.helpers.hideLoaderAndUnsetError();
 			}
-			
-			sulka.setData(combinedRows);
-			if (combinedRows.length > 0) {
-				sulka.adjustFlexibleCols(combinedRows);
-			}
-			sulka.grid.render();
 		};
 		
 		sulka.API.fetchRows(
@@ -702,8 +703,6 @@ sulka = {
 	 * Sets coordinates to selected rows, this function is called from the Colorbox
 	 */
 	setCoordinateToRows: function(){
-	
-		console.log("toimii");
 		/*
 		 * SlickGrid Coordinate Columns
 		 * 
