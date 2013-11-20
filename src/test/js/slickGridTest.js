@@ -44,11 +44,11 @@ casper.test.begin('SlickGrid tests', 13, function suite(test) {
 			
 		}).then(function () {
 			// Fill form
-			oldData = get("sulka.grid.getData()");
+			oldData = get("sulka.getData()");
 			this.fill('form[id="filters"]', { municipality: 'VANTAA', }, true);
 		}).waitWhileVisible("#loader-animation"
 		).then(function () {
-			var newData = get("sulka.grid.getData()");
+			var newData = get("sulka.getData()");
 			test.assertNotEquals(oldData, newData, "SlickGrid has been updated.");
 			oldData = newData;
 			
@@ -56,7 +56,7 @@ casper.test.begin('SlickGrid tests', 13, function suite(test) {
 			this.fill('form[id="filters"]', { municipality: 'Hauho', species: 'BUBBUB'}, true);
 		}).waitWhileVisible("#loader-animation")
 		.then(function () {
-			var newData = get("sulka.grid.getData()");
+			var newData = get("sulka.getData()");
 			test.assertNotEquals(oldData, newData, "SlickGrid has been updated.");
 			oldData = newData;
 			
@@ -64,7 +64,7 @@ casper.test.begin('SlickGrid tests', 13, function suite(test) {
 			this.fill('form[id="filters"]', { municipality: 'Hauho', date: '2001'}, true);
 		}).waitWhileVisible("#loader-animation")
 		.then(function () {
-			var newData = get("sulka.grid.getData()");
+			var newData = get("sulka.getData()");
 			test.assertNotEquals(oldData, newData, "SlickGrid has been updated.");
 			oldData = newData;
 			

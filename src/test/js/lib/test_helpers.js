@@ -2,6 +2,12 @@ const JQUERY_VERSION = '2.0.3';
 const LOCALE = 'fi_FI';
 const TEST_SESSION_CODE = "b0d2cc8b16fc2de6bfbee049f2c62415cdb088ab1983eeafdbc3010f0024bc33";
 
+// Make the window a bit larger to better fit rows
+casper.options.viewportSize = {
+	width: 1024,
+	height: 768
+};
+
 /**
  * Create login session, browse to path in tested deployment, inject jQuery and execute testCb when done. 
  * @param path Web page path to test
