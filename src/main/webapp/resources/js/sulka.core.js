@@ -355,8 +355,6 @@ sulka = {
 		sulka.freeze.invalidate();
 	},
 	
-	
-	
 	onBeforeMoveRows: function(e,data) {
 		sulka.moveRowsPlugin.onBeforeMoveRows.subscribe(function (e, data) {
 			    for (var i = 0; i < data.rows.length; i++) {
@@ -369,7 +367,6 @@ sulka = {
 			    return true;
 		});
 	},
-	
 	
 	onMoveRows: function(e,args){
 		sulka.moveRowsPlugin.onMoveRows.subscribe(function (e, args) {
@@ -410,7 +407,6 @@ sulka = {
 		
 	},
 	
-	
 	onDragInit: function(e,dd){
 		sulka.grid.onDragInit.subscribe(function (e, dd) {
 		    // prevent the grid from cancelling drag'n'drop by default
@@ -418,8 +414,6 @@ sulka = {
 		  });
 		
 	},
-	
-	
 	
 	onDragStart: function(e,dd){
 		sulka.grid.onDragStart.subscribe(function (e, dd) {
@@ -459,8 +453,12 @@ sulka = {
 		          background: "#e0e0e0",
 		          border: "1px solid gray",
 		          "z-index": 99999,
+		          "border-radius": "8px",
+		          "box-shadow": "2px 2px 6px silver",
 		          "-moz-border-radius": "8px",
-		          "-moz-box-shadow": "2px 2px 6px silver"
+		          "-moz-box-shadow": "2px 2px 6px silver",
+		          "-webkit-border-radius": "8px",
+		          "-webkit-box-shadow": "2px 2px 6px silver"
 		        })
 		        .text("Drag to Recycle Bin to delete " + dd.count + " selected row(s)")
 		        .appendTo("body");
@@ -493,32 +491,6 @@ sulka = {
 		      $(dd.available).css("background", "beige");
 		    });
 	},
-	
-	/*onPasteCells: function(event, args){
-		  sulka.copyManager.onPasteCells.subscribe(function (e, args) {
-	      if (args.from.length !== 1 || args.to.length !== 1) {
-	        throw "This implementation only supports single range copy and paste operations";
-	      }
-	      
-	      
-	      var data = sulka.getData();
-	      
-	      var columns = sulka.grid.getColumns();
-	      var from = args.from[0];
-	      var to = args.to[0];
-	      var val;
-	      for (var i = 0; i <= from.toRow - from.fromRow; i++) {
-	        for (var j = 0; j <= from.toCell - from.fromCell; j++) {
-	          if (i <= to.toRow - to.fromRow && j <= to.toCell - to.fromCell) {
-	            val = data[from.fromRow + i][columns[from.fromCell + j].field];
-	            data[to.fromRow + i][columns[to.fromCell + j].field] = val;
-	            sulka.grid.invalidateRow(to.fromRow + i);
-	          }
-	        }
-	      }
-	      sulka.grid.render();
-	    });
-	},*/
 	
 	CONTEXT_HEIGHT_ADJUST: 6,
 	/**
@@ -650,17 +622,18 @@ sulka = {
 			
 			if (combineCalls < N_CALLS) return;
 			
+			sulka.setData(combinedRows);
+			if (combinedRows.length > 0) {
+				sulka.adjustFlexibleCols(combinedRows);
+			}
+			
+			sulka.grid.render();
+			
 			if (combinedRows.length == 0) {
 				sulka.helpers.hideLoaderAndSetError(sulka.strings.noResults);
 			} else {
 				sulka.helpers.hideLoaderAndUnsetError();
 			}
-			
-			sulka.setData(combinedRows);
-			if (combinedRows.length > 0) {
-				sulka.adjustFlexibleCols(combinedRows);
-			}
-			sulka.grid.render();
 		};
 		
 		sulka.API.fetchRows(
@@ -702,8 +675,6 @@ sulka = {
 	 * Sets coordinates to selected rows, this function is called from the Colorbox
 	 */
 	setCoordinateToRows: function(){
-	
-		console.log("toimii");
 		/*
 		 * SlickGrid Coordinate Columns
 		 * 
@@ -716,14 +687,12 @@ sulka = {
 		
 		if (selectedRows.length == 0) return;
 		
-
 		for (var i = 0; i < selectedRows.length; i++){		
-			data[selectedRows[i]]["lon"] = sulka.lastInputCoordinateLon;
-			data[selectedRows[i]]["lat"] = sulka.lastInputCoordinateLat;
+			data[selectedRows[i]].lon = sulka.lastInputCoordinateLon;
+			data[selectedRows[i]].lat = sulka.lastInputCoordinateLat;
 			sulka.addToSulkaDB(selectedRows[i]);
 		}
 	
-		
         sulka.grid.invalidateRow(data.length);
         sulka.setData(data);
         sulka.grid.updateRowCount();
@@ -1053,4 +1022,3 @@ return sulka; }();
 
 /* Launch sulka.init() on DOM complete */
 $(sulka.init);
-
