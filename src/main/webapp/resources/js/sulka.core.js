@@ -192,6 +192,7 @@ sulka = {
 			sulka.grid.registerPlugin(sulka.moveRowsPlugin);
 			
 			//Row move, drag & drop features
+			sulka.grid.onKeyDown.subscribe(sulka.onKeyDown);
 			sulka.moveRowsPlugin.onBeforeMoveRows.subscribe(sulka.onBeforeMoveRows); 	  
 			sulka.moveRowsPlugin.onMoveRows.subscribe(sulka.onMoveRows);
 			sulka.grid.onDragInit.subscribe(sulka.grid.onDragInit);
@@ -413,6 +414,21 @@ sulka = {
 		    e.stopImmediatePropagation();
 		  });
 		
+	},
+	
+	
+	onKeyDown: function(e){
+		  if (e.which == 13) {
+			  if (sulka.gridOptions.editable){
+				  if (sulka.grid.activeRow === sulka.grid.getDataLength()) {
+					  sulka.grid.navigateRight();
+	                } else {
+	                	
+	                	
+	                	sulka.grid.navigateRight();
+	                }
+			  }
+		  }
 	},
 	
 	onDragStart: function(e,dd){
@@ -870,7 +886,7 @@ sulka = {
 	addToSulkaDB: function (index) {
 		var data = sulka.getData();
 		var actualRowData = data[index];
-		console.log(data);
+
 	    if (!actualRowData) return;
 	    var rowStatus = actualRowData.rowStatus;
 	    
