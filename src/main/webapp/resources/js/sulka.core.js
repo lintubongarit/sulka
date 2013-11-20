@@ -494,32 +494,6 @@ sulka = {
 		    });
 	},
 	
-	/*onPasteCells: function(event, args){
-		  sulka.copyManager.onPasteCells.subscribe(function (e, args) {
-	      if (args.from.length !== 1 || args.to.length !== 1) {
-	        throw "This implementation only supports single range copy and paste operations";
-	      }
-	      
-	      
-	      var data = sulka.getData();
-	      
-	      var columns = sulka.grid.getColumns();
-	      var from = args.from[0];
-	      var to = args.to[0];
-	      var val;
-	      for (var i = 0; i <= from.toRow - from.fromRow; i++) {
-	        for (var j = 0; j <= from.toCell - from.fromCell; j++) {
-	          if (i <= to.toRow - to.fromRow && j <= to.toCell - to.fromCell) {
-	            val = data[from.fromRow + i][columns[from.fromCell + j].field];
-	            data[to.fromRow + i][columns[to.fromCell + j].field] = val;
-	            sulka.grid.invalidateRow(to.fromRow + i);
-	          }
-	        }
-	      }
-	      sulka.grid.render();
-	    });
-	},*/
-	
 	CONTEXT_HEIGHT_ADJUST: 6,
 	/**
 	 * Called by SlickGrid to show context menu on headers. 
