@@ -1018,4 +1018,3 @@ return sulka; }();
 
 /* Launch sulka.init() on DOM complete */
 $(sulka.init);
-
