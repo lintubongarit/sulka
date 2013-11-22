@@ -59,6 +59,11 @@
 					<button type="button" class="local-toolbar-menu" value="new row" onclick="sulka.addRow();">Lisää rivi</button>
 				</td>
 				<td>
+				  	<button onclick="sulka.grid.setOptions({autoEdit:true})">Auto-edit ON</button>
+    				<button onclick="sulka.grid.setOptions({autoEdit:false})">Auto-edit OFF</button>
+				</td>
+				<td>
+				
 				    <div id="dropzone" class="recycle-bin">
 				         Roskakori
 				    </div>

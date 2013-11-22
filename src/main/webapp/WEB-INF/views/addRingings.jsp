@@ -65,6 +65,10 @@
 				    <button type="button" id="validate" class="local-toolbar-menu" onclick="sulka.validate();">Validoi</button>
 				</td>
 				<td>
+				  	<button onclick="sulka.grid.setOptions({autoEdit:true})">Auto-edit ON</button>
+    				<button onclick="sulka.grid.setOptions({autoEdit:false})">Auto-edit OFF</button>
+				</td>
+				<td>
 					<div id="dropzone" class="recycle-bin">
 					     Roskakori
 					</div>

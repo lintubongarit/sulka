@@ -463,14 +463,12 @@ sulka = {
 	 * Contains onKeyDown events. Here you can map custom events to different keys by their ASCII code.
 	 */
 	onKeyDown: function(e){
-		
-		//Enter key bindings
+		//Enter key binding
 		  if (e.which == 13) {
 			  if (sulka.gridOptions.editable){
 				  if (sulka.grid.activeRow === sulka.grid.getDataLength()) {
 					  sulka.grid.navigateRight();
 	                } else {
-	                	
 	                	sulka.grid.navigateRight();
 	                }
 			  }
@@ -956,6 +954,7 @@ sulka = {
 	onCellChange: function(event, args){
 		sulka.colourErrors(sulka.getData());
 		sulka.addToSulkaDB(args.row);
+		
 	},
 	
 	/**
