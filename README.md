@@ -24,3 +24,13 @@ version 1.9 of [PhantomJS](http://phantomjs.org/) in PATH. Also, they obviously 
 the localhost (or in the URL specified as the second argument to the test runner at
 ```src/test/js/run-casperjs-tests.sh```. The first argument can be used to specify an alternate location for CasperJS 
 and PhantomJS.)
+
+Created by
+----------
+
+Heikki Kalliokoski  
+Heikki Holopainen  
+Ville Sinisalo  
+Olli Raitio  
+Henriikka Palva
+
