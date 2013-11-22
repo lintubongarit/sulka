@@ -197,6 +197,7 @@ sulka = {
 			
 			//Row move, drag & drop features
 			sulka.grid.onKeyDown.subscribe(sulka.onKeyDown);
+			sulka.grid.onBeforeEditCell.subscribe(sulka.onBeforeEditCell);
 			sulka.moveRowsPlugin.onBeforeMoveRows.subscribe(sulka.onBeforeMoveRows); 	  
 			sulka.moveRowsPlugin.onMoveRows.subscribe(sulka.onMoveRows);
 			sulka.grid.onDragInit.subscribe(sulka.grid.onDragInit);
@@ -312,9 +313,6 @@ sulka = {
 		sulka.reloadData();
 	},
 	
-	
-	
-	
 	/**
 	 * InitDrop function is called when drop event is launched.
 	 */
@@ -367,8 +365,6 @@ sulka = {
         sulka.setData(data);
         sulka.grid.invalidate();
         sulka.grid.setSelectedRows([]);
-		
-		
 	},
 	
 	/**
@@ -818,6 +814,23 @@ sulka = {
 	},
 	
 	/**
+	 * OnBeforeEditCell
+	 * 
+	 * If row is not an inputRow, deny editing.
+	 * 
+	 */
+	onBeforeEditCell: function (e,args){
+
+		if (args.item == undefined){
+			return true;
+		}
+		
+		if (args.item.rowStatus != "inputRow"){
+			return false;
+		}	
+	},
+	
+	/**
 	 * Sets coordinates to selected rows, this function is called from the Colorbox
 	 */
 	setCoordinateToRows: function(){
@@ -1122,7 +1135,6 @@ sulka = {
 		);
 	},
 	
-	
 	/**
 	 * SaveSettings function is used to save users current view, which includes:
 	 * 	- Filters
@@ -1165,7 +1177,6 @@ sulka = {
 				sulka.helpers.hideLoaderAndSetError(sulka.strings.settingsSaveFailed);
 			});
 	},
-	
 	
 	/**
 	 * FetchSettings is used to fetch user settings from the Sulka database.
@@ -1228,7 +1239,6 @@ sulka = {
 		});
 		sulka.grid.setCellCssStyles("invalid-cell", cellsToPaint);
 	}
-	
 };
 
 return sulka; }();
