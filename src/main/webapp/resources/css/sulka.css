@@ -187,7 +187,7 @@ span#last-error {
 }
 
 .slick-cell.selected {
-	background-color: rgba(255, 255, 255, 1); /* show selected row background */
+	background-color: rgba(255, 88, 72, 1); /* show selected row background */
 }
 
 
@@ -286,15 +286,18 @@ span#last-error {
 	-webkit-transition: 0.5s background;
 }
 
-/*.slick-row.odd {
-  background: #fafafa;
-}*/
-
-.tipu-row-color {
-	background: #ACE9F8; 
+.tipu-row-color-odd{
+	background: #6194FF; 
 }
-.sulka-row-color {
-	background: #F9D0D0; 
+.tipu-row-color-even{
+	background: #7EE2FF; 
+}
+.sulka-row-color-odd {
+	background: #E85E26; 
+}
+
+.sulka-row-color-even {
+	background: #FFA433; 
 }
 
 .header-freeze-button, .header-unfreeze-button {
