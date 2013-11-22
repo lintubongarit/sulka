@@ -200,6 +200,14 @@ sulka = {
 			sulka.grid.onDrag.subscribe(sulka.onDrag);
 			sulka.grid.onDragEnd.subscribe(sulka.onDragEnd);
 			
+			sulka.grid.onClick.subscribe(function(e, args) {
+				if (sulka.getData()[args.row].$invalid_msg !== undefined) {
+					sulka.helpers.hideLoaderAndSetError(sulka.getData()[args.row].$invalid_msg);
+				} else {
+					sulka.helpers.hideLoaderAndSetError("");
+				}
+			});
+			
 			//Init drop events?
 			sulka.initDrop();
 		}
@@ -275,6 +283,7 @@ sulka = {
 				sulka.helpers.hideLoaderAndSetError
 			);
 	        
+			sulka.colourErrors(sulka.getData());
 	        sulka.setData(data);
 	        sulka.grid.invalidate();
 	        sulka.grid.setSelectedRows([]);
@@ -643,6 +652,7 @@ sulka = {
 				sulka.adjustFlexibleCols(combinedRows);
 			}
 			
+			sulka.colourErrors(sulka.getData());
 			sulka.grid.render();
 			
 			if (combinedRows.length == 0) {
@@ -717,6 +727,8 @@ sulka = {
 	
 	METADATA_SULKA_RECOVERY: {"cssClasses" : "sulka-row recovery-row" },
 	METADATA_SULKA_RINGING: {"cssClasses" : "sulka-row ringing-row" },
+	METADATA_SULKA_RINGING_VALID : {"cssClasses" : "sulka-row ringing-row-color sulka-valid-row"},
+	METADATA_SULKA_RINGING_INVALID : {"cssClasses" : "sulka-row ringing-row-color sulka-invalid-row"},
 	METADATA_TIPU_RECOVERY: { "cssClasses": "tipu-row recovery-row" },
 	METADATA_TIPU_RINGING: { "cssClasses": "tipu-row ringing-row" },
 	METADATA_EMPTY: { },
@@ -727,6 +739,8 @@ sulka = {
 	createNewDataView: function (data) {
 		var METADATA_SULKA_RECOVERY = sulka.METADATA_SULKA_RECOVERY,
 			METADATA_SULKA_RINGING = sulka.METADATA_SULKA_RINGING,
+			METADATA_SULKA_RINGING_VALID = sulka.METADATA_SULKA_RINGING_VALID,
+			METADATA_SULKA_RINGING_INVALID = sulka.METADATA_SULKA_RINGING_INVALID,
 			METADATA_TIPU_RECOVERY = sulka.METADATA_TIPU_RECOVERY,
 			METADATA_TIPU_RINGING = sulka.METADATA_TIPU_RINGING,
 			METADATA_EMPTY = sulka.METADATA_EMPTY,
@@ -745,8 +759,16 @@ sulka = {
 				}
 				var row = data[index];
 				if (row.hasOwnProperty("databaseId")) {
-					if (row.type == RINGING_TYPE) {
-						return METADATA_SULKA_RINGING;
+					if (sulka.rowsMode == "ringings") {
+						if (row.$valid === false) {
+							// console.log('errors');
+							// console.log(JSON.parse(row.$errors));
+							return METADATA_SULKA_RINGING_INVALID;
+						} else if (row.$valid === true) {
+							return METADATA_SULKA_RINGING_VALID;
+						} else {
+							return METADATA_SULKA_RINGING;
+						}
 					} else {
 						return METADATA_SULKA_RECOVERY;
 					}
@@ -877,6 +899,7 @@ sulka = {
 	 * uses addToSulkaDB() to add row to sulka-database
 	 */
 	onCellChange: function(event, args){
+		sulka.colourErrors(sulka.getData());
 		sulka.addToSulkaDB(args.row);
 	},
 	
@@ -887,32 +910,65 @@ sulka = {
 		var data = sulka.getData();
 		var actualRowData = data[index];
 
-	    if (!actualRowData) return;
-	    var rowStatus = actualRowData.rowStatus;
-	    
-	    if (rowStatus == "inputRow"){
-	    	var localDbRow = {};
-	    	if (actualRowData.hasOwnProperty("databaseId")){
-	    		localDbRow.id = actualRowData.databaseId;
-	    		localDbRow.userId = actualRowData.userId;
-	    	}
-	    	localDbRow.row = JSON.stringify(actualRowData);
-	    	
-	    	sulka.helpers.unsetErrorAndShowLoader();
-	    	sulka.API.addRow(
-	    		localDbRow,
-    			function (row) {
-    				sulka.helpers.hideLoaderAndUnsetError();
-    				actualRowData.databaseId = row.id;
-    				actualRowData.userId = row.userId;
-					sulka.grid.invalidate();
-					sulka.grid.render();
-    			},
-    			function () {
-    				sulka.helpers.hideLoaderAndSetError(sulka.strings.couldNotInsert);
-    			}
-	    	);
-	    }
+		if (!actualRowData)
+			return;
+		var rowStatus = actualRowData.rowStatus;
+
+		if (rowStatus == "inputRow") {
+			var localDbRow = {};
+			if (actualRowData.hasOwnProperty("databaseId")) {
+				localDbRow.id = actualRowData.databaseId;
+				localDbRow.userId = actualRowData.userId;
+			}
+			localDbRow.row = JSON.stringify(actualRowData);
+
+			var errorString;
+
+			sulka.helpers.unsetErrorAndShowLoader();
+			sulka.API.validate(
+				actualRowData,
+				function(data) {
+					actualRowData.$valid = data.passes;
+					if (data.passes) {
+						actualRowData.$invalid_msg = undefined;
+						actualRowData.$errors = undefined;
+					} else {
+						actualRowData.$errors = [];
+						errorString = sulka.strings.invalidRow + ": ";
+						for ( var errorField in data.errors)
+							if (data.errors.hasOwnProperty(errorField)) {
+								var errorArray = data.errors[errorField];
+								errorString = errorString.concat('(' + errorField + ': ' + errorArray[0].errorName + '), ');
+								actualRowData.$errors.push(errorField);
+							}
+						actualRowData.$errors = JSON.stringify(actualRowData.$errors);
+						actualRowData.$invalid_msg = errorString;
+					}
+					var localDbRow = {};
+					if (actualRowData.hasOwnProperty("databaseId")) {
+						localDbRow.id = actualRowData.databaseId;
+						localDbRow.userId = actualRowData.userId;
+					}
+					localDbRow.row = JSON.stringify(actualRowData);
+					sulka.API.addRow(
+						localDbRow,
+						function(row) {
+							actualRowData.databaseId = row.id;
+							actualRowData.userId = row.userId;
+							JSON.stringify(actualRowData.errors);
+							sulka.colourErrors(sulka.getData());
+							sulka.grid.invalidate();
+							sulka.grid.render();
+							sulka.helpers.hideLoaderAndUnsetError();
+						},
+						function() {
+							sulka.helpers.hideLoaderAndSetError(sulka.strings.couldNotInsert);
+						});	
+				}, function() {
+					sulka.helpers.hideLoaderAndSetError;
+				}
+			);
+		}
 	},
 	
 	/**
@@ -1029,9 +1085,33 @@ sulka = {
 			}, function onError(){
 				sulka.helpers.hideLoaderAndSetError(sulka.strings.settingsReceivedFailed);
 			});
+	},
+	
+	/*
+	 * Adds sulka-invalid-cell-color css class to cells that have been tagged invalid by validate().
+	 */
+	colourErrors: function(rows) {
+		var cellsToPaint = {};
+		rows.forEach(function(row, index) {
+			if (row.$errors !== undefined) {
+				var errors = JSON.parse(row.$errors);
+				errors.forEach(function(error) {
+					if (cellsToPaint[index] === undefined){
+						cellsToPaint[index] = {};
+					}
+					sulka.grid.getColumns().forEach(function(column){
+						if (column.field == error){
+							cellsToPaint[index][column.id] = "sulka-invalid-cell";
+						}
+					});
+				});
+			}
+		});
+		sulka.grid.setCellCssStyles("invalid-cell", cellsToPaint);
 	}
 	
 };
+
 
 
 return sulka; }();
