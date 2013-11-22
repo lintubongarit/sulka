@@ -371,7 +371,7 @@ sulka = {
 	},
 	
 	/**
-	 * Sort grid by cols.
+	 * Sort grid by columns.
 	 */
 	sort: function (args) {
 		var data = sulka.getData();
