@@ -168,9 +168,12 @@ sulka = {
 				sulka.initGrid();
 			},
 			sulka.helpers.hideLoaderAndSetError
-		); 
+		);
 	},
-	  
+	
+	previousActiveRow: undefined,
+	previousActiveRowEdited: false,
+	
 	/**
 	 * Init grid. Called once at start after columns have been fetched.
 	 */
@@ -201,12 +204,74 @@ sulka = {
 			sulka.grid.onDrag.subscribe(sulka.onDrag);
 			sulka.grid.onDragEnd.subscribe(sulka.onDragEnd);
 			
-			sulka.grid.onClick.subscribe(function(e, args) {
-				if (sulka.getData()[args.row].$invalid_msg !== undefined) {
-					sulka.helpers.hideLoaderAndSetError(sulka.getData()[args.row].$invalid_msg);
-				} else {
-					sulka.helpers.hideLoaderAndSetError("");
+			sulka.grid.onClick.subscribe(sulka.onClick);
+			
+			sulka.grid.onActiveCellChanged.subscribe(function () {
+				if (sulka.previousActiveRow !== undefined
+						&& sulka.grid.getSelectedRows()[0] !== sulka.previousActiveRow
+						&& sulka.previousActiveRowEdited ){
+					
+					var data = sulka.getData();
+					var actualRowData = data[sulka.previousActiveRow];
+
+					if (!actualRowData)
+						return;
+					
+					sulka.previousActiveRow = sulka.grid.getSelectedRows()[0];
+					
+					sulka.helpers.unsetErrorAndShowLoader();
+					sulka.API.validate(
+						actualRowData,
+						function(data) {
+							sulka.previousActiveRowEdited = false;
+							
+							actualRowData.$valid = data.passes;
+							if (data.passes) {
+								actualRowData.$invalid_msg = undefined;
+								actualRowData.$errors = undefined;
+							} else {
+								actualRowData.$errors = [];
+								errorString = sulka.strings.invalidRow + ": ";
+								for ( var errorField in data.errors)
+									if (data.errors.hasOwnProperty(errorField)) {
+										var errorArray = data.errors[errorField];
+										errorString = errorString.concat('(' + errorField + ': ' + errorArray[0].errorName + '), ');
+										actualRowData.$errors.push(errorField);
+									}
+								actualRowData.$errors = JSON.stringify(actualRowData.$errors);
+								actualRowData.$invalid_msg = errorString;
+							}
+							
+							var localDbRow = {};
+							if (actualRowData.hasOwnProperty("databaseId")) {
+								localDbRow.id = actualRowData.databaseId;
+								localDbRow.userId = actualRowData.userId;
+							}
+							localDbRow.row = JSON.stringify(actualRowData);
+							sulka.API.addRow(
+								localDbRow,
+								function(row) {
+									actualRowData.databaseId = row.id;
+									actualRowData.userId = row.userId;
+									JSON.stringify(actualRowData.errors);
+									sulka.colourErrors(sulka.getData());
+									sulka.grid.invalidate();
+									sulka.grid.render();
+									sulka.helpers.hideLoaderAndUnsetError();
+								},
+								function() {
+									sulka.helpers.hideLoaderAndSetError(sulka.strings.couldNotInsert);
+								});	
+						}, function() {
+							sulka.helpers.hideLoaderAndSetError;
+						}
+					);
 				}
+				if (sulka.newRowWasAdded){
+					sulka.grid.setSelectedRows([sulka.getData().length - 1]);
+					sulka.newRowWasAdded = false;
+				}
+				sulka.previousActiveRow = sulka.grid.getSelectedRows()[0];
 			});
 			
 			//Init drop events?
@@ -368,6 +433,7 @@ sulka = {
 	onGridSort: function (event, args) {
 		sulka.freeze.removeSortMarkers();
 		sulka.sort(args);
+		sulka.colourErrors(sulka.getData());
 	},
 	
 	/**
@@ -826,8 +892,6 @@ sulka = {
 				if (row.hasOwnProperty("databaseId")) {
 					if (sulka.rowsMode == "ringings") {
 						if (row.$valid === false) {
-							// console.log('errors');
-							// console.log(JSON.parse(row.$errors));
 							return METADATA_SULKA_RINGING_INVALID;
 						} else if (row.$valid === true) {
 							return METADATA_SULKA_RINGING_VALID;
@@ -847,7 +911,6 @@ sulka = {
 			}
 		};
 	},
-	
 	
 	/**
 	 * Adjust flexible columns for new data. 
@@ -939,14 +1002,11 @@ sulka = {
 		var data = sulka.getData();
         var item = args.item;
         item.rowStatus = "inputRow";
-        args.row = data.length;
-        
-        sulka.grid.invalidateRow(data.length);
         data.push(item);
         sulka.setData(data);
-        sulka.grid.updateRowCount();
         sulka.grid.render();
-        sulka.addToSulkaDB(data.length-1);
+        sulka.addToSulkaDB(sulka.getData().length - 1);
+        sulka.newRowWasAdded = true;
 	},
 	
 	/**
@@ -954,8 +1014,22 @@ sulka = {
 	 * uses addToSulkaDB() to add row to sulka-database
 	 */
 	onCellChange: function(event, args){
-		sulka.colourErrors(sulka.getData());
 		sulka.addToSulkaDB(args.row);
+	},
+	
+	/**
+	 * This function is called when slickgrid is clicked.
+	 * If invalid row is clicked, displays it's error msg.
+	 */
+	onClick: function(e, args) {
+		if (args.row === sulka.getData().length)
+			return;
+		sulka.helpers.unsetErrorAndShowLoader();
+		if (sulka.getData()[args.row].$invalid_msg !== undefined) {
+			sulka.helpers.hideLoaderAndSetError(sulka.getData()[args.row].$invalid_msg);
+		} else {
+			sulka.helpers.hideLoaderAndSetError("");
+		}
 	},
 	
 	/**
@@ -975,54 +1049,33 @@ sulka = {
 				localDbRow.id = actualRowData.databaseId;
 				localDbRow.userId = actualRowData.userId;
 			}
+//			actualRowData.$changed = true;
 			localDbRow.row = JSON.stringify(actualRowData);
 
-			var errorString;
-
+			
+			var localDbRow = {};
+			if (actualRowData.hasOwnProperty("databaseId")) {
+				localDbRow.id = actualRowData.databaseId;
+				localDbRow.userId = actualRowData.userId;
+			}
+			localDbRow.row = JSON.stringify(actualRowData);
 			sulka.helpers.unsetErrorAndShowLoader();
-			sulka.API.validate(
-				actualRowData,
-				function(data) {
-					actualRowData.$valid = data.passes;
-					if (data.passes) {
-						actualRowData.$invalid_msg = undefined;
-						actualRowData.$errors = undefined;
-					} else {
-						actualRowData.$errors = [];
-						errorString = sulka.strings.invalidRow + ": ";
-						for ( var errorField in data.errors)
-							if (data.errors.hasOwnProperty(errorField)) {
-								var errorArray = data.errors[errorField];
-								errorString = errorString.concat('(' + errorField + ': ' + errorArray[0].errorName + '), ');
-								actualRowData.$errors.push(errorField);
-							}
-						actualRowData.$errors = JSON.stringify(actualRowData.$errors);
-						actualRowData.$invalid_msg = errorString;
-					}
-					var localDbRow = {};
-					if (actualRowData.hasOwnProperty("databaseId")) {
-						localDbRow.id = actualRowData.databaseId;
-						localDbRow.userId = actualRowData.userId;
-					}
-					localDbRow.row = JSON.stringify(actualRowData);
-					sulka.API.addRow(
-						localDbRow,
-						function(row) {
-							actualRowData.databaseId = row.id;
-							actualRowData.userId = row.userId;
-							JSON.stringify(actualRowData.errors);
-							sulka.colourErrors(sulka.getData());
-							sulka.grid.invalidate();
-							sulka.grid.render();
-							sulka.helpers.hideLoaderAndUnsetError();
-						},
-						function() {
-							sulka.helpers.hideLoaderAndSetError(sulka.strings.couldNotInsert);
-						});	
-				}, function() {
-					sulka.helpers.hideLoaderAndSetError;
+			sulka.API.addRow(
+				localDbRow,
+				function(row) {
+					sulka.previousActiveRowEdited = true;	
+					actualRowData.databaseId = row.id;
+					actualRowData.userId = row.userId;
+					JSON.stringify(actualRowData.errors);
+					sulka.colourErrors(sulka.getData());
+					sulka.grid.invalidate();
+					sulka.grid.render();
+					sulka.helpers.hideLoaderAndUnsetError();
+				},
+				function() {
+					sulka.helpers.hideLoaderAndSetError(sulka.strings.couldNotInsert);
 				}
-			);
+			);	
 		}
 	},
 	
