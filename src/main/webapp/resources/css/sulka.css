@@ -290,14 +290,14 @@ span#last-error {
   background: #fafafa;
 }*/
 
-.recovery-row .rowtype-column, .ringing-row .rowtype-column {
+.recovery-row .sulka-column-type, .ringing-row .sulka-column-type {
 	background-repeat: no-repeat;
 	background-position: center;
 }
-.recovery-row .rowtype-column {
+.recovery-row .sulka-column-type {
 	background-image: url('../img/recovery.png');
 }
-.ringing-row .rowtype-column {
+.ringing-row .sulka-column-type {
 	background-image: url('../img/ringing.png');
 }
 
@@ -319,6 +319,10 @@ span#last-error {
 
 .sulka-invalid-cell {
 	background: #f49696; 
+}
+
+.sulka-invalid-cell.selected {
+	background: #f87070; 
 }
 
 .header-freeze-button, .header-unfreeze-button {

@@ -137,13 +137,13 @@ sulka = {
 							$sulkaFlexible: isFlexible,
 							editor: Slick.Editors.Text,
 							$sulkaFlexible: isFlexible,
+							cssClass: "sulka-column-" + field.field,
 						}, sulka.columnOptions);
 						
 						if (field.field == "type") {
 							column.$sulkaFlexible = false;
 							column.formatter = function () { return ""; };
 							column.width  = sulka.COL_TYPE_IMAGE_WIDTH + sulka.COL_PADDING;
-							column.cssClass = "rowtype-column";
 						}
 						
 						columns.push(column);
