@@ -9,7 +9,7 @@ sulka = {
 	grid: null,
 	
 	/**
-	 * Slick grid options.
+	 * Slick grid options that are used to initialize the grid.
 	 */
 	gridOptions: {
 		enableCellNavigation: true,
@@ -78,6 +78,7 @@ sulka = {
 	COL_PADDING: 20,
 	COL_MAX_WIDTH: 200,
 	COL_TYPE_IMAGE_WIDTH: 19,
+	
 	/**
 	 * Called at start to get columns. Calls initGrid() when done. 
 	 */
@@ -248,6 +249,10 @@ sulka = {
 	
 	
 	
+	
+	/**
+	 * InitDrop function is called when drop event is launched.
+	 */
 	initDrop: function(){
 		 $.drop({mode: "mouse"});
 		 $("#dropzone").bind("dropstart", function (e, dd) {
@@ -264,30 +269,41 @@ sulka = {
 	    	if (dd.mode != "recycle") {
 	    		return;
 	        }
-	        var data = sulka.getData();
-	        
-	        var rowsToDelete = dd.rows.sort(sulka.helpers.numericReverseSort);
-	        var toBeDeleted = [];
-	        for (var i=0; i<rowsToDelete.length; i++) {
-	        	var deleteRow = data[rowsToDelete[i]];
-	        	if (deleteRow && deleteRow.rowStatus == "inputRow" && typeof(deleteRow.databaseId) === "number" ) {
-	        		data.splice(rowsToDelete[i], 1);
-		 	    	toBeDeleted.push(deleteRow.databaseId);
-	        	}
-	        }
-	        
-	        sulka.helpers.unsetErrorAndShowLoader();
-			sulka.API.deleteSulkaDBRows(
-				toBeDeleted,
-				sulka.helpers.hideLoaderAndUnsetError,
-				sulka.helpers.hideLoaderAndSetError
-			);
-	        
-			sulka.colourErrors(sulka.getData());
-	        sulka.setData(data);
-	        sulka.grid.invalidate();
-	        sulka.grid.setSelectedRows([]);
+	    	
+	    	//Call delete rows
+	    	sulka.deleteRows(e, dd);
       	});
+	},
+	
+	/**
+	 * Deletes selected rows
+	 */
+	deleteRows: function(e, dd){
+        var data = sulka.getData();
+        
+        var rowsToDelete = dd.rows.sort(sulka.helpers.numericReverseSort);
+        var toBeDeleted = [];
+        for (var i=0; i<rowsToDelete.length; i++) {
+        	var deleteRow = data[rowsToDelete[i]];
+        	if (deleteRow && deleteRow.rowStatus == "inputRow" && typeof(deleteRow.databaseId) === "number" ) {
+        		data.splice(rowsToDelete[i], 1);
+	 	    	toBeDeleted.push(deleteRow.databaseId);
+        	}
+        }
+        
+        sulka.helpers.unsetErrorAndShowLoader();
+		sulka.API.deleteSulkaDBRows(
+			toBeDeleted,
+			sulka.helpers.hideLoaderAndUnsetError,
+			sulka.helpers.hideLoaderAndSetError
+		);
+        
+		sulka.colourErrors(sulka.getData());
+        sulka.setData(data);
+        sulka.grid.invalidate();
+        sulka.grid.setSelectedRows([]);
+		
+		
 	},
 	
 	/**
@@ -312,10 +328,16 @@ sulka = {
 		}, 100);
 	},
 	
-	viewport: null,
 	
+	/**
+	 * Parameters for mouse wheel events
+	 */
+	viewport: null,
 	MOUSE_WHEEL_ROW_HEIGHT: 25,
 	MOUSE_WHEEL_SCROLL_ROWS: 3,
+	
+	
+	
 	/**
 	 * Handle mouse wheel events.
 	 */
@@ -365,6 +387,10 @@ sulka = {
 		sulka.freeze.invalidate();
 	},
 	
+	
+	/**
+	 *  Called before MoveRows
+	 */
 	onBeforeMoveRows: function(e,data) {
 		sulka.moveRowsPlugin.onBeforeMoveRows.subscribe(function (e, data) {
 			    for (var i = 0; i < data.rows.length; i++) {
@@ -378,6 +404,9 @@ sulka = {
 		});
 	},
 	
+	/**
+	 * OnMoveRows events
+	 */
 	onMoveRows: function(e,args){
 		sulka.moveRowsPlugin.onMoveRows.subscribe(function (e, args) {
 		    var extractedRows = [], left, right;
@@ -417,6 +446,10 @@ sulka = {
 		
 	},
 	
+	
+	/**
+	 *	OnDragInit is used to prevent the grid from cancelling drag'n'drop by default 
+	 */
 	onDragInit: function(e,dd){
 		sulka.grid.onDragInit.subscribe(function (e, dd) {
 		    // prevent the grid from cancelling drag'n'drop by default
@@ -426,13 +459,17 @@ sulka = {
 	},
 	
 	
+	/**
+	 * Contains onKeyDown events. Here you can map custom events to different keys by their ASCII code.
+	 */
 	onKeyDown: function(e){
+		
+		//Enter key bindings
 		  if (e.which == 13) {
 			  if (sulka.gridOptions.editable){
 				  if (sulka.grid.activeRow === sulka.grid.getDataLength()) {
 					  sulka.grid.navigateRight();
 	                } else {
-	                	
 	                	
 	                	sulka.grid.navigateRight();
 	                }
@@ -440,6 +477,9 @@ sulka = {
 		  }
 	},
 	
+	/**
+	 * Called when drag event is started
+	 */
 	onDragStart: function(e,dd){
 		sulka.grid.onDragStart.subscribe(function (e, dd) {
 			
@@ -497,6 +537,10 @@ sulka = {
 		
 	},
 	
+	
+	/**
+	 * onDrag events.
+	 */
 	onDrag: function(e,dd){
 		  sulka.grid.onDrag.subscribe(function (e, dd) {
 			    if (dd.mode != "recycle") {
@@ -507,6 +551,9 @@ sulka = {
 	},
 	
 	
+	/**
+	 * onDragEnd: this function is called when dragging rows ends.
+	 */
 	onDragEnd: function(e, dd){
 		sulka.grid.onDragEnd.subscribe(function (e, dd) {
 		    if (dd.mode != "recycle") {
@@ -517,7 +564,12 @@ sulka = {
 		    });
 	},
 	
+	
+	/**
+	 * showColumnHeaderContextMenu parameters
+	 */
 	CONTEXT_HEIGHT_ADJUST: 6,
+	
 	/**
 	 * Called by SlickGrid to show context menu on headers. 
 	 */
@@ -595,7 +647,11 @@ sulka = {
 		sulka.freeze.renderColumnGroups();
 	},
 	
+	/**
+	 * setData parameters.
+	 */
 	currentData: [],
+	
 	/**
 	 * Set grid data and render.
 	 */
@@ -725,6 +781,10 @@ sulka = {
         sulka.grid.render();
 	},
 	
+	
+	/**
+	 * Parameters used while initializing new dataview with createNewDataView.
+	 */
 	METADATA_SULKA_RECOVERY: {"cssClasses" : "sulka-row recovery-row" },
 	METADATA_SULKA_RINGING: {"cssClasses" : "sulka-row ringing-row" },
 	METADATA_SULKA_RINGING_VALID : {"cssClasses" : "sulka-row ringing-row-color sulka-valid-row"},
@@ -736,6 +796,11 @@ sulka = {
 	RINGING_TYPE: "Rengastus",
 	RECOVERY_TYPE: "Tapaaminen",
 	
+	
+	
+	/**
+	 * Creates new DataView for the grid.
+	 */
 	createNewDataView: function (data) {
 		var METADATA_SULKA_RECOVERY = sulka.METADATA_SULKA_RECOVERY,
 			METADATA_SULKA_RINGING = sulka.METADATA_SULKA_RINGING,
@@ -783,16 +848,6 @@ sulka = {
 		};
 	},
 	
-	onAddNewRow: function(event, args){
-		var data = sulka.getData();
-        var item = args.item;
-        //var column = args.column;
-        data.push(item);
-        sulka.setData(data);
-        sulka.grid.invalidateRow(data.length);
-        sulka.grid.updateRowCount();
-        sulka.grid.render();
-	},
 	
 	/**
 	 * Adjust flexible columns for new data. 
@@ -990,7 +1045,7 @@ sulka = {
 	},
 	
 	/**
-	 * validates selected row
+	 * This function validates the selected row.
 	 */
 	validate: function() {
 		var selectedRows = sulka.grid.getSelectedRows();
@@ -1015,6 +1070,14 @@ sulka = {
 		);
 	},
 	
+	
+	/**
+	 * SaveSettings function is used to save users current view, which includes:
+	 * 	- Filters
+	 * 	- Column settings
+	 * 
+	 * to the sulka database.
+	 */
 	saveSettings: function() {
 		sulka.helpers.showLoader();
 		var columnsDataToBeSaved = {};
@@ -1051,6 +1114,10 @@ sulka = {
 			});
 	},
 	
+	
+	/**
+	 * FetchSettings is used to fetch user settings from the Sulka database.
+	 */
 	fetchSettings: function() {
 		sulka.helpers.showLoader();
 		sulka.API.fetchSettings(
@@ -1087,7 +1154,7 @@ sulka = {
 			});
 	},
 	
-	/*
+	/**
 	 * Adds sulka-invalid-cell-color css class to cells that have been tagged invalid by validate().
 	 */
 	colourErrors: function(rows) {
@@ -1111,8 +1178,6 @@ sulka = {
 	}
 	
 };
-
-
 
 return sulka; }();
 
