@@ -211,6 +211,7 @@ sulka = {
 						&& sulka.grid.getSelectedRows()[0] !== sulka.previousActiveRow
 						&& sulka.previousActiveRowEdited ){
 					
+					
 					var data = sulka.getData();
 					var actualRowData = data[sulka.previousActiveRow];
 
@@ -266,10 +267,6 @@ sulka = {
 							sulka.helpers.hideLoaderAndSetError;
 						}
 					);
-				}
-				if (sulka.newRowWasAdded){
-					sulka.grid.setSelectedRows([sulka.getData().length - 1]);
-					sulka.newRowWasAdded = false;
 				}
 				sulka.previousActiveRow = sulka.grid.getSelectedRows()[0];
 			});
@@ -1006,7 +1003,6 @@ sulka = {
         sulka.setData(data);
         sulka.grid.render();
         sulka.addToSulkaDB(sulka.getData().length - 1);
-        sulka.newRowWasAdded = true;
 	},
 	
 	/**
@@ -1036,6 +1032,8 @@ sulka = {
 	 * Adds row to sulka-database
 	 */
 	addToSulkaDB: function (index) {
+		sulka.previousActiveRowEdited = true;	
+		
 		var data = sulka.getData();
 		var actualRowData = data[index];
 
@@ -1049,7 +1047,6 @@ sulka = {
 				localDbRow.id = actualRowData.databaseId;
 				localDbRow.userId = actualRowData.userId;
 			}
-//			actualRowData.$changed = true;
 			localDbRow.row = JSON.stringify(actualRowData);
 
 			
@@ -1063,7 +1060,6 @@ sulka = {
 			sulka.API.addRow(
 				localDbRow,
 				function(row) {
-					sulka.previousActiveRowEdited = true;	
 					actualRowData.databaseId = row.id;
 					actualRowData.userId = row.userId;
 					JSON.stringify(actualRowData.errors);
