@@ -102,6 +102,13 @@ sulka.API = function(API) {
 			});
 		},
 		
+		
+		/**
+		 * 
+		 * @param ids List of row ID's to be deleted
+		 * @param onSuccess Called on success with an array of row objects.
+		 * @param onError If defined, called on failure with the error message, if any.
+		 */
 		deleteSulkaDBRows: function(ids, onSuccess, onError) {
 			var rowsHandled = 0;
 			var errors = [];
@@ -134,6 +141,15 @@ sulka.API = function(API) {
 		},
 		
 		
+		
+		
+		/**
+		 * 
+		 * @param type Either "ringings", "recoveries" or "all". Types of rows to return.
+		 * @param filters Object of filter settings.
+		 * @param onSuccess Called on success with an array of row objects.
+		 * @param onError If defined, called on failure with the error message, if any.
+		 */
 		fetchSulkaDBRows :function(type, filters, onSuccess, onError) {
 			if (type && type.toLowerCase() != "all") {
 				type = "/" + type;
