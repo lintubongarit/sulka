@@ -17,11 +17,10 @@ $(document).ready(function() {
 			function confirmation() {
 				var answer = confirm("" +
 						"Haluatko varmasti kayttaa valitsemaasi koordinaattia?" +
-						"\n" +
-						"Longitude: " + parent.sulka.lastInputCoordinateLon +
-						"\n" +
-						"Latitude: " + parent.sulka.lastInputCoordinateLat);
-				if (answer){
+						"Koordinaatti asetetaan kaikkiin valittuihin soluin." +
+						"Toimintoa ei voida perua.");
+						
+					if (answer){
 					parent.sulka.setCoordinateToRows();
 				}
 				else{
