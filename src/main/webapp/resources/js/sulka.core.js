@@ -190,7 +190,7 @@ sulka = {
 		if (sulka.viewMode == "ringings" || sulka.viewMode == "recoveries"){
 			sulka.moveRowsPlugin = 
 				new Slick.RowMoveManager({   
-					cancelEditOnDrag: true
+					canceltoggleEditDrag: true
 				});
 			
 			sulka.grid.registerPlugin(sulka.moveRowsPlugin);
@@ -456,24 +456,50 @@ sulka = {
 		
 	},
 	
+	/**
+	 * Handled by onkeyDown(). toggleEdit is set true when user start typing. When user presses key that changes active cell, toggleEdit is set false
+	 */
+	toggleEdit: false,
+	
+	/**
+	 * key event enumerations
+	 */
+	keys: {
+		ENTER: 13,
+		TAB: 9,
+		
+		UP: 38,
+		DOWN: 40,
+		LEFT: 37,
+		RIGHT: 39,
+	},
 	
 	/**
 	 * Contains onKeyDown events. Here you can map custom events to different keys by their ASCII code.
+	 * 
 	 */
-	onKeyDown: function(e){
-		//Enter key binding
-		  if (e.which == 13) {
-			  if (sulka.gridOptions.editable){
-				  if (sulka.grid.activeRow === sulka.grid.getDataLength()) {
-					  sulka.grid.navigateRight();
-	                } else {
-	                	sulka.grid.navigateRight();
-	                }
-			  }
-		  }
-		  else{
-			  console.log('painallus: ' + e.which);
-		  }
+	onKeyDown: function(e) {
+		if (sulka.toggleEdit) {
+			if (e.which === sulka.keys.ENTER || e.which === sulka.keys.TAB || e.which === sulka.keys.UP ||
+					e.which === sulka.keys.DOWN) {
+				sulka.toggleEdit = false;
+				sulka.grid.setOptions({
+					editable : false
+				});
+				if (e.which !== sulka.keys.TAB && e.which !== sulka.keys.UP && e.which !== sulka.keys.DOWN){
+					sulka.grid.navigateRight();
+				}
+			}
+		} else {
+			if (e.which !== sulka.keys.UP && e.which !== sulka.keys.DOWN && e.which !== sulka.keys.LEFT
+					&& e.which !== sulka.RIGHT && e.which !== sulka.TAB) {
+				sulka.toggleEdit = true;
+				sulka.grid.setOptions({
+					editable : true
+				});
+				sulka.grid.editActiveCell(Slick.Text);
+			}
+		}
 	},
 	
 	/**
@@ -1122,8 +1148,8 @@ sulka = {
 					actualRowData.userId = row.userId;
 					JSON.stringify(actualRowData.errors);
 					sulka.colouriseCellsWithErrors(sulka.getData());
-					sulka.grid.invalidate();
-					sulka.grid.render();
+//					sulka.grid.invalidate();
+//					sulka.grid.render();
 					sulka.helpers.hideLoaderAndUnsetError();
 				},
 				function() {
