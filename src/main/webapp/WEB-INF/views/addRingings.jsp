@@ -53,7 +53,7 @@
 						Kunta: <input type="text" id="filters-municipality" name="municipality" />
 						<input type="submit" id="form-submit" value="OK" />
 						<input type="reset" id="form-reset" value="Tyhjennä" />
-						<a class='iframe callbacks' href="resources/html/map.html">WKARTTA</a>
+						<a id='mapIFrame' class='iframe callbacks' href="resources/html/map.html">WKARTTA</a>
 						<img src="resources/img/ajax-loader.gif" id="loader-animation" />
 					</form>
 				</td>

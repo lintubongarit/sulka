@@ -9,6 +9,7 @@
 		<link rel="stylesheet" href="resources/css/examples.css" type="text/css" />
 		<link rel="stylesheet" href="resources/css/sulka.css" type="text/css" />
 		<link rel="stylesheet" href="resources/css/lib/slick.dragdrop.css" type="text/css" />
+		<link rel="stylesheet" href="resources/css/lib/colorbox/colorbox.css" type="text/css" />
 		<script src="resources/js/lib/jquery-1.10.2.min.js"></script>
     	<script src="resources/js/lib/jquery-ui-1.10.3.custom.min.js"></script>
    		<script src="resources/js/lib/plugins/jquery.event.drag-2.2.js"></script>
@@ -35,6 +36,8 @@
 		<script src="resources/js/sulka.freeze.js"></script>
 		<script src="resources/js/sulka.addCore.js"></script>
 		<script src="resources/js/sulka.addRecoveries.js"></script>
+		<script src="resources/js/lib/colorbox/jquery.colorbox-min.js"></script>
+		<script src="resources/js/lib/colorbox/colorbox.helpers.js"></script>
 	</head>
 	<body>
 		<%@include file="_header.jsp" %>
@@ -47,6 +50,7 @@
 						Kunta: <input type="text" id="filters-municipality" name="municipality" />
 						<input type="submit" id="form-submit" value="OK" />
 						<input type="reset" id="form-reset" value="Tyhjennä" />
+						<a id='mapIFrame' class='iframe callbacks' href="resources/html/map.html">WKARTTA</a>
 						<img src="resources/img/ajax-loader.gif" id="loader-animation" />
 					</form>
 				</td>
