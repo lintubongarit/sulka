@@ -32,6 +32,25 @@
 		<script src="resources/js/sulka.API.js"></script>
 		<script src="resources/js/sulka.groups.js"></script>
 		<script src="resources/js/sulka.freeze.js"></script>
+		
+		<script> 
+		   function inputLimiter(e,allow) {
+                 var AllowableCharacters = '';
+
+            if (allow == 'date'){AllowableCharacters='1234567890-.';}
+            if (allow == 'Letters'){AllowableCharacters=' ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';}
+            var k = document.all?parseInt(e.keyCode): parseInt(e.which);
+            if (k!=13 && k!=8 && k!=0){
+                if ((e.ctrlKey==false) && (e.altKey==false)) {
+                   return (AllowableCharacters.indexOf(String.fromCharCode(k))!=-1);
+               } else {
+                   return true;
+               }
+            } else {
+                return true;
+           }
+       } </script>
+
 	</head>
 	<body>
 		<%@include file="_header.jsp" %>
@@ -42,9 +61,9 @@
 					    <sec:authorize access="hasRole('ADMIN')">
         				Rengastaja: <input type="text" id="filters-ringer" name="ringer"/>
         				</sec:authorize>
-						Aika (esim. 2005 tai 2005-2006): <input type="text" id="filters-date" name="date" />
-						Laji: <input type="text" id="filters-species" name="species" />
-						Kunta: <input type="text" id="filters-municipality" name="municipality" />
+						Aika (esim. 2005 tai 2005-2006): <input type="text" id="filters-date" onkeypress="return inputLimiter(event,'date')" name="date" />
+						Laji: <input type="text" id="filters-species" onkeypress="return inputLimiter(event,'Letters')" name="species" />
+						Kunta: <input type="text" id="filters-municipality" onkeypress="return inputLimiter(event,'Letters')" name="municipality" />
 						<input type="submit" id="form-submit" value="OK" />
 						<input type="reset" id="form-reset" value="Tyhjennä" />
 						<input type="checkbox" id="filters-ringings" name="ringings" checked/> Rengastukset

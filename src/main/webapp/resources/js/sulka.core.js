@@ -849,6 +849,20 @@ sulka = {
 						return METADATA_TIPU_RECOVERY;
 					}
 				}
+				var item = data[index];
+				if(item.databaseId==null){
+					if(index%2 == 0){
+						return { "cssClasses": "tipu-row-color-even"};
+					}else{
+						return { "cssClasses": "tipu-row-color-odd"};
+					}					
+				}else{					
+					if(index%2 == 0){
+						return {"cssClasses" : "sulka-row-color-even"};
+					}else{
+						return {"cssClasses" : "sulka-row-color-odd"};
+					}
+				}
 			}
 		};
 	},
