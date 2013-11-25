@@ -197,6 +197,7 @@ sulka = {
 			
 			//Row move, drag & drop features
 			sulka.grid.onKeyDown.subscribe(sulka.onKeyDown);
+            sulka.grid.onBeforeEditCell.subscribe(sulka.onBeforeEditCell);
 			sulka.moveRowsPlugin.onBeforeMoveRows.subscribe(sulka.onBeforeMoveRows); 	  
 			sulka.moveRowsPlugin.onMoveRows.subscribe(sulka.onMoveRows);
 			sulka.grid.onDragInit.subscribe(sulka.grid.onDragInit);
@@ -294,7 +295,7 @@ sulka = {
 			sulka.helpers.hideLoaderAndSetError
 		);
         
-		sulka.colourErrors(sulka.getData());
+		sulka.colouriseCellsWithErrors(sulka.getData());
         sulka.setData(data);
         sulka.grid.invalidate();
         sulka.grid.setSelectedRows([]);
@@ -364,7 +365,7 @@ sulka = {
 	onGridSort: function (event, args) {
 		sulka.freeze.removeSortMarkers();
 		sulka.sort(args);
-		sulka.colourErrors(sulka.getData());
+		sulka.colouriseCellsWithErrors(sulka.getData());
 	},
 	
 	/**
@@ -614,6 +615,23 @@ sulka = {
 			$("#header-context-menu").hide();
 		});
 	},
+	    
+    /**
+     * OnBeforeEditCell
+     * 
+     * If row is not an inputRow, deny editing.
+     * 
+     */
+    onBeforeEditCell: function (e,args){
+
+            if (args.item == undefined){
+                    return true;
+            }
+            
+            if (args.item.rowStatus != "inputRow"){
+                    return false;
+            }        
+    },
 	
 	/**
 	 * Called when a context menu item is clicked.
@@ -703,7 +721,7 @@ sulka = {
 				sulka.adjustFlexibleCols(combinedRows);
 			}
 			
-			sulka.colourErrors(sulka.getData());
+			sulka.colouriseCellsWithErrors(sulka.getData());
 			sulka.grid.render();
 			
 			if (combinedRows.length == 0) {
@@ -988,8 +1006,15 @@ sulka = {
 	},
 	
 	/**
-	 * This function is called when activecell is changed.
+	 * This function is called when active cell is changed.
 	 * If active row is changed and previous active row was edited, this function validates previous active row.
+	 * 
+	 * Validation adds these fields to the row:
+	 * 	$valid: true, is row is valid, false if not
+	 * 
+	 *  //these are added only if $valid is false
+	 *  $errors: array which contains fields that are invalid. Example: ["species", "municipalities"]
+	 *  $invalid_msg: error msg to be displayed when invalid row is clicked
 	 */
 	
 	onActiveCellChanged: function () {
@@ -1041,7 +1066,7 @@ sulka = {
 							actualRowData.databaseId = row.id;
 							actualRowData.userId = row.userId;
 							JSON.stringify(actualRowData.errors);
-							sulka.colourErrors(sulka.getData());
+							sulka.colouriseCellsWithErrors(sulka.getData());
 							sulka.grid.invalidate();
 							sulka.grid.render();
 							sulka.helpers.hideLoaderAndUnsetError();
@@ -1092,7 +1117,7 @@ sulka = {
 					actualRowData.databaseId = row.id;
 					actualRowData.userId = row.userId;
 					JSON.stringify(actualRowData.errors);
-					sulka.colourErrors(sulka.getData());
+					sulka.colouriseCellsWithErrors(sulka.getData());
 					sulka.grid.invalidate();
 					sulka.grid.render();
 					sulka.helpers.hideLoaderAndUnsetError();
@@ -1121,33 +1146,6 @@ sulka = {
 			sulka.rowsMode = "all";
 		}
 	},
-	
-	/**
-	 * This function validates the selected row.
-	 */
-	validate: function() {
-		var selectedRows = sulka.grid.getSelectedRows();
-		if (selectedRows.length == 0) return;
-		sulka.helpers.unsetErrorAndShowLoader();
-		var selectedRow = sulka.getData()[selectedRows[0]];
-		sulka.API.validate(
-			selectedRow, 
-			function (data) {
-				if (data.passes){
-					sulka.helpers.hideLoaderAndSetError(sulka.strings.validRow);
-				} else {
-					var errorString = sulka.strings.invalidRow + ": ";
-					for (var errorField in data.errors) if (data.errors.hasOwnProperty(errorField)) {
-						var errorArray = data.errors[errorField];
-						errorString = errorString.concat('(' + errorField + ': ' + errorArray[0].errorName + '), ');
-					}
-					sulka.helpers.hideLoaderAndSetError(errorString);
-				}
-			}, 
-			sulka.helpers.hideLoaderAndSetError
-		);
-	},
-	
 	
 	/**
 	 * SaveSettings function is used to save users current view, which includes:
@@ -1233,26 +1231,26 @@ sulka = {
 	},
 	
 	/**
-	 * Adds sulka-invalid-cell-color css class to cells that have been tagged invalid by validate().
+	 * Adds sulka-invalid-cell css class to cells that have been tagged invalid by validation
 	 */
-	colourErrors: function(rows) {
-		var cellsToPaint = {};
+	colouriseCellsWithErrors: function(rows) {
+		var cellsToColourise = {};
 		rows.forEach(function(row, index) {
 			if (row.$errors !== undefined) {
 				var errors = JSON.parse(row.$errors);
 				errors.forEach(function(error) {
-					if (cellsToPaint[index] === undefined){
-						cellsToPaint[index] = {};
+					if (cellsToColourise[index] === undefined){
+						cellsToColourise[index] = {};
 					}
 					sulka.grid.getColumns().forEach(function(column){
 						if (column.field == error){
-							cellsToPaint[index][column.id] = "sulka-invalid-cell";
+							cellsToColourise[index][column.id] = "sulka-invalid-cell";
 						}
 					});
 				});
 			}
 		});
-		sulka.grid.setCellCssStyles("invalid-cell", cellsToPaint);
+		sulka.grid.setCellCssStyles("invalid-cell", cellsToColourise);
 	}
 	
 };
