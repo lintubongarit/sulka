@@ -46,7 +46,6 @@ sulka.API = function(API) {
 		 * @param onError If defined, called on failure with the error message, if any.
 		 */
 		convertCoordinate: function(lon,lat,onSuccess, onError){
-			
 			$.ajax({
 				url : API.BASE + "/coordinate",
 				type: "GET",
