@@ -482,6 +482,7 @@ sulka = {
 		if (sulka.toggleEdit) {
 			if (e.which === sulka.keys.ENTER || e.which === sulka.keys.TAB || e.which === sulka.keys.UP ||
 					e.which === sulka.keys.DOWN) {
+				console.log('off');
 				sulka.toggleEdit = false;
 				sulka.grid.setOptions({
 					editable : false
@@ -491,8 +492,10 @@ sulka = {
 				}
 			}
 		} else {
+			console.log(e.which);
 			if (e.which !== sulka.keys.UP && e.which !== sulka.keys.DOWN && e.which !== sulka.keys.LEFT
-					&& e.which !== sulka.RIGHT && e.which !== sulka.TAB) {
+					&& e.which !== sulka.keys.RIGHT && e.which !== sulka.keys.TAB) {
+				console.log('on');
 				sulka.toggleEdit = true;
 				sulka.grid.setOptions({
 					editable : true
