@@ -793,6 +793,8 @@ sulka = {
 						if(data[selectedRows[i]].rowStatus == "inputRow"){
 							data[selectedRows[i]].lon = results.lon;
 							data[selectedRows[i]].lat = results.lat;
+							data[selectedRows[i]].coordinateType = "kartta";
+							//data[selectedRows[i]].coordinateAccuracy = "kartta";
 							sulka.addToSulkaDB(selectedRows[i]);
 						}
 					}
