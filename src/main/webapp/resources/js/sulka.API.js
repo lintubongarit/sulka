@@ -35,6 +35,33 @@ sulka.API = function(API) {
 			});
 		},
 
+		
+		
+		/**
+		 * Convert coordinates from WGS84 to YKJ coordinate system.
+		 * 
+		 * @param lon Longitude in WGS84
+		 * @param lat Latitude in WGS84
+		 * @param onSuccess Called on success with an array of field group objects.
+		 * @param onError If defined, called on failure with the error message, if any.
+		 */
+		convertCoordinate: function(lon,lat,onSuccess, onError){
+			
+			$.ajax({
+				url : API.BASE + "/coordinate",
+				type: "GET",
+				data: {lon:lon,lat:lat},
+				dataType: "json",
+				success : function(results) {
+					if (onSuccess) {
+						onSuccess(results.object);
+					}
+				},
+				error: onError
+			});
+		},
+		
+		
 		/**
 		 * Get field groups from the API and call handler with the fetched
 		 * groups when done.
