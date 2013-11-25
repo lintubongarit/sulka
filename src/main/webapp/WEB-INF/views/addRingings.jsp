@@ -61,10 +61,6 @@
 					<button type="button" id="saveSettings" class="local-toolbar-menu" onclick="sulka.saveSettings();">Tallenna asetukset</button>
 					<button type="button" id="loadSettings" class="local-toolbar-menu" onclick="sulka.fetchSettings();">Lataa asetukset</button>
 				</td>
-				<td>
-				    <button type="button" id="validate" class="local-toolbar-menu" onclick="sulka.validate();">Validoi</button>
-				</td>
-				<td>
 				  	<button onclick="sulka.grid.setOptions({autoEdit:true})">Auto-edit ON</button>
     				<button onclick="sulka.grid.setOptions({autoEdit:false})">Auto-edit OFF</button>
 				</td>
