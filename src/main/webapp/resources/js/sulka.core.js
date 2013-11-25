@@ -471,6 +471,9 @@ sulka = {
 	                }
 			  }
 		  }
+		  else{
+			  console.log('painallus: ' + e.which);
+		  }
 	},
 	
 	/**
@@ -781,16 +784,17 @@ sulka = {
 		var data = sulka.getData();
 		
 		if (selectedRows.length == 0) return;
-			sulka.helpers.showLoader();
-			
+			sulka.helpers.unsetErrorAndShowLoader();
 			sulka.API.convertCoordinate(
 				sulka.lastInputCoordinateLon,
 				sulka.lastInputCoordinateLat, 
 				function onSuccess(results){
-					for (var i = 0; i < selectedRows.length; i++){		
-						data[selectedRows[i]].lon = results.lon;
-						data[selectedRows[i]].lat = results.lat;
-						sulka.addToSulkaDB(selectedRows[i]);
+					for (var i = 0; i < selectedRows.length; i++){	
+						if(data[selectedRows[i]].rowStatus == "inputRow"){
+							data[selectedRows[i]].lon = results.lon;
+							data[selectedRows[i]].lat = results.lat;
+							sulka.addToSulkaDB(selectedRows[i]);
+						}
 					}
 					sulka.helpers.hideLoader();
 				},
@@ -1075,7 +1079,7 @@ sulka = {
 							sulka.helpers.hideLoaderAndSetError(sulka.strings.couldNotInsert);
 						});	
 				}, function() {
-					sulka.helpers.hideLoaderAndSetError;
+					sulka.helpers.hideLoaderAndSetError();
 				}
 			);
 		}
