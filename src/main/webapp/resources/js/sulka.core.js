@@ -471,6 +471,9 @@ sulka = {
 	                }
 			  }
 		  }
+		  else{
+			  console.log('painallus: ' + e.which);
+		  }
 	},
 	
 	/**
@@ -1061,7 +1064,7 @@ sulka = {
 							sulka.helpers.hideLoaderAndSetError(sulka.strings.couldNotInsert);
 						});	
 				}, function() {
-					sulka.helpers.hideLoaderAndSetError;
+					sulka.helpers.hideLoaderAndSetError();
 				}
 			);
 		}
