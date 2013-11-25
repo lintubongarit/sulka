@@ -1,4 +1,4 @@
-casper.test.begin('Sulka-datab ase tests', 8, function suite(test) {
+casper.test.begin('Sulka-database tests', 8, function suite(test) {
 	
 	browse('/addRingings', function () {
 		
@@ -8,7 +8,6 @@ casper.test.begin('Sulka-datab ase tests', 8, function suite(test) {
 		
 		var newRow = -1;
 		
-		var TIMEOUT = 200;
 
 		casper.then(function () {
 			
@@ -22,7 +21,8 @@ casper.test.begin('Sulka-datab ase tests', 8, function suite(test) {
 				
 			}, randomSpecies);
 
-		}).then(function() {
+		}).waitWhileVisible("#loader-animation"
+		).then(function() {
 			this.reload(function() {
 	        });
 	    }).waitWhileVisible("#loader-animation"
@@ -122,9 +122,8 @@ casper.test.begin('Sulka-datab ase tests', 8, function suite(test) {
 	    		sulka.onActiveCellChanged();
 	    	}, newRow);
 	    	
-	    	casper.wait(TIMEOUT);
-	    	
-	    }).then(function() {
+	    }).waitWhileVisible("#loader-animation"
+	    ).then(function() {
 			this.reload(function() {
 	        });
 	    }).waitWhileVisible("#loader-animation"
