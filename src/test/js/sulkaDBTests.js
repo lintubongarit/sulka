@@ -8,7 +8,7 @@ casper.test.begin('Sulka-datab ase tests', 8, function suite(test) {
 		
 		var newRow = -1;
 		
-		var sss;
+		var TIMEOUT = 200;
 
 		casper.then(function () {
 			
@@ -47,16 +47,12 @@ casper.test.begin('Sulka-datab ase tests', 8, function suite(test) {
 	    	"sulka.core.onAddNewRow adds new row with wanted data to slickgrid and DB, and sulka.API.fetchSulkaDBRows fetches rows");
 	    	
 	    }).then(function () {
-	    	casper.evaluate(function(newRow){
-	    		return sulka.getData()[newRow];
-	    	}, newRow);
 	    	
 	    	casper.evaluate(function(newRow){
 	    		sulka.previousActiveRow = undefined;
 	    		sulka.grid.setSelectedRows([newRow]);
 	    		sulka.previousActiveRowEdited = false;
 	    		sulka.onActiveCellChanged();
-	    		return sulka.grid.getSelectedRows()[0];
 	    	}, newRow);
 	    	
 	    }).then(function() {
@@ -73,16 +69,12 @@ casper.test.begin('Sulka-datab ase tests', 8, function suite(test) {
 	    	"sulka.onActiveCellChanged() does nothing if sulka.previousActiveRow is undefined");
 	    	
 	    }).then(function () {
-	    	casper.evaluate(function(newRow){
-	    		return sulka.getData()[newRow];
-	    	}, newRow);
 	    	
 	    	casper.evaluate(function(newRow){
 	    		sulka.previousActiveRow = newRow;
 	    		sulka.grid.setSelectedRows([newRow]);
 	    		sulka.previousActiveRowEdited = true;
 	    		sulka.onActiveCellChanged();
-	    		return sulka.grid.getSelectedRows()[0];
 	    	}, newRow);
 	    	
 	    }).then(function() {
@@ -99,16 +91,12 @@ casper.test.begin('Sulka-datab ase tests', 8, function suite(test) {
 	    	"sulka.onActiveCellChanged() does nothing if previous active row is the same row as current active row");
 	    	
 	    }).then(function () {
-	    	casper.evaluate(function(newRow){
-	    		return sulka.getData()[newRow];
-	    	}, newRow);
-	    	
+
 	    	casper.evaluate(function(newRow){
 	    		sulka.previousActiveRow = newRow;
 	    		sulka.grid.setSelectedRows([-1]);
 	    		sulka.previousActiveRowEdited = false;
 	    		sulka.onActiveCellChanged();
-	    		return sulka.grid.getSelectedRows()[0];
 	    	}, newRow);
 	    	
 	    }).then(function() {
@@ -132,8 +120,9 @@ casper.test.begin('Sulka-datab ase tests', 8, function suite(test) {
 	    		sulka.grid.setSelectedRows([-1]);
 	    		sulka.previousActiveRowEdited = true;
 	    		sulka.onActiveCellChanged();
-	    		return sulka.grid.getSelectedRows()[0];
 	    	}, newRow);
+	    	
+	    	casper.wait(TIMEOUT);
 	    	
 	    }).then(function() {
 			this.reload(function() {
@@ -176,9 +165,7 @@ casper.test.begin('Sulka-datab ase tests', 8, function suite(test) {
 				return sulka.getData().length;
 			});
 			
-			
-	    	
-	    	var a = casper.evaluate(function (newRow) {
+	    	casper.evaluate(function (newRow) {
 	    		
 				var toBeDeleted = [];
 				toBeDeleted.push(sulka.getData()[newRow].databaseId);
@@ -215,8 +202,7 @@ casper.test.begin('Sulka-datab ase tests', 8, function suite(test) {
 });
 
 
-function genRandomString()
-{
+function genRandomString(){
     var text = '';
     var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
