@@ -781,8 +781,7 @@ sulka = {
 		var data = sulka.getData();
 		
 		if (selectedRows.length == 0) return;
-			sulka.helpers.showLoader();
-			
+			sulka.helpers.unsetErrorAndShowLoader();
 			sulka.API.convertCoordinate(
 				sulka.lastInputCoordinateLon,
 				sulka.lastInputCoordinateLat, 
