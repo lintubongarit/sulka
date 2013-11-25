@@ -33,5 +33,4 @@ public class CoordinateController {
 		
 		return new ObjectResponse<Coordinate>(coordinateService.convertCoordinate(toBeConverted));
 	}
-
 }

@@ -46,8 +46,7 @@ public class Coordinate {
 	public void setNote(String note){
 		this.note = note;
 	}
-	
-	
+		
 	/*
 	 * Hash implementation
 	 */

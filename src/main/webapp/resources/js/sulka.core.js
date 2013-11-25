@@ -829,12 +829,24 @@ sulka = {
 		var data = sulka.getData();
 		
 		if (selectedRows.length == 0) return;
-		
-		for (var i = 0; i < selectedRows.length; i++){		
-			data[selectedRows[i]].lon = sulka.lastInputCoordinateLon;
-			data[selectedRows[i]].lat = sulka.lastInputCoordinateLat;
-			sulka.addToSulkaDB(selectedRows[i]);
-		}
+			sulka.helpers.showLoader();
+			
+			sulka.API.convertCoordinate(
+				sulka.lastInputCoordinateLon,
+				sulka.lastInputCoordinateLat, 
+				function onSuccess(results){
+					for (var i = 0; i < selectedRows.length; i++){		
+						data[selectedRows[i]].lon = results.lon;
+						data[selectedRows[i]].lat = results.lat;
+						sulka.addToSulkaDB(selectedRows[i]);
+					}
+					sulka.helpers.hideLoader();
+				},
+				function onError(){
+					sulka.helpers.hideLoaderAndSetError(sulka.strings.coordinateConversionFailed);
+				}
+			);
+
 	
         sulka.grid.invalidateRow(data.length);
         sulka.setData(data);
