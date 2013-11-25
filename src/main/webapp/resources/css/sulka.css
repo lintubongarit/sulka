@@ -286,7 +286,6 @@ span#last-error {
 	-webkit-transition: 0.5s background;
 }
 
-<<<<<<< HEAD
 /*.slick-row.odd {
   background: #fafafa;
 }*/
@@ -324,7 +323,12 @@ span#last-error {
 
 .sulka-invalid-cell.selected {
 	background: #f87070; 
-=======
+}
+
+.active.selected {
+	background: yellow;
+}
+	
 .tipu-row-color-odd{
 	background: #6194FF; 
 }
@@ -337,7 +341,6 @@ span#last-error {
 
 .sulka-row-color-even {
 	background: #FFA433; 
->>>>>>> colors
 }
 
 .header-freeze-button, .header-unfreeze-button {
