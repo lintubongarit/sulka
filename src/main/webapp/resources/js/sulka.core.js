@@ -197,6 +197,7 @@ sulka = {
 			
 			//Row move, drag & drop features
 			sulka.grid.onKeyDown.subscribe(sulka.onKeyDown);
+            sulka.grid.onBeforeEditCell.subscribe(sulka.onBeforeEditCell);
 			sulka.moveRowsPlugin.onBeforeMoveRows.subscribe(sulka.onBeforeMoveRows); 	  
 			sulka.moveRowsPlugin.onMoveRows.subscribe(sulka.onMoveRows);
 			sulka.grid.onDragInit.subscribe(sulka.grid.onDragInit);
@@ -614,6 +615,23 @@ sulka = {
 			$("#header-context-menu").hide();
 		});
 	},
+	    
+    /**
+     * OnBeforeEditCell
+     * 
+     * If row is not an inputRow, deny editing.
+     * 
+     */
+    onBeforeEditCell: function (e,args){
+
+            if (args.item == undefined){
+                    return true;
+            }
+            
+            if (args.item.rowStatus != "inputRow"){
+                    return false;
+            }        
+    },
 	
 	/**
 	 * Called when a context menu item is clicked.
