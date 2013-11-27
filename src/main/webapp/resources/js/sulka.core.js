@@ -1183,7 +1183,7 @@ sulka = {
 	},
 	
 	/**
-	 * SaveSettings function is used to save users current view, which includes:
+	 * Save users current view, that includes:
 	 * 	- Filters
 	 * 	- Column settings
 	 * 
@@ -1227,7 +1227,7 @@ sulka = {
 	
 	
 	/**
-	 * FetchSettings is used to fetch user settings from the Sulka database.
+	 * Fetch user settings from the Sulka database.
 	 */
 	fetchSettings: function() {
 		sulka.helpers.showLoader();
