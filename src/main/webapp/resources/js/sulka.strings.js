@@ -10,5 +10,6 @@ sulka.strings = {
 	invalidRow: "RIVI EI OLE VALIDI",
 	couldNotInsert: "Riviä ei voitu lisätä",
 	settingsSaveFailed: "Asetusten tallentaminen epäonnistui.",
-	settingsReceivedFailed: "Asetusten nouto epäonnistui."
+	settingsReceivedFailed: "Asetusten nouto epäonnistui.",
+	coordinateConversionFailed: "Koordinaattien konvertointi WGS84 muodosta YKJ muotoon epäonnistui"
 };

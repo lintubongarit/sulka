@@ -9,7 +9,7 @@ sulka = {
 	grid: null,
 	
 	/**
-	 * Slick grid options.
+	 * Slick grid options that are used to initialize the grid.
 	 */
 	gridOptions: {
 		enableCellNavigation: true,
@@ -78,6 +78,7 @@ sulka = {
 	COL_PADDING: 20,
 	COL_MAX_WIDTH: 200,
 	COL_TYPE_IMAGE_WIDTH: 19,
+	
 	/**
 	 * Called at start to get columns. Calls initGrid() when done. 
 	 */
@@ -136,13 +137,13 @@ sulka = {
 							$sulkaFlexible: isFlexible,
 							editor: Slick.Editors.Text,
 							$sulkaFlexible: isFlexible,
+							cssClass: "sulka-column-" + field.field,
 						}, sulka.columnOptions);
 						
 						if (field.field == "type") {
 							column.$sulkaFlexible = false;
 							column.formatter = function () { return ""; };
 							column.width  = sulka.COL_TYPE_IMAGE_WIDTH + sulka.COL_PADDING;
-							column.cssClass = "rowtype-column";
 						}
 						
 						columns.push(column);
@@ -167,9 +168,12 @@ sulka = {
 				sulka.initGrid();
 			},
 			sulka.helpers.hideLoaderAndSetError
-		); 
+		);
 	},
-	  
+	
+	previousActiveRow: undefined,
+	previousActiveRowEdited: false,
+	
 	/**
 	 * Init grid. Called once at start after columns have been fetched.
 	 */
@@ -186,18 +190,24 @@ sulka = {
 		if (sulka.viewMode == "ringings" || sulka.viewMode == "recoveries"){
 			sulka.moveRowsPlugin = 
 				new Slick.RowMoveManager({   
-					cancelEditOnDrag: true
+					canceltoggleEditDrag: true
 				});
 			
 			sulka.grid.registerPlugin(sulka.moveRowsPlugin);
 			
 			//Row move, drag & drop features
+			sulka.grid.onKeyDown.subscribe(sulka.onKeyDown);
+            sulka.grid.onBeforeEditCell.subscribe(sulka.onBeforeEditCell);
 			sulka.moveRowsPlugin.onBeforeMoveRows.subscribe(sulka.onBeforeMoveRows); 	  
 			sulka.moveRowsPlugin.onMoveRows.subscribe(sulka.onMoveRows);
 			sulka.grid.onDragInit.subscribe(sulka.grid.onDragInit);
 			sulka.grid.onDragStart.subscribe(sulka.onDragStart);
 			sulka.grid.onDrag.subscribe(sulka.onDrag);
 			sulka.grid.onDragEnd.subscribe(sulka.onDragEnd);
+			
+			sulka.grid.onClick.subscribe(sulka.onClick);
+			
+			sulka.grid.onActiveCellChanged.subscribe(sulka.onActiveCellChanged);
 			
 			//Init drop events?
 			sulka.initDrop();
@@ -228,17 +238,23 @@ sulka = {
 		sulka.grid.onAddNewRow.subscribe(sulka.onAddNewRow);
 		
 		sulka.grid.onCellChange.subscribe(sulka.onCellChange);
-				  
+		
+		sulka.grid.onColumnsResized.subscribe(sulka.updateWidthToSulkaColumns);
+		sulka.grid.onColumnsReordered.subscribe(sulka.updateOrderToSulkaColumns);
+		
 		$(window).resize(sulka.resizeGrid);
 		sulka.resizeGrid();
 		
 		$("#slick-grid").mousewheel(sulka.onMouseWheel);
 		
 		sulka.reloadData();
+		
+		sulka.fetchSettings();
 	},
 	
-	
-	
+	/**
+	 * InitDrop function is called when drop event is launched.
+	 */
 	initDrop: function(){
 		 $.drop({mode: "mouse"});
 		 $("#dropzone").bind("dropstart", function (e, dd) {
@@ -255,29 +271,41 @@ sulka = {
 	    	if (dd.mode != "recycle") {
 	    		return;
 	        }
-	        var data = sulka.getData();
-	        
-	        var rowsToDelete = dd.rows.sort(sulka.helpers.numericReverseSort);
-	        var toBeDeleted = [];
-	        for (var i=0; i<rowsToDelete.length; i++) {
-	        	var deleteRow = data[rowsToDelete[i]];
-	        	if (deleteRow && deleteRow.rowStatus == "inputRow" && typeof(deleteRow.databaseId) === "number" ) {
-	        		data.splice(rowsToDelete[i], 1);
-		 	    	toBeDeleted.push(deleteRow.databaseId);
-	        	}
-	        }
-	        
-	        sulka.helpers.unsetErrorAndShowLoader();
-			sulka.API.deleteSulkaDBRows(
-				toBeDeleted,
-				sulka.helpers.hideLoaderAndUnsetError,
-				sulka.helpers.hideLoaderAndSetError
-			);
-	        
-	        sulka.setData(data);
-	        sulka.grid.invalidate();
-	        sulka.grid.setSelectedRows([]);
+	    	
+	    	//Call delete rows
+	    	sulka.deleteRows(e, dd);
       	});
+	},
+	
+	/**
+	 * Deletes selected rows
+	 */
+	deleteRows: function(e, dd){
+        var data = sulka.getData();
+        
+        var rowsToDelete = dd.rows.sort(sulka.helpers.numericReverseSort);
+        var toBeDeleted = [];
+        for (var i=0; i<rowsToDelete.length; i++) {
+        	var deleteRow = data[rowsToDelete[i]];
+        	if (deleteRow && deleteRow.rowStatus == "inputRow" && typeof(deleteRow.databaseId) === "number" ) {
+        		data.splice(rowsToDelete[i], 1);
+	 	    	toBeDeleted.push(deleteRow.databaseId);
+        	}
+        }
+        
+        sulka.helpers.unsetErrorAndShowLoader();
+		sulka.API.deleteSulkaDBRows(
+			toBeDeleted,
+			sulka.helpers.hideLoaderAndUnsetError,
+			sulka.helpers.hideLoaderAndSetError
+		);
+        
+		sulka.colouriseCellsWithErrors(sulka.getData());
+        sulka.setData(data);
+        sulka.grid.invalidate();
+        sulka.grid.setSelectedRows([]);
+		
+		
 	},
 	
 	/**
@@ -302,10 +330,16 @@ sulka = {
 		}, 100);
 	},
 	
-	viewport: null,
 	
+	/**
+	 * Parameters for mouse wheel events
+	 */
+	viewport: null,
 	MOUSE_WHEEL_ROW_HEIGHT: 25,
 	MOUSE_WHEEL_SCROLL_ROWS: 3,
+	
+	
+	
 	/**
 	 * Handle mouse wheel events.
 	 */
@@ -336,10 +370,11 @@ sulka = {
 	onGridSort: function (event, args) {
 		sulka.freeze.removeSortMarkers();
 		sulka.sort(args);
+		sulka.colouriseCellsWithErrors(sulka.getData());
 	},
 	
 	/**
-	 * Sort grid by cols.
+	 * Sort grid by columns.
 	 */
 	sort: function (args) {
 		var data = sulka.getData();
@@ -355,6 +390,10 @@ sulka = {
 		sulka.freeze.invalidate();
 	},
 	
+	
+	/**
+	 *  Called before MoveRows
+	 */
 	onBeforeMoveRows: function(e,data) {
 		sulka.moveRowsPlugin.onBeforeMoveRows.subscribe(function (e, data) {
 			    for (var i = 0; i < data.rows.length; i++) {
@@ -368,6 +407,9 @@ sulka = {
 		});
 	},
 	
+	/**
+	 * OnMoveRows events
+	 */
 	onMoveRows: function(e,args){
 		sulka.moveRowsPlugin.onMoveRows.subscribe(function (e, args) {
 		    var extractedRows = [], left, right;
@@ -407,6 +449,48 @@ sulka = {
 		
 	},
 	
+	/**
+	 * onColumnResized updates column width changes to sulka.columns.
+	 */
+	updateWidthToSulkaColumns: function(e, args){
+		var gridInd = 0;
+		var gridColumns = sulka.grid.getColumns();
+		for(var i = 0; i < sulka.columns.length; i++){
+			if(sulka.columns[i].$sulkaVisible && 
+				sulka.columns[i].field == gridColumns[gridInd].field){
+				sulka.columns[i].width = gridColumns[gridInd].width;
+				gridInd++;
+			}
+		}
+	},
+	
+	/**
+	 * onColumnsReorder updates order changes to sulka.columns.
+	 */
+	updateOrderToSulkaColumns: function(e, args){
+		var columnIndex = 0;
+		var gridColumns = sulka.grid.getColumns();
+		var updatedColumnList = {};
+		for(var i = 0; i < sulka.columns.length; i++){
+			if(!sulka.columns[i].$sulkaVisible)
+				updatedColumnList[sulka.columns[i].field] = i;
+			else
+				if(columnIndex < gridColumns.length){
+					updatedColumnList[gridColumns[columnIndex].field] = i;
+					columnIndex++;
+				}
+		}
+		var newColumns = [];
+		for(var i = 0; i < sulka.columns.length; i++)
+			newColumns[updatedColumnList[sulka.columns[i].field]] = sulka.columns[i];
+		
+		sulka.columns = newColumns;
+	},
+	
+	
+	/**
+	 *	OnDragInit is used to prevent the grid from cancelling drag'n'drop by default 
+	 */
 	onDragInit: function(e,dd){
 		sulka.grid.onDragInit.subscribe(function (e, dd) {
 		    // prevent the grid from cancelling drag'n'drop by default
@@ -415,6 +499,58 @@ sulka = {
 		
 	},
 	
+	/**
+	 * Handled by onkeyDown(). toggleEdit is set true when user start typing. When user presses key that changes active cell, toggleEdit is set false
+	 */
+	toggleEdit: false,
+	
+	/**
+	 * key event enumerations
+	 */
+	keys: {
+		ENTER: 13,
+		TAB: 9,
+		
+		UP: 38,
+		DOWN: 40,
+		LEFT: 37,
+		RIGHT: 39,
+	},
+	
+	/**
+	 * Contains onKeyDown events. Here you can map custom events to different keys by their ASCII code.
+	 * 
+	 */
+	onKeyDown: function(e) {
+		if (sulka.toggleEdit) {
+			if (e.which === sulka.keys.ENTER || e.which === sulka.keys.TAB || e.which === sulka.keys.UP ||
+					e.which === sulka.keys.DOWN) {
+				console.log('off');
+				sulka.toggleEdit = false;
+				sulka.grid.setOptions({
+					editable : false
+				});
+				if (e.which !== sulka.keys.TAB && e.which !== sulka.keys.UP && e.which !== sulka.keys.DOWN){
+					sulka.grid.navigateRight();
+				}
+			}
+		} else {
+			console.log(e.which);
+			if (e.which !== sulka.keys.UP && e.which !== sulka.keys.DOWN && e.which !== sulka.keys.LEFT
+					&& e.which !== sulka.keys.RIGHT && e.which !== sulka.keys.TAB) {
+				console.log('on');
+				sulka.toggleEdit = true;
+				sulka.grid.setOptions({
+					editable : true
+				});
+				sulka.grid.editActiveCell(Slick.Text);
+			}
+		}
+	},
+	
+	/**
+	 * Called when drag event is started
+	 */
 	onDragStart: function(e,dd){
 		sulka.grid.onDragStart.subscribe(function (e, dd) {
 			
@@ -472,6 +608,10 @@ sulka = {
 		
 	},
 	
+	
+	/**
+	 * onDrag events.
+	 */
 	onDrag: function(e,dd){
 		  sulka.grid.onDrag.subscribe(function (e, dd) {
 			    if (dd.mode != "recycle") {
@@ -482,6 +622,9 @@ sulka = {
 	},
 	
 	
+	/**
+	 * onDragEnd: this function is called when dragging rows ends.
+	 */
 	onDragEnd: function(e, dd){
 		sulka.grid.onDragEnd.subscribe(function (e, dd) {
 		    if (dd.mode != "recycle") {
@@ -492,7 +635,12 @@ sulka = {
 		    });
 	},
 	
+	
+	/**
+	 * showColumnHeaderContextMenu parameters
+	 */
 	CONTEXT_HEIGHT_ADJUST: 6,
+	
 	/**
 	 * Called by SlickGrid to show context menu on headers. 
 	 */
@@ -542,6 +690,23 @@ sulka = {
 			$("#header-context-menu").hide();
 		});
 	},
+	    
+    /**
+     * OnBeforeEditCell
+     * 
+     * If row is not an inputRow, deny editing.
+     * 
+     */
+    onBeforeEditCell: function (e,args){
+
+            if (args.item == undefined){
+                    return true;
+            }
+            
+            if (args.item.rowStatus != "inputRow"){
+                    return false;
+            }        
+    },
 	
 	/**
 	 * Called when a context menu item is clicked.
@@ -570,7 +735,11 @@ sulka = {
 		sulka.freeze.renderColumnGroups();
 	},
 	
+	/**
+	 * setData parameters.
+	 */
 	currentData: [],
+	
 	/**
 	 * Set grid data and render.
 	 */
@@ -623,10 +792,8 @@ sulka = {
 			if (combineCalls < N_CALLS) return;
 			
 			sulka.setData(combinedRows);
-			if (combinedRows.length > 0) {
-				sulka.adjustFlexibleCols(combinedRows);
-			}
 			
+			sulka.colouriseCellsWithErrors(sulka.getData());
 			sulka.grid.render();
 			
 			if (combinedRows.length == 0) {
@@ -648,10 +815,6 @@ sulka = {
 				sulka.rowsMode,
 				filters,
 				function (rows) {
-					if (rows.length > 0) {
-						sulka.adjustFlexibleCols(rows);
-					}
-					
 					var sulkaRows = [];
 					for (var i=0; i<rows.length; i++) {
 						var row;
@@ -686,12 +849,27 @@ sulka = {
 		var data = sulka.getData();
 		
 		if (selectedRows.length == 0) return;
-		
-		for (var i = 0; i < selectedRows.length; i++){		
-			data[selectedRows[i]].lon = sulka.lastInputCoordinateLon;
-			data[selectedRows[i]].lat = sulka.lastInputCoordinateLat;
-			sulka.addToSulkaDB(selectedRows[i]);
-		}
+			sulka.helpers.unsetErrorAndShowLoader();
+			sulka.API.convertCoordinate(
+				sulka.lastInputCoordinateLon,
+				sulka.lastInputCoordinateLat, 
+				function onSuccess(results){
+					for (var i = 0; i < selectedRows.length; i++){	
+						if(data[selectedRows[i]].rowStatus == "inputRow"){
+							data[selectedRows[i]].lon = results.lon;
+							data[selectedRows[i]].lat = results.lat;
+							data[selectedRows[i]].coordinateType = "kartta";
+							//data[selectedRows[i]].coordinateAccuracy = "kartta";
+							sulka.addToSulkaDB(selectedRows[i]);
+						}
+					}
+					sulka.helpers.hideLoader();
+				},
+				function onError(){
+					sulka.helpers.hideLoaderAndSetError(sulka.strings.coordinateConversionFailed);
+				}
+			);
+
 	
         sulka.grid.invalidateRow(data.length);
         sulka.setData(data);
@@ -699,8 +877,14 @@ sulka = {
         sulka.grid.render();
 	},
 	
+	
+	/**
+	 * Parameters used while initializing new dataview with createNewDataView.
+	 */
 	METADATA_SULKA_RECOVERY: {"cssClasses" : "sulka-row recovery-row" },
 	METADATA_SULKA_RINGING: {"cssClasses" : "sulka-row ringing-row" },
+	METADATA_SULKA_RINGING_VALID : {"cssClasses" : "sulka-row ringing-row-color sulka-valid-row"},
+	METADATA_SULKA_RINGING_INVALID : {"cssClasses" : "sulka-row ringing-row-color sulka-invalid-row"},
 	METADATA_TIPU_RECOVERY: { "cssClasses": "tipu-row recovery-row" },
 	METADATA_TIPU_RINGING: { "cssClasses": "tipu-row ringing-row" },
 	METADATA_EMPTY: { },
@@ -708,9 +892,16 @@ sulka = {
 	RINGING_TYPE: "Rengastus",
 	RECOVERY_TYPE: "Tapaaminen",
 	
+	
+	
+	/**
+	 * Creates new DataView for the grid.
+	 */
 	createNewDataView: function (data) {
 		var METADATA_SULKA_RECOVERY = sulka.METADATA_SULKA_RECOVERY,
 			METADATA_SULKA_RINGING = sulka.METADATA_SULKA_RINGING,
+			METADATA_SULKA_RINGING_VALID = sulka.METADATA_SULKA_RINGING_VALID,
+			METADATA_SULKA_RINGING_INVALID = sulka.METADATA_SULKA_RINGING_INVALID,
 			METADATA_TIPU_RECOVERY = sulka.METADATA_TIPU_RECOVERY,
 			METADATA_TIPU_RINGING = sulka.METADATA_TIPU_RINGING,
 			METADATA_EMPTY = sulka.METADATA_EMPTY,
@@ -729,8 +920,14 @@ sulka = {
 				}
 				var row = data[index];
 				if (row.hasOwnProperty("databaseId")) {
-					if (row.type == RINGING_TYPE) {
-						return METADATA_SULKA_RINGING;
+					if (sulka.rowsMode == "ringings") {
+						if (row.$valid === false) {
+							return METADATA_SULKA_RINGING_INVALID;
+						} else if (row.$valid === true) {
+							return METADATA_SULKA_RINGING_VALID;
+						} else {
+							return METADATA_SULKA_RINGING;
+						}
 					} else {
 						return METADATA_SULKA_RECOVERY;
 					}
@@ -741,68 +938,22 @@ sulka = {
 						return METADATA_TIPU_RECOVERY;
 					}
 				}
-			}
-		};
-	},
-	
-	onAddNewRow: function(event, args){
-		var data = sulka.getData();
-        var item = args.item;
-        //var column = args.column;
-        data.push(item);
-        sulka.setData(data);
-        sulka.grid.invalidateRow(data.length);
-        sulka.grid.updateRowCount();
-        sulka.grid.render();
-	},
-	
-	/**
-	 * Adjust flexible columns for new data. 
-	 */
-	adjustFlexibleCols: function (rows) {
-		var flexibleCols = [];
-		
-		var a = sulka.grid.getColumns();
-		for (var i=0; i<a.length; i++) {
-			var col = a[i];
-			if (col.$sulkaFlexible) {
-				col.$sulkaFlexible = false;
-				col.$sulkaMaxStrLen = 0;
-				col.$sulkaMaxTextWidth = sulka.COL_PADDING;
-				flexibleCols.push(col);
-			}
-		}
-		
-		if (flexibleCols.length == 0) {
-			return;
-		}
-		
-		for (var i=0; i<rows.length; i++) {
-			var row = rows[i];
-			for (var j=0; j<flexibleCols.length; j++) {
-				var col = flexibleCols[j];
-				if (col.$sulkaMaxTextWidth >= sulka.COL_MAX_WIDTH) continue;
-				
-				var str = String(row[col.field]);
-				if (str.length > col.$sulkaMaxStrLen) {
-					col.$sulkaMaxStrLen = str.length;
-					// sulka.getRenderedTextWidth() is an expensive call
-					var newWidth = sulka.COL_PADDING + sulka.getRenderedTextWidth(str);
-					if (col.$sulkaMaxTextWidth < newWidth) {
-						col.$sulkaMaxTextWidth = Math.max(newWidth, col.$sulkaMaxTextWidth);
+				var item = data[index];
+				if(item.databaseId==null){
+					if(index%2 == 0){
+						return { "cssClasses": "tipu-row-color-even"};
+					}else{
+						return { "cssClasses": "tipu-row-color-odd"};
+					}					
+				}else{					
+					if(index%2 == 0){
+						return {"cssClasses" : "sulka-row-color-even"};
+					}else{
+						return {"cssClasses" : "sulka-row-color-odd"};
 					}
 				}
 			}
-		}
-		
-		for (var j=0; j<flexibleCols.length; j++) {
-			var col = flexibleCols[j];
-			col.width = Math.min(sulka.COL_MAX_WIDTH, col.$sulkaMaxTextWidth);
-			delete col.$sulkaMaxStrLen;
-			delete col.$sulkaMaxTextWidth;
-		}
-		sulka.grid.setColumns(a);
-		sulka.renderColumnGroups();
+		};
 	},
 	
 	/**
@@ -846,14 +997,10 @@ sulka = {
 		var data = sulka.getData();
         var item = args.item;
         item.rowStatus = "inputRow";
-        args.row = data.length;
-        
-        sulka.grid.invalidateRow(data.length);
         data.push(item);
         sulka.setData(data);
-        sulka.grid.updateRowCount();
         sulka.grid.render();
-        sulka.addToSulkaDB(data.length-1);
+        sulka.addToSulkaDB(sulka.getData().length - 1);
 	},
 	
 	/**
@@ -862,41 +1009,146 @@ sulka = {
 	 */
 	onCellChange: function(event, args){
 		sulka.addToSulkaDB(args.row);
+		
+	},
+	
+	/**
+	 * This function is called when slickgrid is clicked.
+	 * If invalid row is clicked, displays it's error msg.
+	 */
+	onClick: function(e, args) {
+		if (args.row === sulka.getData().length)
+			return;
+		sulka.helpers.unsetErrorAndShowLoader();
+		if (sulka.getData()[args.row].$invalid_msg !== undefined) {
+			sulka.helpers.hideLoaderAndSetError(sulka.getData()[args.row].$invalid_msg);
+		} else {
+			sulka.helpers.hideLoaderAndSetError("");
+		}
+	},
+	
+	/**
+	 * This function is called when active cell is changed.
+	 * If active row is changed and previous active row was edited, this function validates previous active row.
+	 * 
+	 * Validation adds these fields to the row:
+	 * 	$valid: true, is row is valid, false if not
+	 * 
+	 *  //these are added only if $valid is false
+	 *  $errors: array which contains fields that are invalid. Example: ["species", "municipalities"]
+	 *  $invalid_msg: error msg to be displayed when invalid row is clicked
+	 */
+	
+	onActiveCellChanged: function () {
+		if (sulka.previousActiveRow !== undefined
+				&& sulka.grid.getSelectedRows()[0] !== sulka.previousActiveRow
+				&& sulka.previousActiveRowEdited ){
+			
+			
+			var data = sulka.getData();
+			var actualRowData = data[sulka.previousActiveRow];
+
+			if (!actualRowData)
+				return;
+			
+			sulka.previousActiveRow = sulka.grid.getSelectedRows()[0];
+			
+			sulka.helpers.unsetErrorAndShowLoader();
+			sulka.API.validate(
+				actualRowData,
+				function(data) {
+					sulka.previousActiveRowEdited = false;
+					
+					actualRowData.$valid = data.passes;
+					if (data.passes) {
+						actualRowData.$invalid_msg = undefined;
+						actualRowData.$errors = undefined;
+					} else {
+						actualRowData.$errors = [];
+						errorString = sulka.strings.invalidRow + ": ";
+						for ( var errorField in data.errors)
+							if (data.errors.hasOwnProperty(errorField)) {
+								var errorArray = data.errors[errorField];
+								errorString = errorString.concat('(' + errorField + ': ' + errorArray[0].errorName + '), ');
+								actualRowData.$errors.push(errorField);
+							}
+						actualRowData.$errors = JSON.stringify(actualRowData.$errors);
+						actualRowData.$invalid_msg = errorString;
+					}
+					
+					var localDbRow = {};
+					if (actualRowData.hasOwnProperty("databaseId")) {
+						localDbRow.id = actualRowData.databaseId;
+						localDbRow.userId = actualRowData.userId;
+					}
+					localDbRow.row = JSON.stringify(actualRowData);
+					sulka.API.addRow(
+						localDbRow,
+						function(row) {
+							actualRowData.databaseId = row.id;
+							actualRowData.userId = row.userId;
+							JSON.stringify(actualRowData.errors);
+							sulka.colouriseCellsWithErrors(sulka.getData());
+							sulka.grid.invalidate();
+							sulka.grid.render();
+							sulka.helpers.hideLoaderAndUnsetError();
+						},
+						function() {
+							sulka.helpers.hideLoaderAndSetError(sulka.strings.couldNotInsert);
+						});	
+				}, function() {
+					sulka.helpers.hideLoaderAndSetError();
+				}
+			);
+		}
+		sulka.previousActiveRow = sulka.grid.getSelectedRows()[0];
 	},
 	
 	/**
 	 * Adds row to sulka-database
 	 */
 	addToSulkaDB: function (index) {
+		sulka.previousActiveRowEdited = true;	
+		
 		var data = sulka.getData();
 		var actualRowData = data[index];
-		console.log(data);
-	    if (!actualRowData) return;
-	    var rowStatus = actualRowData.rowStatus;
-	    
-	    if (rowStatus == "inputRow"){
-	    	var localDbRow = {};
-	    	if (actualRowData.hasOwnProperty("databaseId")){
-	    		localDbRow.id = actualRowData.databaseId;
-	    		localDbRow.userId = actualRowData.userId;
-	    	}
-	    	localDbRow.row = JSON.stringify(actualRowData);
-	    	
-	    	sulka.helpers.unsetErrorAndShowLoader();
-	    	sulka.API.addRow(
-	    		localDbRow,
-    			function (row) {
-    				sulka.helpers.hideLoaderAndUnsetError();
-    				actualRowData.databaseId = row.id;
-    				actualRowData.userId = row.userId;
-					sulka.grid.invalidate();
-					sulka.grid.render();
-    			},
-    			function () {
-    				sulka.helpers.hideLoaderAndSetError(sulka.strings.couldNotInsert);
-    			}
-	    	);
-	    }
+
+		if (!actualRowData)
+			return;
+		var rowStatus = actualRowData.rowStatus;
+
+		if (rowStatus == "inputRow") {
+			var localDbRow = {};
+			if (actualRowData.hasOwnProperty("databaseId")) {
+				localDbRow.id = actualRowData.databaseId;
+				localDbRow.userId = actualRowData.userId;
+			}
+			localDbRow.row = JSON.stringify(actualRowData);
+
+			
+			var localDbRow = {};
+			if (actualRowData.hasOwnProperty("databaseId")) {
+				localDbRow.id = actualRowData.databaseId;
+				localDbRow.userId = actualRowData.userId;
+			}
+			localDbRow.row = JSON.stringify(actualRowData);
+			sulka.helpers.unsetErrorAndShowLoader();
+			sulka.API.addRow(
+				localDbRow,
+				function(row) {
+					actualRowData.databaseId = row.id;
+					actualRowData.userId = row.userId;
+					JSON.stringify(actualRowData.errors);
+					sulka.colouriseCellsWithErrors(sulka.getData());
+//					sulka.grid.invalidate();
+//					sulka.grid.render();
+					sulka.helpers.hideLoaderAndUnsetError();
+				},
+				function() {
+					sulka.helpers.hideLoaderAndSetError(sulka.strings.couldNotInsert);
+				}
+			);	
+		}
 	},
 	
 	/**
@@ -918,31 +1170,12 @@ sulka = {
 	},
 	
 	/**
-	 * validates selected row
+	 * Save users current view, that includes:
+	 * 	- Filters
+	 * 	- Column settings
+	 * 
+	 * to the sulka database.
 	 */
-	validate: function() {
-		var selectedRows = sulka.grid.getSelectedRows();
-		if (selectedRows.length == 0) return;
-		sulka.helpers.unsetErrorAndShowLoader();
-		var selectedRow = sulka.getData()[selectedRows[0]];
-		sulka.API.validate(
-			selectedRow, 
-			function (data) {
-				if (data.passes){
-					sulka.helpers.hideLoaderAndSetError(sulka.strings.validRow);
-				} else {
-					var errorString = sulka.strings.invalidRow + ": ";
-					for (var errorField in data.errors) if (data.errors.hasOwnProperty(errorField)) {
-						var errorArray = data.errors[errorField];
-						errorString = errorString.concat('(' + errorField + ': ' + errorArray[0].errorName + '), ');
-					}
-					sulka.helpers.hideLoaderAndSetError(errorString);
-				}
-			}, 
-			sulka.helpers.hideLoaderAndSetError
-		);
-	},
-	
 	saveSettings: function() {
 		sulka.helpers.showLoader();
 		var columnsDataToBeSaved = {};
@@ -979,6 +1212,10 @@ sulka = {
 			});
 	},
 	
+	
+	/**
+	 * Fetch user settings from the Sulka database.
+	 */
 	fetchSettings: function() {
 		sulka.helpers.showLoader();
 		sulka.API.fetchSettings(
@@ -1000,23 +1237,67 @@ sulka = {
 					sulka.columns = updatedColumns;
 					sulka.grid.setColumns(sulka.getVisibleColumns());
 					sulka.renderColumnGroups();
+					
+					var menuItems = $("#header-context-menu .context-menu-item span");
+					for(var i = 0; i < (menuItems.length / 2); i++){
+						var tickIndex = 2 * i;
+						var itemIndex = 2 * i + 1;
+						var columnName = menuItems[itemIndex].innerHTML;
+						for(var columnNo in sulka.columns){
+							if(sulka.columns[columnNo].name == columnName){
+								if(sulka.columns[columnNo].$sulkaVisible)
+									menuItems[tickIndex].textContent = sulka.TICK_MARK;
+								else
+									menuItems[tickIndex].textContent = "";
+								break;
+							}
+						}
+					}
 				}
 				
 				if(results.object.filters){
 					var filters = jQuery.parseJSON(results.object.filters);
-					$("#filters-date").val(filters.date);
-					$("#filters-species").val(filters.species);
-					$("#filters-municipality").val(filters.municipality);
-					$("#filters-ringings").prop('checked', filters.ringings);
-					$("#filters-recoveries").prop('checked', filters.recoveries);
+					if(filters.date != "")
+						$("#filters-date").val(filters.date);
+					if(filters.species != "")
+						$("#filters-species").val(filters.species);
+					if(filters.municipality != "")
+						$("#filters-municipality").val(filters.municipality);
+
+					if(sulka.viewMode == "browsing"){
+						$("#filters-ringings").prop('checked', filters.ringings);
+						$("#filters-recoveries").prop('checked', filters.recoveries);
+					}
 				}
 			}, function onError(){
 				sulka.helpers.hideLoaderAndSetError(sulka.strings.settingsReceivedFailed);
 			});
+	},
+	
+	/**
+	 * Adds sulka-invalid-cell css class to cells that have been tagged invalid by validation
+	 */
+	colouriseCellsWithErrors: function(rows) {
+		var cellsToColourise = {};
+		rows.forEach(function(row, index) {
+			if (row.$errors !== undefined) {
+				var errors = JSON.parse(row.$errors);
+				errors.forEach(function(error) {
+					if (cellsToColourise[index] === undefined){
+						cellsToColourise[index] = {};
+					}
+					sulka.grid.getColumns().forEach(function(column){
+						if (column.field == error){
+							cellsToColourise[index][column.id] = "sulka-invalid-cell";
+						}
+					});
+				});
+			}
+		});
+		sulka.grid.setCellCssStyles("invalid-cell", cellsToColourise);
 	}
 	
 };
-
 
 return sulka; }();
 

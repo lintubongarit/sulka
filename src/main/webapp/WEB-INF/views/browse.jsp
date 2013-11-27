@@ -30,6 +30,8 @@
 		<script src="resources/js/sulka.API.js"></script>
 		<script src="resources/js/sulka.groups.js"></script>
 		<script src="resources/js/sulka.freeze.js"></script>
+		<script src="resources/js/lib/inputChecker.js"></script>
+		
 	</head>
 	<body>
 		<%@include file="_header.jsp" %>
@@ -40,9 +42,9 @@
 					    <sec:authorize access="hasRole('ADMIN')">
         				Rengastaja: <input type="text" id="filters-ringer" name="ringer"/>
         				</sec:authorize>
-						Aika (esim. 2005 tai 2005-2006): <input type="text" id="filters-date" name="date" />
-						Laji: <input type="text" id="filters-species" name="species" />
-						Kunta: <input type="text" id="filters-municipality" name="municipality" />
+						Aika (esim. 2005 tai 2005-2006): <input type="text" id="filters-date" onkeypress="return inputLimiter(event,'date')" name="date" />
+						Laji: <input type="text" id="filters-species" onkeypress="return inputLimiter(event,'Letters')" name="species" />
+						Kunta: <input type="text" id="filters-municipality" onkeypress="return inputLimiter(event,'Letters')" name="municipality" />
 						<input type="submit" id="form-submit" value="OK" />
 						<input type="reset" id="form-reset" value="Tyhjennä" />
 						<input type="checkbox" id="filters-ringings" name="ringings" checked/> Rengastukset

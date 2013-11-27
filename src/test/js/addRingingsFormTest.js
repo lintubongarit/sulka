@@ -1,6 +1,6 @@
 var moment = require('lib/moment.min.js');
 
-casper.test.begin('AddRinger pages form tests', 12, function suite(test) {
+casper.test.begin('AddRinger pages form tests', 11, function suite(test) {
     browse('/', function () {
     	// Data loading and filtering
 		
@@ -45,10 +45,6 @@ casper.test.begin('AddRinger pages form tests', 12, function suite(test) {
 				test.assertEquals(formValues[filter], "", 'The "' + filter + ' field is cleared.'); 
 			}
 			test.assertNotVisible('#loader-animation', "Loader animation is not shown.");
-		
-		}).then(function (){
-			this.test.assertExists('button#validate', 
-			'The "validate" button exists.');
 		
 		}).then(function (){
 			this.test.assertExists('.recycle-bin', 
