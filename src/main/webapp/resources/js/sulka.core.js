@@ -190,7 +190,7 @@ sulka = {
 		if (sulka.viewMode == "ringings" || sulka.viewMode == "recoveries"){
 			sulka.moveRowsPlugin = 
 				new Slick.RowMoveManager({   
-					canceltoggleEditDrag: true
+					canceleditingCellDrag: true
 				});
 			
 			sulka.grid.registerPlugin(sulka.moveRowsPlugin);
@@ -457,9 +457,16 @@ sulka = {
 	},
 	
 	/**
-	 * Handled by onkeyDown(). toggleEdit is set true when user start typing. When user presses key that changes active cell, toggleEdit is set false
+	 * Handled by onkeyDown(). editingCell is set true when user start typing. When user presses key that changes active cell, editingCell is set false
 	 */
-	toggleEdit: false,
+	editingCell: false,
+	
+	setEditingCell: function (value) {
+		sulka.editingCell = value;
+		sulka.grid.setOptions({
+			editable : value
+		});
+	},
 	
 	/**
 	 * key event enumerations
@@ -479,27 +486,17 @@ sulka = {
 	 * 
 	 */
 	onKeyDown: function(e) {
-		if (sulka.toggleEdit) {
+		if (sulka.editingCell) {
 			if (e.which === sulka.keys.ENTER || e.which === sulka.keys.TAB || e.which === sulka.keys.UP ||
 					e.which === sulka.keys.DOWN) {
-				console.log('off');
-				sulka.toggleEdit = false;
-				sulka.grid.setOptions({
-					editable : false
-				});
-				if (e.which !== sulka.keys.TAB && e.which !== sulka.keys.UP && e.which !== sulka.keys.DOWN){
 					sulka.grid.navigateRight();
-				}
 			}
 		} else {
-			console.log(e.which);
-			if (e.which !== sulka.keys.UP && e.which !== sulka.keys.DOWN && e.which !== sulka.keys.LEFT
+			if (e.which === sulka.keys.ENTER){
+				sulka.grid.navigateRight();
+			} else if (e.which !== sulka.keys.UP && e.which !== sulka.keys.DOWN && e.which !== sulka.keys.LEFT
 					&& e.which !== sulka.keys.RIGHT && e.which !== sulka.keys.TAB) {
-				console.log('on');
-				sulka.toggleEdit = true;
-				sulka.grid.setOptions({
-					editable : true
-				});
+				sulka.setEditingCell(true);
 				sulka.grid.editActiveCell(Slick.Text);
 			}
 		}
@@ -1053,6 +1050,8 @@ sulka = {
 	 */
 	
 	onActiveCellChanged: function () {
+		sulka.setEditingCell(false);
+		
 		if (sulka.previousActiveRow !== undefined
 				&& sulka.grid.getSelectedRows()[0] !== sulka.previousActiveRow
 				&& sulka.previousActiveRowEdited ){

@@ -326,8 +326,13 @@ span#last-error {
 }
 
 .active.selected {
-	background: rgba(0, 0, 255, 0.1);
+	border: 2px solid black;
 }
+
+.slick-cell.editable {
+	background: rgba(255, 255, 255, 1);
+}
+
 	
 .tipu-row-color-odd{
 	background: #6194FF; 
