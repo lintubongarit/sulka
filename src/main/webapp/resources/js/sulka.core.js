@@ -238,11 +238,16 @@ sulka = {
 		sulka.grid.onAddNewRow.subscribe(sulka.onAddNewRow);
 		
 		sulka.grid.onCellChange.subscribe(sulka.onCellChange);
-				  
+		
+		sulka.grid.onColumnsResized.subscribe(sulka.updateWidthToSulkaColumns);
+		sulka.grid.onColumnsReordered.subscribe(sulka.updateOrderToSulkaColumns);
+		
 		$(window).resize(sulka.resizeGrid);
 		sulka.resizeGrid();
 		
 		$("#slick-grid").mousewheel(sulka.onMouseWheel);
+		
+		sulka.fetchSettings();
 		
 		sulka.reloadData();
 	},
@@ -442,6 +447,44 @@ sulka = {
 		    sulka.grid.render();
 		  });
 		
+	},
+	
+	/**
+	 * onColumnResized updates column width changes to sulka.columns.
+	 */
+	updateWidthToSulkaColumns: function(e, args){
+		var gridInd = 0;
+		var gridColumns = sulka.grid.getColumns();
+		for(var i = 0; i < sulka.columns.length; i++){
+			if(sulka.columns[i].$sulkaVisible && 
+				sulka.columns[i].field == gridColumns[gridInd].field){
+				sulka.columns[i].width = gridColumns[gridInd].width;
+				gridInd++;
+			}
+		}
+	},
+	
+	/**
+	 * onColumnsReorder updates order changes to sulka.columns.
+	 */
+	updateOrderToSulkaColumns: function(e, args){
+		var columnIndex = 0;
+		var gridColumns = sulka.grid.getColumns();
+		var updatedColumnList = {};
+		for(var i = 0; i < sulka.columns.length; i++){
+			if(!sulka.columns[i].$sulkaVisible)
+				updatedColumnList[sulka.columns[i].field] = i;
+			else
+				if(columnIndex < gridColumns.length){
+					updatedColumnList[gridColumns[columnIndex].field] = i;
+					columnIndex++;
+				}
+		}
+		var newColumns = [];
+		for(var i = 0; i < sulka.columns.length; i++)
+			newColumns[updatedColumnList[sulka.columns[i].field]] = sulka.columns[i];
+		
+		sulka.columns = newColumns;
 	},
 	
 	
