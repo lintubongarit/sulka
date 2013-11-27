@@ -93,6 +93,15 @@ helpers = {
 		helpers.showLoader();
 	},
 	
+	showValidationErrors: function (args) {
+		sulka.helpers.unsetErrorAndShowLoader();
+		if (sulka.getData()[args.row].$invalid_msg !== undefined) {
+			sulka.helpers.hideLoaderAndSetError(sulka.getData()[args.row].$invalid_msg);
+		} else {
+			sulka.helpers.hideLoaderAndSetError("");
+		}
+	},
+	
 	/**
 	 * A generic function that will cancel the jQuery or DOM event it is
 	 * supplied with. */

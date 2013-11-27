@@ -205,8 +205,6 @@ sulka = {
 			sulka.grid.onDrag.subscribe(sulka.onDrag);
 			sulka.grid.onDragEnd.subscribe(sulka.onDragEnd);
 			
-			sulka.grid.onClick.subscribe(sulka.onClick);
-			
 			sulka.grid.onActiveCellChanged.subscribe(sulka.onActiveCellChanged);
 			
 			//Init drop events?
@@ -1019,22 +1017,6 @@ sulka = {
 	 */
 	onCellChange: function(event, args){
 		sulka.addToSulkaDB(args.row);
-		
-	},
-	
-	/**
-	 * This function is called when slickgrid is clicked.
-	 * If invalid row is clicked, displays it's error msg.
-	 */
-	onClick: function(e, args) {
-		if (args.row === sulka.getData().length)
-			return;
-		sulka.helpers.unsetErrorAndShowLoader();
-		if (sulka.getData()[args.row].$invalid_msg !== undefined) {
-			sulka.helpers.hideLoaderAndSetError(sulka.getData()[args.row].$invalid_msg);
-		} else {
-			sulka.helpers.hideLoaderAndSetError("");
-		}
 	},
 	
 	/**
@@ -1049,13 +1031,12 @@ sulka = {
 	 *  $invalid_msg: error msg to be displayed when invalid row is clicked
 	 */
 	
-	onActiveCellChanged: function () {
+	onActiveCellChanged: function (e, args) {
 		sulka.setEditingCell(false);
 		
 		if (sulka.previousActiveRow !== undefined
 				&& sulka.grid.getSelectedRows()[0] !== sulka.previousActiveRow
 				&& sulka.previousActiveRowEdited ){
-			
 			
 			var data = sulka.getData();
 			var actualRowData = data[sulka.previousActiveRow];
@@ -1114,6 +1095,8 @@ sulka = {
 			);
 		}
 		sulka.previousActiveRow = sulka.grid.getSelectedRows()[0];
+		
+		sulka.helpers.showValidationErrors(args);
 	},
 	
 	/**
