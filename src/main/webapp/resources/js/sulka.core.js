@@ -1250,6 +1250,22 @@ sulka = {
 					sulka.columns = updatedColumns;
 					sulka.grid.setColumns(sulka.getVisibleColumns());
 					sulka.renderColumnGroups();
+					
+					var menuItems = $("#header-context-menu .context-menu-item span");
+					for(var i = 0; i < (menuItems.length / 2); i++){
+						var tickIndex = 2 * i;
+						var itemIndex = 2 * i + 1;
+						var columnName = menuItems[itemIndex].innerHTML;
+						for(var columnNo in sulka.columns){
+							if(sulka.columns[columnNo].name == columnName){
+								if(sulka.columns[columnNo].$sulkaVisible)
+									menuItems[tickIndex].textContent = sulka.TICK_MARK;
+								else
+									menuItems[tickIndex].textContent = "";
+								break;
+							}
+						}
+					}
 				}
 				
 				if(results.object.filters){

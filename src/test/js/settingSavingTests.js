@@ -1,4 +1,4 @@
-casper.test.begin('Setting saving tests', 23, function suite(test) {
+casper.test.begin('Setting saving tests', 24, function suite(test) {
     browse('/', function () {
     	
     	casper.then(function () {
@@ -191,6 +191,18 @@ casper.test.begin('Setting saving tests', 23, function suite(test) {
 				return sulka.columns[4].$sulkaVisible;
 			});
 			test.assertFalse(isColumnVisible, "Column visibility status is restored in addRingings -mode.");
+		}).then(function() {
+			var isTickVisible = casper.evaluate(function() {
+				var name = sulka.columns[4].name;
+				var menuItems = $("#header-context-menu .context-menu-item span");
+				for(var i=0; i < sulka.columns.length; i++){
+					var tickIndex = 2 * i;
+					var itemIndex = 2 * i + 1;
+					if(menuItems[itemIndex].innerHTML == name)
+						return ! menuItems[tickIndex].textContent == "";
+				}
+			});
+			test.assertFalse(isTickVisible, "Tick is removed from context-menu.");
 		}).then(function () {
 			this.click('#add-recoveries-tab');
 		}).then(function () {
