@@ -1,4 +1,4 @@
-casper.test.begin('Setting saving tests', 23, function suite(test) {
+casper.test.begin('Setting saving tests', 24, function suite(test) {
     browse('/', function () {
     	
     	casper.then(function () {
@@ -7,7 +7,7 @@ casper.test.begin('Setting saving tests', 23, function suite(test) {
     		});
     	}).waitWhileVisible("#loader-animation"
 		).then(function () {
-			returnValue = casper.evaluate(function() {
+			var returnValue = casper.evaluate(function() {
 				return sulka.helpers.getError();
 			});
 			test.assertNotEquals(returnValue, "Asetusten tallentaminen epäonnistui.", "Saving columns won't fail in browsing -mode.");
@@ -30,7 +30,10 @@ casper.test.begin('Setting saving tests', 23, function suite(test) {
 		).then(function(){
 			var columnWidth = casper.evaluate(function(){
 				var gridColumns = sulka.grid.getColumns();
-				return gridColumns[2].width;
+				var returnWidth = gridColumns[2].width;
+				gridColumns[2].width = 50;
+				sulka.saveSettings();
+				return returnWidth;
 			});
 			test.assertEquals(columnWidth, 555, "Previously saved column width is restored in browsing -mode.");
 		}).then(function() {
@@ -98,6 +101,17 @@ casper.test.begin('Setting saving tests', 23, function suite(test) {
 				return sulka.columns[4].$sulkaVisible;
 			});
 			test.assertFalse(isColumnVisible, "Column visibility status is restored in browsing -mode.");
+		}).then(function() {
+			this.fill('form#filters', {
+				date: '',
+				species: '',
+				municipality: '',
+				ringings: true,
+				recoveries: true
+				}, false);
+			casper.evaluate(function(){
+				sulka.saveSettings();
+			});
 		}).then(function () {
 			this.click('#add-ringings-tab');
 		}).then(function () {
@@ -106,7 +120,7 @@ casper.test.begin('Setting saving tests', 23, function suite(test) {
     		});
     	}).waitWhileVisible("#loader-animation"
 		).then(function () {
-			returnValue = casper.evaluate(function() {
+			var returnValue = casper.evaluate(function() {
 				return sulka.helpers.getError();
 			});
 			test.assertNotEquals(returnValue, "Asetusten tallentaminen epäonnistui.", "Saving columns won't fail in addRingings -mode.");
@@ -129,7 +143,10 @@ casper.test.begin('Setting saving tests', 23, function suite(test) {
 		).then(function(){
 			var columnWidth = casper.evaluate(function(){
 				var gridColumns = sulka.grid.getColumns();
-				return gridColumns[2].width;
+				var returnWidth = gridColumns[2].width;
+				gridColumns[2].width = 50;
+				sulka.saveSettings();
+				return returnWidth;
 			});
 			test.assertEquals(columnWidth, 555, "Previously saved column width is restored in addRingings -mode.");
 		}).then(function() {
@@ -191,6 +208,28 @@ casper.test.begin('Setting saving tests', 23, function suite(test) {
 				return sulka.columns[4].$sulkaVisible;
 			});
 			test.assertFalse(isColumnVisible, "Column visibility status is restored in addRingings -mode.");
+		}).then(function() {
+			var isTickVisible = casper.evaluate(function() {
+				var name = sulka.columns[4].name;
+				var menuItems = $("#header-context-menu .context-menu-item span");
+				for(var i=0; i < sulka.columns.length; i++){
+					var tickIndex = 2 * i;
+					var itemIndex = 2 * i + 1;
+					if(menuItems[itemIndex].innerHTML == name)
+						return ! menuItems[tickIndex].textContent == "";
+				}
+			});
+			test.assertFalse(isTickVisible, "Tick is removed from context-menu.");
+		}).then(function() {
+			this.fill('form#filters', {
+				date: '',
+				species: '',
+				municipality: ''
+				}, false);
+			casper.evaluate(function(){
+				sulka.columns[4].$sulkaVisible = true;
+				sulka.saveSettings();
+			});
 		}).then(function () {
 			this.click('#add-recoveries-tab');
 		}).then(function () {
@@ -199,7 +238,7 @@ casper.test.begin('Setting saving tests', 23, function suite(test) {
     		});
     	}).waitWhileVisible("#loader-animation"
 		).then(function () {
-			returnValue = casper.evaluate(function() {
+			var returnValue = casper.evaluate(function() {
 				return sulka.helpers.getError();
 			});
 			test.assertNotEquals(returnValue, "Asetusten tallentaminen epäonnistui.", "Saving columns won't fail in addRecoveries -mode.");
@@ -222,7 +261,10 @@ casper.test.begin('Setting saving tests', 23, function suite(test) {
 		).then(function(){
 			var columnWidth = casper.evaluate(function(){
 				var gridColumns = sulka.grid.getColumns();
-				return gridColumns[2].width;
+				var returnWidth = gridColumns[2].width;
+				gridColumns[2].width = 50;
+				sulka.saveSettings();
+				return returnWidth;
 			});
 			test.assertEquals(columnWidth, 555, "Previously saved column width is restored in addRecoveries -mode.");
 		}).then(function() {
@@ -284,6 +326,15 @@ casper.test.begin('Setting saving tests', 23, function suite(test) {
 				return sulka.columns[4].$sulkaVisible;
 			});
 			test.assertFalse(isColumnVisible, "Column visibility status is restored in addRecoveries -mode.");
+		}).then(function(){
+			this.fill('form#filters', {
+				date: '',
+				species: '',
+				municipality: ''
+				}, false);
+			casper.evaluate(function(){
+				sulka.saveSettings();
+			});
 		});
     });
     

@@ -238,13 +238,18 @@ sulka = {
 		sulka.grid.onAddNewRow.subscribe(sulka.onAddNewRow);
 		
 		sulka.grid.onCellChange.subscribe(sulka.onCellChange);
-				  
+		
+		sulka.grid.onColumnsResized.subscribe(sulka.updateWidthToSulkaColumns);
+		sulka.grid.onColumnsReordered.subscribe(sulka.updateOrderToSulkaColumns);
+		
 		$(window).resize(sulka.resizeGrid);
 		sulka.resizeGrid();
 		
 		$("#slick-grid").mousewheel(sulka.onMouseWheel);
 		
 		sulka.reloadData();
+		
+		sulka.fetchSettings();
 	},
 	
 	/**
@@ -442,6 +447,44 @@ sulka = {
 		    sulka.grid.render();
 		  });
 		
+	},
+	
+	/**
+	 * onColumnResized updates column width changes to sulka.columns.
+	 */
+	updateWidthToSulkaColumns: function(e, args){
+		var gridInd = 0;
+		var gridColumns = sulka.grid.getColumns();
+		for(var i = 0; i < sulka.columns.length; i++){
+			if(sulka.columns[i].$sulkaVisible && 
+				sulka.columns[i].field == gridColumns[gridInd].field){
+				sulka.columns[i].width = gridColumns[gridInd].width;
+				gridInd++;
+			}
+		}
+	},
+	
+	/**
+	 * onColumnsReorder updates order changes to sulka.columns.
+	 */
+	updateOrderToSulkaColumns: function(e, args){
+		var columnIndex = 0;
+		var gridColumns = sulka.grid.getColumns();
+		var updatedColumnList = {};
+		for(var i = 0; i < sulka.columns.length; i++){
+			if(!sulka.columns[i].$sulkaVisible)
+				updatedColumnList[sulka.columns[i].field] = i;
+			else
+				if(columnIndex < gridColumns.length){
+					updatedColumnList[gridColumns[columnIndex].field] = i;
+					columnIndex++;
+				}
+		}
+		var newColumns = [];
+		for(var i = 0; i < sulka.columns.length; i++)
+			newColumns[updatedColumnList[sulka.columns[i].field]] = sulka.columns[i];
+		
+		sulka.columns = newColumns;
 	},
 	
 	
@@ -749,9 +792,6 @@ sulka = {
 			if (combineCalls < N_CALLS) return;
 			
 			sulka.setData(combinedRows);
-			if (combinedRows.length > 0) {
-				sulka.adjustFlexibleCols(combinedRows);
-			}
 			
 			sulka.colouriseCellsWithErrors(sulka.getData());
 			sulka.grid.render();
@@ -775,10 +815,6 @@ sulka = {
 				sulka.rowsMode,
 				filters,
 				function (rows) {
-					if (rows.length > 0) {
-						sulka.adjustFlexibleCols(rows);
-					}
-					
 					var sulkaRows = [];
 					for (var i=0; i<rows.length; i++) {
 						var row;
@@ -918,55 +954,6 @@ sulka = {
 				}
 			}
 		};
-	},
-	
-	/**
-	 * Adjust flexible columns for new data. 
-	 */
-	adjustFlexibleCols: function (rows) {
-		var flexibleCols = [];
-		
-		var a = sulka.grid.getColumns();
-		for (var i=0; i<a.length; i++) {
-			var col = a[i];
-			if (col.$sulkaFlexible) {
-				col.$sulkaFlexible = false;
-				col.$sulkaMaxStrLen = 0;
-				col.$sulkaMaxTextWidth = sulka.COL_PADDING;
-				flexibleCols.push(col);
-			}
-		}
-		
-		if (flexibleCols.length == 0) {
-			return;
-		}
-		
-		for (var i=0; i<rows.length; i++) {
-			var row = rows[i];
-			for (var j=0; j<flexibleCols.length; j++) {
-				var col = flexibleCols[j];
-				if (col.$sulkaMaxTextWidth >= sulka.COL_MAX_WIDTH) continue;
-				
-				var str = String(row[col.field]);
-				if (str.length > col.$sulkaMaxStrLen) {
-					col.$sulkaMaxStrLen = str.length;
-					// sulka.getRenderedTextWidth() is an expensive call
-					var newWidth = sulka.COL_PADDING + sulka.getRenderedTextWidth(str);
-					if (col.$sulkaMaxTextWidth < newWidth) {
-						col.$sulkaMaxTextWidth = Math.max(newWidth, col.$sulkaMaxTextWidth);
-					}
-				}
-			}
-		}
-		
-		for (var j=0; j<flexibleCols.length; j++) {
-			var col = flexibleCols[j];
-			col.width = Math.min(sulka.COL_MAX_WIDTH, col.$sulkaMaxTextWidth);
-			delete col.$sulkaMaxStrLen;
-			delete col.$sulkaMaxTextWidth;
-		}
-		sulka.grid.setColumns(a);
-		sulka.renderColumnGroups();
 	},
 	
 	/**
@@ -1183,7 +1170,7 @@ sulka = {
 	},
 	
 	/**
-	 * SaveSettings function is used to save users current view, which includes:
+	 * Save users current view, that includes:
 	 * 	- Filters
 	 * 	- Column settings
 	 * 
@@ -1227,7 +1214,7 @@ sulka = {
 	
 	
 	/**
-	 * FetchSettings is used to fetch user settings from the Sulka database.
+	 * Fetch user settings from the Sulka database.
 	 */
 	fetchSettings: function() {
 		sulka.helpers.showLoader();
@@ -1250,15 +1237,37 @@ sulka = {
 					sulka.columns = updatedColumns;
 					sulka.grid.setColumns(sulka.getVisibleColumns());
 					sulka.renderColumnGroups();
+					
+					var menuItems = $("#header-context-menu .context-menu-item span");
+					for(var i = 0; i < (menuItems.length / 2); i++){
+						var tickIndex = 2 * i;
+						var itemIndex = 2 * i + 1;
+						var columnName = menuItems[itemIndex].innerHTML;
+						for(var columnNo in sulka.columns){
+							if(sulka.columns[columnNo].name == columnName){
+								if(sulka.columns[columnNo].$sulkaVisible)
+									menuItems[tickIndex].textContent = sulka.TICK_MARK;
+								else
+									menuItems[tickIndex].textContent = "";
+								break;
+							}
+						}
+					}
 				}
 				
 				if(results.object.filters){
 					var filters = jQuery.parseJSON(results.object.filters);
-					$("#filters-date").val(filters.date);
-					$("#filters-species").val(filters.species);
-					$("#filters-municipality").val(filters.municipality);
-					$("#filters-ringings").prop('checked', filters.ringings);
-					$("#filters-recoveries").prop('checked', filters.recoveries);
+					if(filters.date != "")
+						$("#filters-date").val(filters.date);
+					if(filters.species != "")
+						$("#filters-species").val(filters.species);
+					if(filters.municipality != "")
+						$("#filters-municipality").val(filters.municipality);
+
+					if(sulka.viewMode == "browsing"){
+						$("#filters-ringings").prop('checked', filters.ringings);
+						$("#filters-recoveries").prop('checked', filters.recoveries);
+					}
 				}
 			}, function onError(){
 				sulka.helpers.hideLoaderAndSetError(sulka.strings.settingsReceivedFailed);
