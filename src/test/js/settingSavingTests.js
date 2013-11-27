@@ -7,7 +7,7 @@ casper.test.begin('Setting saving tests', 23, function suite(test) {
     		});
     	}).waitWhileVisible("#loader-animation"
 		).then(function () {
-			returnValue = casper.evaluate(function() {
+			var returnValue = casper.evaluate(function() {
 				return sulka.helpers.getError();
 			});
 			test.assertNotEquals(returnValue, "Asetusten tallentaminen epäonnistui.", "Saving columns won't fail in browsing -mode.");
@@ -106,7 +106,7 @@ casper.test.begin('Setting saving tests', 23, function suite(test) {
     		});
     	}).waitWhileVisible("#loader-animation"
 		).then(function () {
-			returnValue = casper.evaluate(function() {
+			var returnValue = casper.evaluate(function() {
 				return sulka.helpers.getError();
 			});
 			test.assertNotEquals(returnValue, "Asetusten tallentaminen epäonnistui.", "Saving columns won't fail in addRingings -mode.");
@@ -199,7 +199,7 @@ casper.test.begin('Setting saving tests', 23, function suite(test) {
     		});
     	}).waitWhileVisible("#loader-animation"
 		).then(function () {
-			returnValue = casper.evaluate(function() {
+			var returnValue = casper.evaluate(function() {
 				return sulka.helpers.getError();
 			});
 			test.assertNotEquals(returnValue, "Asetusten tallentaminen epäonnistui.", "Saving columns won't fail in addRecoveries -mode.");
