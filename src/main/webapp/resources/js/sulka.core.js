@@ -247,9 +247,9 @@ sulka = {
 		
 		$("#slick-grid").mousewheel(sulka.onMouseWheel);
 		
-		sulka.fetchSettings();
-		
 		sulka.reloadData();
+		
+		sulka.fetchSettings();
 	},
 	
 	/**
@@ -792,9 +792,6 @@ sulka = {
 			if (combineCalls < N_CALLS) return;
 			
 			sulka.setData(combinedRows);
-			if (combinedRows.length > 0) {
-				sulka.adjustFlexibleCols(combinedRows);
-			}
 			
 			sulka.colouriseCellsWithErrors(sulka.getData());
 			sulka.grid.render();
@@ -818,10 +815,6 @@ sulka = {
 				sulka.rowsMode,
 				filters,
 				function (rows) {
-					if (rows.length > 0) {
-						sulka.adjustFlexibleCols(rows);
-					}
-					
 					var sulkaRows = [];
 					for (var i=0; i<rows.length; i++) {
 						var row;
@@ -961,55 +954,6 @@ sulka = {
 				}
 			}
 		};
-	},
-	
-	/**
-	 * Adjust flexible columns for new data. 
-	 */
-	adjustFlexibleCols: function (rows) {
-		var flexibleCols = [];
-		
-		var a = sulka.grid.getColumns();
-		for (var i=0; i<a.length; i++) {
-			var col = a[i];
-			if (col.$sulkaFlexible) {
-				col.$sulkaFlexible = false;
-				col.$sulkaMaxStrLen = 0;
-				col.$sulkaMaxTextWidth = sulka.COL_PADDING;
-				flexibleCols.push(col);
-			}
-		}
-		
-		if (flexibleCols.length == 0) {
-			return;
-		}
-		
-		for (var i=0; i<rows.length; i++) {
-			var row = rows[i];
-			for (var j=0; j<flexibleCols.length; j++) {
-				var col = flexibleCols[j];
-				if (col.$sulkaMaxTextWidth >= sulka.COL_MAX_WIDTH) continue;
-				
-				var str = String(row[col.field]);
-				if (str.length > col.$sulkaMaxStrLen) {
-					col.$sulkaMaxStrLen = str.length;
-					// sulka.getRenderedTextWidth() is an expensive call
-					var newWidth = sulka.COL_PADDING + sulka.getRenderedTextWidth(str);
-					if (col.$sulkaMaxTextWidth < newWidth) {
-						col.$sulkaMaxTextWidth = Math.max(newWidth, col.$sulkaMaxTextWidth);
-					}
-				}
-			}
-		}
-		
-		for (var j=0; j<flexibleCols.length; j++) {
-			var col = flexibleCols[j];
-			col.width = Math.min(sulka.COL_MAX_WIDTH, col.$sulkaMaxTextWidth);
-			delete col.$sulkaMaxStrLen;
-			delete col.$sulkaMaxTextWidth;
-		}
-		sulka.grid.setColumns(a);
-		sulka.renderColumnGroups();
 	},
 	
 	/**
@@ -1313,11 +1257,17 @@ sulka = {
 				
 				if(results.object.filters){
 					var filters = jQuery.parseJSON(results.object.filters);
-					$("#filters-date").val(filters.date);
-					$("#filters-species").val(filters.species);
-					$("#filters-municipality").val(filters.municipality);
-					$("#filters-ringings").prop('checked', filters.ringings);
-					$("#filters-recoveries").prop('checked', filters.recoveries);
+					if(filters.date != "")
+						$("#filters-date").val(filters.date);
+					if(filters.species != "")
+						$("#filters-species").val(filters.species);
+					if(filters.municipality != "")
+						$("#filters-municipality").val(filters.municipality);
+
+					if(sulka.viewMode == "browsing"){
+						$("#filters-ringings").prop('checked', filters.ringings);
+						$("#filters-recoveries").prop('checked', filters.recoveries);
+					}
 				}
 			}, function onError(){
 				sulka.helpers.hideLoaderAndSetError(sulka.strings.settingsReceivedFailed);
