@@ -1080,10 +1080,11 @@ sulka = {
 					sulka.helpers.hideLoaderAndSetError();
 				}
 			);
+		} else if (sulka.grid.getSelectedRows()[0] !== sulka.getData().length) { //addrow is buggy
+			sulka.helpers.showValidationErrors(args);
 		}
 		sulka.previousActiveRow = sulka.grid.getSelectedRows()[0];
 		
-		sulka.helpers.showValidationErrors(args);
 	},
 	
 	/**
