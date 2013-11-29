@@ -419,7 +419,7 @@ sulka = {
 	/**
 	 * OnMoveRows events
 	 */
-	onMoveRows: function(e,args){
+	onMoveRows: function(e,args) {
 		sulka.moveRowsPlugin.onMoveRows.subscribe(function (e, args) {
 		    var extractedRows = [], left, right;
 		    var rows = args.rows;
@@ -461,7 +461,7 @@ sulka = {
 	/**
 	 * onColumnResized updates column width changes to sulka.columns.
 	 */
-	updateWidthToSulkaColumns: function(e, args){
+	updateWidthToSulkaColumns: function(e, args) {
 		var gridInd = 0;
 		var gridColumns = sulka.grid.getColumns();
 		for(var i = 0; i < sulka.columns.length; i++){
@@ -476,7 +476,7 @@ sulka = {
 	/**
 	 * onColumnsReorder updates order changes to sulka.columns.
 	 */
-	updateOrderToSulkaColumns: function(e, args){
+	updateOrderToSulkaColumns: function(e, args) {
 		var columnIndex = 0;
 		var gridColumns = sulka.grid.getColumns();
 		var updatedColumnList = {};
@@ -500,7 +500,7 @@ sulka = {
 	/**
 	 *	OnDragInit is used to prevent the grid from cancelling drag'n'drop by default 
 	 */
-	onDragInit: function(e,dd){
+	onDragInit: function(e,dd) {
 		sulka.grid.onDragInit.subscribe(function (e, dd) {
 		    // prevent the grid from cancelling drag'n'drop by default
 		    e.stopImmediatePropagation();
