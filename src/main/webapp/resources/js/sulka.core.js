@@ -347,8 +347,6 @@ sulka = {
 	MOUSE_WHEEL_ROW_HEIGHT: 25,
 	MOUSE_WHEEL_SCROLL_ROWS: 3,
 	
-	
-	
 	/**
 	 * Handle mouse wheel events.
 	 */
