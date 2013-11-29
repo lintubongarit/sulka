@@ -25,50 +25,48 @@
 </head>
 <body>
 	<iframe id="mapframe" name="map" src="https://www.luomus.fi/wkartta/map.html"></iframe>
-	<script type="text/javascript">
-
-    function config() {
-    	konffi =  {
-    	  "simple": true,
-    	  "single": true,
-    	  "annotate": false,
-    	  "mapOptions": {
-    	    "scale": true,
-    	    "center": [
-  	               62,
-  	               25
-    	    ],
-    	    "maxBounds": null,
-    	    "maxZoom": 17,
-    	    "minZoom": null,
-    	    "zoom": 7
-    	  },
-    	  "locationTypes": {
-    	    "lineString": true,
-    	    "point": true,
-    	    "polygon": true,
-    	    "rectangle": true
-    	  },
-    	  "mapTypes": [
-    	    "osm",
-    	    "mm"
-    	  ]
-    	}
-    	
-        map = new (new WK()).Map('mapframe', konffi);
-        map.onChange(function (mapEntries) {
-
-        	parent.sulka.lastInputCoordinate = JSONWK.stringify(mapEntries, undefined, 2);
-        	parent.sulka.lastInputCoordinateLat = JSONWK.stringify(mapEntries[0].location[0], undefined, 2);
-        	parent.sulka.lastInputCoordinateLon = JSONWK.stringify(mapEntries[0].location[1], undefined, 2);
-        });
-        
-       	if (parent.sulka.lastInputCoordinate) {
-           	map.update(JSONWK.parse(parent.sulka.lastInputCoordinate));
-
-       	}
-    }
-    config();
-</script>
+    <script type="text/javascript">
+    var testi = null;
+	(function () {
+	  var konffi =  {
+	    "simple": true,
+	    "single": true,
+	    "annotate": false,
+	    "mapOptions": {
+	      "scale": true,
+	      "center": [
+	             62,
+	             25
+	      ],
+	      "maxBounds": null,
+	      "maxZoom": 17,
+	      "minZoom": null,
+	      "zoom": 7
+	    },
+	    "locationTypes": {
+	      "lineString": true,
+	      "point": true,
+	      "polygon": true,
+	      "rectangle": true
+	    },
+	    "mapTypes": [
+	      "osm",
+	      "mm"
+	    ]
+	  };
+	  
+	  var map = new (new WK()).Map('mapframe', konffi);
+	  map.onChange(function(mapEntries) {
+	      parent.sulka.lastInputCoordinate = JSON.stringify(mapEntries, undefined, 2);
+	      parent.sulka.lastInputCoordinateLat = JSON.stringify(mapEntries[0].location[0], undefined, 2);
+	      parent.sulka.lastInputCoordinateLon = JSON.stringify(mapEntries[0].location[1], undefined, 2);
+	  });
+	  
+	  if (parent.sulka.lastInputCoordinate) {
+	      map.update(JSON.parse(parent.sulka.lastInputCoordinate));
+	
+	  }
+	})();
+    </script>
 </body>
 </html>

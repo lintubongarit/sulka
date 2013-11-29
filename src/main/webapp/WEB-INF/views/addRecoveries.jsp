@@ -44,23 +44,19 @@
 		<table class="local-toolbar">
 			<tr>
 				<td>
-					<form id="filters">
+					<form id="filters" onchange="sulka.reloadData();">
 						Aika (esim. 2005 tai 2005-2006): <input type="text" id="filters-date" name="date" />
 						Laji: <input type="text" id="filters-species" name="species" />
 						Kunta: <input type="text" id="filters-municipality" name="municipality" />
 						<input type="submit" id="form-submit" value="OK" />
 						<input type="reset" id="form-reset" value="Tyhjennä" />
-						<a class='iframe callbacks' href="resources/html/map.html">WKARTTA</a>
+						<a id='mapIFrame' class='iframe callbacks' href="resources/html/map.html">WKARTTA</a>
 						<img src="resources/img/ajax-loader.gif" id="loader-animation" />
 					</form>
 				</td>
 				<td>
 					<button type="button" id="saveSettings" class="local-toolbar-menu" onclick="sulka.saveSettings();">Tallenna asetukset</button>
 					<button type="button" id="loadSettings" class="local-toolbar-menu" onclick="sulka.fetchSettings();">Lataa asetukset</button>
-				</td>
-				<td>
-					<button type="button" id="validate" class="local-toolbar-menu" onclick="sulka.validate();">Validoi</button>
-					<button type="button" class="local-toolbar-menu" value="new row" onclick="sulka.addRow();">Lisää rivi</button>
 				</td>
 				<td>
 				    <div id="dropzone" class="recycle-bin">

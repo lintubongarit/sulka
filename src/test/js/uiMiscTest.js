@@ -21,11 +21,11 @@ casper.test.begin('Uitests', 9, function suite(test) {
     	}).
     	waitWhileVisible("#loader-animation").
     	then(function () {
-    		test.assertExists("#slick-grid .recovery-row .rowtype-column", "There is at least one recovery row");
-    		test.assertExists("#slick-grid .ringing-row .rowtype-column", "There is at least one ringing row");
+    		test.assertExists("#slick-grid .recovery-row .sulka-column-type", "There is at least one recovery row");
+    		test.assertExists("#slick-grid .ringing-row .sulka-column-type", "There is at least one ringing row");
 	    	test.assertTrue(
 				casper.evaluate(function () {
-					return $.map($("#slick-grid .rowtype-column"), function (item) {
+					return $.map($("#slick-grid .sulka-column-type"), function (item) {
 						return $(item).text().trim();
 					}).every(function (itemText) {
 						return itemText.length == 0; 
@@ -39,7 +39,7 @@ casper.test.begin('Uitests', 9, function suite(test) {
 	    			var bgImageEnd1 = bgImage + '")';
 	    			var bgImageEnd2 = bgImage + "')";
 	    			var bgImageEnd3 = bgImage + ")";
-	    			return $.map($("#slick-grid .ringing-row .rowtype-column"), function (rowTypeColumn) {
+	    			return $.map($("#slick-grid .ringing-row .sulka-column-type"), function (rowTypeColumn) {
 	    				return String($(rowTypeColumn).css("backgroundImage"));
 	    			}).every(function (bgImageActual) {
 	    				var endsWith = function(str, end) {
@@ -59,7 +59,7 @@ casper.test.begin('Uitests', 9, function suite(test) {
 	    			var bgImageEnd1 = bgImage + '")';
 	    			var bgImageEnd2 = bgImage + "')";
 	    			var bgImageEnd3 = bgImage + ")";
-	    			return $.map($("#slick-grid .recovery-row .rowtype-column"), function (rowTypeColumn) {
+	    			return $.map($("#slick-grid .recovery-row .sulka-column-type"), function (rowTypeColumn) {
 	    				return String($(rowTypeColumn).css("backgroundImage"));
 	    			}).every(function (bgImageActual) {
 	    				var endsWith = function(str, end) {
