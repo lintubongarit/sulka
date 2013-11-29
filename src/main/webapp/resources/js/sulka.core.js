@@ -1200,8 +1200,17 @@ sulka = {
 				recoveries: $("#filters-recoveries").prop("checked"),
 		};
 		
+		var freezedCount = 0;
+		if(sulka.freeze.grid != null)
+			freezedCount = sulka.freeze.grid.getColumns().length;
+		
+		var columnsData = {
+				columns: columnsDataToBeSaved,
+				freezeCount: freezedCount,
+		};
+		
 		var settings = {
-				columns: JSON.stringify(columnsDataToBeSaved),
+				columns: JSON.stringify(columnsData),
 				filters: JSON.stringify(filters),
 		};
 		sulka.API.saveSettings(sulka.viewMode, settings,
@@ -1224,19 +1233,32 @@ sulka = {
 				sulka.helpers.hideLoader();
 				
 				if(results.object.columns){
+					if(sulka.viewMode == "browsing" && sulka.freeze.grid != null){
+						// Unfreeze freezed columns before editing. 
+						var freezedColumnCount = sulka.freeze.grid.getColumns().length;
+						for(; freezedColumnCount > 0; freezedColumnCount--)
+							sulka.freeze.unfreezeRightColumn();
+					}
 					var settings = jQuery.parseJSON(results.object.columns);
 					var oldColumns = sulka.columns;
 					var updatedColumns = [];
 					for(var index in oldColumns){ 
 						// Data is in following format:
 						// "columnName": [position, width, visibility]
-						oldColumns[index].width = settings[oldColumns[index].field][1];
-						oldColumns[index].$sulkaVisible = settings[oldColumns[index].field][2];
-						updatedColumns[settings[oldColumns[index].field][0]] = oldColumns[index];
+						oldColumns[index].width = settings.columns[oldColumns[index].field][1];
+						oldColumns[index].$sulkaVisible = settings.columns[oldColumns[index].field][2];
+						updatedColumns[settings.columns[oldColumns[index].field][0]] = oldColumns[index];
 					}
 					sulka.columns = updatedColumns;
 					sulka.grid.setColumns(sulka.getVisibleColumns());
 					sulka.renderColumnGroups();
+					
+					if(sulka.viewMode == "browsing"){
+						var wantedFreezedColumnCount = settings.freezeCount;
+						for(var i = 0; i < wantedFreezedColumnCount; i++){
+							sulka.freeze.freezeLeftColumn();
+						}
+					}
 					
 					var menuItems = $("#header-context-menu .context-menu-item span");
 					for(var i = 0; i < (menuItems.length / 2); i++){
@@ -1252,6 +1274,13 @@ sulka = {
 								break;
 							}
 						}
+					}
+				}
+				
+				if(results.object.freezed){
+					var freezedColumnCount = jQuery.parseJSON(results.object.freezed);
+					for(var i = 0; i < freezedColumnCount; i++){
+						sulka.freeze.freezeLeftColumn();
 					}
 				}
 				
