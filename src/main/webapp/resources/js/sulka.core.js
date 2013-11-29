@@ -1222,12 +1222,13 @@ sulka = {
 					var settings = jQuery.parseJSON(results.object.columns);
 					var oldColumns = sulka.columns;
 					var updatedColumns = [];
-					for (var index=0; index<oldColumns.length; index++) { 
+					for (var index=0; index<oldColumns.length; index++) {
+						var oldColumn = oldColumns[index]; 
 						// Data is in following format:
 						// "columnName": [position, width, visibility]
-						oldColumns[index].width = settings[oldColumns[index].field][1];
-						oldColumns[index].$sulkaVisible = settings[oldColumns[index].field][2];
-						updatedColumns[settings[oldColumns[index].field][0]] = oldColumns[index];
+						oldColumn.width = settings[oldColumn.field][1];
+						oldColumn.$sulkaVisible = settings[oldColumn.field][2];
+						updatedColumns[settings[oldColumn.field][0]] = oldColumn;
 					}
 					sulka.columns = updatedColumns;
 					sulka.grid.setColumns(sulka.getVisibleColumns());
