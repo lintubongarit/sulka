@@ -133,49 +133,53 @@ editors = {
 	
 	    var prefixTree = new PrefixTree(enumValues);
 	    
-	    function setCompletionValue(value) {
-	    	$input.val(value);
+	    function showCompletions() {
+			var curVal = $input.val();
+			if (!caseSensitive) curVal = curVal.toUpperCase();
+			
+			if (completionsVisible && curVal === completionsString) return;
+			
+			var completions = prefixTree.getCompletions(curVal);
+			if (completions.length == 0) {
+				hideCompletions();
+				return;
+			}
+			
+			completions = completions.slice(0, MAX_COMPLETIONS);
+			$completions.empty();
+			var holder = $("<div></div>");
+			completions.forEach(function (completion) {
+				holder.append(
+					$("<div></div>").text(completion).click(setCompletionValue.bind(null, completion))
+				);
+			});
+			$completions.empty().append(holder).show();
+			selectedCompletion = -1;
+			curCompletions = completions;
+			completionsString = curVal;
+			completionsVisible = true;
+	    }
+	    
+	    function hideCompletions() {
 	    	$completions.hide();
-	    	completionsVisbile = false;
+			completionsVisible = false;
 	    }
 
+	    function setCompletionValue(value) {
+	    	$input.val(value);
+	    	hideCompletions();
+	    }
+	    
 	    this.init = function () {
 		    $input = $('<INPUT type="text" class="editor-text editor-completions" />');
 		    $completions = $('<DIV class="sulka-completions"></DIV>');
 		    
-		    $completions.hide();
-	
 		    $input.keyup(function (e) {
 		    	if (e.keyCode === $.ui.keyCode.UP || e.keyCode === $.ui.keyCode.LEFT || e.keyCode === $.ui.keyCode.RIGHT || 
 		    			e.keyCode === $.ui.keyCode.ENTER) {
 		    		return;
 		    	}
-		    	
-				var curVal = $input.val();
-				if (!caseSensitive) curVal = curVal.toUpperCase();
-				
-				if (completionsVisible && curVal === completionsString) return;
-				
-				var completions = prefixTree.getCompletions(curVal);
-				if (completions.length == 0) {
-					$completions.hide();
-					completionsVisible = false;
-					return;
-				}
-				
-				completions = completions.slice(0, MAX_COMPLETIONS);
-				$completions.empty();
-				var holder = $("<div></div>");
-				completions.forEach(function (completion) {
-					holder.append(
-						$("<div></div>").text(completion).click(setCompletionValue.bind(null, completion))
-					);
-				});
-				$completions.empty().append(holder).show();
-				selectedCompletion = -1;
-				curCompletions = completions;
-				completionsString = curVal;
-				completionsVisible = true;
+		    	showCompletions();
 		    });
 		    
 		    $input.bind("keydown.nav", function (e) {
@@ -193,8 +197,7 @@ editors = {
 		    				selectedCompletion--;
 		    			}
 						if (selectedCompletion < 0) {
-							$completions.hide();
-							completionsVisible = false;
+							hideCompletions();
 							return;
 						} else if (oldCompletion !== selectedCompletion) {
 	    					$completions.find('div div').removeClass("selected-completion");
@@ -215,6 +218,7 @@ editors = {
 		    	}
 		    });
 	
+		    showCompletions();
 		    $('<div></div>').append($completions).append($input).appendTo(args.container);
 		    $input.focus().select();
 	    };
