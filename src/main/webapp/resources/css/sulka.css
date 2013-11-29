@@ -187,7 +187,7 @@ span#last-error {
 }
 
 .slick-cell.selected {
-	background-color: rgba(166, 61, 118, 1); /* show selected row background */
+	background: rgba(0, 0, 255, 0.1)
 }
 
 
@@ -318,16 +318,21 @@ span#last-error {
 }
 
 .sulka-invalid-cell {
-	background: #f49696; 
+	background: rgba(255, 0, 0, 0.3);
 }
 
 .sulka-invalid-cell.selected {
-	background: #f87070; 
+	background: rgba(255, 0, 0, 0.5); 
 }
 
 .active.selected {
-	background: yellow;
+	border: 2px solid black;
 }
+
+.slick-cell.editable {
+	background: rgba(255, 255, 255, 1);
+}
+
 	
 .tipu-row-color-odd{
 	background: #6194FF; 
@@ -371,4 +376,24 @@ span#last-error {
 	width: 0;
 	z-index: 80;
 	border-right: 1px solid black;
+}
+.sulka-completions {
+	position: absolute;
+	top: 23px;
+	width: 100%;
+}
+.sulka-completions div div:first-child {
+	border-top: 1px solid black;
+}
+.sulka-completions div div {
+	border: 1px solid black;
+	border-top: none;
+	background-color: white;
+	height: 20px;
+}
+.sulka-completions div div.selected-completion {
+	background-color: gray;
+}
+.editor-completions {
+	float: left;
 }

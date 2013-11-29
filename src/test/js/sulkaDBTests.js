@@ -113,15 +113,12 @@ casper.test.begin('Sulka-database tests', 8, function suite(test) {
 	    	"sulka.onActiveCellChanged() does nothing if previous active row wasn't edited");
 	    	
 	    }).then(function() {
-	    	
-	    	
 	    	casper.evaluate(function(newRow){
 	    		sulka.previousActiveRow = newRow;
 	    		sulka.grid.setSelectedRows([-1]);
 	    		sulka.previousActiveRowEdited = true;
 	    		sulka.onActiveCellChanged();
 	    	}, newRow);
-	    	
 	    }).waitWhileVisible("#loader-animation"
 	    ).then(function() {
 			this.reload(function() {

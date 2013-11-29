@@ -44,7 +44,7 @@
 		<table class="local-toolbar">
 			<tr>
 				<td>
-					<form id="filters">
+					<form id="filters" onchange="sulka.reloadData();">
 						Aika (esim. 2005 tai 2005-2006): <input type="text" id="filters-date" name="date" />
 						Laji: <input type="text" id="filters-species" name="species" />
 						Kunta: <input type="text" id="filters-municipality" name="municipality" />
@@ -57,10 +57,6 @@
 				<td>
 					<button type="button" id="saveSettings" class="local-toolbar-menu" onclick="sulka.saveSettings();">Tallenna asetukset</button>
 					<button type="button" id="loadSettings" class="local-toolbar-menu" onclick="sulka.fetchSettings();">Lataa asetukset</button>
-				</td>
-				<td>
-				  	<button onclick="sulka.grid.setOptions({autoEdit:true})">Auto-edit ON</button>
-    				<button onclick="sulka.grid.setOptions({autoEdit:false})">Auto-edit OFF</button>
 				</td>
 				<td>
 				    <div id="dropzone" class="recycle-bin">

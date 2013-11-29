@@ -38,7 +38,7 @@
 		<table class="local-toolbar">
 			<tr>
 				<td>
-					<form id="filters">
+					<form id="filters" onchange="sulka.reloadData();">
 					    <sec:authorize access="hasRole('ADMIN')">
         				Rengastaja: <input type="text" id="filters-ringer" name="ringer"/>
         				</sec:authorize>

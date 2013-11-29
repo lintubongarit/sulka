@@ -107,11 +107,12 @@ sulka = {
 					$.each(this.fields, function () {
 						var field = this;
 						var id = group.name + "/" + field.field;
-						
-						var width;
+						var isEnumeration = false;
 						var isFlexible = false;
+						var width;
+						
 						if (field.enumerationValues) {
-							isFlexible = false;
+							isEnumeration = true;
 							width = sulka.COL_PADDING;
 							$.each(field.enumerationValues, function () {
 								var enumWidth = Math.min(
@@ -135,15 +136,25 @@ sulka = {
 							$sulkaGroup: group,
 							// Flexible columns are resized on next data fetch
 							$sulkaFlexible: isFlexible,
-							editor: Slick.Editors.Text,
+							$sulkaField: field, 
 							$sulkaFlexible: isFlexible,
-							cssClass: "sulka-column-" + field.field,
+							cssClass: "sulka-column-" + field.field
 						}, sulka.columnOptions);
 						
 						if (field.field == "type") {
 							column.$sulkaFlexible = false;
 							column.formatter = function () { return ""; };
 							column.width  = sulka.COL_TYPE_IMAGE_WIDTH + sulka.COL_PADDING;
+						}
+						
+						if (sulka.addMode) {
+							column.editor = isEnumeration ? sulka.editors.EnumerationEditor : Slick.Editors.Text;
+						}
+						
+						if (isEnumeration) {
+							column.$sulkaEnumValues = field.enumerationValues.map(function (apiField) {
+								return apiField.value;
+							});
 						}
 						
 						columns.push(column);
@@ -190,7 +201,7 @@ sulka = {
 		if (sulka.viewMode == "ringings" || sulka.viewMode == "recoveries"){
 			sulka.moveRowsPlugin = 
 				new Slick.RowMoveManager({   
-					canceltoggleEditDrag: true
+					canceleditingCellDrag: true
 				});
 			
 			sulka.grid.registerPlugin(sulka.moveRowsPlugin);
@@ -204,8 +215,6 @@ sulka = {
 			sulka.grid.onDragStart.subscribe(sulka.onDragStart);
 			sulka.grid.onDrag.subscribe(sulka.onDrag);
 			sulka.grid.onDragEnd.subscribe(sulka.onDragEnd);
-			
-			sulka.grid.onClick.subscribe(sulka.onClick);
 			
 			sulka.grid.onActiveCellChanged.subscribe(sulka.onActiveCellChanged);
 			
@@ -500,9 +509,16 @@ sulka = {
 	},
 	
 	/**
-	 * Handled by onkeyDown(). toggleEdit is set true when user start typing. When user presses key that changes active cell, toggleEdit is set false
+	 * Handled by onkeyDown(). editingCell is set true when user start typing. When user presses key that changes active cell, editingCell is set false
 	 */
-	toggleEdit: false,
+	editingCell: false,
+	
+	setEditingCell: function (value) {
+		sulka.editingCell = value;
+		sulka.grid.setOptions({
+			editable : value
+		});
+	},
 	
 	/**
 	 * key event enumerations
@@ -522,27 +538,17 @@ sulka = {
 	 * 
 	 */
 	onKeyDown: function(e) {
-		if (sulka.toggleEdit) {
+		if (sulka.editingCell) {
 			if (e.which === sulka.keys.ENTER || e.which === sulka.keys.TAB || e.which === sulka.keys.UP ||
 					e.which === sulka.keys.DOWN) {
-				console.log('off');
-				sulka.toggleEdit = false;
-				sulka.grid.setOptions({
-					editable : false
-				});
-				if (e.which !== sulka.keys.TAB && e.which !== sulka.keys.UP && e.which !== sulka.keys.DOWN){
 					sulka.grid.navigateRight();
-				}
 			}
 		} else {
-			console.log(e.which);
-			if (e.which !== sulka.keys.UP && e.which !== sulka.keys.DOWN && e.which !== sulka.keys.LEFT
+			if (e.which === sulka.keys.ENTER){
+				sulka.grid.navigateRight();
+			} else if (e.which !== sulka.keys.UP && e.which !== sulka.keys.DOWN && e.which !== sulka.keys.LEFT
 					&& e.which !== sulka.keys.RIGHT && e.which !== sulka.keys.TAB) {
-				console.log('on');
-				sulka.toggleEdit = true;
-				sulka.grid.setOptions({
-					editable : true
-				});
+				sulka.setEditingCell(true);
 				sulka.grid.editActiveCell(Slick.Text);
 			}
 		}
@@ -1009,22 +1015,6 @@ sulka = {
 	 */
 	onCellChange: function(event, args){
 		sulka.addToSulkaDB(args.row);
-		
-	},
-	
-	/**
-	 * This function is called when slickgrid is clicked.
-	 * If invalid row is clicked, displays it's error msg.
-	 */
-	onClick: function(e, args) {
-		if (args.row === sulka.getData().length)
-			return;
-		sulka.helpers.unsetErrorAndShowLoader();
-		if (sulka.getData()[args.row].$invalid_msg !== undefined) {
-			sulka.helpers.hideLoaderAndSetError(sulka.getData()[args.row].$invalid_msg);
-		} else {
-			sulka.helpers.hideLoaderAndSetError("");
-		}
 	},
 	
 	/**
@@ -1039,11 +1029,12 @@ sulka = {
 	 *  $invalid_msg: error msg to be displayed when invalid row is clicked
 	 */
 	
-	onActiveCellChanged: function () {
+	onActiveCellChanged: function (e, args) {
+		sulka.setEditingCell(false);
+		
 		if (sulka.previousActiveRow !== undefined
 				&& sulka.grid.getSelectedRows()[0] !== sulka.previousActiveRow
 				&& sulka.previousActiveRowEdited ){
-			
 			
 			var data = sulka.getData();
 			var actualRowData = data[sulka.previousActiveRow];
@@ -1100,8 +1091,11 @@ sulka = {
 					sulka.helpers.hideLoaderAndSetError();
 				}
 			);
+		} else if (sulka.grid.getSelectedRows()[0] !== sulka.getData().length) { //addrow is buggy
+			sulka.helpers.showValidationErrors(args);
 		}
 		sulka.previousActiveRow = sulka.grid.getSelectedRows()[0];
+		
 	},
 	
 	/**
@@ -1209,7 +1203,8 @@ sulka = {
 				sulka.helpers.hideLoader();
 			}, function onError(){
 				sulka.helpers.hideLoaderAndSetError(sulka.strings.settingsSaveFailed);
-			});
+			}
+		);
 	},
 	
 	
@@ -1227,7 +1222,7 @@ sulka = {
 					var settings = jQuery.parseJSON(results.object.columns);
 					var oldColumns = sulka.columns;
 					var updatedColumns = [];
-					for(var index in oldColumns){ 
+					for (var index=0; index<oldColumns.length; index++) { 
 						// Data is in following format:
 						// "columnName": [position, width, visibility]
 						oldColumns[index].width = settings[oldColumns[index].field][1];
@@ -1271,7 +1266,8 @@ sulka = {
 				}
 			}, function onError(){
 				sulka.helpers.hideLoaderAndSetError(sulka.strings.settingsReceivedFailed);
-			});
+			}
+		);
 	},
 	
 	/**
@@ -1296,7 +1292,6 @@ sulka = {
 		});
 		sulka.grid.setCellCssStyles("invalid-cell", cellsToColourise);
 	}
-	
 };
 
 return sulka; }();
