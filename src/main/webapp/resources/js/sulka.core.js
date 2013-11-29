@@ -107,11 +107,12 @@ sulka = {
 					$.each(this.fields, function () {
 						var field = this;
 						var id = group.name + "/" + field.field;
-						
-						var width;
+						var isEnumeration = false;
 						var isFlexible = false;
+						var width;
+						
 						if (field.enumerationValues) {
-							isFlexible = false;
+							isEnumeration = true;
 							width = sulka.COL_PADDING;
 							$.each(field.enumerationValues, function () {
 								var enumWidth = Math.min(
@@ -135,15 +136,25 @@ sulka = {
 							$sulkaGroup: group,
 							// Flexible columns are resized on next data fetch
 							$sulkaFlexible: isFlexible,
-							editor: Slick.Editors.Text,
+							$sulkaField: field, 
 							$sulkaFlexible: isFlexible,
-							cssClass: "sulka-column-" + field.field,
+							cssClass: "sulka-column-" + field.field
 						}, sulka.columnOptions);
 						
 						if (field.field == "type") {
 							column.$sulkaFlexible = false;
 							column.formatter = function () { return ""; };
 							column.width  = sulka.COL_TYPE_IMAGE_WIDTH + sulka.COL_PADDING;
+						}
+						
+						if (sulka.addMode) {
+							column.editor = isEnumeration ? sulka.editors.EnumerationEditor : Slick.Editors.Text;
+						}
+						
+						if (isEnumeration) {
+							column.$sulkaEnumValues = field.enumerationValues.map(function (apiField) {
+								return apiField.value;
+							});
 						}
 						
 						columns.push(column);
@@ -1201,7 +1212,8 @@ sulka = {
 				sulka.helpers.hideLoader();
 			}, function onError(){
 				sulka.helpers.hideLoaderAndSetError(sulka.strings.settingsSaveFailed);
-			});
+			}
+		);
 	},
 	
 	
@@ -1225,7 +1237,7 @@ sulka = {
 					var settings = jQuery.parseJSON(results.object.columns);
 					var oldColumns = sulka.columns;
 					var updatedColumns = [];
-					for(var index in oldColumns){ 
+					for (var index=0; index<oldColumns.length; index++) { 
 						// Data is in following format:
 						// "columnName": [position, width, visibility]
 						oldColumns[index].width = settings.columns[oldColumns[index].field][1];
@@ -1283,7 +1295,8 @@ sulka = {
 				}
 			}, function onError(){
 				sulka.helpers.hideLoaderAndSetError(sulka.strings.settingsReceivedFailed);
-			});
+			}
+		);
 	},
 	
 	/**
@@ -1308,7 +1321,6 @@ sulka = {
 		});
 		sulka.grid.setCellCssStyles("invalid-cell", cellsToColourise);
 	}
-	
 };
 
 return sulka; }();

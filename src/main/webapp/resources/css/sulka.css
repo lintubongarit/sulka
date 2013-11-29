@@ -377,3 +377,23 @@ span#last-error {
 	z-index: 80;
 	border-right: 1px solid black;
 }
+.sulka-completions {
+	position: absolute;
+	top: 23px;
+	width: 100%;
+}
+.sulka-completions div div:first-child {
+	border-top: 1px solid black;
+}
+.sulka-completions div div {
+	border: 1px solid black;
+	border-top: none;
+	background-color: white;
+	height: 20px;
+}
+.sulka-completions div div.selected-completion {
+	background-color: gray;
+}
+.editor-completions {
+	float: left;
+}

@@ -8,6 +8,25 @@ casper.options.viewportSize = {
 	height: 768
 };
 
+casper.options.logLevel = "info";
+casper.options.verbose = true;
+
+// Add some sensible error handlers
+casper.on('page.error', function(err, backtrace) {
+	var msg = "Uncaught JavaScript Error: " + err + "\nBacktrace: " 
+		+ backtrace.map(function (b) { return b.file + ":" + b.line; }).join(",\n\t");
+	casper.test.fail(msg);
+    casper.log(msg, "error");
+});
+
+casper.on('remote.message', function(msg) {
+    casper.log("Remote console: " + msg, "info");
+});
+
+casper.on('remote.alert', function(msg) {
+    casper.log("Remote window.alert(): " + msg, "info");
+});
+
 /**
  * Create login session, browse to path in tested deployment, inject jQuery and execute testCb when done. 
  * @param path Web page path to test
@@ -43,6 +62,16 @@ function get(codeString) {
 		return JSON.stringify(eval("var v=" + codeString + "; v"));
 	}, codeString);
 	return JSON.parse(json);
+};
+
+/**
+ * Evaluate string in the browser environment and but do not return its value.
+ * @param codeString JavaScript code snippet to evaluate.
+ */
+function exec(codeString) {
+	casper.evaluate(function (codeString) {
+		eval(codeString);
+	}, codeString);
 };
 
 /**
