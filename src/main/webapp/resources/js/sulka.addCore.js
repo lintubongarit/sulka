@@ -2,8 +2,6 @@ sulka.addMode = true;
 sulka.gridOptions.editable = true;
 sulka.gridOptions.enableAddRow = true;
 
-sulka.columnOptions.editor = Slick.Editors.Text;
-
 /*
  * Overrides sulka.cores sulka.getRowMode to use always rowsMode defined on this page ("ringings")
  */
