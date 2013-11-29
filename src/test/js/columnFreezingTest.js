@@ -13,7 +13,7 @@ casper.test.begin('Column freezing tests', 10, function suite(test) {
 				test.assertNotVisible("#freeze-grid", "Freeze grid is not visible");
 				firstColumn = get('sulka.grid.getColumns()[0].id');
 				
-				get('$("#slick-grid .header-freeze-button").click()');
+				exec('$("#slick-grid .header-freeze-button").click()');
 			})
 			.then(function () {
 				test.assertVisible("#slick-grid .header-freeze-button", "Freeze button is visible");
@@ -24,7 +24,7 @@ casper.test.begin('Column freezing tests', 10, function suite(test) {
 				firstColumn = get('sulka.grid.getColumns()[0].id');
 				test.assertNotEquals(firstColumn, firstFreezeGridColumn, "First column is not anymore in main grid");
 				
-				get('$("#freeze-grid .header-unfreeze-button").click()');
+				exec('$("#freeze-grid .header-unfreeze-button").click()');
 			})
 			.then(function () {
 				test.assertVisible("#slick-grid .header-freeze-button", "Freeze button is visible");

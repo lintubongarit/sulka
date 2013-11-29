@@ -65,6 +65,16 @@ function get(codeString) {
 };
 
 /**
+ * Evaluate string in the browser environment and but do not return its value.
+ * @param codeString JavaScript code snippet to evaluate.
+ */
+function exec(codeString) {
+	casper.evaluate(function (codeString) {
+		eval(codeString);
+	}, codeString);
+};
+
+/**
  * Get selector element count.
  */
 function count(selector) {

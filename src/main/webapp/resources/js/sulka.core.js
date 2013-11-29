@@ -137,7 +137,6 @@ sulka = {
 							// Flexible columns are resized on next data fetch
 							$sulkaFlexible: isFlexible,
 							$sulkaField: field, 
-							editor: Slick.Editors.Text,
 							$sulkaFlexible: isFlexible,
 							cssClass: "sulka-column-" + field.field
 						}, sulka.columnOptions);
