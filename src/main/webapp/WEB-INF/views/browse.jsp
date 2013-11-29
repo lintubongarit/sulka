@@ -23,9 +23,7 @@
 		<script src="resources/js/lib/plugins/slick.rowselectionmodel.js"></script>
 		<script src="resources/js/lib/plugins/slick.columnpicker.js"></script>
 		<script src="resources/js/lib/slick.core.js"></script>
-		<script src="resources/js/lib/slick.editors.js"></script>
 		<script src="resources/js/lib/slick.grid.js"></script>
-		<script src="resources/js/lib/slick.editors.js"></script>
 		<script src="resources/js/sulka.core.js"></script>
 		<script src="resources/js/sulka.strings.js"></script>
 		<script src="resources/js/sulka.helpers.js"></script>
@@ -40,7 +38,7 @@
 		<table class="local-toolbar">
 			<tr>
 				<td>
-					<form id="filters">
+					<form id="filters" onchange="sulka.reloadData();">
 					    <sec:authorize access="hasRole('ADMIN')">
         				Rengastaja: <input type="text" id="filters-ringer" name="ringer"/>
         				</sec:authorize>

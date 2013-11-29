@@ -190,7 +190,7 @@ sulka = {
 		if (sulka.viewMode == "ringings" || sulka.viewMode == "recoveries"){
 			sulka.moveRowsPlugin = 
 				new Slick.RowMoveManager({   
-					canceltoggleEditDrag: true
+					canceleditingCellDrag: true
 				});
 			
 			sulka.grid.registerPlugin(sulka.moveRowsPlugin);
@@ -204,8 +204,6 @@ sulka = {
 			sulka.grid.onDragStart.subscribe(sulka.onDragStart);
 			sulka.grid.onDrag.subscribe(sulka.onDrag);
 			sulka.grid.onDragEnd.subscribe(sulka.onDragEnd);
-			
-			sulka.grid.onClick.subscribe(sulka.onClick);
 			
 			sulka.grid.onActiveCellChanged.subscribe(sulka.onActiveCellChanged);
 			
@@ -500,9 +498,16 @@ sulka = {
 	},
 	
 	/**
-	 * Handled by onkeyDown(). toggleEdit is set true when user start typing. When user presses key that changes active cell, toggleEdit is set false
+	 * Handled by onkeyDown(). editingCell is set true when user start typing. When user presses key that changes active cell, editingCell is set false
 	 */
-	toggleEdit: false,
+	editingCell: false,
+	
+	setEditingCell: function (value) {
+		sulka.editingCell = value;
+		sulka.grid.setOptions({
+			editable : value
+		});
+	},
 	
 	/**
 	 * key event enumerations
@@ -522,27 +527,17 @@ sulka = {
 	 * 
 	 */
 	onKeyDown: function(e) {
-		if (sulka.toggleEdit) {
+		if (sulka.editingCell) {
 			if (e.which === sulka.keys.ENTER || e.which === sulka.keys.TAB || e.which === sulka.keys.UP ||
 					e.which === sulka.keys.DOWN) {
-				console.log('off');
-				sulka.toggleEdit = false;
-				sulka.grid.setOptions({
-					editable : false
-				});
-				if (e.which !== sulka.keys.TAB && e.which !== sulka.keys.UP && e.which !== sulka.keys.DOWN){
 					sulka.grid.navigateRight();
-				}
 			}
 		} else {
-			console.log(e.which);
-			if (e.which !== sulka.keys.UP && e.which !== sulka.keys.DOWN && e.which !== sulka.keys.LEFT
+			if (e.which === sulka.keys.ENTER){
+				sulka.grid.navigateRight();
+			} else if (e.which !== sulka.keys.UP && e.which !== sulka.keys.DOWN && e.which !== sulka.keys.LEFT
 					&& e.which !== sulka.keys.RIGHT && e.which !== sulka.keys.TAB) {
-				console.log('on');
-				sulka.toggleEdit = true;
-				sulka.grid.setOptions({
-					editable : true
-				});
+				sulka.setEditingCell(true);
 				sulka.grid.editActiveCell(Slick.Text);
 			}
 		}
@@ -1009,22 +1004,6 @@ sulka = {
 	 */
 	onCellChange: function(event, args){
 		sulka.addToSulkaDB(args.row);
-		
-	},
-	
-	/**
-	 * This function is called when slickgrid is clicked.
-	 * If invalid row is clicked, displays it's error msg.
-	 */
-	onClick: function(e, args) {
-		if (args.row === sulka.getData().length)
-			return;
-		sulka.helpers.unsetErrorAndShowLoader();
-		if (sulka.getData()[args.row].$invalid_msg !== undefined) {
-			sulka.helpers.hideLoaderAndSetError(sulka.getData()[args.row].$invalid_msg);
-		} else {
-			sulka.helpers.hideLoaderAndSetError("");
-		}
 	},
 	
 	/**
@@ -1039,11 +1018,12 @@ sulka = {
 	 *  $invalid_msg: error msg to be displayed when invalid row is clicked
 	 */
 	
-	onActiveCellChanged: function () {
+	onActiveCellChanged: function (e, args) {
+		sulka.setEditingCell(false);
+		
 		if (sulka.previousActiveRow !== undefined
 				&& sulka.grid.getSelectedRows()[0] !== sulka.previousActiveRow
 				&& sulka.previousActiveRowEdited ){
-			
 			
 			var data = sulka.getData();
 			var actualRowData = data[sulka.previousActiveRow];
@@ -1100,8 +1080,11 @@ sulka = {
 					sulka.helpers.hideLoaderAndSetError();
 				}
 			);
+		} else if (sulka.grid.getSelectedRows()[0] !== sulka.getData().length) { //addrow is buggy
+			sulka.helpers.showValidationErrors(args);
 		}
 		sulka.previousActiveRow = sulka.grid.getSelectedRows()[0];
+		
 	},
 	
 	/**

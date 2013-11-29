@@ -7,7 +7,6 @@
 		<title>Sulka - Lisää rengastuksia</title>
 		<link rel="stylesheet" href="resources/css/lib/slick.grid.css" type="text/css" />
 		<link rel="stylesheet" href="resources/css/examples.css" type="text/css" />
-		<link rel="stylesheet" href="resources/css/examples.css" type="text/css" />
 		<link rel="stylesheet" href="resources/css/sulka.css" type="text/css" />
 		<link rel="stylesheet" href="resources/css/lib/slick.dragdrop.css" type="text/css" />
 		<link rel="stylesheet" href="resources/css/lib/colorbox/colorbox.css" type="text/css" />
@@ -17,6 +16,10 @@
    		<script src="resources/js/lib/plugins/jquery.event.drop-2.2.js"></script>
    		<script src="resources/js/lib/plugins/jquery.mousewheel.js"></script>
 		<script src="resources/js/lib/moment.min.js"></script>
+		<script src="resources/js/lib/slick.core.js"></script>
+		<script src="resources/js/lib/slick.grid.js"></script>
+		<script src="resources/js/lib/slick.formatters.js"></script>
+		<script src="resources/js/lib/slick.editors.js"></script>
 		<script src="resources/js/lib/plugins/slick.autotooltips.js"></script>
 		<script src="resources/js/lib/plugins/slick.cellrangedecorator.js"></script>
 		<script src="resources/js/lib/plugins/slick.cellrangeselector.js"></script>
@@ -24,30 +27,24 @@
 		<script src="resources/js/lib/plugins/slick.cellcopymanager.js"></script>
 		<script src="resources/js/lib/plugins/slick.rowselectionmodel.js"></script>
 		<script src="resources/js/lib/plugins/slick.rowmovemanager.js"></script>
-		<script src="resources/js/lib/slick.editors.js"></script>
-		<script src="resources/js/lib/slick.formatters.js"></script>
-		<script src="resources/js/lib/slick.editors.js"></script>
-		<script src="resources/js/lib/slick.core.js"></script>
-		<script src="resources/js/lib/slick.grid.js"></script>
 		<script src="resources/js/sulka.core.js"></script>
 		<script src="resources/js/sulka.strings.js"></script>
 		<script src="resources/js/sulka.helpers.js"></script>
 		<script src="resources/js/sulka.API.js"></script>
 		<script src="resources/js/sulka.groups.js"></script>
 		<script src="resources/js/sulka.freeze.js"></script>
+		<script src="resources/js/sulka.editors.js"></script>
 		<script src="resources/js/sulka.addCore.js"></script>
 		<script src="resources/js/sulka.addRingings.js"></script>
 		<script src="resources/js/lib/colorbox/jquery.colorbox-min.js"></script>
 		<script src="resources/js/lib/colorbox/colorbox.helpers.js"></script>
-
-</head>
+	</head>
 	<body>
-		<%@include file="_header.jsp" %>
-		
+		<%@include file="_header.jsp" %>	
 		<table class="local-toolbar">
 			<tr>
 				<td>
-					<form id="filters">
+					<form id="filters" onchange="sulka.reloadData();">
 						Aika (esim. 2005 tai 2005-2006): <input type="text" id="filters-date" name="date" />
 						Laji: <input type="text" id="filters-species" name="species" />
 						Kunta: <input type="text" id="filters-municipality" name="municipality" />
@@ -60,10 +57,6 @@
 				<td>
 					<button type="button" id="saveSettings" class="local-toolbar-menu" onclick="sulka.saveSettings();">Tallenna asetukset</button>
 					<button type="button" id="loadSettings" class="local-toolbar-menu" onclick="sulka.fetchSettings();">Lataa asetukset</button>
-				</td>
-				<td>
-				  	<button onclick="sulka.grid.setOptions({autoEdit:true})">Auto-edit ON</button>
-    				<button onclick="sulka.grid.setOptions({autoEdit:false})">Auto-edit OFF</button>
 				</td>
 				<td>
 					<div id="dropzone" class="recycle-bin">
