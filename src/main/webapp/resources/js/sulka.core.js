@@ -195,10 +195,10 @@ sulka = {
 		
 		sulka.viewport = $("#slick-grid").find(".slick-viewport");
 		
-		sulka.grid.setSelectionModel(new Slick.CellSelectionModel());
+		//sulka.grid.setSelectionModel(new Slick.CellSelectionModel());
 		sulka.grid.setSelectionModel(new Slick.RowSelectionModel());
 		
-		if (sulka.viewMode == "ringings" || sulka.viewMode == "recoveries"){
+		if (sulka.addMode) {
 			sulka.moveRowsPlugin = 
 				new Slick.RowMoveManager({   
 					canceleditingCellDrag: true
@@ -237,8 +237,6 @@ sulka = {
 
 		sulka.grid.onHeaderContextMenu.subscribe(sulka.showColumnHeaderContextMenu);
 		$("#header-context-menu li.context-menu-item").click(sulka.headerContextMenuItemClicked);
-		
-		//sulka.grid.setSelectionModel(new Slick.RowSelectionModel());
 		
 		sulka.copyManager.onPasteCells.subscribe(sulka.onPasteCells);
 		
