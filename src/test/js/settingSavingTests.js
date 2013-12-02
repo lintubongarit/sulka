@@ -3,7 +3,7 @@ casper.test.begin('Setting saving tests', 25, function suite(test) {
     	
     	casper.then(function () {
     		casper.evaluate(function() {
-    			sulka.saveSettings();
+    			sulka.userSettings.saveSettings();
     		});
     	}).waitWhileVisible("#loader-animation"
 		).then(function () {
@@ -16,7 +16,7 @@ casper.test.begin('Setting saving tests', 25, function suite(test) {
 				var gridColumns = sulka.grid.getColumns();
 				gridColumns[2].width = 555;
 				sulka.grid.setColumns(gridColumns);
-				sulka.saveSettings();
+				sulka.userSettings.saveSettings();
 			});
 		}).waitWhileVisible("loader-animation"
 		).then(function(){
@@ -24,7 +24,7 @@ casper.test.begin('Setting saving tests', 25, function suite(test) {
 				var gridColumns = sulka.grid.getColumns();
 				gridColumns[2].width = 23;
 				sulka.grid.setColumns(gridColumns);
-				sulka.fetchSettings();
+				sulka.userSettings.fetchSettings();
 			});
 		}).waitWhileVisible("loader-animation"
 		).then(function(){
@@ -32,19 +32,19 @@ casper.test.begin('Setting saving tests', 25, function suite(test) {
 				var gridColumns = sulka.grid.getColumns();
 				var returnWidth = gridColumns[2].width;
 				gridColumns[2].width = 50;
-				sulka.saveSettings();
+				sulka.userSettings.saveSettings();
 				return returnWidth;
 			});
 			test.assertEquals(columnWidth, 555, "Previously saved column width is restored in browsing -mode.");
 		}).then(function() {
 			casper.evaluate(function() {
-				sulka.saveSettings();
+				sulka.userSettings.saveSettings();
 				var gridColumns = sulka.grid.getColumns();
 				var tmp = gridColumns[0];
 				gridColumns[0] = gridColumns[1];
 				gridColumns[1] = tmp;
 				sulka.grid.setColumns(gridColumns);
-				sulka.fetchSettings();
+				sulka.userSettings.fetchSettings();
 			});
 		}).waitWhileVisible("loader-animation"
 		).then(function() {
@@ -62,7 +62,7 @@ casper.test.begin('Setting saving tests', 25, function suite(test) {
 				recoveries: true
 				}, true);
 			casper.evaluate(function() {
-				sulka.saveSettings();
+				sulka.userSettings.saveSettings();
 			});
 			this.fill('form#filters', {
 				date: '',
@@ -74,7 +74,7 @@ casper.test.begin('Setting saving tests', 25, function suite(test) {
 		}).waitWhileVisible("loader-animation"
 		).then(function() {
 			casper.evaluate(function() {
-				sulka.fetchSettings();
+				sulka.userSettings.fetchSettings();
 			});
 		}).waitWhileVisible("loader-animation"
 		).then(function(){
@@ -87,13 +87,13 @@ casper.test.begin('Setting saving tests', 25, function suite(test) {
 			casper.evaluate(function(){
 				sulka.columns[4].$sulkaVisible = false;
 				sulka.grid.setColumns(sulka.getVisibleColumns());
-				sulka.saveSettings();
+				sulka.userSettings.saveSettings();
 				sulka.columns[4].$sulkaVisible = true;
 			});
 		}).waitWhileVisible("loader-animation"
 		).then(function(){
 			casper.evaluate(function(){
-				sulka.fetchSettings();
+				sulka.userSettings.fetchSettings();
 			});
 		}).waitWhileVisible("loader-animation"
 		).then(function(){
@@ -143,13 +143,13 @@ casper.test.begin('Setting saving tests', 25, function suite(test) {
 				recoveries: true
 				}, false);
 			casper.evaluate(function(){
-				sulka.saveSettings();
+				sulka.userSettings.saveSettings();
 			});
 		}).then(function () {
 			this.click('#add-ringings-tab');
 		}).then(function () {
     		casper.evaluate(function() {
-    			sulka.saveSettings();
+    			sulka.userSettings.saveSettings();
     		});
     	}).waitWhileVisible("#loader-animation"
 		).then(function () {
@@ -162,7 +162,7 @@ casper.test.begin('Setting saving tests', 25, function suite(test) {
 				var gridColumns = sulka.grid.getColumns();
 				gridColumns[2].width = 555;
 				sulka.grid.setColumns(gridColumns);
-				sulka.saveSettings();
+				sulka.userSettings.saveSettings();
 			});
 		}).waitWhileVisible("loader-animation"
 		).then(function(){
@@ -170,7 +170,7 @@ casper.test.begin('Setting saving tests', 25, function suite(test) {
 				var gridColumns = sulka.grid.getColumns();
 				gridColumns[2].width = 23;
 				sulka.grid.setColumns(gridColumns);
-				sulka.fetchSettings();
+				sulka.userSettings.fetchSettings();
 			});
 		}).waitWhileVisible("loader-animation"
 		).then(function(){
@@ -178,19 +178,19 @@ casper.test.begin('Setting saving tests', 25, function suite(test) {
 				var gridColumns = sulka.grid.getColumns();
 				var returnWidth = gridColumns[2].width;
 				gridColumns[2].width = 50;
-				sulka.saveSettings();
+				sulka.userSettings.saveSettings();
 				return returnWidth;
 			});
 			test.assertEquals(columnWidth, 555, "Previously saved column width is restored in addRingings -mode.");
 		}).then(function() {
 			casper.evaluate(function() {
-				sulka.saveSettings();
+				sulka.userSettings.saveSettings();
 				var gridColumns = sulka.grid.getColumns();
 				var tmp = gridColumns[0];
 				gridColumns[0] = gridColumns[1];
 				gridColumns[1] = tmp;
 				sulka.grid.setColumns(gridColumns);
-				sulka.fetchSettings();
+				sulka.userSettings.fetchSettings();
 			});
 		}).waitWhileVisible("loader-animation"
 		).then(function() {
@@ -206,7 +206,7 @@ casper.test.begin('Setting saving tests', 25, function suite(test) {
 				municipality: 'VANTAA'
 				}, true);
 			casper.evaluate(function() {
-				sulka.saveSettings();
+				sulka.userSettings.saveSettings();
 			});
 			this.fill('form#filters', {
 				date: '',
@@ -216,7 +216,7 @@ casper.test.begin('Setting saving tests', 25, function suite(test) {
 		}).waitWhileVisible("loader-animation"
 		).then(function() {
 			casper.evaluate(function() {
-				sulka.fetchSettings();
+				sulka.userSettings.fetchSettings();
 			});
 		}).waitWhileVisible("loader-animation"
 		).then(function(){
@@ -227,13 +227,13 @@ casper.test.begin('Setting saving tests', 25, function suite(test) {
 			casper.evaluate(function(){
 				sulka.columns[4].$sulkaVisible = false;
 				sulka.grid.setColumns(sulka.getVisibleColumns());
-				sulka.saveSettings();
+				sulka.userSettings.saveSettings();
 				sulka.columns[4].$sulkaVisible = true;
 			});
 		}).waitWhileVisible("loader-animation"
 		).then(function(){
 			casper.evaluate(function(){
-				sulka.fetchSettings();
+				sulka.userSettings.fetchSettings();
 			});
 		}).waitWhileVisible("loader-animation"
 		).then(function(){
@@ -261,13 +261,13 @@ casper.test.begin('Setting saving tests', 25, function suite(test) {
 				}, false);
 			casper.evaluate(function(){
 				sulka.columns[4].$sulkaVisible = true;
-				sulka.saveSettings();
+				sulka.userSettings.saveSettings();
 			});
 		}).then(function () {
 			this.click('#add-recoveries-tab');
 		}).then(function () {
     		casper.evaluate(function() {
-    			sulka.saveSettings();
+    			sulka.userSettings.saveSettings();
     		});
     	}).waitWhileVisible("#loader-animation"
 		).then(function () {
@@ -280,7 +280,7 @@ casper.test.begin('Setting saving tests', 25, function suite(test) {
 				var gridColumns = sulka.grid.getColumns();
 				gridColumns[2].width = 555;
 				sulka.grid.setColumns(gridColumns);
-				sulka.saveSettings();
+				sulka.userSettings.saveSettings();
 			});
 		}).waitWhileVisible("loader-animation"
 		).then(function(){
@@ -288,7 +288,7 @@ casper.test.begin('Setting saving tests', 25, function suite(test) {
 				var gridColumns = sulka.grid.getColumns();
 				gridColumns[2].width = 23;
 				sulka.grid.setColumns(gridColumns);
-				sulka.fetchSettings();
+				sulka.userSettings.fetchSettings();
 			});
 		}).waitWhileVisible("loader-animation"
 		).then(function(){
@@ -296,19 +296,19 @@ casper.test.begin('Setting saving tests', 25, function suite(test) {
 				var gridColumns = sulka.grid.getColumns();
 				var returnWidth = gridColumns[2].width;
 				gridColumns[2].width = 50;
-				sulka.saveSettings();
+				sulka.userSettings.saveSettings();
 				return returnWidth;
 			});
 			test.assertEquals(columnWidth, 555, "Previously saved column width is restored in addRecoveries -mode.");
 		}).then(function() {
 			casper.evaluate(function() {
-				sulka.saveSettings();
+				sulka.userSettings.saveSettings();
 				var gridColumns = sulka.grid.getColumns();
 				var tmp = gridColumns[0];
 				gridColumns[0] = gridColumns[1];
 				gridColumns[1] = tmp;
 				sulka.grid.setColumns(gridColumns);
-				sulka.fetchSettings();
+				sulka.userSettings.fetchSettings();
 			});
 		}).waitWhileVisible("loader-animation"
 		).then(function() {
@@ -324,7 +324,7 @@ casper.test.begin('Setting saving tests', 25, function suite(test) {
 				municipality: 'VANTAA'
 				}, true);
 			casper.evaluate(function() {
-				sulka.saveSettings();
+				sulka.userSettings.saveSettings();
 			});
 			this.fill('form#filters', {
 				date: '',
@@ -334,7 +334,7 @@ casper.test.begin('Setting saving tests', 25, function suite(test) {
 		}).waitWhileVisible("loader-animation"
 		).then(function() {
 			casper.evaluate(function() {
-				sulka.fetchSettings();
+				sulka.userSettings.fetchSettings();
 			});
 		}).waitWhileVisible("loader-animation"
 		).then(function(){
@@ -345,13 +345,13 @@ casper.test.begin('Setting saving tests', 25, function suite(test) {
 			casper.evaluate(function(){
 				sulka.columns[4].$sulkaVisible = false;
 				sulka.grid.setColumns(sulka.getVisibleColumns());
-				sulka.saveSettings();
+				sulka.userSettings.saveSettings();
 				sulka.columns[4].$sulkaVisible = true;
 			});
 		}).waitWhileVisible("loader-animation"
 		).then(function(){
 			casper.evaluate(function(){
-				sulka.fetchSettings();
+				sulka.userSettings.fetchSettings();
 			});
 		}).waitWhileVisible("loader-animation"
 		).then(function(){
@@ -366,7 +366,7 @@ casper.test.begin('Setting saving tests', 25, function suite(test) {
 				municipality: ''
 				}, false);
 			casper.evaluate(function(){
-				sulka.saveSettings();
+				sulka.userSettings.saveSettings();
 			});
 		});
     });

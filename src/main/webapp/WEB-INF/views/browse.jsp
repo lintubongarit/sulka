@@ -30,6 +30,7 @@
 		<script src="resources/js/sulka.API.js"></script>
 		<script src="resources/js/sulka.groups.js"></script>
 		<script src="resources/js/sulka.freeze.js"></script>
+		<script src="resources/js/sulka.userSettings.js"></script>
 		<script src="resources/js/lib/inputChecker.js"></script>
 		
 	</head>
@@ -53,8 +54,8 @@
 					</form>
 				</td>
 				<td>
-				    <button type="button" id="saveSettings" class="local-toolbar-menu" onclick="sulka.saveSettings();">Tallenna asetukset</button>
-				    <button type="button" id="loadSettings" class="local-toolbar-menu" onclick="sulka.fetchSettings();">Lataa asetukset</button>
+				    <button type="button" id="saveSettings" class="local-toolbar-menu" onclick="sulka.userSettings.saveSettings();">Tallenna asetukset</button>
+				    <button type="button" id="loadSettings" class="local-toolbar-menu" onclick="sulka.userSettings.fetchSettings();">Lataa asetukset</button>
 				</td>
 			</tr>
 		</table>
