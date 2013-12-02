@@ -14,4 +14,4 @@ if [ -n "$2" ]; then
 else
 	url_include=""
 fi
-casperjs test --includes=lib/default_base_url.js,lib/test_helpers.js$url_include --xunit=../../../target/surefire-reports/casperjs.xml --no-colors *.js
+casperjs test --includes=lib/default_base_url.js,lib/test_helpers.js$url_include --xunit=../../../target/surefire-reports/casperjs.xml *.js
