@@ -1231,15 +1231,16 @@ sulka = {
 							sulka.freeze.unfreezeRightColumn();
 					}
 					var settings = jQuery.parseJSON(results.object.columns);
+					var newColumnData = settings.columns;
 					var oldColumns = sulka.columns;
 					var updatedColumns = [];
 					for (var index=0; index<oldColumns.length; index++) {
 						var oldColumn = oldColumns[index]; 
 						// Data is in following format:
 						// "columnName": [position, width, visibility]
-						oldColumn.width = settings[oldColumn.field][1];
-						oldColumn.$sulkaVisible = settings[oldColumn.field][2];
-						updatedColumns[settings[oldColumn.field][0]] = oldColumn;
+						oldColumn.width = newColumnData[oldColumn.field][1];
+						oldColumn.$sulkaVisible = newColumnData[oldColumn.field][2];
+						updatedColumns[newColumnData[oldColumn.field][0]] = oldColumn;
 					}
 					sulka.columns = updatedColumns;
 					sulka.grid.setColumns(sulka.getVisibleColumns());
