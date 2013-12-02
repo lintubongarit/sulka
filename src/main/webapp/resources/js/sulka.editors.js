@@ -211,10 +211,8 @@ editors = {
 		    
 		    // Prevent inputting invalid chars
 		    $input.keypress(function (e) {
-		    	if (e.charCode > 0) {
-		    		if (!legalChars.hasOwnProperty(String.fromCharCode(e.charCode))) {
-		    			e.preventDefault();
-		    		}
+		    	if (e.which >= 0x20 && !legalChars.hasOwnProperty(String.fromCharCode(e.which))) {
+		    		e.preventDefault();
 		    	}
 		    });
 	
