@@ -1102,6 +1102,8 @@ sulka = {
 				}
 			);
 		}
+		console.log(args);
+		sulka.helpers.showValidationErrors(args);
 		sulka.previousActiveRow = sulka.grid.getSelectedRows()[0];
 		
 	},
