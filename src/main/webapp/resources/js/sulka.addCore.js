@@ -1,6 +1,5 @@
 sulka.addMode = true;
 sulka.gridOptions.editable = true;
-sulka.gridOptions.enableAddRow = true;
 
 /*
  * Overrides sulka.cores sulka.getRowMode to use always rowsMode defined on this page ("ringings")

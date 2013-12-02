@@ -302,7 +302,11 @@ span#last-error {
 }
 
 .tipu-row {
-	background: #e6f3ff; 
+	background: #E3F2FF; 
+}
+
+.tipu-row-color-odd {
+	background: #D3E2EF; 
 }
 
 .sulka-row {
@@ -313,8 +317,16 @@ span#last-error {
 	background: #ebffec; 
 }
 
+.sulka-valid-row-odd {
+	background: #dbefdc; 
+}
+
 .sulka-invalid-row {
 	background: #fcebeb; 
+}
+
+.sulka-invalid-row-odd {
+	background: #ecdbdb; 
 }
 
 .sulka-invalid-cell {
@@ -333,11 +345,8 @@ span#last-error {
 	background: rgba(255, 255, 255, 1);
 }
 
-	
-.tipu-row-color-odd{
-	background: #6194FF; 
-}
-.tipu-row-color-even{
+
+.tipu-row-color-even {
 	background: #7EE2FF; 
 }
 .sulka-row-color-odd {
