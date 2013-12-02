@@ -234,7 +234,7 @@ sulka = {
 			sulka.grid.onDrag.subscribe(sulka.onDrag);
 			sulka.grid.onDragEnd.subscribe(sulka.onDragEnd);
 			
-			sulka.grid.onKeyDown.subscribe(sulka.onKeyDown);
+			sulka.grid.onKeyDown.subscribe(sulka.makeOnKeyDown());
 			sulka.grid.onDblClick.subscribe(sulka.onDblClick);
 			
 			sulka.grid.onActiveCellChanged.subscribe(sulka.onActiveCellChanged);
@@ -519,72 +519,38 @@ sulka = {
 		sulka.grid.onDragInit.subscribe(function (e, dd) {
 		    // prevent the grid from cancelling drag'n'drop by default
 		    e.stopImmediatePropagation();
-		  });
-		
+		 });
 	},
 	
 	/**
-	 * Handled by setEditingCell(). editingCell is set true when user start typing. When user presses key that changes active cell, editingCell is set false
+	 * Used to overwrite default edit navigation and editing. Returns an event handler function.
 	 */
-	editingCell: false,
-	
-	/**
-	 * Sets active cell editable or not editable
-	 * 
-	 * @param value: true, if active cell is to be set editable, false otherwise
-	 */
-	setEditingCell: function (value) {
-		sulka.editingCell = value;
-		sulka.grid.setOptions({
-			editable : value
-		});
-		if (value){
-			sulka.grid.editActiveCell(Slick.Text);
+	makeOnKeyDown: function() {
+		var specialCodes = {};
+		for (var key in $.ui.keyCode) {
+			specialCodes[$.ui.keyCode[key]] = true;
 		}
-	},
-	
-	/**
-	 * key event enumerations
-	 */
-	keys: {
-		ENTER: 13,
-		TAB: 9,
-		SHIFT: 16,
-		CTRL: 17,
-		ALT: 18,
-		F5: 116,
 		
-		
-		UP: 38,
-		DOWN: 40,
-		LEFT: 37,
-		RIGHT: 39,
-	},
-	
-	/**
-	 * Used to overwrite default edit navigation and editing
-	 */
-	onKeyDown: function(e) {
-		if (sulka.editingCell) {
-			if (e.which === sulka.keys.ENTER) {
+		return function (e) {
+			if (e.which === $.ui.keyCode.ENTER) {
+				if (sulka.grid.getCellEditor() !== null) 
 					sulka.grid.navigateRight();
+				sulka.grid.editActiveCell();
+				sulka.helpers.cancelEvent(e);
+			} else if (!specialCodes.hasOwnProperty(e.which) && sulka.grid.getCellEditor() === null) {
+				// Show editor if user starts typing in a cell
+				sulka.grid.editActiveCell();
 			}
-		} else {
-			if (e.which === sulka.keys.ENTER){
-				sulka.grid.navigateRight();
-			} else if (e.which !== sulka.keys.UP && e.which !== sulka.keys.DOWN && e.which !== sulka.keys.LEFT
-					&& e.which !== sulka.keys.RIGHT && e.which !== sulka.keys.TAB && e.which !== sulka.keys.ALT
-					&& e.which !== sulka.keys.SHIFT && e.which !== sulka.keys.F5) {
-				sulka.setEditingCell(true);
-			}
-		}
+		};
 	},
 	
 	/**
 	 * Called upon double click. Sets clicked cell editable.
 	 */
 	onDblClick: function() {
-		sulka.setEditingCell(true);
+		if (sulka.grid.getCellEditor() === null) {
+			sulka.grid.editActiveCell();
+		}
 	},
 	
 	/**
@@ -729,14 +695,11 @@ sulka = {
      * If row is not an inputRow, deny editing.
      * 
      */
-    onBeforeEditCell: function (e,args){
-        if (args.item == undefined){
+    onBeforeEditCell: function (e, args){
+        if (args.item && args.item.rowStatus === "inputRow") {
             return true;
         }
-        
-        if (args.item.rowStatus != "inputRow"){
-            return false;
-        }        
+        return false;
     },
 	
 	/**
@@ -898,6 +861,8 @@ sulka = {
 							data[selectedRows[i]].lat = results.lat;
 							data[selectedRows[i]].coordinateType = "KARTTA";
 							//data[selectedRows[i]].coordinateAccuracy = "kartta";
+							sulka.grid.invalidate();
+							sulka.grid.render();
 							sulka.addToSulkaDB(selectedRows[i]);
 						}
 					}
@@ -1065,7 +1030,6 @@ sulka = {
 	 *  $invalid_msg: error msg to be displayed when invalid row is clicked
 	 */
 	onActiveCellChanged: function (e, args) {
-		sulka.setEditingCell(false);
 		if (sulka.previousActiveRow !== undefined
 				&& sulka.grid.getSelectedRows()[0] !== sulka.previousActiveRow
 				&& sulka.previousActiveRowEdited ){
@@ -1108,6 +1072,7 @@ sulka = {
 				}
 			);
 		}
+		sulka.helpers.showValidationErrors(args);
 		sulka.previousActiveRow = sulka.grid.getSelectedRows()[0];
 		
 	},
@@ -1136,8 +1101,6 @@ sulka = {
 				row.userId = savedRow.userId;
 				JSON.stringify(row.errors);
 				sulka.colouriseCellsWithErrors(sulka.getData());
-				sulka.grid.invalidate();
-				sulka.grid.render();
 				sulka.helpers.hideLoaderAndUnsetError();
 			},
 			function() {

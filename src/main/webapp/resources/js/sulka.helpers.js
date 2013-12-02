@@ -106,7 +106,7 @@ helpers = {
 	 * A generic function that will cancel the jQuery or DOM event it is
 	 * supplied with. */
 	cancelEvent: function (event) {
-		event.stopPropagation();
+		event.stopImmediatePropagation();
 		event.preventDefault();
 	},
 

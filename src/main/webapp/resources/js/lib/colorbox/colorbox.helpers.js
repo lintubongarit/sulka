@@ -1,8 +1,16 @@
 $(document).ready(function() {
 	$(".iframe").colorbox({
 		iframe : true,
-		width : "80%",
-		height : "80%"
+		width : "85%",
+		height : "85%",
+//		closeButton : false,
+//		overlayClose :false,
+		title : "LUOMUS - Karttakomponentti",
+		scrolling : false,
+		arrowKey : false,
+		className : "mapIframeClass",
+		html : true,
+		reposition : true
 	});
 	$(".callbacks").colorbox({
 		onOpen : function() {
@@ -21,10 +29,10 @@ $(document).ready(function() {
 						"Toimintoa ei voida perua.");
 						
 					if (answer){
-					parent.sulka.setCoordinateToRows();
+						parent.sulka.setCoordinateToRows();
 				}
 				else{
-					
+					return;
 				}
 			}
 			if (parent.sulka.lastInputCoordinateLon != undefined && parent.sulka.lastInputCoordinateLat != undefined){

@@ -72,7 +72,7 @@ casper.test.begin('Sulka-database tests', 10, function suite(test) {
 	    		sulka.previousActiveRow = undefined;
 	    		sulka.grid.setSelectedRows([newRow]);
 	    		sulka.previousActiveRowEdited = false;
-	    		sulka.onActiveCellChanged();
+	    		sulka.onActiveCellChanged(null, {row: newRow});
 	    	}, newRow);
 	    	
 	    }).then(function() {
@@ -94,7 +94,7 @@ casper.test.begin('Sulka-database tests', 10, function suite(test) {
 	    		sulka.previousActiveRow = newRow;
 	    		sulka.grid.setSelectedRows([newRow]);
 	    		sulka.previousActiveRowEdited = true;
-	    		sulka.onActiveCellChanged();
+	    		sulka.onActiveCellChanged(null, {row: newRow});
 	    	}, newRow);
 	    	
 	    }).then(function() {
@@ -116,7 +116,7 @@ casper.test.begin('Sulka-database tests', 10, function suite(test) {
 	    		sulka.previousActiveRow = newRow;
 	    		sulka.grid.setSelectedRows([-1]);
 	    		sulka.previousActiveRowEdited = false;
-	    		sulka.onActiveCellChanged();
+	    		sulka.onActiveCellChanged(null, {row: newRow});
 	    	}, newRow);
 	    	
 	    }).then(function() {
@@ -137,7 +137,7 @@ casper.test.begin('Sulka-database tests', 10, function suite(test) {
 	    		sulka.previousActiveRow = newRow;
 	    		sulka.grid.setSelectedRows([-1]);
 	    		sulka.previousActiveRowEdited = true;
-	    		sulka.onActiveCellChanged();
+	    		sulka.onActiveCellChanged(null, {row: newRow});
 	    	}, newRow);
 	    }).waitWhileVisible("#loader-animation"
 	    ).then(function() {
