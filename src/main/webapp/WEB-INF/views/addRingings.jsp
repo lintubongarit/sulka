@@ -36,6 +36,7 @@
 		<script src="resources/js/sulka.editors.js"></script>
 		<script src="resources/js/sulka.addCore.js"></script>
 		<script src="resources/js/sulka.addRingings.js"></script>
+		<script src="resources/js/sulka.userSettings.js"></script>
 		<script src="resources/js/lib/colorbox/jquery.colorbox-min.js"></script>
 		<script src="resources/js/lib/colorbox/colorbox.helpers.js"></script>
 	</head>
@@ -55,8 +56,8 @@
 					</form>
 				</td>
 				<td>
-					<button type="button" id="saveSettings" class="local-toolbar-menu" onclick="sulka.saveSettings();">Tallenna asetukset</button>
-					<button type="button" id="loadSettings" class="local-toolbar-menu" onclick="sulka.fetchSettings();">Lataa asetukset</button>
+					<button type="button" id="saveSettings" class="local-toolbar-menu" onclick="sulka.userSettings.save();">Tallenna asetukset</button>
+					<button type="button" id="loadSettings" class="local-toolbar-menu" onclick="sulka.userSettings.restore();">Lataa asetukset</button>
 				</td>
 				<td>
 					<div id="dropzone" class="recycle-bin">
