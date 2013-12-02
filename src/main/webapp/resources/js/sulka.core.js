@@ -197,7 +197,7 @@ sulka = {
 			sulka.grid.registerPlugin(sulka.moveRowsPlugin);
 			
 			//Row move, drag & drop features
-			sulka.grid.onKeyDown.subscribe(sulka.onKeyDown);
+			
             sulka.grid.onBeforeEditCell.subscribe(sulka.onBeforeEditCell);
 			sulka.moveRowsPlugin.onBeforeMoveRows.subscribe(sulka.onBeforeMoveRows); 	  
 			sulka.moveRowsPlugin.onMoveRows.subscribe(sulka.onMoveRows);
@@ -205,6 +205,9 @@ sulka = {
 			sulka.grid.onDragStart.subscribe(sulka.onDragStart);
 			sulka.grid.onDrag.subscribe(sulka.onDrag);
 			sulka.grid.onDragEnd.subscribe(sulka.onDragEnd);
+			
+			sulka.grid.onKeyDown.subscribe(sulka.onKeyDown);
+			sulka.grid.onDblClick.subscribe(sulka.onDblClick);
 			
 			sulka.grid.onActiveCellChanged.subscribe(sulka.onActiveCellChanged);
 			
@@ -499,15 +502,24 @@ sulka = {
 	},
 	
 	/**
-	 * Handled by onkeyDown(). editingCell is set true when user start typing. When user presses key that changes active cell, editingCell is set false
+	 * Handled by setEditingCell(). editingCell is set true when user start typing. When user presses key that changes active cell, editingCell is set false
 	 */
 	editingCell: false,
+	
+	/**
+	 * Sets active cell editable or not editable
+	 * 
+	 * @param value true, if active cell is to be set editable, false otherwise
+	 */
 	
 	setEditingCell: function (value) {
 		sulka.editingCell = value;
 		sulka.grid.setOptions({
 			editable : value
 		});
+		if (value){
+			sulka.grid.editActiveCell(Slick.Text);
+		}
 	},
 	
 	/**
@@ -516,6 +528,11 @@ sulka = {
 	keys: {
 		ENTER: 13,
 		TAB: 9,
+		SHIFT: 16,
+		CTRL: 17,
+		ALT: 18,
+		F5: 116,
+		
 		
 		UP: 38,
 		DOWN: 40,
@@ -526,21 +543,32 @@ sulka = {
 	/**
 	 * Contains onKeyDown events. Here you can map custom events to different keys by their ASCII code.
 	 * 
+	 * Used to overwrite default edit nagivation and editing
+	 * 
 	 */
 	onKeyDown: function(e) {
+		console.log(e.which);
 		if (sulka.editingCell) {
-			if (e.which === sulka.keys.ENTER || e.which === sulka.keys.UP || e.which === sulka.keys.DOWN) {
+			if (e.which === sulka.keys.ENTER) {
 					sulka.grid.navigateRight();
 			}
 		} else {
 			if (e.which === sulka.keys.ENTER){
 				sulka.grid.navigateRight();
 			} else if (e.which !== sulka.keys.UP && e.which !== sulka.keys.DOWN && e.which !== sulka.keys.LEFT
-					&& e.which !== sulka.keys.RIGHT && e.which !== sulka.keys.TAB) {
+					&& e.which !== sulka.keys.RIGHT && e.which !== sulka.keys.TAB && e.which !== sulka.keys.SHIFT
+					&& e.which !== sulka.keys.F5) {
 				sulka.setEditingCell(true);
-				sulka.grid.editActiveCell(Slick.Text);
 			}
 		}
+	},
+	
+	/**
+	 * Called upon double click. Sets clicked cell editable.
+	 */
+	
+	onDblClick: function() {
+		sulka.setEditingCell(true);
 	},
 	
 	/**
@@ -694,12 +722,10 @@ sulka = {
      */
     onBeforeEditCell: function (e,args){
         if (args.item == undefined){
-    		console.log('2');
             return true;
         }
         
-        if (args.item.rowStatus != "inputRow" && !args.item.$addRow){
-        	console.log('3');
+        if (args.item.rowStatus != "inputRow"){
             return false;
         }        
     },
@@ -789,7 +815,7 @@ sulka = {
 			
 			//add empty row to end
 			if (sulka.addMode){
-				combinedRows = combinedRows.concat({$addRow: true});
+				combinedRows = combinedRows.concat({rowStatus: "inputRow"});
 			}
 			
 			sulka.setData(combinedRows);
@@ -884,7 +910,7 @@ sulka = {
 	 */
 	METADATA_SULKA_RECOVERY: {"cssClasses" : "sulka-row recovery-row" },
 	METADATA_SULKA_RINGING: {"cssClasses" : "sulka-row ringing-row" },
-	METADATA_SULKA: {"cssClasses" : "sulka-row" },
+	METADATA_SULKA_ADDROW: {"cssClasses" : "sulka-row" },
 	
 	METADATA_SULKA_VALID : {"cssClasses" : "sulka-row ringing-row-color sulka-valid-row"},
 	METADATA_SULKA_VALID_ODD : {"cssClasses" : "sulka-row ringing-row-color sulka-valid-row-odd"},
@@ -909,8 +935,7 @@ sulka = {
 	 * Creates new DataView for the grid.
 	 */
 	createNewDataView: function (data) {
-		var METADATA_SULKA_RECOVERY = sulka.METADATA_SULKA_RECOVERY,
-			METADATA_SULKA = sulka.METADATA_SULKA,
+		var METADATA_SULKA_ADDROW = sulka.METADATA_SULKA_ADDROW,
 			
 			METADATA_SULKA_VALID = sulka.METADATA_SULKA_VALID,
 			METADATA_SULKA_VALID_ODD = sulka.METADATA_SULKA_VALID_ODD,
@@ -951,10 +976,10 @@ sulka = {
 							else
 								return METADATA_SULKA_VALID_ODD;
 						} else {
-							return METADATA_SULKA;
+							return METADATA_EMPTY;
 						}
-				} else if (row.$addRow === true) {
-					return METADATA_SULKA;
+				} else if (sulka.viewMode !== "browsing" && index === data.length - 1) {
+					return METADATA_SULKA_ADDROW;
 				} else {
 					if (row.type == RINGING_TYPE) {
 						if (index%2 == 0)
@@ -1004,31 +1029,13 @@ sulka = {
 	},
 	
 	/**
-	 * When new row is added, this function is called.
-	 * uses addToSulkaDB() to add row to sulka-database
-	 * 
-	 * @returns slick grid row id where was added
-	 */
-	onAddNewRow: function(event, args) {
-		var data = sulka.getData();
-        var item = args.item;
-        item.rowStatus = "inputRow";
-        data.push(item);
-        sulka.setData(data);
-        sulka.grid.render();
-        sulka.addToSulkaDB(sulka.getData().length - 1);
-	},
-	
-	/**
 	 * When cell is changed, this function is called.
 	 * uses addToSulkaDB() to add row to sulka-database
 	 */
 	onCellChange: function(event, args){
 		sulka.addToSulkaDB(args.row);
-		console.log(sulka.grid.getSelectedRows()[0]);
-		console.log(sulka.getData().length);
 		if (sulka.grid.getSelectedRows()[0] === sulka.getData().length - 1){
-			sulka.setData(sulka.getData().concat({$addRow: true}));
+			sulka.setData(sulka.getData().concat({rowStatus: "inputRow"}));
 		}
 	},
 	
