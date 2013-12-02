@@ -197,6 +197,10 @@ sulka = {
 	},
 	
 	previousActiveRow: undefined,
+	/**
+	 * Set to true whenever the current row has been edited and needs to be re-validated once user
+	 * moves the selection to another row. 
+	 */
 	previousActiveRowEdited: false,
 	
 	/**
@@ -824,6 +828,7 @@ sulka = {
 				combinedRows = combinedRows.concat({rowStatus: "inputRow"});
 			}
 			
+			sulka.formatRowsIn(combinedRows);
 			sulka.setData(combinedRows);
 			
 			sulka.colouriseCellsWithErrors(sulka.getData());
@@ -1035,10 +1040,14 @@ sulka = {
 	
 	/**
 	 * When cell is changed, this function is called.
-	 * uses addToSulkaDB() to add row to sulka-database
+	 * uses submitSulkaDBRow() to add row to sulka-database
 	 */
-	onCellChange: function(event, args){
-		sulka.addToSulkaDB(args.row);
+	onCellChange: function(event, args) {
+		if (args.row >= 0) {
+			var row = sulka.getData()[args.row];
+			sulka.submitSulkaDBRow(row);
+		}
+
 		if (sulka.grid.getSelectedRows()[0] === sulka.getData().length - 1){
 			sulka.setData(sulka.getData().concat({rowStatus: "inputRow"}));
 		}
@@ -1063,15 +1072,16 @@ sulka = {
 			var data = sulka.getData();
 			var actualRowData = data[sulka.previousActiveRow];
 
-			if (!actualRowData)
+			if (!actualRowData) {
 				return;
+			}
 			
 			sulka.previousActiveRow = sulka.grid.getSelectedRows()[0];
 			
 			sulka.helpers.unsetErrorAndShowLoader();
 			sulka.API.validate(
 				actualRowData,
-				function(data) {
+				function (data) {
 					sulka.previousActiveRowEdited = false;
 					
 					actualRowData.$valid = data.passes;
@@ -1091,26 +1101,8 @@ sulka = {
 						actualRowData.$invalid_msg = errorString;
 					}
 					
-					var localDbRow = {};
-					if (actualRowData.hasOwnProperty("databaseId")) {
-						localDbRow.id = actualRowData.databaseId;
-						localDbRow.userId = actualRowData.userId;
-					}
-					localDbRow.row = JSON.stringify(actualRowData);
-					sulka.API.addRow(
-						localDbRow,
-						function(row) {
-							actualRowData.databaseId = row.id;
-							actualRowData.userId = row.userId;
-							JSON.stringify(actualRowData.errors);
-							sulka.colouriseCellsWithErrors(sulka.getData());
-							sulka.grid.invalidate();
-							sulka.grid.render();
-							sulka.helpers.hideLoaderAndUnsetError();
-						},
-						function() {
-							sulka.helpers.hideLoaderAndSetError(sulka.strings.couldNotInsert);
-						});	
+					sulka.submitSulkaDBRow(actualRowData);
+					sulka.helpers.hideLoaderAndUnsetError();
 				}, function() {
 					sulka.helpers.hideLoaderAndSetError();
 				}
@@ -1120,51 +1112,38 @@ sulka = {
 		
 	},
 	
-	/**
-	 * Adds row to sulka-database
-	 */
-	addToSulkaDB: function (index) {
-		sulka.previousActiveRowEdited = true;	
-		
-		var data = sulka.getData();
-		var actualRowData = data[index];
-
-		if (!actualRowData)
+	submitSulkaDBRow: function (row) {
+		if (!row || row.rowStatus !== "inputRow") {
+			// Refuse to submit undefined or read-only row
 			return;
-		var rowStatus = actualRowData.rowStatus;
-
-		if (rowStatus == "inputRow") {
-			var localDbRow = {};
-			if (actualRowData.hasOwnProperty("databaseId")) {
-				localDbRow.id = actualRowData.databaseId;
-				localDbRow.userId = actualRowData.userId;
-			}
-			localDbRow.row = JSON.stringify(actualRowData);
-
-			
-			var localDbRow = {};
-			if (actualRowData.hasOwnProperty("databaseId")) {
-				localDbRow.id = actualRowData.databaseId;
-				localDbRow.userId = actualRowData.userId;
-			}
-			localDbRow.row = JSON.stringify(actualRowData);
-			sulka.helpers.unsetErrorAndShowLoader();
-			sulka.API.addRow(
-				localDbRow,
-				function(row) {
-					actualRowData.databaseId = row.id;
-					actualRowData.userId = row.userId;
-					JSON.stringify(actualRowData.errors);
-					sulka.colouriseCellsWithErrors(sulka.getData());
-					sulka.grid.invalidate();
-					sulka.grid.render();
-					sulka.helpers.hideLoaderAndUnsetError();
-				},
-				function() {
-					sulka.helpers.hideLoaderAndSetError(sulka.strings.couldNotInsert);
-				}
-			);	
 		}
+		
+		sulka.previousActiveRowEdited = true;
+		
+		// The local DB wrapper object
+		var localDbRow = {};
+		
+		if (row.hasOwnProperty("databaseId")) {
+			localDbRow.id = row.databaseId;
+			localDbRow.userId = row.userId;
+		}
+		localDbRow.row = JSON.stringify(sulka.formatRowOut(row));
+		sulka.helpers.unsetErrorAndShowLoader();
+		sulka.API.addRow(
+			localDbRow,
+			function (savedRow) {
+				row.databaseId = savedRow.id;
+				row.userId = savedRow.userId;
+				JSON.stringify(row.errors);
+				sulka.colouriseCellsWithErrors(sulka.getData());
+				sulka.grid.invalidate();
+				sulka.grid.render();
+				sulka.helpers.hideLoaderAndUnsetError();
+			},
+			function() {
+				sulka.helpers.hideLoaderAndSetError(sulka.strings.couldNotInsert);
+			}
+		);	
 	},
 	
 	/**
@@ -1210,9 +1189,10 @@ sulka = {
 	},
 	
 	/**
-	 * Create and return an keypress event handler that contrains the allowable input characters to the ones
+	 * Create and return an keypress event handler that constrains the allowable input characters to the ones
 	 * specified in alphabet.
 	 * @param alphabet the allowed alphabet of the input string.
+	 * @return An jQuery event handler that discards any printable input keypresses that are not in the alphabet. 
 	 */
 	createInputLimitter: function (alphabet) {
 		var alphabetSet = {};
@@ -1224,6 +1204,43 @@ sulka = {
 				e.preventDefault();
 			}
 		};
+	},
+	
+	DATE_IN_REGEXP: /^(\d+)\.(\d+)\.(\d+)$/,
+	/**
+	 * Apply transformations to API row data on input from server. The transformations should happen in-place.
+	 * @param data Input rows from the API.
+	 */
+	formatRowsIn: function (data) {
+		var DATE_RE = sulka.DATE_IN_REGEXP;
+		var pad2 = sulka.helpers.pad2;
+		data.forEach(function (row) {
+			if (row && typeof(row.eventDate) === "string") {
+				var match = row.eventDate.match(DATE_RE);
+				if (match !== null) {
+					row.eventDate = match[3] + "-" + pad2(match[2]) + "-" + pad2(match[1]);  
+				}
+			}
+		});
+	},
+	
+	DATE_OUT_REGEXP: /^(\d+)-(\d+)-(\d+)$/,
+	/**
+	 * Apply transformations to an API row on output back to server. Should do the
+	 * reverse of formatRowsIn for individual row. Should clone the row if it needs
+	 * to be modified.
+	 * @param row Row from the local grid that is being saved to the API.
+	 * @return Possibly modified row that conforms to the expectations of the API.
+	 */
+	formatRowOut: function (row) {
+		if (row && typeof(row.eventDate) === "string") {
+			var match = row.eventDate.match(sulka.DATE_OUT_REGEXP);
+			if (match !== null) {
+				var row = $.extend({}, row);
+				row.eventDate = match[3] + "." + match[2] + "." + match[1];  
+			}
+		}
+		return row;
 	}
 };
 

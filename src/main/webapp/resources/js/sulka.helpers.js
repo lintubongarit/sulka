@@ -206,12 +206,28 @@ helpers = {
       }
     },
     
+    /**
+     * Can be used as a callback to .sort() to sort JavaScript arrays numerically. 
+     */
     numericSort: function (item1, item2) {
     	return item1 - item2;
     },
     
+    /**
+     * Can be used as a callback to .sort() to sort JavaScript arrays numerically in reverse. 
+     */
     numericReverseSort: function (item1, item2) {
     	return item2 - item1;
+    },
+    
+    /**
+     * Pad string to two zeroes.
+     * @param str The string to pad.
+     */
+    pad2: function (str) {
+    	if (str.length === 1) return "0" + str;
+    	if (str.length === 0) return "00";
+    	return str;
     }
 };
 
