@@ -31,7 +31,7 @@ sulka.userSettings = function (userSettings) {
 				if(sulka.freeze.grid != null)
 					freezedCount = sulka.freeze.grid.getColumns().length;
 				
-				var columnsData = {
+				var columnsRelatedSettings = {
 						columns: columnsSettings,
 						freezeCount: freezedCount,
 				};
@@ -45,7 +45,7 @@ sulka.userSettings = function (userSettings) {
 				};
 				
 				var settings = {
-						columns: JSON.stringify(columnsData),
+						columns: JSON.stringify(columnsRelatedSettings),
 						filters: JSON.stringify(filters),
 				};
 				sulka.API.saveSettings(sulka.viewMode, settings,
@@ -69,33 +69,35 @@ sulka.userSettings = function (userSettings) {
 						sulka.helpers.hideLoader();
 						
 						if(results.object.columns){
+							var columnsRelatedSettings = jQuery.parseJSON(results.object.columns);
+
+							
+							// Unfreeze all columns before restore
 							if(sulka.viewMode == "browsing" && sulka.freeze.grid != null){
-								// Unfreeze freezed columns before editing. 
 								var freezedColumnCount = sulka.freeze.grid.getColumns().length;
 								for(; freezedColumnCount > 0; freezedColumnCount--)
 									sulka.freeze.unfreezeRightColumn();
 							}
-							var settings = jQuery.parseJSON(results.object.columns);
-							var newColumnData = settings.columns;
-							var oldColumns = sulka.columns;
+							
+							// Restore columns
+							var restoredColumnSettings = columnsRelatedSettings.columns;
 							var updatedColumns = [];
-							for (var index=0; index<oldColumns.length; index++) {
-								var oldColumn = oldColumns[index];
-								// Data is in following format:
-								// "columnName": [position, width, visibility]
-								oldColumn.width = newColumnData[oldColumn.field][1];
-								oldColumn.$sulkaVisible = newColumnData[oldColumn.field][2];
-								updatedColumns[newColumnData[oldColumn.field][0]] = oldColumn;
+							for (var i=0; i<sulka.columns.length; i++) {
+								var oldColumn = sulka.columns[i];
+								var columnSettings = restoredColumnSettings[oldColumn.field];
+								// Data format: [position, width, visibility]
+								oldColumn.width = columnSettings[1];
+								oldColumn.$sulkaVisible = columnSettings[2];
+								updatedColumns[columnSettings[0]] = oldColumn;
 							}
 							sulka.columns = updatedColumns;
 							sulka.grid.setColumns(sulka.getVisibleColumns());
 							sulka.renderColumnGroups();
 							
 							if(sulka.viewMode == "browsing"){
-								var wantedFreezedColumnCount = settings.freezeCount;
-								for(var i = 0; i < wantedFreezedColumnCount; i++){
+								var wantedFreezedColumnCount = columnsRelatedSettings.freezeCount;
+								for(var i = 0; i < wantedFreezedColumnCount; i++)
 									sulka.freeze.freezeLeftColumn();
-								}
 							}
 							
 							var menuItems = $("#header-context-menu .context-menu-item span");
@@ -103,22 +105,15 @@ sulka.userSettings = function (userSettings) {
 								var tickIndex = 2 * i;
 								var itemIndex = 2 * i + 1;
 								var columnName = menuItems[itemIndex].innerHTML;
-								for(var columnNo in sulka.columns){
-									if(sulka.columns[columnNo].name == columnName){
-										if(sulka.columns[columnNo].$sulkaVisible)
+								for(var column in sulka.columns){
+									if(sulka.columns[column].name == columnName){
+										if(sulka.columns[column].$sulkaVisible)
 											menuItems[tickIndex].textContent = sulka.TICK_MARK;
 										else
 											menuItems[tickIndex].textContent = "";
 										break;
 									}
 								}
-							}
-						}
-						
-						if(results.object.freezed){
-							var freezedColumnCount = jQuery.parseJSON(results.object.freezed);
-							for(var i = 0; i < freezedColumnCount; i++){
-								sulka.freeze.freezeLeftColumn();
 							}
 						}
 						
@@ -135,6 +130,7 @@ sulka.userSettings = function (userSettings) {
 								$("#filters-ringings").prop('checked', filters.ringings);
 								$("#filters-recoveries").prop('checked', filters.recoveries);
 							}
+							sulka.reloadData();
 						}
 					}, function onError(){
 						sulka.helpers.hideLoaderAndSetError(sulka.strings.settingsReceivedFailed);

@@ -34,6 +34,7 @@ casper.test.begin('Setting saving tests', 25, function suite(test) {
 				var gridColumns = sulka.grid.getColumns();
 				var returnWidth = gridColumns[2].width;
 				gridColumns[2].width = 50;
+				sulka.updateWidthToSulkaColumns();
 				sulka.userSettings.save();
 				return returnWidth;
 			});
@@ -183,6 +184,7 @@ casper.test.begin('Setting saving tests', 25, function suite(test) {
 				var gridColumns = sulka.grid.getColumns();
 				var returnWidth = gridColumns[2].width;
 				gridColumns[2].width = 50;
+				sulka.updateWidthToSulkaColumns();
 				sulka.userSettings.save();
 				return returnWidth;
 			});
@@ -304,6 +306,7 @@ casper.test.begin('Setting saving tests', 25, function suite(test) {
 				var gridColumns = sulka.grid.getColumns();
 				var returnWidth = gridColumns[2].width;
 				gridColumns[2].width = 50;
+				sulka.updateWidthToSulkaColumns();
 				sulka.userSettings.save();
 				return returnWidth;
 			});
