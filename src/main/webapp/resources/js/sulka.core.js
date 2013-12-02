@@ -50,8 +50,21 @@ sulka = {
 	initEventHandlers: function () {
 		$("#filters").submit(function (event) {
 			sulka.helpers.cancelEvent(event);
+		});
+		$("#filters").change(function (event) {
+			sulka.helpers.cancelEvent(event);
 			sulka.reloadData();
 		});
+		
+		$("#saveSettings").click(sulka.userSettings.save);
+		$("#loadSettings").click(sulka.userSettings.restore);
+		
+		// Prevent inputting invalid chars to filter fields
+		$("#filters-date").keypress(
+				sulka.createInputLimitter("1234567890-."));
+		var letterPercentLimitter = sulka.createInputLimitter("ABCDEFGHJIJKLMNOPQRSTUVWXYZÅÄÖabcdefghijklmnopqrstyuvwxyzåäö%");
+		$("#filters-species").keypress(letterPercentLimitter);
+		$("#filters-municipality").keypress(letterPercentLimitter);
 	},
 	
 	TICK_MARK: "✓",
@@ -773,7 +786,8 @@ sulka = {
 	},
 	
 	/**
-	 * Reload all data to table, applying new filters etc.
+	 * Reload all data to table, applying new filters etc. If in add mode, the data is combined
+	 * from Tipu and Sulka DBs.
 	 */
 	reloadData: function () {
 		// Grid not yet initialised?
@@ -783,7 +797,7 @@ sulka = {
 		
 		var filters = sulka.getFilters();
 		if (typeof(filters) === "string") {
-			sulka.helpers.hideLoaderAndSetError(filters);
+			sulka.helpers.setError(filters);
 			sulka.setData([]);
 			return;
 		}
@@ -1195,6 +1209,23 @@ sulka = {
 			}
 		});
 		sulka.grid.setCellCssStyles("invalid-cell", cellsToColourise);
+	},
+	
+	/**
+	 * Create and return an keypress event handler that contrains the allowable input characters to the ones
+	 * specified in alphabet.
+	 * @param alphabet the allowed alphabet of the input string.
+	 */
+	createInputLimitter: function (alphabet) {
+		var alphabetSet = {};
+		for (var i=0; i<alphabet.length; i++) {
+			alphabetSet[alphabet[i]] = true; 
+		}
+		return function (e) {
+			if (e.which >= 0x20 && !alphabetSet.hasOwnProperty(String.fromCharCode(e.which))) {
+				e.preventDefault();
+			}
+		};
 	}
 };
 
