@@ -34,6 +34,7 @@ sulka = {
 	viewMode: "browsing",
 	rowsMode: "ringings",
 	
+	
 	/**
 	 * Called at start, when the document has fully loaded.
 	 */
@@ -528,8 +529,7 @@ sulka = {
 	 */
 	onKeyDown: function(e) {
 		if (sulka.editingCell) {
-			if (e.which === sulka.keys.ENTER || e.which === sulka.keys.TAB || e.which === sulka.keys.UP ||
-					e.which === sulka.keys.DOWN) {
+			if (e.which === sulka.keys.ENTER || e.which === sulka.keys.UP || e.which === sulka.keys.DOWN) {
 					sulka.grid.navigateRight();
 			}
 		} else {
@@ -693,14 +693,15 @@ sulka = {
      * 
      */
     onBeforeEditCell: function (e,args){
-
-            if (args.item == undefined){
-                    return true;
-            }
-            
-            if (args.item.rowStatus != "inputRow"){
-                    return false;
-            }        
+        if (args.item == undefined){
+    		console.log('2');
+            return true;
+        }
+        
+        if (args.item.rowStatus != "inputRow" && !args.item.$addRow){
+        	console.log('3');
+            return false;
+        }        
     },
 	
 	/**
@@ -785,6 +786,11 @@ sulka = {
 			}
 			
 			if (combineCalls < N_CALLS) return;
+			
+			//add empty row to end
+			if (sulka.addMode){
+				combinedRows = combinedRows.concat({$addRow: true});
+			}
 			
 			sulka.setData(combinedRows);
 			
@@ -878,10 +884,20 @@ sulka = {
 	 */
 	METADATA_SULKA_RECOVERY: {"cssClasses" : "sulka-row recovery-row" },
 	METADATA_SULKA_RINGING: {"cssClasses" : "sulka-row ringing-row" },
-	METADATA_SULKA_RINGING_VALID : {"cssClasses" : "sulka-row ringing-row-color sulka-valid-row"},
-	METADATA_SULKA_RINGING_INVALID : {"cssClasses" : "sulka-row ringing-row-color sulka-invalid-row"},
+	METADATA_SULKA: {"cssClasses" : "sulka-row" },
+	
+	METADATA_SULKA_VALID : {"cssClasses" : "sulka-row ringing-row-color sulka-valid-row"},
+	METADATA_SULKA_VALID_ODD : {"cssClasses" : "sulka-row ringing-row-color sulka-valid-row-odd"},
+	
+	METADATA_SULKA_INVALID : {"cssClasses" : "sulka-row ringing-row-color sulka-invalid-row"},
+	METADATA_SULKA_INVALID_ODD : {"cssClasses" : "sulka-row ringing-row-color sulka-invalid-row-odd"},
+	
 	METADATA_TIPU_RECOVERY: { "cssClasses": "tipu-row recovery-row" },
+	METADATA_TIPU_RECOVERY_ODD: {"cssClasses": "tipu-row recovery-row tipu-row-color-odd"},
+	
 	METADATA_TIPU_RINGING: { "cssClasses": "tipu-row ringing-row" },
+	METADATA_TIPU_RINGING_ODD: {"cssClasses": "tipu-row ringing-row tipu-row-color-odd"},
+	
 	METADATA_EMPTY: { },
 	
 	RINGING_TYPE: "Rengastus",
@@ -894,11 +910,20 @@ sulka = {
 	 */
 	createNewDataView: function (data) {
 		var METADATA_SULKA_RECOVERY = sulka.METADATA_SULKA_RECOVERY,
-			METADATA_SULKA_RINGING = sulka.METADATA_SULKA_RINGING,
-			METADATA_SULKA_RINGING_VALID = sulka.METADATA_SULKA_RINGING_VALID,
-			METADATA_SULKA_RINGING_INVALID = sulka.METADATA_SULKA_RINGING_INVALID,
+			METADATA_SULKA = sulka.METADATA_SULKA,
+			
+			METADATA_SULKA_VALID = sulka.METADATA_SULKA_VALID,
+			METADATA_SULKA_VALID_ODD = sulka.METADATA_SULKA_VALID_ODD,
+			
+			METADATA_SULKA_INVALID = sulka.METADATA_SULKA_INVALID,
+			METADATA_SULKA_INVALID_ODD = sulka.METADATA_SULKA_INVALID_ODD,
+			
 			METADATA_TIPU_RECOVERY = sulka.METADATA_TIPU_RECOVERY,
+			METADATA_TIPU_RECOVERY_ODD = sulka.METADATA_TIPU_RECOVERY_ODD,
+			
 			METADATA_TIPU_RINGING = sulka.METADATA_TIPU_RINGING,
+			METADATA_TIPU_RINGING_ODD = sulka.METADATA_TIPU_RINGING_ODD,
+			
 			METADATA_EMPTY = sulka.METADATA_EMPTY,
 			RINGING_TYPE = sulka.RINGING_TYPE;
 		return {
@@ -915,36 +940,32 @@ sulka = {
 				}
 				var row = data[index];
 				if (row.hasOwnProperty("databaseId")) {
-					if (sulka.rowsMode == "ringings") {
 						if (row.$valid === false) {
-							return METADATA_SULKA_RINGING_INVALID;
+							if (index%2 == 0)
+								return METADATA_SULKA_INVALID;
+							else
+								return METADATA_SULKA_INVALID_ODD;
 						} else if (row.$valid === true) {
-							return METADATA_SULKA_RINGING_VALID;
+							if (index%2 == 0)
+								return METADATA_SULKA_VALID;
+							else
+								return METADATA_SULKA_VALID_ODD;
 						} else {
-							return METADATA_SULKA_RINGING;
+							return METADATA_SULKA;
 						}
-					} else {
-						return METADATA_SULKA_RECOVERY;
-					}
+				} else if (row.$addRow === true) {
+					return METADATA_SULKA;
 				} else {
 					if (row.type == RINGING_TYPE) {
-						return METADATA_TIPU_RINGING;
+						if (index%2 == 0)
+							return METADATA_TIPU_RINGING;
+						else
+							return METADATA_TIPU_RINGING_ODD;
 					} else {
-						return METADATA_TIPU_RECOVERY;
-					}
-				}
-				var item = data[index];
-				if(item.databaseId==null){
-					if(index%2 == 0){
-						return { "cssClasses": "tipu-row-color-even"};
-					}else{
-						return { "cssClasses": "tipu-row-color-odd"};
-					}					
-				}else{					
-					if(index%2 == 0){
-						return {"cssClasses" : "sulka-row-color-even"};
-					}else{
-						return {"cssClasses" : "sulka-row-color-odd"};
+						if (index%2 == 0)
+							return METADATA_TIPU_RECOVERY;
+						else
+							return METADATA_TIPU_RECOVERY_ODD;
 					}
 				}
 			}
@@ -1004,6 +1025,11 @@ sulka = {
 	 */
 	onCellChange: function(event, args){
 		sulka.addToSulkaDB(args.row);
+		console.log(sulka.grid.getSelectedRows()[0]);
+		console.log(sulka.getData().length);
+		if (sulka.grid.getSelectedRows()[0] === sulka.getData().length - 1){
+			sulka.setData(sulka.getData().concat({$addRow: true}));
+		}
 	},
 	
 	/**
@@ -1019,12 +1045,11 @@ sulka = {
 	 */
 	
 	onActiveCellChanged: function (e, args) {
+		console.log(sulka.getData()[sulka.grid.getSelectedRows()[0]]);
 		sulka.setEditingCell(false);
-		
 		if (sulka.previousActiveRow !== undefined
 				&& sulka.grid.getSelectedRows()[0] !== sulka.previousActiveRow
 				&& sulka.previousActiveRowEdited ){
-			
 			var data = sulka.getData();
 			var actualRowData = data[sulka.previousActiveRow];
 
