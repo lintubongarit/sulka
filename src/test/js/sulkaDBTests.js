@@ -1,4 +1,4 @@
-casper.test.begin('Sulka-database tests', 8, function suite(test) {
+casper.test.begin('Sulka-database tests', 10, function suite(test) {
 	
 	browse('/addRingings', function () {
 		
@@ -8,16 +8,30 @@ casper.test.begin('Sulka-database tests', 8, function suite(test) {
 		
 		var newRow = -1;
 		
-
+		
 		casper.then(function () {
 			
-			casper.evaluate(function(randomSpecies){
+			var addRow = casper.evaluate(function(randomSpecies){
+				return sulka.getData()[sulka.getData().length - 1];
+			});
+			
+			test.assertEquals(Object.keys(addRow).length, 1, "addRow exists after page init");
+
+		}).then(function () {
+			
+			var a = casper.evaluate(function(randomSpecies){
+				
+				var data = sulka.getData();
+				
+				data[sulka.getData().length - 1].species = randomSpecies;
+				sulka.setData(data);
 				
 				var args = {};
-				args.item = {};
-				args.item.species = randomSpecies;
+				args.row = sulka.getData().length - 1;
 				
-				sulka.onAddNewRow(null, args);
+				sulka.grid.setSelectedRows([sulka.getData().length - 1]);
+				
+				sulka.onCellChange(null, args);
 				
 			}, randomSpecies);
 
@@ -44,7 +58,13 @@ casper.test.begin('Sulka-database tests', 8, function suite(test) {
 			}
 	    	
 	    	test.assertNotEquals(newRow, -1,
-	    	"sulka.core.onAddNewRow adds new row with wanted data to slickgrid and DB, and sulka.API.fetchSulkaDBRows fetches rows");
+	    	"sulka.core.onCellChange sends to sulka-DB, and sulka.API.fetchSulkaDBRows fetches rows");
+	    	
+	    	var addRow = casper.evaluate(function(randomSpecies){
+				return sulka.getData()[sulka.getData().length - 1];
+			});
+			
+			test.assertEquals(Object.keys(addRow).length, 1, "after editing addRow, new addRow is added to end of rows");
 	    	
 	    }).then(function () {
 	    	

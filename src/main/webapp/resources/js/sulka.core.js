@@ -34,6 +34,7 @@ sulka = {
 	viewMode: "browsing",
 	rowsMode: "ringings",
 	
+	
 	/**
 	 * Called at start, when the document has fully loaded.
 	 */
@@ -207,7 +208,7 @@ sulka = {
 			sulka.grid.registerPlugin(sulka.moveRowsPlugin);
 			
 			//Row move, drag & drop features
-			sulka.grid.onKeyDown.subscribe(sulka.onKeyDown);
+			
             sulka.grid.onBeforeEditCell.subscribe(sulka.onBeforeEditCell);
 			sulka.moveRowsPlugin.onBeforeMoveRows.subscribe(sulka.onBeforeMoveRows); 	  
 			sulka.moveRowsPlugin.onMoveRows.subscribe(sulka.onMoveRows);
@@ -215,6 +216,9 @@ sulka = {
 			sulka.grid.onDragStart.subscribe(sulka.onDragStart);
 			sulka.grid.onDrag.subscribe(sulka.onDrag);
 			sulka.grid.onDragEnd.subscribe(sulka.onDragEnd);
+			
+			sulka.grid.onKeyDown.subscribe(sulka.onKeyDown);
+			sulka.grid.onDblClick.subscribe(sulka.onDblClick);
 			
 			sulka.grid.onActiveCellChanged.subscribe(sulka.onActiveCellChanged);
 			
@@ -400,16 +404,14 @@ sulka = {
 	 *  Called before MoveRows
 	 */
 	onBeforeMoveRows: function(e,data) {
-		sulka.moveRowsPlugin.onBeforeMoveRows.subscribe(function (e, data) {
-			    for (var i = 0; i < data.rows.length; i++) {
-			      // no point in moving before or after itself
-			      if (data.rows[i] == data.insertBefore || data.rows[i] == data.insertBefore - 1) {
-			        e.stopPropagation();
-			        return false;
-			      }
+	    for (var i = 0; i < data.rows.length; i++) {
+		    // no point in moving before or after itself
+		    if (data.rows[i] == data.insertBefore || data.rows[i] == data.insertBefore - 1) {
+			    e.stopPropagation();
+			    return false;
 		    }
-			    return true;
-		});
+	    }
+	    return true;
 	},
 	
 	/**
@@ -505,15 +507,23 @@ sulka = {
 	},
 	
 	/**
-	 * Handled by onkeyDown(). editingCell is set true when user start typing. When user presses key that changes active cell, editingCell is set false
+	 * Handled by setEditingCell(). editingCell is set true when user start typing. When user presses key that changes active cell, editingCell is set false
 	 */
 	editingCell: false,
 	
+	/**
+	 * Sets active cell editable or not editable
+	 * 
+	 * @param value: true, if active cell is to be set editable, false otherwise
+	 */
 	setEditingCell: function (value) {
 		sulka.editingCell = value;
 		sulka.grid.setOptions({
 			editable : value
 		});
+		if (value){
+			sulka.grid.editActiveCell(Slick.Text);
+		}
 	},
 	
 	/**
@@ -522,6 +532,11 @@ sulka = {
 	keys: {
 		ENTER: 13,
 		TAB: 9,
+		SHIFT: 16,
+		CTRL: 17,
+		ALT: 18,
+		F5: 116,
+		
 		
 		UP: 38,
 		DOWN: 40,
@@ -530,83 +545,85 @@ sulka = {
 	},
 	
 	/**
-	 * Contains onKeyDown events. Here you can map custom events to different keys by their ASCII code.
-	 * 
+	 * Used to overwrite default edit navigation and editing
 	 */
 	onKeyDown: function(e) {
 		if (sulka.editingCell) {
-			if (e.which === sulka.keys.ENTER || e.which === sulka.keys.TAB || e.which === sulka.keys.UP ||
-					e.which === sulka.keys.DOWN) {
+			if (e.which === sulka.keys.ENTER) {
 					sulka.grid.navigateRight();
 			}
 		} else {
 			if (e.which === sulka.keys.ENTER){
 				sulka.grid.navigateRight();
 			} else if (e.which !== sulka.keys.UP && e.which !== sulka.keys.DOWN && e.which !== sulka.keys.LEFT
-					&& e.which !== sulka.keys.RIGHT && e.which !== sulka.keys.TAB) {
+					&& e.which !== sulka.keys.RIGHT && e.which !== sulka.keys.TAB && e.which !== sulka.keys.ALT
+					&& e.which !== sulka.keys.SHIFT && e.which !== sulka.keys.F5) {
 				sulka.setEditingCell(true);
-				sulka.grid.editActiveCell(Slick.Text);
 			}
 		}
+	},
+	
+	/**
+	 * Called upon double click. Sets clicked cell editable.
+	 */
+	onDblClick: function() {
+		sulka.setEditingCell(true);
 	},
 	
 	/**
 	 * Called when drag event is started
 	 */
 	onDragStart: function(e,dd){
-		sulka.grid.onDragStart.subscribe(function (e, dd) {
-			
-		    var cell = sulka.grid.getCellFromEvent(e);
-		    if (!cell) {
-		      return;
-		    }
+	    var cell = sulka.grid.getCellFromEvent(e);
+	    if (!cell) {
+	    	return;
+	    }
 
-		    dd.row = cell.row;
-		    if (!sulka.getData()[dd.row]) {
-		      return;
-		    }
+	    dd.row = cell.row;
+	    if (!sulka.getData()[dd.row]) {
+	    	return;
+	    }
 
-		    if (Slick.GlobalEditorLock.isActive()) {
-		      return;
-		    }
+	    if (Slick.GlobalEditorLock.isActive()) {
+	    	return;
+	    }
 
-		    e.stopImmediatePropagation();
-		    dd.mode = "recycle";
+	    e.stopImmediatePropagation();
+	    dd.mode = "recycle";
 
-		    var selectedRows = sulka.grid.getSelectedRows();
+	    var selectedRows = sulka.grid.getSelectedRows();
 
-		    if (!selectedRows.length || $.inArray(dd.row, selectedRows) == -1) {
-		      selectedRows = [dd.row];
-		      sulka.grid.setSelectedRows(selectedRows);
-		    }
+	    if (!selectedRows.length || $.inArray(dd.row, selectedRows) == -1) {
+	    	selectedRows = [dd.row];
+	    	sulka.grid.setSelectedRows(selectedRows);
+	    }
 
-		    dd.rows = selectedRows;
-		    dd.count = selectedRows.length;
+	    dd.rows = selectedRows;
+	    dd.count = selectedRows.length;
 
-		    var proxy = $("<span></span>")
-		        .css({
-		          position: "absolute",
-		          display: "inline-block",
-		          padding: "4px 10px",
-		          background: "#e0e0e0",
-		          border: "1px solid gray",
-		          "z-index": 99999,
-		          "border-radius": "8px",
-		          "box-shadow": "2px 2px 6px silver",
-		          "-moz-border-radius": "8px",
-		          "-moz-box-shadow": "2px 2px 6px silver",
-		          "-webkit-border-radius": "8px",
-		          "-webkit-box-shadow": "2px 2px 6px silver"
-		        })
-		        .text("Drag to Recycle Bin to delete " + dd.count + " selected row(s)")
-		        .appendTo("body");
+	    var proxy = $("<span></span>")
+	    	.css({
+	    		position: "absolute",
+	    		display: "inline-block",
+	    		padding: "4px 10px",
+	    		background: "#e0e0e0",
+	    		border: "1px solid gray",
+	    		"z-index": 99999,
+	    		"border-radius": "8px",
+	    		"box-shadow": "2px 2px 6px silver",
+	    		"-moz-border-radius": "8px",
+	    		"-moz-box-shadow": "2px 2px 6px silver",
+	    		"-webkit-border-radius": "8px",
+	    		"-webkit-box-shadow": "2px 2px 6px silver"
+	    	})
+	    	.text("Drag to Recycle Bin to delete " + dd.count + " selected row(s)")
+	    	.appendTo("body");
 
-		    dd.helper = proxy;
+		dd.helper = proxy;
 
-		    $(dd.available).css("background", "pink");
+		$(dd.available).css("background", "pink");
 
-		    return proxy;
-		  });
+		return proxy;
 		
 	},
 	
@@ -615,12 +632,10 @@ sulka = {
 	 * onDrag events.
 	 */
 	onDrag: function(e,dd){
-		  sulka.grid.onDrag.subscribe(function (e, dd) {
-			    if (dd.mode != "recycle") {
-			      return;
-			    }
-			    dd.helper.css({top: e.pageY + 5, left: e.pageX + 5});
-			  });
+			if (dd.mode != "recycle") {
+				return;
+			}
+			dd.helper.css({top: e.pageY + 5, left: e.pageX + 5});
 	},
 	
 	
@@ -628,13 +643,11 @@ sulka = {
 	 * onDragEnd: this function is called when dragging rows ends.
 	 */
 	onDragEnd: function(e, dd){
-		sulka.grid.onDragEnd.subscribe(function (e, dd) {
-		    if (dd.mode != "recycle") {
-		        return;
-		      }
-		      dd.helper.remove();
-		      $(dd.available).css("background", "beige");
-		    });
+	    if (dd.mode != "recycle") {
+	    	return;
+	    }
+	    dd.helper.remove();
+	    $(dd.available).css("background", "beige");
 	},
 	
 	
@@ -700,14 +713,13 @@ sulka = {
      * 
      */
     onBeforeEditCell: function (e,args){
-
-            if (args.item == undefined){
-                    return true;
-            }
-            
-            if (args.item.rowStatus != "inputRow"){
-                    return false;
-            }        
+        if (args.item == undefined){
+            return true;
+        }
+        
+        if (args.item.rowStatus != "inputRow"){
+            return false;
+        }        
     },
 	
 	/**
@@ -792,6 +804,11 @@ sulka = {
 			}
 			
 			if (combineCalls < N_CALLS) return;
+			
+			//add empty row to end
+			if (sulka.addMode){
+				combinedRows = combinedRows.concat({rowStatus: "inputRow"});
+			}
 			
 			sulka.setData(combinedRows);
 			
@@ -884,10 +901,20 @@ sulka = {
 	 */
 	METADATA_SULKA_RECOVERY: {"cssClasses" : "sulka-row recovery-row" },
 	METADATA_SULKA_RINGING: {"cssClasses" : "sulka-row ringing-row" },
-	METADATA_SULKA_RINGING_VALID : {"cssClasses" : "sulka-row ringing-row-color sulka-valid-row"},
-	METADATA_SULKA_RINGING_INVALID : {"cssClasses" : "sulka-row ringing-row-color sulka-invalid-row"},
+	METADATA_SULKA_ADDROW: {"cssClasses" : "sulka-row" },
+	
+	METADATA_SULKA_VALID : {"cssClasses" : "sulka-row ringing-row-color sulka-valid-row"},
+	METADATA_SULKA_VALID_ODD : {"cssClasses" : "sulka-row ringing-row-color sulka-valid-row-odd"},
+	
+	METADATA_SULKA_INVALID : {"cssClasses" : "sulka-row ringing-row-color sulka-invalid-row"},
+	METADATA_SULKA_INVALID_ODD : {"cssClasses" : "sulka-row ringing-row-color sulka-invalid-row-odd"},
+	
 	METADATA_TIPU_RECOVERY: { "cssClasses": "tipu-row recovery-row" },
+	METADATA_TIPU_RECOVERY_ODD: {"cssClasses": "tipu-row recovery-row tipu-row-color-odd"},
+	
 	METADATA_TIPU_RINGING: { "cssClasses": "tipu-row ringing-row" },
+	METADATA_TIPU_RINGING_ODD: {"cssClasses": "tipu-row ringing-row tipu-row-color-odd"},
+	
 	METADATA_EMPTY: { },
 	
 	RINGING_TYPE: "Rengastus",
@@ -899,12 +926,20 @@ sulka = {
 	 * Creates new DataView for the grid.
 	 */
 	createNewDataView: function (data) {
-		var METADATA_SULKA_RECOVERY = sulka.METADATA_SULKA_RECOVERY,
-			METADATA_SULKA_RINGING = sulka.METADATA_SULKA_RINGING,
-			METADATA_SULKA_RINGING_VALID = sulka.METADATA_SULKA_RINGING_VALID,
-			METADATA_SULKA_RINGING_INVALID = sulka.METADATA_SULKA_RINGING_INVALID,
+		var METADATA_SULKA_ADDROW = sulka.METADATA_SULKA_ADDROW,
+			
+			METADATA_SULKA_VALID = sulka.METADATA_SULKA_VALID,
+			METADATA_SULKA_VALID_ODD = sulka.METADATA_SULKA_VALID_ODD,
+			
+			METADATA_SULKA_INVALID = sulka.METADATA_SULKA_INVALID,
+			METADATA_SULKA_INVALID_ODD = sulka.METADATA_SULKA_INVALID_ODD,
+			
 			METADATA_TIPU_RECOVERY = sulka.METADATA_TIPU_RECOVERY,
+			METADATA_TIPU_RECOVERY_ODD = sulka.METADATA_TIPU_RECOVERY_ODD,
+			
 			METADATA_TIPU_RINGING = sulka.METADATA_TIPU_RINGING,
+			METADATA_TIPU_RINGING_ODD = sulka.METADATA_TIPU_RINGING_ODD,
+			
 			METADATA_EMPTY = sulka.METADATA_EMPTY,
 			RINGING_TYPE = sulka.RINGING_TYPE;
 		return {
@@ -921,36 +956,32 @@ sulka = {
 				}
 				var row = data[index];
 				if (row.hasOwnProperty("databaseId")) {
-					if (sulka.rowsMode == "ringings") {
 						if (row.$valid === false) {
-							return METADATA_SULKA_RINGING_INVALID;
+							if (index%2 == 0)
+								return METADATA_SULKA_INVALID;
+							else
+								return METADATA_SULKA_INVALID_ODD;
 						} else if (row.$valid === true) {
-							return METADATA_SULKA_RINGING_VALID;
+							if (index%2 == 0)
+								return METADATA_SULKA_VALID;
+							else
+								return METADATA_SULKA_VALID_ODD;
 						} else {
-							return METADATA_SULKA_RINGING;
+							return METADATA_EMPTY;
 						}
-					} else {
-						return METADATA_SULKA_RECOVERY;
-					}
+				} else if (sulka.viewMode !== "browsing" && index === data.length - 1) {
+					return METADATA_SULKA_ADDROW;
 				} else {
 					if (row.type == RINGING_TYPE) {
-						return METADATA_TIPU_RINGING;
+						if (index%2 == 0)
+							return METADATA_TIPU_RINGING;
+						else
+							return METADATA_TIPU_RINGING_ODD;
 					} else {
-						return METADATA_TIPU_RECOVERY;
-					}
-				}
-				var item = data[index];
-				if(item.databaseId==null){
-					if(index%2 == 0){
-						return { "cssClasses": "tipu-row-color-even"};
-					}else{
-						return { "cssClasses": "tipu-row-color-odd"};
-					}					
-				}else{					
-					if(index%2 == 0){
-						return {"cssClasses" : "sulka-row-color-even"};
-					}else{
-						return {"cssClasses" : "sulka-row-color-odd"};
+						if (index%2 == 0)
+							return METADATA_TIPU_RECOVERY;
+						else
+							return METADATA_TIPU_RECOVERY_ODD;
 					}
 				}
 			}
@@ -989,27 +1020,14 @@ sulka = {
 	},
 	
 	/**
-	 * When new row is added, this function is called.
-	 * uses addToSulkaDB() to add row to sulka-database
-	 * 
-	 * @returns slick grid row id where was added
-	 */
-	onAddNewRow: function(event, args) {
-		var data = sulka.getData();
-        var item = args.item;
-        item.rowStatus = "inputRow";
-        data.push(item);
-        sulka.setData(data);
-        sulka.grid.render();
-        sulka.addToSulkaDB(sulka.getData().length - 1);
-	},
-	
-	/**
 	 * When cell is changed, this function is called.
 	 * uses addToSulkaDB() to add row to sulka-database
 	 */
 	onCellChange: function(event, args){
 		sulka.addToSulkaDB(args.row);
+		if (sulka.grid.getSelectedRows()[0] === sulka.getData().length - 1){
+			sulka.setData(sulka.getData().concat({rowStatus: "inputRow"}));
+		}
 	},
 	
 	/**
@@ -1023,14 +1041,11 @@ sulka = {
 	 *  $errors: array which contains fields that are invalid. Example: ["species", "municipalities"]
 	 *  $invalid_msg: error msg to be displayed when invalid row is clicked
 	 */
-	
 	onActiveCellChanged: function (e, args) {
 		sulka.setEditingCell(false);
-		
 		if (sulka.previousActiveRow !== undefined
 				&& sulka.grid.getSelectedRows()[0] !== sulka.previousActiveRow
 				&& sulka.previousActiveRowEdited ){
-			
 			var data = sulka.getData();
 			var actualRowData = data[sulka.previousActiveRow];
 
@@ -1086,8 +1101,6 @@ sulka = {
 					sulka.helpers.hideLoaderAndSetError();
 				}
 			);
-		} else if (sulka.grid.getSelectedRows()[0] !== sulka.getData().length) { //addrow is buggy
-			sulka.helpers.showValidationErrors(args);
 		}
 		sulka.previousActiveRow = sulka.grid.getSelectedRows()[0];
 		
@@ -1129,8 +1142,8 @@ sulka = {
 					actualRowData.userId = row.userId;
 					JSON.stringify(actualRowData.errors);
 					sulka.colouriseCellsWithErrors(sulka.getData());
-//					sulka.grid.invalidate();
-//					sulka.grid.render();
+					sulka.grid.invalidate();
+					sulka.grid.render();
 					sulka.helpers.hideLoaderAndUnsetError();
 				},
 				function() {

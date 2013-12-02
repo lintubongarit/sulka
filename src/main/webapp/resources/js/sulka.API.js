@@ -176,7 +176,7 @@ sulka.API = function(API) {
 		 * @param onSuccess Called on success with an array of row objects.
 		 * @param onError If defined, called on failure with the error message, if any.
 		 */
-		fetchSulkaDBRows :function(type, filters, onSuccess, onError) {
+		fetchSulkaDBRows: function(type, filters, onSuccess, onError) {
 			if (type && type.toLowerCase() != "all") {
 				type = "/" + type;
 			} else {
