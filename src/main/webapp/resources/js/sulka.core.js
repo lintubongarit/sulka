@@ -1018,7 +1018,6 @@ sulka = {
 	 * uses addToSulkaDB() to add row to sulka-database
 	 */
 	onCellChange: function(event, args){
-		console.log('cellchange');
 		sulka.addToSulkaDB(args.row);
 		if (sulka.grid.getSelectedRows()[0] === sulka.getData().length - 1){
 			sulka.setData(sulka.getData().concat({rowStatus: "inputRow"}));
@@ -1036,7 +1035,6 @@ sulka = {
 	 *  $errors: array which contains fields that are invalid. Example: ["species", "municipalities"]
 	 *  $invalid_msg: error msg to be displayed when invalid row is clicked
 	 */
-	
 	onActiveCellChanged: function (e, args) {
 		sulka.setEditingCell(false);
 		if (sulka.previousActiveRow !== undefined
@@ -1097,8 +1095,6 @@ sulka = {
 					sulka.helpers.hideLoaderAndSetError();
 				}
 			);
-		} else if (sulka.grid.getSelectedRows()[0] !== sulka.getData().length) { //addrow is buggy
-			sulka.helpers.showValidationErrors(args);
 		}
 		sulka.previousActiveRow = sulka.grid.getSelectedRows()[0];
 		
