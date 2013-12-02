@@ -1,4 +1,4 @@
-casper.test.begin('Setting saving tests', 24, function suite(test) {
+casper.test.begin('Setting saving tests', 25, function suite(test) {
     browse('/', function () {
     	
     	casper.then(function () {
@@ -101,6 +101,39 @@ casper.test.begin('Setting saving tests', 24, function suite(test) {
 				return sulka.columns[4].$sulkaVisible;
 			});
 			test.assertFalse(isColumnVisible, "Column visibility status is restored in browsing -mode.");
+		}).then(function(){
+			for(var i = 0; i < 5; i++){
+				casper.evaluate(function(){
+					sulka.freeze.freezeLeftColumn();
+				});
+			}
+			casper.evaluate(function(){
+				sulka.saveSettings();
+			});
+		}).waitWhileVisible("loader-animation"
+		).then(function(){
+			for(var i = 0; i < 5; i++){
+				casper.evaluate(function(){
+						sulka.freeze.unfreezeRightColumn();
+				});
+			}
+			casper.evaluate(function(){
+				sulka.fetchSettings();
+			});
+		}).waitWhileVisible("loader-animation"
+		).then(function(){
+			var freezedColumnCount = casper.evaluate(function(){
+				return sulka.freeze.grid.getColumns().length;
+			});
+			test.assertEquals(freezedColumnCount, 5, "Freezed columns are restored.");
+			var count = casper.evaluate(function(){
+				return sulka.freeze.grid.getColumns().length;
+			});
+			for(; count > 0; count--){
+				casper.evaluate(function(){
+					sulka.freeze.unfreezeRightColumn();
+				});
+			}
 		}).then(function() {
 			this.fill('form#filters', {
 				date: '',
