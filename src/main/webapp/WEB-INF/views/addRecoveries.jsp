@@ -56,8 +56,8 @@
 					</form>
 				</td>
 				<td>
-					<button type="button" id="saveSettings" class="local-toolbar-menu" onclick="sulka.userSettings.saveSettings();">Tallenna asetukset</button>
-					<button type="button" id="loadSettings" class="local-toolbar-menu" onclick="sulka.userSettings.fetchSettings();">Lataa asetukset</button>
+					<button type="button" id="saveSettings" class="local-toolbar-menu" onclick="sulka.userSettings.save();">Tallenna asetukset</button>
+					<button type="button" id="loadSettings" class="local-toolbar-menu" onclick="sulka.userSettings.restore();">Lataa asetukset</button>
 				</td>
 				<td>
 				    <div id="dropzone" class="recycle-bin">

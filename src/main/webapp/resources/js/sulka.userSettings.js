@@ -6,27 +6,35 @@ sulka.userSettings = function (userSettings) {
 	userSettings = {
 
 			/**
-			 * Save users current view, that includes:
-			 * 	- Filters
-			 * 	- Column settings
+			 * Save users current settings to SulkaDB. Following settings are 
+			 * saved:
+			 * 	- Current filters
+			 * 	- Columns order
+			 *  - Columns width
+			 *  - Columns visibility
+			 *  - Freezed columns
 			 * 
-			 * to the sulka database.
 			 */
-			saveSettings: function() {
+			save: function() {
 				sulka.helpers.showLoader();
-				var columnsDataToBeSaved = {};
-				for(var index in sulka.columns){
-					var columnData = [ // [position, width, visibility]
-							index,
-							sulka.columns[index].width,
-							sulka.columns[index].$sulkaVisible,
+				var columnsSettings = {};
+				for(var i in sulka.columns){
+					var currentColumn = [ // [position, width, visibility]
+							i,
+							sulka.columns[i].width,
+							sulka.columns[i].$sulkaVisible,
 					];
-					columnsDataToBeSaved[sulka.columns[index].field] = columnData;
+					columnsSettings[sulka.columns[i].field] = currentColumn;
 				}
-				var gridColumns = sulka.grid.getColumns();
-				for(var index in gridColumns){
-					columnsDataToBeSaved[gridColumns[index].field][1] = gridColumns[index].width;
-				}
+				
+				var freezedCount = 0;
+				if(sulka.freeze.grid != null)
+					freezedCount = sulka.freeze.grid.getColumns().length;
+				
+				var columnsData = {
+						columns: columnsSettings,
+						freezeCount: freezedCount,
+				};
 				
 				var filters =  {
 						date: $("#filters-date").val(),
@@ -34,15 +42,6 @@ sulka.userSettings = function (userSettings) {
 						municipality: $("#filters-municipality").val(),
 						ringings: $("#filters-ringings").prop("checked"),
 						recoveries: $("#filters-recoveries").prop("checked"),
-				};
-				
-				var freezedCount = 0;
-				if(sulka.freeze.grid != null)
-					freezedCount = sulka.freeze.grid.getColumns().length;
-				
-				var columnsData = {
-						columns: columnsDataToBeSaved,
-						freezeCount: freezedCount,
 				};
 				
 				var settings = {
@@ -60,9 +59,9 @@ sulka.userSettings = function (userSettings) {
 			
 			
 			/**
-			 * Fetch user settings from the Sulka database.
+			 * Restore previously saved settings from SulkaDB.
 			 */
-			fetchSettings: function() {
+			restore: function() {
 				sulka.helpers.showLoader();
 				sulka.API.fetchSettings(
 					sulka.viewMode,

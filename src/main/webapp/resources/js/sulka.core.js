@@ -256,7 +256,7 @@ sulka = {
 		
 		sulka.reloadData();
 		
-		sulka.userSettings.fetchSettings();
+		sulka.userSettings.restore();
 	},
 	
 	/**
