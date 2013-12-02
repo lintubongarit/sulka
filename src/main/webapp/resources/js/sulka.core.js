@@ -860,7 +860,7 @@ sulka = {
 						if(data[selectedRows[i]].rowStatus == "inputRow"){
 							data[selectedRows[i]].lon = results.lon;
 							data[selectedRows[i]].lat = results.lat;
-							data[selectedRows[i]].coordinateType = "kartta";
+							data[selectedRows[i]].coordinateType = "KARTTA";
 							//data[selectedRows[i]].coordinateAccuracy = "kartta";
 							sulka.addToSulkaDB(selectedRows[i]);
 						}
@@ -872,7 +872,6 @@ sulka = {
 				}
 			);
 
-	
         sulka.grid.invalidateRow(data.length);
         sulka.setData(data);
         sulka.grid.updateRowCount();
