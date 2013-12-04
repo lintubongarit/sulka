@@ -19,7 +19,7 @@ casper.test.begin('Sulka-database tests', 10, function suite(test) {
 
 		}).then(function () {
 			
-			var a = casper.evaluate(function(randomSpecies){
+			casper.evaluate(function(randomSpecies){
 				
 				var data = sulka.getData();
 				
@@ -31,7 +31,7 @@ casper.test.begin('Sulka-database tests', 10, function suite(test) {
 				
 				sulka.grid.setSelectedRows([sulka.getData().length - 1]);
 				
-				sulka.onCellChange(null, args);
+				sulka.events.onCellChange(null, args);
 				
 			}, randomSpecies);
 
@@ -72,7 +72,7 @@ casper.test.begin('Sulka-database tests', 10, function suite(test) {
 	    		sulka.previousActiveRow = undefined;
 	    		sulka.grid.setSelectedRows([newRow]);
 	    		sulka.previousActiveRowEdited = false;
-	    		sulka.onActiveCellChanged(null, {row: newRow});
+	    		sulka.events.onActiveCellChanged(null, {row: newRow});
 	    	}, newRow);
 	    	
 	    }).then(function() {
@@ -86,7 +86,7 @@ casper.test.begin('Sulka-database tests', 10, function suite(test) {
 	    	}, newRow);
 	    	
 	    	test.assertDoesntExist(editedRow.$valid,
-	    	"sulka.onActiveCellChanged() does nothing if sulka.previousActiveRow is undefined");
+	    	"sulka.events.onActiveCellChanged() does nothing if sulka.previousActiveRow is undefined");
 	    	
 	    }).then(function () {
 	    	
@@ -94,7 +94,7 @@ casper.test.begin('Sulka-database tests', 10, function suite(test) {
 	    		sulka.previousActiveRow = newRow;
 	    		sulka.grid.setSelectedRows([newRow]);
 	    		sulka.previousActiveRowEdited = true;
-	    		sulka.onActiveCellChanged(null, {row: newRow});
+	    		sulka.events.onActiveCellChanged(null, {row: newRow});
 	    	}, newRow);
 	    	
 	    }).then(function() {
@@ -108,7 +108,7 @@ casper.test.begin('Sulka-database tests', 10, function suite(test) {
 	    	}, newRow);
 	    	
 	    	test.assertDoesntExist(editedRow.$valid,
-	    	"sulka.onActiveCellChanged() does nothing if previous active row is the same row as current active row");
+	    	"sulka.events.onActiveCellChanged() does nothing if previous active row is the same row as current active row");
 	    	
 	    }).then(function () {
 
@@ -116,7 +116,7 @@ casper.test.begin('Sulka-database tests', 10, function suite(test) {
 	    		sulka.previousActiveRow = newRow;
 	    		sulka.grid.setSelectedRows([-1]);
 	    		sulka.previousActiveRowEdited = false;
-	    		sulka.onActiveCellChanged(null, {row: newRow});
+	    		sulka.events.onActiveCellChanged(null, {row: newRow});
 	    	}, newRow);
 	    	
 	    }).then(function() {
@@ -130,14 +130,14 @@ casper.test.begin('Sulka-database tests', 10, function suite(test) {
 	    	}, newRow);
 	    	
 	    	test.assertDoesntExist(editedRow.$valid,
-	    	"sulka.onActiveCellChanged() does nothing if previous active row wasn't edited");
+	    	"sulka.events.onActiveCellChanged() does nothing if previous active row wasn't edited");
 	    	
 	    }).then(function() {
 	    	casper.evaluate(function(newRow){
 	    		sulka.previousActiveRow = newRow;
 	    		sulka.grid.setSelectedRows([-1]);
 	    		sulka.previousActiveRowEdited = true;
-	    		sulka.onActiveCellChanged(null, {row: newRow});
+	    		sulka.events.onActiveCellChanged(null, {row: newRow});
 	    	}, newRow);
 	    }).waitWhileVisible("#loader-animation"
 	    ).then(function() {

@@ -30,6 +30,7 @@
 		<script src="resources/js/sulka.API.js"></script>
 		<script src="resources/js/sulka.groups.js"></script>
 		<script src="resources/js/sulka.freeze.js"></script>
+		<script src="resources/js/sulka.events.js"></script>
 		<script src="resources/js/sulka.userSettings.js"></script>
 	</head>
 	<body>
