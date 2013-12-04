@@ -510,7 +510,7 @@ editors = {
 	    	if (curVal.trim() !== "" && !curVal.match(EDIT_REGEXP)) {
 		    	return {
 		    		valid: false,
-		    		msg: sulka.strings.invalidDate
+		    		msg: sulka.strings.invalidDateInput
 		    	};
 	    	}
 	    	
