@@ -527,13 +527,28 @@ sulka = {
 			specialCodes[$.ui.keyCode[key]] = true;
 		}
 		
+		//these aren't in $ui.keyCode
+		specialCodes[16] = true; //SHIFT
+		specialCodes[17] = true; //CTRL
+		specialCodes[18] = true; //ALT
+		specialCodes[20] = true; //CAPS_LOCK
+		specialCodes[91] = true; //WIN_KEY
+		for (var i = 112; i <= 123; i++){ //F_KEYS
+			specialCodes[i] = true;
+		}
+		specialCodes[225] = true; //ALT_GR
+		
+		specialCodes[8] = false; //backspace should work
+		specialCodes[46] = false; //delete should work
+		
 		return function (e) {
+			console.log(e.which);
 			if (e.which === $.ui.keyCode.ENTER) {
 				if (sulka.grid.getCellEditor() !== null) 
 					sulka.grid.navigateRight();
 				sulka.grid.editActiveCell();
 				sulka.helpers.cancelEvent(e);
-			} else if (!specialCodes.hasOwnProperty(e.which) && sulka.grid.getCellEditor() === null) {
+			} else if (!specialCodes[e.which] && sulka.grid.getCellEditor() === null) {
 				// Show editor if user starts typing in a cell
 				sulka.grid.editActiveCell();
 			}
