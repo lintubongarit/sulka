@@ -36,6 +36,7 @@
 		<script src="resources/js/sulka.editors.js"></script>
 		<script src="resources/js/sulka.addCore.js"></script>
 		<script src="resources/js/sulka.addRecoveries.js"></script>
+        <script src="resources/js/sulka.events.js"></script>
 		<script src="resources/js/sulka.userSettings.js"></script>
 		<script src="resources/js/lib/colorbox/jquery.colorbox-min.js"></script>
 		<script src="resources/js/lib/colorbox/colorbox.helpers.js"></script>
