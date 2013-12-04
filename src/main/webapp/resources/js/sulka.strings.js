@@ -25,6 +25,6 @@ sulka.strings = {
 		return fieldName + ": " + fieldErrors;
 	},
 	validationFailed: function (errors) {
-		return "Rivillä on virheitä – " + errors.join(", ");
+		return "Rivillä on virheitä (" + errors.join(", ") + ")";
 	}
 };
