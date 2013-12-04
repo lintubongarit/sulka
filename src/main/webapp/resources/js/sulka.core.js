@@ -878,15 +878,12 @@ sulka = {
 	/**
 	 * Parameters used while initializing new dataview with createNewDataView.
 	 */
-	METADATA_SULKA_RECOVERY: {"cssClasses" : "sulka-row recovery-row" },
-	METADATA_SULKA_RINGING: {"cssClasses" : "sulka-row ringing-row" },
-	METADATA_SULKA_ADDROW: {"cssClasses" : "sulka-row" },
 	
-	METADATA_SULKA_VALID : {"cssClasses" : "sulka-row ringing-row-color sulka-valid-row"},
-	METADATA_SULKA_VALID_ODD : {"cssClasses" : "sulka-row ringing-row-color sulka-valid-row-odd"},
+	METADATA_SULKA : {"cssClasses" : "sulka-row"},
+	METADATA_SULKA_ODD : {"cssClasses" : "sulka-row-odd"},
 	
-	METADATA_SULKA_INVALID : {"cssClasses" : "sulka-row ringing-row-color sulka-invalid-row"},
-	METADATA_SULKA_INVALID_ODD : {"cssClasses" : "sulka-row ringing-row-color sulka-invalid-row-odd"},
+	METADATA_SULKA_INVALID : {"cssClasses" : "sulka-invalid-row"},
+	METADATA_SULKA_INVALID_ODD : {"cssClasses" : "sulka-invalid-row-odd"},
 	
 	METADATA_TIPU_RECOVERY: { "cssClasses": "tipu-row recovery-row" },
 	METADATA_TIPU_RECOVERY_ODD: {"cssClasses": "tipu-row recovery-row tipu-row-color-odd"},
@@ -905,10 +902,8 @@ sulka = {
 	 * Creates new DataView for the grid.
 	 */
 	createNewDataView: function (data) {
-		var METADATA_SULKA_ADDROW = sulka.METADATA_SULKA_ADDROW,
-			
-			METADATA_SULKA_VALID = sulka.METADATA_SULKA_VALID,
-			METADATA_SULKA_VALID_ODD = sulka.METADATA_SULKA_VALID_ODD,
+		var METADATA_SULKA= sulka.METADATA_SULKA,
+			METADATA_SULKA_ODD = sulka.METADATA_SULKA_ODD,
 			
 			METADATA_SULKA_INVALID = sulka.METADATA_SULKA_INVALID,
 			METADATA_SULKA_INVALID_ODD = sulka.METADATA_SULKA_INVALID_ODD,
@@ -942,14 +937,17 @@ sulka = {
 								return METADATA_SULKA_INVALID_ODD;
 						} else if (row.$valid === true) {
 							if (index%2 == 0)
-								return METADATA_SULKA_VALID;
+								return METADATA_SULKA;
 							else
-								return METADATA_SULKA_VALID_ODD;
+								return METADATA_SULKA_ODD;
 						} else {
 							return METADATA_EMPTY;
 						}
 				} else if (sulka.viewMode !== "browsing" && index === data.length - 1) {
-					return METADATA_SULKA_ADDROW;
+					if (index%2 == 0)
+						return METADATA_SULKA;
+					else
+						return METADATA_SULKA_ODD;
 				} else {
 					if (row.type == RINGING_TYPE) {
 						if (index%2 == 0)
