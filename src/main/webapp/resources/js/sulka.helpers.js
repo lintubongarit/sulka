@@ -17,12 +17,26 @@ helpers = {
 		}
 	},
 
+	validationErrorVisible: false,
 	/**
 	 * Sets the user-visible error text to a given value, or removes
-	 * the text if a false-like value is given.
+	 * the text if a false-like value is given. If empty sting is passed
+	 * and there is a validation error, it is shown instead.
 	 * @param errorMsg New error string.
+	 * @param isValidationError Whether this is a validation error or not.
 	 */
-	setError: function (errorMsg) {
+	setError: function (errorMsg, isValidationError) {
+		if (!isValidationError) {
+			if (!errorMsg) {
+				if (helpers.currentValidationError !== null) {
+					helpers.validationErrorVisible = true;
+					errorMsg = helpers.currentValidationError;
+				}
+			} else {
+				helpers.validationErrorVisible = false;
+			}
+		} 
+		
 		if (errorMsg) {
 			if (errorMsg.length > 500) {
 				errorMsg = errorMsg.substring(0, 500) + "...";
@@ -44,7 +58,7 @@ helpers = {
 	 * @returns the current error text.
 	 */
 	getError: function () {
-		return $.trim($("#last-error").text());
+		return $("#last-error").text().trim();
 	},
 	
 	/**
@@ -93,12 +107,19 @@ helpers = {
 		helpers.showLoader();
 	},
 	
-	showValidationErrors: function (args) {
-		sulka.helpers.unsetErrorAndShowLoader();
-		if (sulka.getData()[args.row].$invalid_msg !== undefined) {
-			sulka.helpers.hideLoaderAndSetError(sulka.getData()[args.row].$invalid_msg);
+	currentValidationError: null,
+	setValidationError: function (error) {
+		if (typeof(error) === "string" && error) {
+			helpers.currentValidationError = error;
+			helpers.setError(error, true);
+			helpers.validationErrorVisible = true;
 		} else {
-			sulka.helpers.hideLoaderAndSetError("");
+			if (helpers.currentValidationError !== null && helpers.validationErrorVisible) {
+				helpers.setError("", true);
+				helpers.validationErrorVisible = false;
+			} else {
+				helpers.currentValidationError = null;
+			}
 		}
 	},
 	
