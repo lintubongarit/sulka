@@ -22,7 +22,7 @@ sulka.strings = {
 		}
 	},
 	fieldErrorString: function (fieldName, fieldErrors) {
-		return fieldName + ":" + fieldErrors;
+		return fieldName + ": " + fieldErrors;
 	},
 	validationFailed: function (errors) {
 		return "Rivillä on virheitä – " + errors.join(", ");
