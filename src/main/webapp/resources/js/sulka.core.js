@@ -547,17 +547,17 @@ sulka = {
 		}
 		specialCodes[225] = true; //ALT_GR
 		
-		specialCodes[8] = false; //backspace should work
-		specialCodes[46] = false; //delete should work
+		delete specialCodes[$.ui.keyCode.BACKSPACE]; //backspace should work
+		delete specialCodes[$.ui.keyCode.DELETE]; //delete should work
 		
 		return function (e) {
-			console.log(e.which);
 			if (e.which === $.ui.keyCode.ENTER) {
-				if (sulka.grid.getCellEditor() !== null) 
+				if (sulka.grid.getCellEditor() !== null) {
 					sulka.grid.navigateRight();
+				}
 				sulka.grid.editActiveCell();
 				sulka.helpers.cancelEvent(e);
-			} else if (!specialCodes[e.which] && sulka.grid.getCellEditor() === null) {
+			} else if (!specialCodes.hasOwnProperty(e.which) && sulka.grid.getCellEditor() === null) {
 				// Show editor if user starts typing in a cell
 				sulka.grid.editActiveCell();
 			}
@@ -619,7 +619,7 @@ sulka = {
 	    		"-webkit-border-radius": "8px",
 	    		"-webkit-box-shadow": "2px 2px 6px silver"
 	    	})
-	    	.text("Drag to Recycle Bin to delete " + dd.count + " selected row(s)")
+	    	.text(sulka.strings.dragToDelete(dd.count))
 	    	.appendTo("body");
 
 		dd.helper = proxy;
@@ -1075,14 +1075,16 @@ sulka = {
 						actualRowData.$errors = undefined;
 					} else {
 						actualRowData.$errors = [];
-						errorString = sulka.strings.invalidRow + ": ";
+						var errorStrings = []; 
 						for (var errorField in data.errors) if (data.errors.hasOwnProperty(errorField)) {
 							var errorArray = data.errors[errorField];
-							errorString = errorString.concat('(' + errorField + ': ' + errorArray[0].errorName + '), ');
+							errorStrings.push(sulka.strings.fieldErrorString(errorField, errorArray.map(function (error) { 
+								return error.localizedErrorText; 
+							})));
 							actualRowData.$errors.push(errorField);
 						}
 						actualRowData.$errors = JSON.stringify(actualRowData.$errors);
-						actualRowData.$invalid_msg = errorString;
+						actualRowData.$invalid_msg = sulka.strings.validationFailed(errorStrings);
 					}
 					
 					sulka.submitSulkaDBRow(actualRowData);
