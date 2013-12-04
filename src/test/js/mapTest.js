@@ -33,8 +33,8 @@ casper.test.begin('Map tests', 11, function suite(test) {
 		}).waitWhileVisible("#loader-animation"
 		).then(function() {
 			casper.evaluate(function() {
-				sulka.lastInputCoordinateLon = 28.1;
-				sulka.lastInputCoordinateLat = 62.1;
+				sulka.lastInputCoordinateLon = "24.1";
+				sulka.lastInputCoordinateLat = "62.1";
 				sulka.grid.setSelectedRows([0]);
 				sulka.setCoordinateToRows();
 			});

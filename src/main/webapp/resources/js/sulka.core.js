@@ -273,7 +273,10 @@ sulka = {
 		$(window).resize(sulka.resizeGrid);
 		sulka.resizeGrid();
 		
-		$("#slick-grid").mousewheel(sulka.onMouseWheel);
+		var $slickGrid = $("#slick-grid");
+		if (typeof($slickGrid.mousewheel) === "function") {
+			$slickGrid.mousewheel(sulka.onMouseWheel);
+		}
 		
 		sulka.reloadData();
 		
@@ -863,7 +866,10 @@ sulka = {
 							//data[selectedRows[i]].coordinateAccuracy = "kartta";
 							sulka.grid.invalidate();
 							sulka.grid.render();
-							sulka.addToSulkaDB(selectedRows[i]);
+							var row = sulka.getData()[selectedRows[i]];
+							if (row) {
+								sulka.submitSulkaDBRow(row);
+							}
 						}
 					}
 					sulka.helpers.hideLoader();

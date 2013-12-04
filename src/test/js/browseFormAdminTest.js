@@ -62,10 +62,11 @@ casper.test.begin('Browsing pages form tests for admin', 16, function suite(test
 				test.assertEquals(formValues[filter], "", 'The "' + filter + ' field is cleared.'); 
 				}
 			}
+		}).waitWhileVisible("#loader-animation"
+		).then(function(){
 			test.assertNotVisible('#loader-animation', "Loader animation is not shown.");
 		});
-
-	    });
+	});
 		
     casper.run(function () {
         test.done();

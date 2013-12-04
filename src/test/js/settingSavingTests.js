@@ -31,7 +31,7 @@ casper.test.begin('Setting saving tests', 25, function suite(test) {
 				var gridColumns = sulka.grid.getColumns();
 				gridColumns[column].width = width;
 				sulka.grid.setColumns(gridColumns);
-				sulka.events.updateWidthToSulkaColumns();
+				sulka.updateWidthToSulkaColumns();
 			}, column, width);
     	};
     	
@@ -55,7 +55,7 @@ casper.test.begin('Setting saving tests', 25, function suite(test) {
 				gridColumns[column] = gridColumns[anotherColumn];
 				gridColumns[anotherColumn] = tmp;
 				sulka.grid.setColumns(gridColumns);
-				sulka.events.updateOrderToSulkaColumns();
+				sulka.updateOrderToSulkaColumns();
     		}, column, anotherColumn);
     	};
     	
@@ -77,22 +77,22 @@ casper.test.begin('Setting saving tests', 25, function suite(test) {
 		}).then(function(){
 			changeColumnWidth(COLUMN, NEW_WIDTH);
 			saveSettings();
-		}).waitWhileVisible("loader-animation"
+		}).waitWhileVisible("#loader-animation"
 		).then(function(){
 			changeColumnWidth(COLUMN, NORMAL_WIDTH);
 			restoreSettings();
-		}).waitWhileVisible("loader-animation"
+		}).waitWhileVisible("#loader-animation"
 		).then(function(){
 			var columnWidth = getColumnWidth(COLUMN);
 			test.assertEquals(columnWidth, NEW_WIDTH, "Previously saved column width is restored in browsing -mode.");
 			changeColumnWidth(COLUMN, NORMAL_WIDTH);
 			saveSettings();
-		}).waitWhileVisible("loader-animation"
+		}).waitWhileVisible("#loader-animation"
 		).then(function() {
 			previousColumnName = getColumnName(COLUMN);
 			changeColumnOrder(COLUMN, COLUMN +1);
 			restoreSettings();
-		}).waitWhileVisible("loader-animation"
+		}).waitWhileVisible("#loader-animation"
 		).then(function() {
 			var currentColumnName = getColumnName(COLUMN);
 			test.assertEquals(currentColumnName, previousColumnName, "Changed column order is restored in browsing -mode.");
@@ -114,10 +114,10 @@ casper.test.begin('Setting saving tests', 25, function suite(test) {
 				ringings: true,
 				recoveries: false
 				}, false);
-		}).waitWhileVisible("loader-animation"
+		}).waitWhileVisible("#loader-animation"
 		).then(function() {
 			restoreSettings();
-		}).waitWhileVisible("loader-animation"
+		}).waitWhileVisible("#loader-animation"
 		).then(function(){
 			test.assertField('date', '1990', "Date is restored in browsing -mode..");
 			test.assertField('species', 'BUBBUB', "Species is restored in browsing -mode..");
@@ -127,40 +127,40 @@ casper.test.begin('Setting saving tests', 25, function suite(test) {
 		}).then(function(){
 			setColumnVisibility(COLUMN, false);
 			restoreSettings();
-		}).waitWhileVisible("loader-animation"
+		}).waitWhileVisible("#loader-animation"
 		).then(function(){
 			var isColumnVisible = getColumnVisibility(COLUMN);
 			test.assertTrue(isColumnVisible, "Column visibility status is restored in browsing -mode.");
 		}).then(function(){
-//			for(var i = 0; i < 5; i++){
-//				casper.evaluate(function(){
-//					sulka.freeze.freezeLeftColumn();
-//				});
-//			}
-//			saveSettings();
-//		}).waitWhileVisible("loader-animation"
-//		).then(function(){
-//			for(var i = 0; i < 5; i++){
-//				casper.evaluate(function(){
-//						sulka.freeze.unfreezeRightColumn();
-//				});
-//			}
-//			restoreSettings();
-//		}).waitWhileVisible("loader-animation"
-//		).then(function(){
-//			var freezedColumnCount = casper.evaluate(function(){
-//				return sulka.freeze.grid.getColumns().length;
-//			});
-//			test.assertEquals(freezedColumnCount, 5, "Freezed columns are restored.");
-//			var count = casper.evaluate(function(){
-//				return sulka.freeze.grid.getColumns().length;
-//			});
-//			for(; count > 0; count--){
-//				casper.evaluate(function(){
-//					sulka.freeze.unfreezeRightColumn();
-//				});
-//			}
-//		}).then(function() {
+			for(var i = 0; i < 5; i++){
+				casper.evaluate(function(){
+					sulka.freeze.freezeLeftColumn();
+				});
+			}
+			saveSettings();
+		}).waitWhileVisible("#loader-animation"
+		).then(function(){
+			for(var i = 0; i < 5; i++){
+				casper.evaluate(function(){
+						sulka.freeze.unfreezeRightColumn();
+				});
+			}
+			restoreSettings();
+		}).waitWhileVisible("#loader-animation"
+		).then(function(){
+			var freezedColumnCount = casper.evaluate(function(){
+				return sulka.freeze.grid.getColumns().length;
+			});
+			test.assertEquals(freezedColumnCount, 5, "Freezed columns are restored.");
+			var count = casper.evaluate(function(){
+				return sulka.freeze.grid.getColumns().length;
+			});
+			for(; count > 0; count--){
+				casper.evaluate(function(){
+					sulka.freeze.unfreezeRightColumn();
+				});
+			}
+		}).then(function() {
 			this.fill('form#filters', {
 				date: '',
 				species: '',
@@ -183,22 +183,22 @@ casper.test.begin('Setting saving tests', 25, function suite(test) {
 		}).then(function(){
 			changeColumnWidth(COLUMN, NEW_WIDTH);
 			saveSettings();
-		}).waitWhileVisible("loader-animation"
+		}).waitWhileVisible("#loader-animation"
 		).then(function(){
 			changeColumnWidth(COLUMN, NORMAL_WIDTH);
 			restoreSettings();
-		}).waitWhileVisible("loader-animation"
+		}).waitWhileVisible("#loader-animation"
 		).then(function(){
 			var columnWidth = getColumnWidth(COLUMN);
 			test.assertEquals(columnWidth, NEW_WIDTH, "Previously saved column width is restored in addRingings -mode.");
 			changeColumnWidth(COLUMN, NORMAL_WIDTH);
 			saveSettings();
-		}).waitWhileVisible("loader-animation"
+		}).waitWhileVisible("#loader-animation"
 		).then(function() {
 			previousColumnName = getColumnName(COLUMN);
 			changeColumnOrder(COLUMN, COLUMN+1);
 			restoreSettings();
-		}).waitWhileVisible("loader-animation"
+		}).waitWhileVisible("#loader-animation"
 		).then(function() {
 			var currentColumnName = getColumnName(COLUMN);
 			test.assertEquals(currentColumnName, previousColumnName, "Changed column order is restored in addRingings -mode.");
@@ -214,10 +214,10 @@ casper.test.begin('Setting saving tests', 25, function suite(test) {
 				species: '',
 				municipality: ''
 				}, false);
-		}).waitWhileVisible("loader-animation"
+		}).waitWhileVisible("#loader-animation"
 		).then(function() {
 			restoreSettings();
-		}).waitWhileVisible("loader-animation"
+		}).waitWhileVisible("#loader-animation"
 		).then(function(){
 			test.assertField('date', '1990', "Date is restored in addRingings -mode.");
 			test.assertField('species', 'BUBBUB', "Species is restored in addRingings -mode.");
@@ -226,10 +226,10 @@ casper.test.begin('Setting saving tests', 25, function suite(test) {
 			setColumnVisibility(COLUMN, false);
 			saveSettings();
 			setColumnVisibility(COLUMN, true);
-		}).waitWhileVisible("loader-animation"
+		}).waitWhileVisible("#loader-animation"
 		).then(function(){
 			restoreSettings();
-		}).waitWhileVisible("loader-animation"
+		}).waitWhileVisible("#loader-animation"
 		).then(function(){
 			var isColumnVisible = getColumnVisibility(COLUMN);
 			test.assertFalse(isColumnVisible, "Column visibility status is restored in addRingings -mode.");
@@ -247,7 +247,7 @@ casper.test.begin('Setting saving tests', 25, function suite(test) {
 			test.assertFalse(isTickVisible, "Tick is removed from context-menu.");
 			setColumnVisibility(COLUMN, true);
 			saveSettings();	
-		}).waitWhileVisible("loader-animation"
+		}).waitWhileVisible("#loader-animation"
 		).then(function() {
 			this.fill('form#filters', {
 				date: '',
@@ -269,22 +269,22 @@ casper.test.begin('Setting saving tests', 25, function suite(test) {
 		}).then(function(){
 			changeColumnWidth(COLUMN, NEW_WIDTH);
 			saveSettings();
-		}).waitWhileVisible("loader-animation"
+		}).waitWhileVisible("#loader-animation"
 		).then(function(){
 			changeColumnWidth(COLUMN, NORMAL_WIDTH);
 			restoreSettings();
-		}).waitWhileVisible("loader-animation"
+		}).waitWhileVisible("#loader-animation"
 		).then(function(){
 			var columnWidth = getColumnWidth(COLUMN);
 			test.assertEquals(columnWidth, NEW_WIDTH, "Previously saved column width is restored in addRecoveries -mode.");
 			changeColumnWidth(COLUMN, NORMAL_WIDTH);
 			saveSettings();
-		}).waitWhileVisible("loader-animation"
+		}).waitWhileVisible("#loader-animation"
 		).then(function() {
 			previousColumnName = getColumnName(COLUMN);
 			changeColumnOrder(COLUMN, COLUMN + 1);
 			restoreSettings();
-		}).waitWhileVisible("loader-animation"
+		}).waitWhileVisible("#loader-animation"
 		).then(function() {
 			var currentColumnName = getColumnName(COLUMN);
 			test.assertEquals(currentColumnName, previousColumnName, "Changed column order is restored in addRecoveries -mode.");
@@ -300,10 +300,10 @@ casper.test.begin('Setting saving tests', 25, function suite(test) {
 				species: '',
 				municipality: ''
 				}, false);
-		}).waitWhileVisible("loader-animation"
+		}).waitWhileVisible("#loader-animation"
 		).then(function() {
 			restoreSettings();
-		}).waitWhileVisible("loader-animation"
+		}).waitWhileVisible("#loader-animation"
 		).then(function(){
 			test.assertField('date', '1990', "Date is restored in addRecoveries -mode.");
 			test.assertField('species', 'BUBBUB', "Species is restored in addRecoveries -mode.");
@@ -311,7 +311,7 @@ casper.test.begin('Setting saving tests', 25, function suite(test) {
 		}).then(function(){
 			setColumnVisibility(COLUMN, false);
 			restoreSettings();
-		}).waitWhileVisible("loader-animation"
+		}).waitWhileVisible("#loader-animation"
 		).then(function(){
 			var isColumnVisible = getColumnVisibility(COLUMN);
 			test.assertTrue(isColumnVisible, "Column visibility status is restored in addRecoveries -mode.");
