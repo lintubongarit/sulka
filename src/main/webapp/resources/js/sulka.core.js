@@ -549,7 +549,6 @@ sulka = {
 		specialCodes[46] = false; //delete should work
 		
 		return function (e) {
-			console.log(e.which);
 			if (e.which === $.ui.keyCode.ENTER) {
 				if (sulka.grid.getCellEditor() !== null) 
 					sulka.grid.navigateRight();
@@ -1023,6 +1022,7 @@ sulka = {
 	 */
 	onCellChange: function(event, args) {
 		if (args.row >= 0) {
+			sulka.previousActiveRowEdited = true;
 			var row = sulka.getData()[args.row];
 			sulka.submitSulkaDBRow(row);
 		}
@@ -1044,9 +1044,13 @@ sulka = {
 	 *  $invalid_msg: error msg to be displayed when invalid row is clicked
 	 */
 	onActiveCellChanged: function (e, args) {
+		console.log('sulka.previousActiveRow ' + sulka.previousActiveRow);
+		console.log('sulka.previousActiveRowEdited ' + sulka.previousActiveRowEdited);
+		
 		if (sulka.previousActiveRow !== undefined
 				&& sulka.grid.getSelectedRows()[0] !== sulka.previousActiveRow
 				&& sulka.previousActiveRowEdited ){
+			
 			var data = sulka.getData();
 			var actualRowData = data[sulka.previousActiveRow];
 
@@ -1054,13 +1058,10 @@ sulka = {
 				return;
 			}
 			
-			sulka.previousActiveRow = sulka.grid.getSelectedRows()[0];
-			
 			sulka.helpers.unsetErrorAndShowLoader();
 			sulka.API.validate(
 				actualRowData,
 				function (data) {
-					sulka.previousActiveRowEdited = false;
 					
 					actualRowData.$valid = data.passes;
 					if (data.passes) {
@@ -1081,12 +1082,17 @@ sulka = {
 					
 					sulka.submitSulkaDBRow(actualRowData);
 					sulka.helpers.hideLoaderAndUnsetError();
+					sulka.setData(sulka.getData());
 				}, function() {
 					sulka.helpers.hideLoaderAndSetError();
 				}
 			);
 		}
 		sulka.helpers.showValidationErrors(args);
+		
+		if (sulka.previousActiveRow !== sulka.grid.getSelectedRows()[0])
+			sulka.previousActiveRowEdited = false;
+		
 		sulka.previousActiveRow = sulka.grid.getSelectedRows()[0];
 		
 	},
@@ -1096,8 +1102,6 @@ sulka = {
 			// Refuse to submit undefined or read-only row
 			return;
 		}
-		
-		sulka.previousActiveRowEdited = true;
 		
 		// The local DB wrapper object
 		var localDbRow = {};
