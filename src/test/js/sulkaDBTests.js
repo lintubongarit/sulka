@@ -172,8 +172,8 @@ casper.test.begin('Sulka-database tests', 10, function suite(test) {
 	    	test.assertEquals(editedRow.$errors, '["species"]',
 	    	"validated row contains $errors-variable which tells which property is invalid");
 	    	
-	    	test.assertEquals(editedRow.$invalid_msg, 'RIVI EI OLE VALIDI: (species: invalid_enumeration_value), ',
-	    	"validated row contains $invalid_msg-variable");
+	    	test.assertTrue(editedRow.$invalid_msg.indexOf("species") >= 0,
+	    	"validated row complains about species field");
 	    	
 		}).then(function () {	  //DELETE TEST FOR SINGLE ROW BEGINS
 			
