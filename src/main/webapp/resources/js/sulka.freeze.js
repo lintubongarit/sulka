@@ -99,7 +99,9 @@ sulka.freeze = (function (freeze) { freeze = {
 			freeze.viewport = freezeContainer.find(".slick-viewport").first();
 			freeze.mainViewport = sulka.viewport;
 			freeze.viewport.css("overflow", "hidden");
-			freezeContainer.mousewheel(freeze.onMouseWheel);
+			if (typeof(freezeContainer.mousewheel) === "function") {
+				freezeContainer.mousewheel(freeze.onMouseWheel);
+			}
 			var unfreezeButton = $("<div></div>")
 				.addClass("header-unfreeze-button")
 				.text(freeze.LEFT_TRIANGLE)

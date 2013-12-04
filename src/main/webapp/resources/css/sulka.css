@@ -313,11 +313,15 @@ span#last-error {
 	background: #ffffff; 
 }
 
-.sulka-valid-row {
+.sulka-row-odd {
+	background: #efefef; 
+}
+
+.sulka-ready-row {
 	background: #ebffec; 
 }
 
-.sulka-valid-row-odd {
+.sulka-ready-row-odd {
 	background: #dbefdc; 
 }
 
