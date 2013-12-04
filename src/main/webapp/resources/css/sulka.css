@@ -314,7 +314,7 @@ span#last-error {
 }
 
 .sulka-row-odd {
-	background: #efefef; 
+	background: #f5f5f5; 
 }
 
 .sulka-ready-row {
@@ -326,11 +326,11 @@ span#last-error {
 }
 
 .sulka-invalid-row {
-	background: #fcebeb; 
+	background: #fcdbdb; 
 }
 
 .sulka-invalid-row-odd {
-	background: #ecdbdb; 
+	background: #ffcbcb; 
 }
 
 .sulka-invalid-cell {

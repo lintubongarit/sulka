@@ -955,13 +955,13 @@ sulka = {
 					return METADATA_EMPTY; 
 				}
 				var row = data[index];
-				if (row.hasOwnProperty("databaseId")) {
+				if (row.hasOwnProperty("rowStatus")) {
 						if (row.$valid === false) {
 							if (index%2 == 0)
 								return METADATA_SULKA_INVALID;
 							else
 								return METADATA_SULKA_INVALID_ODD;
-						} else if (row.$valid === true) {
+						} else if (row.$valid === true || !row.hasOwnProperty("$valid")) {
 							if (index%2 == 0)
 								return METADATA_SULKA;
 							else
@@ -969,11 +969,6 @@ sulka = {
 						} else {
 							return METADATA_EMPTY;
 						}
-				} else if (sulka.viewMode !== "browsing" && index === data.length - 1) {
-					if (index%2 == 0)
-						return METADATA_SULKA;
-					else
-						return METADATA_SULKA_ODD;
 				} else {
 					if (row.type == RINGING_TYPE) {
 						if (index%2 == 0)
