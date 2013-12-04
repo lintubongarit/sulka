@@ -6,11 +6,12 @@ sulka.strings = {
 	noResults: "Ei hakutuloksia!",
 	invalidDate: "Virheellinen päivämäärä!",
 	inverseDateRange: "Virheellinen päivämäärä (alku>loppu)!",
-	validRow: "Rivi on validi",
-	invalidRow: "RIVI EI OLE VALIDI",
+	validRow: "Rivi OK",
+	invalidRow: "Rivillä on virheitä",
 	couldNotInsert: "Riviä ei voitu lisätä",
 	settingsSaveFailed: "Asetusten tallentaminen epäonnistui.",
 	settingsReceivedFailed: "Asetusten nouto epäonnistui.",
 	invalidEnum: "Tuntematon sarakkeen arvo",
-	coordinateConversionFailed: "Koordinaattien konvertointi WGS84 muodosta YKJ muotoon epäonnistui"
+	coordinateConversionFailed: "Koordinaattien konvertointi WGS84 muodosta YKJ muotoon epäonnistui",
+	invalidDate: "Virheellinen päivämäärä (syötä muodossa pp.kk.vvvv)"
 };

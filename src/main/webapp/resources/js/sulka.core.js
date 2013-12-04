@@ -75,10 +75,11 @@ sulka = {
 	contextMenuItemById: {},
 	
 	/**
-	 * Reference to current view's columns and fieldGroups.
+	 * Reference to current view's columns, fieldGroups and list of date fields.
 	 */
-	columns: null,
-	fieldGroups: null,
+	columns: [],
+	fieldGroups: [],
+	dateFields: [],
 	
 	/**
 	 * Get rendered text width.
@@ -105,32 +106,29 @@ sulka = {
 			function (fieldGroups) {
 				sulka.helpers.hideLoaderAndUnsetError();
 				var columns = [];
+				var dateFields = [];
 				sulka.fieldGroups = fieldGroups;
 				
 				var $headerContextMenu = $("#header-context-menu");
+				dateFieldFormatter = sulka.makeDateFieldFormatter();
 				
-				$.each(fieldGroups, function () {
-					var group = this;
-					
+				fieldGroups.forEach(function (group) {
 					var contextHeader = $("<li></li>")
 						.addClass("context-menu-title")
 						.text(group.description);
 					sulka.contextMenuItemById[group.name] = contextHeader; 
 					$headerContextMenu.append(contextHeader);
 					
-					$.each(this.fields, function () {
-						var field = this;
+					group.fields.forEach(function (field) {
 						var id = group.name + "/" + field.field;
-						var isEnumeration = false;
 						var isFlexible = false;
 						var width;
 						
-						if (field.enumerationValues) {
-							isEnumeration = true;
+						if (field.type === "ENUMERATION") {
 							width = sulka.COL_PADDING;
-							$.each(field.enumerationValues, function () {
+							field.enumerationValues.forEach(function (enumValue) {
 								var enumWidth = Math.min(
-										sulka.COL_MAX_WIDTH, sulka.getRenderedTextWidth(this.value) + sulka.COL_PADDING);
+										sulka.COL_MAX_WIDTH, sulka.getRenderedTextWidth(enumValue.value) + sulka.COL_PADDING);
 								if (enumWidth > width) {
 									width = enumWidth;
 								}
@@ -155,20 +153,27 @@ sulka = {
 							cssClass: "sulka-column-" + field.field
 						}, sulka.columnOptions);
 						
-						if (field.field == "type") {
+						if (field.field === "type") {
 							column.$sulkaFlexible = false;
 							column.formatter = function () { return ""; };
 							column.width  = sulka.COL_TYPE_IMAGE_WIDTH + sulka.COL_PADDING;
 						}
-						
-						if (sulka.addMode) {
-							column.editor = isEnumeration ? sulka.editors.EnumerationEditor : Slick.Editors.Text;
-						}
-						
-						if (isEnumeration) {
+						if (field.type === "ENUMERATION") {
 							column.$sulkaEnumValues = field.enumerationValues.map(function (apiField) {
 								return apiField.value;
 							});
+							if (sulka.addMode) {
+								column.editor = sulka.editors.EnumerationEditor;
+							}
+						} else if (field.type === "DATE") {
+							column.formatter = dateFieldFormatter;
+							dateFields.push(field.field);
+							if (sulka.addMode) {
+								column.editor = sulka.editors.DateEditor;
+							}
+						} 
+						else if (sulka.addMode) {
+							column.editor = Slick.Editors.Text;
 						}
 						
 						columns.push(column);
@@ -190,6 +195,7 @@ sulka = {
 					});
 				});
 				sulka.columns = columns;
+				sulka.dateFields = dateFields;
 				sulka.initGrid();
 			},
 			sulka.helpers.hideLoaderAndSetError
@@ -381,13 +387,9 @@ sulka = {
 	 * Return currently visible columns (even those not currently on grid)
 	 */
 	getVisibleColumns: function () {
-		var visible = [];
-		$.each(sulka.columns, function () {
-			if (this.$sulkaVisible) {
-				visible.push(this);
-			}
+		return sulka.columns.filter(function (column) {
+			return column.$sulkaVisible;
 		});
-		return visible;
 	},
 	
 	/**
@@ -1044,7 +1046,7 @@ sulka = {
 			
 			sulka.helpers.unsetErrorAndShowLoader();
 			sulka.API.validate(
-				actualRowData,
+				sulka.formatRowOut(actualRowData),
 				function (data) {
 					sulka.previousActiveRowEdited = false;
 					
@@ -1055,12 +1057,11 @@ sulka = {
 					} else {
 						actualRowData.$errors = [];
 						errorString = sulka.strings.invalidRow + ": ";
-						for ( var errorField in data.errors)
-							if (data.errors.hasOwnProperty(errorField)) {
-								var errorArray = data.errors[errorField];
-								errorString = errorString.concat('(' + errorField + ': ' + errorArray[0].errorName + '), ');
-								actualRowData.$errors.push(errorField);
-							}
+						for (var errorField in data.errors) if (data.errors.hasOwnProperty(errorField)) {
+							var errorArray = data.errors[errorField];
+							errorString = errorString.concat('(' + errorField + ': ' + errorArray[0].errorName + '), ');
+							actualRowData.$errors.push(errorField);
+						}
 						actualRowData.$errors = JSON.stringify(actualRowData.$errors);
 						actualRowData.$invalid_msg = errorString;
 					}
@@ -1169,7 +1170,7 @@ sulka = {
 		};
 	},
 	
-	DATE_IN_REGEXP: /^(\d+)\.(\d+)\.(\d+)$/,
+	DATE_IN_REGEXP: /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/,
 	/**
 	 * Apply transformations to API row data on input from server. The transformations should happen in-place.
 	 * @param data Input rows from the API.
@@ -1177,17 +1178,23 @@ sulka = {
 	formatRowsIn: function (data) {
 		var DATE_RE = sulka.DATE_IN_REGEXP;
 		var pad2 = sulka.helpers.pad2;
+		var dateFields = sulka.dateFields; 
 		data.forEach(function (row) {
-			if (row && typeof(row.eventDate) === "string") {
-				var match = row.eventDate.match(DATE_RE);
-				if (match !== null) {
-					row.eventDate = match[3] + "-" + pad2(match[2]) + "-" + pad2(match[1]);  
-				}
+			if (row) {
+				dateFields.forEach(function (field) {
+					if (typeof(row[field]) === "string") { 
+						// Order dates year-month-day to make string sorting work
+						var match = row[field].match(DATE_RE);
+						if (match !== null) {
+							row[field] = match[3] + "." + pad2(match[2]) + "." + pad2(match[1]);  
+						}
+					}
+				});
 			}
 		});
 	},
 	
-	DATE_OUT_REGEXP: /^(\d+)-(\d+)-(\d+)$/,
+	DATE_OUT_REGEXP: /^(\d{4})\.(\d{1,2})\.(\d{1,2})$/,
 	/**
 	 * Apply transformations to an API row on output back to server. Should do the
 	 * reverse of formatRowsIn for individual row. Should clone the row if it needs
@@ -1196,14 +1203,36 @@ sulka = {
 	 * @return Possibly modified row that conforms to the expectations of the API.
 	 */
 	formatRowOut: function (row) {
-		if (row && typeof(row.eventDate) === "string") {
-			var match = row.eventDate.match(sulka.DATE_OUT_REGEXP);
-			if (match !== null) {
-				var row = $.extend({}, row);
-				row.eventDate = match[3] + "." + match[2] + "." + match[1];  
-			}
+		var copy = null;
+		var dateFields = sulka.dateFields;
+		if (row) {
+			dateFields.forEach(function (field) {
+				if (typeof(row[field]) === "string") {
+					var match = row[field].match(sulka.DATE_OUT_REGEXP);
+					if (match !== null) {
+						if (copy === null) copy = $.extend({}, row);  
+						copy[field] = match[3] + "." + match[2] + "." + match[1];  
+					}
+				}
+			});
 		}
-		return row;
+		return copy === null ? row : copy;
+	},
+	
+	/**
+	 * Create a new formatter for date fields.
+	 */
+	makeDateFieldFormatter: function () {
+		var DATE_RE = sulka.DATE_OUT_REGEXP;
+		return function (row, cell, date) {
+			if (typeof(date) === "string") {
+				var match = date.match(DATE_RE);
+				if (match !== null) {
+					return match[3] + "." + match[2] + "." + match[1];
+				}
+			}
+			return date;
+		};
 	}
 };
 
