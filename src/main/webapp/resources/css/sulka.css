@@ -158,14 +158,16 @@ img#loader-animation {
 #row-status-box-container {
 	position: absolute;
 	bottom: 0;
-	background-color: rgb(253, 214, 136);
-	height: 24px;
+	background-color: lightgray;
+	/* This border should be covered by the grid once it's loaded */
+	border-top: 1px solid black;
+	height: 20px;
 	width: 100%;
 	border-collapse: collapse;
 }
 
 #row-status-box {
-	padding: 4px;
+	padding: 2px;
 	height: 16px;
 	overflow: hidden;
 	vertical-align: middle;
@@ -174,7 +176,7 @@ img#loader-animation {
 #slick-grid, #freeze-grid {
     position: absolute;
     left: 0;
-    bottom: 24px;
+    bottom: 20px;
     top: 161px;
     vertical-align: middle;
     text-align: center;
@@ -236,7 +238,7 @@ span#last-error {
 	box-shadow: 2px 2px 2px silver;
 	-moz-box-shadow: 2px 2px 2px silver;
 	-webkit-box-shadow: 2px 2px 2px silver;
-	z-index: 99999;
+	z-index: 9000;
 	overflow-y: scroll;
 }
 
@@ -393,8 +395,8 @@ span#last-error {
 }
 .sulka-completions {
 	position: absolute;
-	top: 23px;
 	width: 100%;
+	z-index: 8000;
 }
 .sulka-completions div div:first-child {
 	border-top: 1px solid black;

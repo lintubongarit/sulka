@@ -17,33 +17,46 @@ events = {
 	 * Used to overwrite default edit navigation and editing. Returns an event handler function.
 	 */
 	makeOnKeyDown: function() {
-		var specialCodes = {};
+		// This is the set of keys that should not cause cell editing to begin
+		var ignoreKeys = {};
 		for (var key in $.ui.keyCode) {
-			specialCodes[$.ui.keyCode[key]] = true;
+			ignoreKeys[$.ui.keyCode[key]] = true;
 		}
+		delete ignoreKeys[$.ui.keyCode.BACKSPACE];
+		delete ignoreKeys[$.ui.keyCode.DELETE];
 		
-		//these aren't in $ui.keyCode
-		specialCodes[16] = true; //SHIFT
-		specialCodes[17] = true; //CTRL
-		specialCodes[18] = true; //ALT
-		specialCodes[20] = true; //CAPS_LOCK
-		specialCodes[91] = true; //WIN_KEY
-		for (var i = 112; i <= 123; i++){ //F_KEYS
-			specialCodes[i] = true;
+		$.extend(ignoreKeys, {
+			16: true, //SHIFT
+			18: true, //ALT
+			20: true, //CAPS_LOCK
+			91: true, //WIN_KEY
+			225: true //ALT_GR
+		});
+		for (var i=112; i<=123; i++) { //F_KEYS
+			ignoreKeys[i] = true;
 		}
-		specialCodes[225] = true; //ALT_GR
-		
-		delete specialCodes[$.ui.keyCode.BACKSPACE]; //backspace should work
-		delete specialCodes[$.ui.keyCode.DELETE]; //delete should work
 		
 		return function (e) {
+			if (e.ctrlKey) return;
+			
 			if (e.which === $.ui.keyCode.ENTER) {
 				if (sulka.grid.getCellEditor() !== null) {
 					sulka.grid.navigateRight();
 				}
 				sulka.grid.editActiveCell();
 				sulka.helpers.cancelEvent(e);
-			} else if (!specialCodes.hasOwnProperty(e.which) && sulka.grid.getCellEditor() === null) {
+			} else if (e.which === $.ui.keyCode.TAB) {
+				var editing = sulka.grid.getCellEditor() !== null;
+				if (e.shiftKey) {
+					sulka.grid.navigateLeft();
+				} else {
+					sulka.grid.navigateRight();
+				}
+				if (editing) {
+					sulka.grid.editActiveCell();
+				}
+				sulka.helpers.cancelEvent(e);
+			} else if (!ignoreKeys.hasOwnProperty(e.which) && sulka.grid.getCellEditor() === null) {
 				// Show editor if user starts typing in a cell
 				sulka.grid.editActiveCell();
 			}
@@ -160,18 +173,18 @@ events = {
 		var columnIndex = 0;
 		var gridColumns = sulka.grid.getColumns();
 		var updatedColumnList = {};
-		for(var i = 0; i < sulka.columns.length; i++){
-			if(!sulka.columns[i].$sulkaVisible)
+		for (var i = 0; i < sulka.columns.length; i++) {
+			if (sulka.columns[i] && !sulka.columns[i].$sulkaVisible) {
 				updatedColumnList[sulka.columns[i].field] = i;
-			else
-				if(columnIndex < gridColumns.length){
-					updatedColumnList[gridColumns[columnIndex].field] = i;
-					columnIndex++;
-				}
+			} else if (columnIndex < gridColumns.length) {
+				updatedColumnList[gridColumns[columnIndex].field] = i;
+				columnIndex++;
+			}
 		}
 		var newColumns = [];
-		for(var i = 0; i < sulka.columns.length; i++)
+		for (var i=0; i < sulka.columns.length; i++) {
 			newColumns[updatedColumnList[sulka.columns[i].field]] = sulka.columns[i];
+		}
 		
 		sulka.columns = newColumns;
 	},

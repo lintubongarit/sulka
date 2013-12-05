@@ -137,6 +137,7 @@ sulka.groups = function (grid, container) {
 	render();
 	
 	$.extend(this, {
-		render: render
+		render: render,
+		onReordered: onReordered
 	});
 };

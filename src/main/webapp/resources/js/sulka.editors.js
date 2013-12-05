@@ -90,6 +90,10 @@ function PrefixTree(enumValues) {
 	this._root = root;
 };
 
+// Offsets for completions list
+var COMPLETIONS_TOP = 23,
+	COMPLETIONS_BOTTOM = 25; // Reverse (too close to bottom)
+
 editors = {
 	/**
 	 * Editor for enumerations field.
@@ -111,6 +115,7 @@ editors = {
 	    var completionsString = null;
 	    var curCompletions = null;
 	    var selectedCompletion = -1;
+	    var completionsReverse = false;
 	    
 	    if (!caseSensitive) {
 	    	enumValues = enumValues.map(function (enumValue) { return enumValue.toUpperCase(); });
@@ -153,7 +158,34 @@ editors = {
 					$("<div></div>").text(completion).click(setCompletionValue.bind(null, completion))
 				);
 			});
-			$completions.empty().append(holder).show();
+			$completions.empty().css({
+				top: COMPLETIONS_TOP + "px",
+				bottom: "auto"
+			}).append(holder).show();
+			
+			var topY = $completions.offset().top;
+			var height = $completions.outerHeight();
+			var bottomY = topY + height;
+			
+			var viewportTop = sulka.viewport.offset().top; 
+			var viewportBottom = viewportTop + sulka.viewport.innerHeight(); 
+			
+			// Show reverse list if full list can't fit under the text field and there is more space on top
+			if (bottomY > viewportBottom && 
+					bottomY - viewportBottom > 
+					viewportTop - (topY - COMPLETIONS_TOP - COMPLETIONS_BOTTOM - height)) {
+				$completions.hide();
+				var reversedHolder = $("<div></div>");
+				holder.find('>div').each(function () { reversedHolder.prepend(this); });
+				$completions.empty().append(reversedHolder).show();
+				$completions.css({
+					bottom: COMPLETIONS_BOTTOM + "px",
+					top: "auto"
+				});
+				completionsReverse = true;
+			} else {
+				completionsReverse = false;
+			}
 			selectedCompletion = -1;
 			curCompletions = completions;
 			completionsString = curVal;
@@ -191,7 +223,7 @@ editors = {
 		    			e.stopImmediatePropagation();
 		    			
 	    				var oldCompletion = selectedCompletion;
-		    			if (e.keyCode === $.ui.keyCode.DOWN) {
+		    			if (e.keyCode === (completionsReverse ? $.ui.keyCode.UP : $.ui.keyCode.DOWN)) {
 		    				selectedCompletion = Math.min(curCompletions.length-1, selectedCompletion + 1);
 		    			} else {
 		    				selectedCompletion--;
@@ -200,11 +232,17 @@ editors = {
 							hideCompletions();
 							return;
 						} else if (oldCompletion !== selectedCompletion) {
-	    					$completions.find('div div').removeClass("selected-completion");
-	    					$completions.find('div div:nth-child(' + (selectedCompletion+1) + ')').addClass("selected-completion");
+	    					$completions.find('div div.selected-completion').removeClass();
+	    					$completions.find('div div:nth-child(' + 
+	    							(completionsReverse ? (curCompletions.length-selectedCompletion) : (selectedCompletion+1)) + 
+	    					')').addClass("selected-completion");
 	    				}
-		    		} else if (e.keyCode === $.ui.keyCode.ENTER && 0 <= selectedCompletion) {
-		    			setCompletionValue(curCompletions[Math.min(curCompletions.length-1, selectedCompletion)]);
+		    		} else if (e.keyCode === $.ui.keyCode.ENTER) {
+		    			if (0 <= selectedCompletion) {
+		    				setCompletionValue(curCompletions[Math.min(curCompletions.length-1, selectedCompletion)]);
+		    			} else if (curCompletions.length === 1) {
+		    				setCompletionValue(curCompletions[0]);
+		    			}
 		    		}
 		    	}
 		    });
@@ -297,6 +335,7 @@ editors = {
 	    var completionsString = null;
 	    var curCompletions = null;
 	    var selectedCompletion = -1;
+	    var completionsReverse = false;
 	    
 	    var EDIT_REGEXP = sulka.DATE_IN_REGEXP; 
 	    var DATA_REGEXP = sulka.DATE_OUT_REGEXP;
@@ -401,7 +440,34 @@ editors = {
 					$("<div></div>").text(completion).click(setCompletionValue.bind(null, completion))
 				);
 			});
-			$completions.empty().append(holder).show();
+			$completions.empty().css({
+				top: COMPLETIONS_TOP + "px",
+				bottom: "auto"
+			}).append(holder).show();
+			
+			var topY = $completions.offset().top;
+			var height = $completions.outerHeight();
+			var bottomY = topY + height;
+			
+			var viewportTop = sulka.viewport.offset().top; 
+			var viewportBottom = viewportTop + sulka.viewport.innerHeight(); 
+			
+			// Show reverse list if full list can't fit under the text field and there is more space on top
+			if (bottomY > viewportBottom && 
+					bottomY - viewportBottom > 
+					viewportTop - (topY - COMPLETIONS_TOP - COMPLETIONS_BOTTOM - height)) {
+				$completions.hide();
+				var reversedHolder = $("<div></div>");
+				holder.find('>div').each(function () { reversedHolder.prepend(this); });
+				$completions.empty().append(reversedHolder).show();
+				$completions.css({
+					bottom: COMPLETIONS_BOTTOM + "px",
+					top: "auto"
+				});
+				completionsReverse = true;
+			} else {
+				completionsReverse = false;
+			}
 			selectedCompletion = -1;
 			curCompletions = completions;
 			completionsString = curVal;
@@ -439,7 +505,7 @@ editors = {
 		    			e.stopImmediatePropagation();
 		    			
 	    				var oldCompletion = selectedCompletion;
-		    			if (e.keyCode === $.ui.keyCode.DOWN) {
+		    			if (e.keyCode === (completionsReverse ? $.ui.keyCode.UP : $.ui.keyCode.DOWN)) {
 		    				selectedCompletion = Math.min(curCompletions.length-1, selectedCompletion + 1);
 		    			} else {
 		    				selectedCompletion--;
@@ -448,11 +514,17 @@ editors = {
 							hideCompletions();
 							return;
 						} else if (oldCompletion !== selectedCompletion) {
-	    					$completions.find('div div').removeClass("selected-completion");
-	    					$completions.find('div div:nth-child(' + (selectedCompletion+1) + ')').addClass("selected-completion");
+	    					$completions.find('div div.selected-completion').removeClass();
+	    					$completions.find('div div:nth-child(' + 
+	    							(completionsReverse ? (curCompletions.length-selectedCompletion) : (selectedCompletion+1)) + 
+	    					')').addClass("selected-completion");
 	    				}
-		    		} else if (e.keyCode === $.ui.keyCode.ENTER && 0 <= selectedCompletion) {
-		    			setCompletionValue(curCompletions[Math.min(curCompletions.length-1, selectedCompletion)]);
+		    		} else if (e.keyCode === $.ui.keyCode.ENTER) {
+		    			if (0 <= selectedCompletion) {
+		    				setCompletionValue(curCompletions[Math.min(curCompletions.length-1, selectedCompletion)]);
+		    			} else if (curCompletions.length === 1) {
+		    				setCompletionValue(curCompletions[0]);
+		    			}
 		    		}
 		    	}
 		    });

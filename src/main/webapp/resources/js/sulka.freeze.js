@@ -56,8 +56,8 @@ sulka.freeze = (function (freeze) { freeze = {
 		} else {
 			freeze.grid.setColumns(freeze.columns);
 		}
-		sulka.resizeGrid();
-		sulka.renderColumnGroups();
+		sulka.events.resizeGrid();
+		sulka.reorderToColumnGroups();
 	},
 	
 	unfreezeRightColumn: function () {
@@ -72,8 +72,8 @@ sulka.freeze = (function (freeze) { freeze = {
 		} else {
 			freeze.grid.setColumns(freeze.columns);
 		}
-		sulka.resizeGrid();
-		sulka.renderColumnGroups();
+		sulka.events.resizeGrid();
+		sulka.reorderToColumnGroups();
 	},
 	
 	position: function (y) {
@@ -94,7 +94,7 @@ sulka.freeze = (function (freeze) { freeze = {
 			freeze.grid = new Slick.Grid(freeze.freezeContainer, sulka.grid.getData(), freeze.columns, 
 					$.extend({}, freeze.gridOptions, sulka.gridOptions));
 			freeze.grid.$columnGroups = new sulka.groups(freeze.grid, freezeContainer);
-			freeze.grid.onColumnsResized.subscribe(sulka.resizeGrid);
+			freeze.grid.onColumnsResized.subscribe(sulka.events.resizeGrid);
 			freeze.grid.onSort.subscribe(freeze.onGridSort);
 			freeze.viewport = freezeContainer.find(".slick-viewport").first();
 			freeze.mainViewport = sulka.viewport;
@@ -151,6 +151,10 @@ sulka.freeze = (function (freeze) { freeze = {
 	
 	renderColumnGroups: function () {
 		if (freeze.visible && freeze.grid.$columnGroups) freeze.grid.$columnGroups.render();
+	},
+	
+	reorderToColumnGroups: function () {
+		if (freeze.visible && freeze.grid.$columnGroups) freeze.grid.$columnGroups.onReordered();
 	},
 	
 	onMainScroll: function (event, args) {

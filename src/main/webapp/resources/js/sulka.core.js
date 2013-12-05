@@ -214,10 +214,11 @@ sulka = {
 	 */
 	initGrid: function () {
 		// We are now ready to actually initialize the grid
+		var $slickGrid = $("#slick-grid");
 		  
 		sulka.grid = new Slick.Grid("#slick-grid", [], sulka.getVisibleColumns(), sulka.gridOptions);
 		
-		sulka.viewport = $("#slick-grid").find(".slick-viewport");
+		sulka.viewport = $slickGrid.find(".slick-viewport");
 		
 		//sulka.grid.setSelectionModel(new Slick.CellSelectionModel());
 		sulka.grid.setSelectionModel(new Slick.RowSelectionModel());
@@ -257,8 +258,7 @@ sulka = {
 		sulka.copyManager = new Slick.CellCopyManager();
 		sulka.grid.registerPlugin(sulka.copyManager);
 		
-		
-		sulka.grid.$columnGroups = new sulka.groups(sulka.grid, $("#slick-grid"));
+		sulka.grid.$columnGroups = new sulka.groups(sulka.grid, $slickGrid);
 		
 		sulka.freeze.init();
 
@@ -275,7 +275,6 @@ sulka = {
 		$(window).resize(sulka.events.resizeGrid);
 		sulka.events.resizeGrid();
 		
-		var $slickGrid = $("#slick-grid");
 		if (typeof($slickGrid.mousewheel) === "function") {
 			$slickGrid.mousewheel(sulka.events.onMouseWheel);
 		}
@@ -447,6 +446,14 @@ sulka = {
 	renderColumnGroups: function () {
 		if (sulka.grid && sulka.grid.$columnGroups) sulka.grid.$columnGroups.render();
 		sulka.freeze.renderColumnGroups();
+	},
+	
+	/**
+	 * Called whenever column group order needs to be enforced.
+	 */
+	reorderToColumnGroups: function () {
+		if (sulka.grid && sulka.grid.$columnGroups) sulka.grid.$columnGroups.onReordered();
+		sulka.freeze.reorderToColumnGroups();
 	},
 	
 	/**
