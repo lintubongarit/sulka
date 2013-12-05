@@ -341,6 +341,28 @@ events = {
 			sulka.viewport.scrollTop(Math.max(0, sulka.viewport.scrollTop() - 
 					deltaY*sulka.events.MOUSE_WHEEL_SCROLL_ROWS*sulka.events.MOUSE_WHEEL_ROW_HEIGHT));
 		}
+	},
+	
+	/**
+	 * Adjust grid positioning and size after window resize. 
+	 */
+	resizeGrid: function () {
+		setTimeout(function () {
+			sulka.freeze.resize();
+			
+			var y = $("#row-status-box-container").offset().top + $("#row-status-box-container").outerHeight();
+			var x = sulka.freeze.getWidth(); 
+			var width = $(window).width() - x;
+			
+			$("#slick-grid").css({
+				left: x + "px",
+				top: y + "px",
+				width: width + "px"
+			});
+			
+			sulka.freeze.position(y);
+			sulka.grid.resizeCanvas();
+		}, 100);
 	}
 };
 return events;

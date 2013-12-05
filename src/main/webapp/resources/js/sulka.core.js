@@ -342,31 +342,6 @@ sulka = {
 	},
 	
 	/**
-	 * Adjust grid positioning and size after window resize. 
-	 */
-	resizeGrid: function () {
-		setTimeout(function () {
-			sulka.freeze.resize();
-			
-			var y = $("#row-status-box-container").offset().top + $("#row-status-box-container").outerHeight();
-			var x = sulka.freeze.getWidth(); 
-			var width = $(window).width() - x;
-			
-			$("#slick-grid").css({
-				left: x + "px",
-				top: y + "px",
-				width: width + "px"
-			});
-			
-			sulka.freeze.position(y);
-			sulka.grid.resizeCanvas();
-		}, 100);
-	},
-	
-	
-
-	
-	/**
 	 * Return currently visible columns (even those not currently on grid)
 	 */
 	getVisibleColumns: function () {
