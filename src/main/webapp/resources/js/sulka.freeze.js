@@ -122,7 +122,7 @@ sulka.freeze = (function (freeze) { freeze = {
 	 */
 	onMouseWheel: function (event, delta, deltaX, deltaY) {
 		if (!freeze.visible) return;
-		sulka.onMouseWheel(event, delta, deltaX, deltaY);
+		sulka.events.onMouseWheel(event, delta, deltaX, deltaY);
 	},
 	
 	setData: function(rows) {
