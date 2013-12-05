@@ -100,52 +100,61 @@ events = {
 	 *  $invalid_msg: error msg to be displayed when invalid row is clicked
 	 */
 	onActiveCellChanged: function (e, args) {
+		sulka.statusBar.clearGridValidationError();
+		
+		var newRow = sulka.getData()[args.row];
+		if (newRow && newRow.$invalid_msg) {
+			sulka.statusBar.setValidationServiceError(newRow.$invalid_msg);
+		} else {
+			sulka.statusBar.clearValidationServiceError();
+		}
+		
 		if (sulka.previousActiveRow !== undefined
 				&& sulka.grid.getSelectedRows()[0] !== sulka.previousActiveRow
 				&& sulka.previousActiveRowEdited ){
-			var data = sulka.getData();
-			var actualRowData = data[sulka.previousActiveRow];
+			var previousRow = sulka.getData()[sulka.previousActiveRow];
 
-			if (!actualRowData) {
+			if (!previousRow) {
 				return;
 			}
 			
-			sulka.helpers.unsetErrorAndShowLoader();
-			sulka.helpers.setValidationError(sulka.getData()[args.row].$invalid_msg);
-			
+			sulka.statusBar.unsetErrorAndShowLoader();
 			sulka.API.validate(
-				sulka.formatRowOut(actualRowData),
+				sulka.formatRowOut(previousRow),
 				function (data) {
-					actualRowData.$valid = data.passes;
+					previousRow.$valid = data.passes;
 					if (data.passes) {
-						actualRowData.$invalid_msg = undefined;
-						actualRowData.$errors = undefined;
+						delete previousRow.$invalid_msg;
+						delete previousRow.$errors;
 					} else {
-						actualRowData.$errors = [];
+						var serializeErrors = [];
 						var errorStrings = []; 
 						for (var errorField in data.errors) if (data.errors.hasOwnProperty(errorField)) {
 							var errorArray = data.errors[errorField];
-							errorStrings.push(sulka.strings.fieldErrorString(errorField, errorArray.map(function (error) { 
+							var fieldName = sulka.fieldsByName.hasOwnProperty(errorField) ? 
+									sulka.fieldsByName[errorField].name : 
+									errorField;
+							errorStrings.push(sulka.strings.fieldErrorString(fieldName, errorArray.map(function (error) { 
 								return error.localizedErrorText; 
 							})));
-							actualRowData.$errors.push(errorField);
+							serializeErrors.push(errorField);
 						}
-						actualRowData.$errors = JSON.stringify(actualRowData.$errors);
-						actualRowData.$invalid_msg = sulka.strings.validationFailed(errorStrings);
+						previousRow.$errors = JSON.stringify(serializeErrors);
+						previousRow.$invalid_msg = sulka.strings.validationFailed(errorStrings);
 					}
 					
-					sulka.submitSulkaDBRow(actualRowData);
-					sulka.helpers.hideLoaderAndUnsetError();
+					sulka.submitSulkaDBRow(previousRow);
+					sulka.statusBar.hideLoaderAndUnsetError();
 					sulka.setData(sulka.getData());
 				}, function() {
-					sulka.helpers.hideLoaderAndSetError();
+					sulka.statusBar.hideLoaderAndSetError();
 				}
 			);
 		}
-		sulka.helpers.setValidationError(sulka.getData()[args.row].$invalid_msg);
 		
-		if (sulka.previousActiveRow !== sulka.grid.getSelectedRows()[0])
+		if (sulka.previousActiveRow !== sulka.grid.getSelectedRows()[0]) {
 			sulka.previousActiveRowEdited = false;
+		}
 		
 		sulka.previousActiveRow = sulka.grid.getSelectedRows()[0];
 		
@@ -376,6 +385,18 @@ events = {
 			sulka.freeze.position(y);
 			sulka.grid.resizeCanvas();
 		}, 100);
+	},
+	
+	onValidationError: function (e, args) {
+		if (args.validationResults) {
+			if (!args.validationResults.valid) {
+				if (args.validationResults.msg) {
+					sulka.statusBar.setGridValidationError(args.validationResults.msg);
+				}
+			} else {
+				sulka.statusBar.clearGridValidationError();
+			}
+		}
 	}
 };
 return events;
