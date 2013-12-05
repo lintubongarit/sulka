@@ -272,8 +272,8 @@ sulka = {
 		sulka.grid.onColumnsResized.subscribe(sulka.events.updateWidthToSulkaColumns);
 		sulka.grid.onColumnsReordered.subscribe(sulka.events.updateOrderToSulkaColumns);
 		
-		$(window).resize(sulka.resizeGrid);
-		sulka.resizeGrid();
+		$(window).resize(sulka.events.resizeGrid);
+		sulka.events.resizeGrid();
 		
 		var $slickGrid = $("#slick-grid");
 		if (typeof($slickGrid.mousewheel) === "function") {
@@ -868,8 +868,9 @@ sulka = {
 				if (match !== null) {
 					return match[3] + "." + match[2] + "." + match[1];
 				}
+				return date;
 			}
-			return date;
+			return "";
 		};
 	}
 };
