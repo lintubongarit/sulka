@@ -164,6 +164,7 @@ img#loader-animation {
 	height: 20px;
 	width: 100%;
 	border-collapse: collapse;
+	z-index: 200;
 }
 
 #row-status-box {
