@@ -164,7 +164,7 @@ img#loader-animation {
 	height: 20px;
 	width: 100%;
 	border-collapse: collapse;
-	z-index: 200;
+	z-index: 20;
 }
 
 #row-status-box {
@@ -184,6 +184,7 @@ img#loader-animation {
 }
 #slick-grid {
 	right: 0;
+	z-index: 60;
 }
 
 span#last-error {
