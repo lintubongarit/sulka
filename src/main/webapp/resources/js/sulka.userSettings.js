@@ -16,40 +16,42 @@ userSettings = {
 	save: function() {
 		sulka.helpers.showLoader();
 		var columnsSettings = {};
-		for(var i in sulka.columns){
+		sulka.columns.forEach(function (column, i) {
 			var currentColumn = [ // [position, width, visibility]
 					i,
-					sulka.columns[i].width,
-					sulka.columns[i].$sulkaVisible,
+					column.width,
+					column.$sulkaVisible,
 			];
-			columnsSettings[sulka.columns[i].field] = currentColumn;
-		}
+			columnsSettings[column.field] = currentColumn;
+		});
 		
 		var freezedCount = 0;
-		if(sulka.freeze.grid != null)
+		if (sulka.freeze.grid != null) {
 			freezedCount = sulka.freeze.grid.getColumns().length;
+		}
 		
 		var columnsRelatedSettings = {
-				columns: columnsSettings,
-				freezeCount: freezedCount,
+			columns: columnsSettings,
+			freezeCount: freezedCount,
 		};
 		
 		var filters =  {
-				date: $("#filters-date").val(),
-				species: $("#filters-species").val(),
-				municipality: $("#filters-municipality").val(),
-				ringings: $("#filters-ringings").prop("checked"),
-				recoveries: $("#filters-recoveries").prop("checked"),
+			date: $("#filters-date").val(),
+			species: $("#filters-species").val(),
+			municipality: $("#filters-municipality").val(),
+			ringings: $("#filters-ringings").prop("checked"),
+			recoveries: $("#filters-recoveries").prop("checked"),
 		};
 		
 		var settings = {
-				columns: JSON.stringify(columnsRelatedSettings),
-				filters: JSON.stringify(filters),
+			columns: JSON.stringify(columnsRelatedSettings),
+			filters: JSON.stringify(filters),
 		};
 		sulka.API.saveSettings(sulka.viewMode, settings,
 			function onSuccess() {
 				sulka.helpers.hideLoader();
-			}, function onError(){
+			}, 
+			function onError() {
 				sulka.helpers.hideLoaderAndSetError(sulka.strings.settingsSaveFailed);
 			}
 		);
@@ -59,22 +61,22 @@ userSettings = {
 	/**
 	 * Restore previously saved settings from SulkaDB.
 	 */
-	restore: function() {
+	restore: function () {
 		sulka.helpers.showLoader();
 		sulka.API.fetchSettings(
 			sulka.viewMode,
-			function onSuccess(results){
+			function onSuccess(results) {
 				sulka.helpers.hideLoader();
 				
-				if(results.object.columns){
+				if (results.object.columns) {
 					var columnsRelatedSettings = jQuery.parseJSON(results.object.columns);
 
-					
 					// Unfreeze all columns before restore
-					if(sulka.viewMode == "browsing" && sulka.freeze.grid != null){
+					if (sulka.viewMode == "browsing" && sulka.freeze.grid != null) {
 						var freezedColumnCount = sulka.freeze.grid.getColumns().length;
-						for(; freezedColumnCount > 0; freezedColumnCount--)
+						for (; freezedColumnCount > 0; freezedColumnCount--) {
 							sulka.freeze.unfreezeRightColumn();
+						}
 					}
 					
 					// Restore columns
@@ -92,45 +94,63 @@ userSettings = {
 					sulka.grid.setColumns(sulka.getVisibleColumns());
 					sulka.renderColumnGroups();
 					
-					if(sulka.viewMode == "browsing"){
+					if (sulka.viewMode == "browsing") {
 						var wantedFreezedColumnCount = columnsRelatedSettings.freezeCount;
-						for(var i = 0; i < wantedFreezedColumnCount; i++)
+						for (var i = 0; i < wantedFreezedColumnCount; i++) {
 							sulka.freeze.freezeLeftColumn();
+						}
 					}
 					
 					var menuItems = $("#header-context-menu .context-menu-item span");
-					for(var i = 0; i < (menuItems.length / 2); i++){
+					for (var i = 0; i < (menuItems.length / 2); i++) {
 						var tickIndex = 2 * i;
 						var itemIndex = 2 * i + 1;
 						var columnName = menuItems[itemIndex].innerHTML;
-						for(var column in sulka.columns){
-							if(sulka.columns[column].name == columnName){
-								if(sulka.columns[column].$sulkaVisible)
+						for (var column in sulka.columns) if (sulka.columns.hasOwnProperty(column)) {
+							if (sulka.columns[column].name == columnName) {
+								if (sulka.columns[column].$sulkaVisible) {
 									menuItems[tickIndex].textContent = sulka.TICK_MARK;
-								else
+								}
+								else {
 									menuItems[tickIndex].textContent = "";
+								}
 								break;
 							}
 						}
 					}
 				}
 				
-				if(results.object.filters){
+				if (results.object.filters) {
 					var filters = jQuery.parseJSON(results.object.filters);
-					if(filters.date != "")
+					if (!filters) return;
+					
+					var changed = false;
+					if (typeof(filters.date) === "string") {
+						if ($("#filters-date").val() !== filters.date) changed = true;
 						$("#filters-date").val(filters.date);
-					if(filters.species != "")
-						$("#filters-species").val(filters.species);
-					if(filters.municipality != "")
-						$("#filters-municipality").val(filters.municipality);
-
-					if(sulka.viewMode == "browsing"){
-						$("#filters-ringings").prop('checked', filters.ringings);
-						$("#filters-recoveries").prop('checked', filters.recoveries);
 					}
-					sulka.reloadData();
+					if (typeof(filters.species) === "string") {
+						if ($("#filters-species").val() !== filters.species) changed = true;
+						$("#filters-species").val(filters.species);
+					}
+					if (typeof(filters.municipality) === "string") {
+						if ($("#filters-municipality").val() !== filters.municipality) changed = true;
+						$("#filters-municipality").val(filters.municipality);
+					}
+
+					if (sulka.viewMode === "browsing") {
+						if ($("#filters-ringings").prop('checked') !== !!filters.ringings) changed = true;
+						$("#filters-ringings").prop('checked', !!filters.ringings);
+						if ($("#filters-recoveries").prop('checked') !== !!filters.recoveries) changed = true;
+						$("#filters-recoveries").prop('checked', !!filters.recoveries);
+					}
+					
+					if (changed) {
+						sulka.reloadData();
+					}
 				}
-			}, function onError(){
+			}, 
+			function onError() {
 				sulka.helpers.hideLoaderAndSetError(sulka.strings.settingsReceivedFailed);
 			}
 		);
