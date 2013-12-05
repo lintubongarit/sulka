@@ -479,6 +479,7 @@ editors = {
 	
 	    this.loadValue = function (item) {
 	    	defaultValue = normalizeDate(item[args.column.field] || "");
+	    	console.log("defaultValue", defaultValue);
 	    	$input.val(defaultValue);
 	    	$input[0].defaultValue = defaultValue;
 		    showCompletions();
@@ -493,15 +494,17 @@ editors = {
 	    			return match[3] + "." + match[2] + "." + match[1]; 
 	    		}
 	    	}
+	    	console.log("ser", trimmed);
 	    	return trimmed;
 	    };
 	
 	    this.applyValue = function (item, state) {
+	    	console.log("state", state);
 	    	item[args.column.field] = state;
 	    };
 	
 	    this.isValueChanged = function () {
-    		return (!($input.val() == "" && defaultValue == null)) && ($input.val() != defaultValue);
+    		return (!($input.val().trim() === "" && defaultValue === null)) && ($input.val().trim() !== defaultValue);
 	    };
 	
 	    this.validate = function () {
