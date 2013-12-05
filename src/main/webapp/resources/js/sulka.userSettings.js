@@ -14,7 +14,7 @@ userSettings = {
 	 * 
 	 */
 	save: function() {
-		sulka.helpers.showLoader();
+		sulka.statusBar.showLoader();
 		var columnsSettings = {};
 		sulka.columns.forEach(function (column, i) {
 			var currentColumn = [ // [position, width, visibility]
@@ -49,10 +49,10 @@ userSettings = {
 		};
 		sulka.API.saveSettings(sulka.viewMode, settings,
 			function onSuccess() {
-				sulka.helpers.hideLoader();
+				sulka.statusBar.hideLoader();
 			}, 
 			function onError() {
-				sulka.helpers.hideLoaderAndSetError(sulka.strings.settingsSaveFailed);
+				sulka.statusBar.hideLoaderAndSetError(sulka.strings.settingsSaveFailed);
 			}
 		);
 	},
@@ -62,11 +62,11 @@ userSettings = {
 	 * Restore previously saved settings from SulkaDB.
 	 */
 	restore: function () {
-		sulka.helpers.showLoader();
+		sulka.statusBar.showLoader();
 		sulka.API.fetchSettings(
 			sulka.viewMode,
 			function onSuccess(results) {
-				sulka.helpers.hideLoader();
+				sulka.statusBar.hideLoader();
 				
 				if (results.object.columns) {
 					var columnsRelatedSettings = jQuery.parseJSON(results.object.columns);
@@ -151,7 +151,7 @@ userSettings = {
 				}
 			}, 
 			function onError() {
-				sulka.helpers.hideLoaderAndSetError(sulka.strings.settingsReceivedFailed);
+				sulka.statusBar.hideLoaderAndSetError(sulka.strings.settingsReceivedFailed);
 			}
 		);
 	},

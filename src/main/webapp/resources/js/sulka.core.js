@@ -80,6 +80,7 @@ sulka = {
 	columns: [],
 	fieldGroups: [],
 	dateFields: [],
+	fieldsByName: {},
 	
 	/**
 	 * Get rendered text width.
@@ -98,15 +99,16 @@ sulka = {
 	 * Called at start to get columns. Calls initGrid() when done. 
 	 */
 	initColumns: function () {
-		sulka.helpers.showLoader();
+		sulka.statusBar.showLoader();
 
 		// Get view fields
 		sulka.API.fetchFieldGroups(
 			sulka.viewMode,
 			function (fieldGroups) {
-				sulka.helpers.hideLoaderAndUnsetError();
+				sulka.statusBar.hideLoaderAndUnsetError();
 				var columns = [];
 				var dateFields = [];
+				var fieldsByName = {};
 				sulka.fieldGroups = fieldGroups;
 				
 				var $headerContextMenu = $("#header-context-menu");
@@ -177,6 +179,7 @@ sulka = {
 						}
 						
 						columns.push(column);
+						fieldsByName[field.field] = field;
 
 						var contextItem = $("<li></li>")
 							.addClass("context-menu-item")
@@ -196,9 +199,10 @@ sulka = {
 				});
 				sulka.columns = columns;
 				sulka.dateFields = dateFields;
+				sulka.fieldsByName = fieldsByName;
 				sulka.initGrid();
 			},
-			sulka.helpers.hideLoaderAndSetError
+			sulka.statusBar.hideLoaderAndSetError
 		);
 	},
 	
@@ -245,6 +249,8 @@ sulka = {
 			sulka.grid.onDblClick.subscribe(sulka.events.onDblClick);
 			
 			sulka.grid.onActiveCellChanged.subscribe(sulka.events.onActiveCellChanged);
+			
+			sulka.grid.onValidationError.subscribe(sulka.events.onValidationError);
 			
 			//Init drop events?
 			sulka.initDrop();
@@ -325,11 +331,11 @@ sulka = {
         	}
         }
         
-        sulka.helpers.unsetErrorAndShowLoader();
+        sulka.statusBar.unsetErrorAndShowLoader();
 		sulka.API.deleteSulkaDBRows(
 			toBeDeleted,
-			sulka.helpers.hideLoaderAndUnsetError,
-			sulka.helpers.hideLoaderAndSetError
+			sulka.statusBar.hideLoaderAndUnsetError,
+			sulka.statusBar.hideLoaderAndSetError
 		);
         
 		sulka.colouriseCellsWithErrors(sulka.getData());
@@ -491,12 +497,12 @@ sulka = {
 		
 		var filters = sulka.getFilters();
 		if (typeof(filters) === "string") {
-			sulka.helpers.setError(filters);
+			sulka.statusBar.setGridValidationError(filters);
 			sulka.setData([]);
 			return;
 		}
 		
-		sulka.helpers.unsetErrorAndShowLoader();
+		sulka.statusBar.unsetErrorAndShowLoader();
 		
 		// Fetch rows
 		var combinedRows = null;
@@ -525,9 +531,9 @@ sulka = {
 			sulka.grid.render();
 			
 			if (combinedRows.length == 0) {
-				sulka.helpers.hideLoaderAndSetError(sulka.strings.noResults);
+				sulka.statusBar.hideLoaderAndSetError(sulka.strings.noResults);
 			} else {
-				sulka.helpers.hideLoaderAndUnsetError();
+				sulka.statusBar.hideLoaderAndUnsetError();
 			}
 		};
 		
@@ -535,7 +541,7 @@ sulka = {
 			sulka.rowsMode,
 			filters,
 			combine,
-			sulka.helpers.hideLoaderAndSetError
+			sulka.statusBar.hideLoaderAndSetError
 		);
 		
 		if (sulka.addMode) {
@@ -557,7 +563,7 @@ sulka = {
 					}
 					combine(sulkaRows);
 				},
-				sulka.helpers.hideLoaderAndSetError
+				sulka.statusBar.hideLoaderAndSetError
 			);
 		}
 	},
@@ -577,7 +583,7 @@ sulka = {
 		var data = sulka.getData();
 		
 		if (selectedRows.length == 0) return;
-			sulka.helpers.unsetErrorAndShowLoader();
+			sulka.statusBar.unsetErrorAndShowLoader();
 			sulka.API.convertCoordinate(
 				sulka.lastInputCoordinateLon,
 				sulka.lastInputCoordinateLat, 
@@ -596,10 +602,10 @@ sulka = {
 							}
 						}
 					}
-					sulka.helpers.hideLoader();
+					sulka.statusBar.hideLoader();
 				},
 				function onError(){
-					sulka.helpers.hideLoaderAndSetError(sulka.strings.coordinateConversionFailed);
+					sulka.statusBar.hideLoaderAndSetError(sulka.strings.coordinateConversionFailed);
 				}
 			);
 
@@ -740,7 +746,7 @@ sulka = {
 			localDbRow.userId = row.userId;
 		}
 		localDbRow.row = JSON.stringify(sulka.formatRowOut(row));
-		sulka.helpers.unsetErrorAndShowLoader();
+		sulka.statusBar.unsetErrorAndShowLoader();
 		sulka.API.addRow(
 			localDbRow,
 			function (savedRow) {
@@ -748,10 +754,10 @@ sulka = {
 				row.userId = savedRow.userId;
 				JSON.stringify(row.errors);
 				sulka.colouriseCellsWithErrors(sulka.getData());
-				sulka.helpers.hideLoaderAndUnsetError();
+				sulka.statusBar.hideLoaderAndUnsetError();
 			},
 			function() {
-				sulka.helpers.hideLoaderAndSetError(sulka.strings.couldNotInsert);
+				sulka.statusBar.hideLoaderAndSetError(sulka.strings.couldNotInsert);
 			}
 		);	
 	},
@@ -781,17 +787,24 @@ sulka = {
 		var cellsToColourise = {};
 		rows.forEach(function(row, index) {
 			if (row.$errors !== undefined) {
-				var errors = JSON.parse(row.$errors);
-				errors.forEach(function(error) {
-					if (cellsToColourise[index] === undefined){
-						cellsToColourise[index] = {};
-					}
-					sulka.grid.getColumns().forEach(function(column){
-						if (column.field == error){
-							cellsToColourise[index][column.id] = "sulka-invalid-cell";
+				var errors = null;
+				try {
+					errors = JSON.parse(row.$errors);
+				} catch (e) {
+					;
+				}
+				if (errors !== null) {
+					errors.forEach(function(error) {
+						if (cellsToColourise[index] === undefined){
+							cellsToColourise[index] = {};
 						}
+						sulka.grid.getColumns().forEach(function(column){
+							if (column.field == error){
+								cellsToColourise[index][column.id] = "sulka-invalid-cell";
+							}
+						});
 					});
-				});
+				}
 			}
 		});
 		sulka.grid.setCellCssStyles("invalid-cell", cellsToColourise);

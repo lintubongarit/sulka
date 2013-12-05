@@ -595,6 +595,94 @@ editors = {
 	    this.init();
 	},
 	
+	// This is expanded from Slick.Editors version with key handling (doesn't allow illegal chars to be inputted) 
+	IntegerEditor: function (args) {
+	    var $input;
+	    var legalChars = {
+	    	1: true, 2: true, 3: true, 4: true, 5: true, 
+	    	6: true, 7: true, 8: true, 9: true, 0: true
+	    };
+	    var allowNegative = !!args.allowNegative;
+	    if (allowNegative) {
+	    	legalChars['-'] = true;
+	    }
+	    var defaultValue;
+
+	    this.init = function () {
+			$input = $('<INPUT type="text" class="editor-text editor-integer" />');
+			
+			$input.bind("keydown.nav", function (e) {
+				if (e.keyCode === $.ui.keyCode.LEFT || e.keyCode === $.ui.keyCode.RIGHT) {
+			    	e.stopImmediatePropagation();
+			    }
+			});
+			
+		    // Prevent inputting invalid chars
+		    $input.keypress(function (e) {
+		    	if (e.which >= 0x20 && !legalChars.hasOwnProperty(String.fromCharCode(e.which))) {
+		    		e.preventDefault();
+		    	}
+		    });
+		    
+			$input.appendTo(args.container);
+			$input.focus().select();
+	    };
+
+	    this.destroy = function () {
+	    	$input.remove();
+	    };
+
+	    this.focus = function () {
+	    	$input.focus();
+	    };
+
+	    this.loadValue = function (item) {
+	    	defaultValue = item[args.column.field].trim();
+	    	$input.val(defaultValue);
+	    	$input[0].defaultValue = defaultValue;
+	    	$input.select();
+	    };
+
+	    this.serializeValue = function () {
+	    	return parseInt($input.val().trim(), 10) || 0;
+	    };
+
+	    this.applyValue = function (item, state) {
+	    	item[args.column.field] = state;
+	    };
+
+	    this.isValueChanged = function () {
+	    	return (!($input.val().trim() == "" && defaultValue == null)) && ($input.val().trim() != defaultValue);
+	    };
+
+	    this.validate = function () {
+	    	var val = $input.val().trim();
+	    	if (val !== "") {
+		    	int = parseInt($input.val().trim(), 10);
+		    	
+		    	if (isNaN(int)) {
+		    		return {
+		    			valid: false,
+		    			msg: sulka.strings.invalidInteger
+		    		};
+		    	} else if (!allowNegative && int < 0) {
+		    		return {
+		    			valid: false,
+		    			msg: sulka.strings.negativeInteger
+		    		};
+		    	}
+	    	}
+
+	    	return {
+	    		valid: true,
+	    		msg: null
+	    	};
+	    };
+
+	    this.init();
+	},
+
+	
 	// Exported just for testing
 	_PrefixTree: PrefixTree
 }; 

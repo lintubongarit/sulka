@@ -22,9 +22,27 @@ sulka.strings = {
 		}
 	},
 	fieldErrorString: function (fieldName, fieldErrors) {
-		return fieldName + ": " + fieldErrors;
+		return fieldName + ": " + fieldErrors.join(sulka.strings.listSeparator);
 	},
 	validationFailed: function (errors) {
-		return "Rivillä on virheitä (" + errors.join(", ") + ")";
+		return "Rivillä on virheitä (" + sulka.strings.listJoin(errors) + ")";
+	},
+	invalidInteger: "Virheellinen kokonaislukusyöte.",
+	negativeInteger: "Syötä positiivinen kokonaisluku.",
+	joinStatusBarErrors: function (errorArray) {
+		return errorArray.join(" – ");
+	},
+	spaceAndSpace: " ja ",
+	listSeparator: ", ",
+	listJoin: function (listOfStrings) {
+		if (listOfStrings.length > 1) {
+			return listOfStrings.slice(0, -1).join(sulka.strings.listSeparator) + 
+				sulka.strings.spaceAndSpace + 
+				listOfStrings.slice(-1);
+		}
+		if (listOfStrings.length > 0) {
+			return listOfStrings[0];
+		}
+		return "";
 	}
 };
