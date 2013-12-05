@@ -3,9 +3,6 @@ sulka.helpers = function (helpers){
  * Helper function name space.
  */
 helpers = {
-		
-	loaderCounter: 0,
-		
 	/**
 	 * Just calls console.log with the same arguments, if it exists.
 	 * @param string Log message.
@@ -17,112 +14,6 @@ helpers = {
 		}
 	},
 
-	validationErrorVisible: false,
-	/**
-	 * Sets the user-visible error text to a given value, or removes
-	 * the text if a false-like value is given. If empty sting is passed
-	 * and there is a validation error, it is shown instead.
-	 * @param errorMsg New error string.
-	 * @param isValidationError Whether this is a validation error or not.
-	 */
-	setError: function (errorMsg, isValidationError) {
-		if (!isValidationError) {
-			if (!errorMsg) {
-				if (helpers.currentValidationError !== null) {
-					helpers.validationErrorVisible = true;
-					errorMsg = helpers.currentValidationError;
-				}
-			} else {
-				helpers.validationErrorVisible = false;
-			}
-		} 
-		
-		if (errorMsg) {
-			if (errorMsg.length > 500) {
-				errorMsg = errorMsg.substring(0, 500) + "...";
-			} 
-			$("#last-error").text(errorMsg);
-		} else {
-			$("#last-error").text("");
-		}
-	},
-	
-	/**
-	 * Removes user-visible error text, if any. 
-	 */
-	unsetError: function () {
-		helpers.setError("");
-	},
-	
-	/**
-	 * @returns the current error text.
-	 */
-	getError: function () {
-		return $("#last-error").text().trim();
-	},
-	
-	/**
-	 * Show the loader animation.
-	 */
-	showLoader: function () {
-		helpers.loaderCounter++;
-		$("#loader-animation").show();
-	},
-	
-	/**
-	 * Hide the loader animation.
-	 */
-	hideLoader: function () {
-		if (--helpers.loaderCounter <= 0) {
-			if (helpers.loaderCounter < 0) {
-				console.log("hideLoader called without preceding showLoader!");
-			}
-			$("#loader-animation").hide();
-		}
-	},
-	
-	/**
-	 * Hide the loader animation and set the error text.
-	 */
-	hideLoaderAndSetError: function (errorMsg) {
-		helpers.hideLoader();
-		helpers.setError(errorMsg);
-	},
-	
-	/**
-	 * Hide the loader animation and unset the error text.
-	 * @param errorMsg New error string.
-	 */
-	hideLoaderAndUnsetError: function () {
-		helpers.hideLoader();
-		helpers.unsetError();
-	},
-	
-	/**
-	 * Unset the error text and show the loader animation.
-	 * @param errorMsg New error string.
-	 */
-	unsetErrorAndShowLoader: function () {
-		helpers.unsetError();
-		helpers.showLoader();
-	},
-	
-	currentValidationError: null,
-	setValidationError: function (error) {
-		if (typeof(error) === "string" && error) {
-			helpers.currentValidationError = error;
-			helpers.setError(error, true);
-			helpers.validationErrorVisible = true;
-		} else {
-			if (helpers.currentValidationError !== null && helpers.validationErrorVisible) {
-				helpers.setError("", true);
-				helpers.validationErrorVisible = false;
-			} else {
-				helpers.currentValidationError = null;
-			}
-		}
-	},
-	
 	/**
 	 * A generic function that will cancel the jQuery or DOM event it is
 	 * supplied with. */
