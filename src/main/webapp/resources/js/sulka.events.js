@@ -350,7 +350,7 @@ events = {
 		setTimeout(function () {
 			sulka.freeze.resize();
 			
-			var y = $("#row-status-box-container").offset().top + $("#row-status-box-container").outerHeight();
+			var y = $("#local-toolbar").offset().top + $("#local-toolbar").outerHeight();
 			var x = sulka.freeze.getWidth(); 
 			var width = $(window).width() - x;
 			

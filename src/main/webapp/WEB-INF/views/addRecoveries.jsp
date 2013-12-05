@@ -43,7 +43,7 @@
 	</head>
 	<body>
 		<%@include file="_header.jsp" %>
-		<table class="local-toolbar">
+		<table id="local-toolbar">
 			<tr>
 				<td>
 					<form id="filters">

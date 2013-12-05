@@ -125,7 +125,7 @@ ul.feature-list-tabs li.current-feature-item:hover {
 	background-color: darkred;
 }
 
-.local-toolbar {
+#local-toolbar {
 	height: 38px;
 	background-color: rgb(253, 214, 136);
 	width: 100%;
@@ -134,7 +134,7 @@ ul.feature-list-tabs li.current-feature-item:hover {
 	border-collapse: collapse;
 }
 
-.local-toolbar td {
+#local-toolbar td {
 	padding: 4px;
 	height: 30px;
 }
@@ -156,10 +156,11 @@ img#loader-animation {
 }
 
 #row-status-box-container {
+	position: absolute;
+	bottom: 0;
 	background-color: rgb(253, 214, 136);
 	height: 24px;
 	width: 100%;
-	border-bottom: 1px solid black;
 	border-collapse: collapse;
 }
 
@@ -173,8 +174,8 @@ img#loader-animation {
 #slick-grid, #freeze-grid {
     position: absolute;
     left: 0;
-    bottom: 0;
-    top: 186px;
+    bottom: 24px;
+    top: 161px;
     vertical-align: middle;
     text-align: center;
 }
