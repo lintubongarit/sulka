@@ -34,18 +34,16 @@ API = {
 			error : API._jQueryErrorHandler(onError)
 		});
 	},
-
-	
 	
 	/**
 	 * Convert coordinates from WGS84 to YKJ coordinate system.
 	 * 
 	 * @param lon Longitude in WGS84
 	 * @param lat Latitude in WGS84
-	 * @param onSuccess Called on success with an array of field group objects.
+	 * @param onSuccess Called on success with converted coordinates.
 	 * @param onError If defined, called on failure with the error message, if any.
 	 */
-	convertCoordinate: function(lon,lat,onSuccess, onError){
+	convertCoordinate: function(lon ,lat ,onSuccess , onError) {
 		$.ajax({
 			url : API.BASE + "/coordinate",
 			type: "GET",
@@ -60,10 +58,8 @@ API = {
 		});
 	},
 	
-	
 	/**
-	 * Get field groups from the API and call handler with the fetched
-	 * groups when done.
+	 * Get field from the API and call handler with the fetched groups when done.
 	 * 
 	 * @param type Either "browsing", "ringings", "recoveries" or "all". Browsing type to return fields for.
 	 * @param onSuccess Called on success with an array of field objects.
@@ -89,7 +85,7 @@ API = {
 	},
 
 	/**
-	 * Get rows from the API and call handler with the fetched rows when
+	 * Get TipuDB rows from the API and call handler with the fetched rows when
 	 * done.
 	 * 
 	 * @param type Either "ringings", "recoveries" or "all". Types of rows to return.
@@ -128,8 +124,8 @@ API = {
 		});
 	},
 	
-	
 	/**
+	 * Remove selected rows from SulkaDB
 	 * 
 	 * @param ids List of row ID's to be deleted
 	 * @param onSuccess Called on success with an array of row objects.
@@ -166,10 +162,8 @@ API = {
 		});
 	},
 	
-	
-	
-	
 	/**
+	 * Get users rows from SulkaDB
 	 * 
 	 * @param type Either "ringings", "recoveries" or "all". Types of rows to return.
 	 * @param filters Object of filter settings.
@@ -195,7 +189,6 @@ API = {
 						+ encodeURIComponent(filters[filter]);
 			}
 		
-		
 		$.ajax({
 			url : API.BASE + "/storage/"  + sulka.viewMode ,
 			dataType : 'json',
@@ -209,7 +202,13 @@ API = {
 		});
 	},
 	
-			
+	/**
+	 * Save new row to SulkaDB
+	 * 
+	 * @param row The row data to be saved.
+	 * @param onSuccess Called on success.
+	 * @param onError Called on failure with the error message, if any.
+	 */		
 	addRow: function(row, onSuccess, onError) {
 		$.ajax({
 			url : API.BASE + "/storage/" + sulka.viewMode,
@@ -226,9 +225,9 @@ API = {
 		});
 	},
 
-	
 	/**
 	 * Validate a row object through the validation service.  
+	 * 
 	 * @param row The data to validate
 	 * @param onSuccess Handler for when we get a validation reply (irrespective of if validation was successful).
 	 * @param onError Handler for when we have a network error or such and no reply.
@@ -246,8 +245,9 @@ API = {
 	},
 	
 	/**
-	 * Save users settings to database 
-	 * @param viewMode Which mode is being saved
+	 * Save users settings to the SulkaDB
+	 * 
+	 * @param viewMode Which view modes settings are being saved.
 	 * @param settings Settings to be saved
 	 * @param onSuccess Handler for succesfull POST.
 	 * @param onError Handler for failed POST.
@@ -264,7 +264,8 @@ API = {
 	},
 	
 	/**
-	 * Get user settings from database
+	 * Get user settings from the SulkaDB
+	 * 
 	 * @param viewMode To which mode to get the settings
 	 * @param onSuccess Handler for succesfull GET.
 	 * @param onError Handler for failed GET.

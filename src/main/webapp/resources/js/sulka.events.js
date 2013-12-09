@@ -1,10 +1,11 @@
 sulka.events = function (events) {
 events = {
 	/**
-     * OnBeforeEditCell
+     * Check if row is editable
      * 
-     * If row is not an inputRow, deny editing.
-     * 
+     * @param e Event
+     * @param args Data that is related to the event.
+     * @return True if row is editable, otherwise false.
      */
     onBeforeEditCell: function (e, args){
         if (args.item && args.item.rowStatus === "inputRow") {
@@ -14,7 +15,8 @@ events = {
     },
     
 	/**
-	 * Used to overwrite default edit navigation and editing. Returns an event handler function.
+	 * Used to overwrite default edit navigation and editing. Returns an event
+	 * handler function.
 	 */
 	makeOnKeyDown: function() {
 		// This is the set of keys that should not cause cell editing to begin
@@ -74,7 +76,7 @@ events = {
 
 	/**
 	 * When cell is changed, this function is called.
-	 * uses submitSulkaDBRow() to add row to sulka-database
+	 * uses submitSulkaDBRow() to add row to SulkaDB
 	 */
 	onCellChange: function(event, args) {
 		if (args.row >= 0) {
@@ -90,7 +92,8 @@ events = {
 	
 	/**
 	 * This function is called when active cell is changed.
-	 * If active row is changed and previous active row was edited, this function validates previous active row.
+	 * If active row is changed and previous active row was edited, this 
+	 * function validates previous active row.
 	 * 
 	 * Validation adds these fields to the row:
 	 * 	$valid: true, is row is valid, false if not
@@ -161,7 +164,7 @@ events = {
 	},
 	
 	/**
-	 * onColumnResized updates column width changes to sulka.columns.
+	 * Update column width changes in visible columns to sulka.columns.
 	 */
 	updateWidthToSulkaColumns: function(e, args) {
 		var gridInd = 0;
@@ -176,7 +179,7 @@ events = {
 	},
 	
 	/**
-	 * onColumnsReorder updates order changes to sulka.columns.
+	 * Update order changes in visible columns to sulka.columns.
 	 */
 	updateOrderToSulkaColumns: function(e, args) {
 		var columnIndex = 0;
@@ -199,10 +202,9 @@ events = {
 	},
 	
 	/**
-	 *	OnDragInit is used to prevent the grid from cancelling drag'n'drop by default 
+	 *	Prevent the grid from cancelling drag'n'drop by default 
 	 */
 	onDragInit: function(e,dd) {
-	    // prevent the grid from cancelling drag'n'drop by default
 	    e.stopImmediatePropagation();
 	},
 

@@ -1,6 +1,7 @@
 sulka.editors = (function (editors) {
 /**
  * Find the smallest common prefix of two strings starting from an index.
+ * 
  * @param s1 String
  * @param s2 String
  * @param i Index to start finding the common prefix at.
@@ -682,7 +683,6 @@ editors = {
 	    this.init();
 	},
 
-	
 	// Exported just for testing
 	_PrefixTree: PrefixTree
 }; 

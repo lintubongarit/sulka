@@ -34,7 +34,6 @@ sulka = {
 	viewMode: "browsing",
 	rowsMode: "ringings",
 	
-	
 	/**
 	 * Called at start, when the document has fully loaded.
 	 */
@@ -236,7 +235,6 @@ sulka = {
 			sulka.grid.registerPlugin(sulka.moveRowsPlugin);
 			
 			//Row move, drag & drop features
-			
             sulka.grid.onBeforeEditCell.subscribe(sulka.events.onBeforeEditCell);
 			sulka.moveRowsPlugin.onBeforeMoveRows.subscribe(sulka.events.onBeforeMoveRows); 	  
 			sulka.moveRowsPlugin.onMoveRows.subscribe(sulka.events.onMoveRows);
@@ -316,7 +314,7 @@ sulka = {
 	},
 	
 	/**
-	 * Deletes selected rows
+	 * Delete selected rows
 	 */
 	deleteRows: function(e, dd){
         var data = sulka.getData();
@@ -342,8 +340,6 @@ sulka = {
         sulka.setData(data);
         sulka.grid.invalidate();
         sulka.grid.setSelectedRows([]);
-		
-		
 	},
 	
 	/**
@@ -487,7 +483,7 @@ sulka = {
 	
 	/**
 	 * Reload all data to table, applying new filters etc. If in add mode, the data is combined
-	 * from Tipu and Sulka DBs.
+	 * from Tipu- and SulkaDBs.
 	 */
 	reloadData: function () {
 		// Grid not yet initialised?
@@ -577,7 +573,6 @@ sulka = {
 		 * 
 		 * Latitude: lat
 		 * Longitude: lon 
-		 * 
 		 */
 		var selectedRows = sulka.grid.getSelectedRows();
 		var data = sulka.getData();
@@ -615,7 +610,6 @@ sulka = {
         sulka.grid.render();
 	},
 	
-	
 	/**
 	 * Parameters used while initializing new dataview with createNewDataView.
 	 */
@@ -636,8 +630,6 @@ sulka = {
 	
 	RINGING_TYPE: "Rengastus",
 	RECOVERY_TYPE: "Tapaaminen",
-	
-	
 	
 	/**
 	 * Creates new DataView for the grid.
@@ -732,6 +724,11 @@ sulka = {
 		return filters;
 	},
 	
+	/**
+	 * Save row to the SulkaDB
+	 * 
+	 * @param row The data of the row to be saved.
+	 */
 	submitSulkaDBRow: function (row) {
 		if (!row || row.rowStatus !== "inputRow") {
 			// Refuse to submit undefined or read-only row
@@ -763,7 +760,7 @@ sulka = {
 	},
 	
 	/**
-	 * Gets the wanted rows mode from the checkboxes in filters-form
+	 * Get the wanted row-mode from the checkboxes in filters-form
 	 */
 	getRowMode: function () {
 		var	ringings = $("#filters-ringings").is(':checked'),
@@ -811,8 +808,9 @@ sulka = {
 	},
 	
 	/**
-	 * Create and return an keypress event handler that constrains the allowable input characters to the ones
-	 * specified in alphabet.
+	 * Create and return an keypress event handler that constrains the allowable
+	 * input characters to the ones specified in alphabet.
+	 * 
 	 * @param alphabet the allowed alphabet of the input string.
 	 * @return An jQuery event handler that discards any printable input keypresses that are not in the alphabet. 
 	 */
@@ -830,7 +828,9 @@ sulka = {
 	
 	DATE_IN_REGEXP: /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/,
 	/**
-	 * Apply transformations to API row data on input from server. The transformations should happen in-place.
+	 * Apply transformations to API row data on input from server. The 
+	 * transformations should happen in-place.
+	 * 
 	 * @param data Input rows from the API.
 	 */
 	formatRowsIn: function (data) {
@@ -857,6 +857,7 @@ sulka = {
 	 * Apply transformations to an API row on output back to server. Should do the
 	 * reverse of formatRowsIn for individual row. Should clone the row if it needs
 	 * to be modified.
+	 * 
 	 * @param row Row from the local grid that is being saved to the API.
 	 * @return Possibly modified row that conforms to the expectations of the API.
 	 */
