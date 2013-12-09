@@ -337,8 +337,8 @@ editors = {
 	    var selectedCompletion = -1;
 	    var completionsReverse = false;
 	    
-	    var EDIT_REGEXP = sulka.DATE_IN_REGEXP; 
-	    var DATA_REGEXP = sulka.DATE_OUT_REGEXP;
+	    var EDIT_REGEXP = sulka.formatters.DATE_IN_REGEXP; 
+	    var DATA_REGEXP = sulka.formatters.DATE_OUT_REGEXP;
 	    function detectFormat(date) {
 	    	if (typeof(date) === "string") {
 	    		if (date.match(EDIT_REGEXP)) {
@@ -636,15 +636,28 @@ editors = {
 	    	$input.focus();
 	    };
 
-	    this.loadValue = function (item) {
-	    	defaultValue = item[args.column.field].trim();
-	    	$input.val(defaultValue);
-	    	$input[0].defaultValue = defaultValue;
+	    this.loadValue = function (row) {
+	    	var val = row[args.column.field];
+	    	if (typeof(val) === "number" && isFinite(val)) {
+	    		defaultValue = val;
+		    	$input.val(String(defaultValue));
+		    	$input[0].defaultValue = String(defaultValue);
+	    	} else {
+	    		defaultValue = null;
+	    	}
 	    	$input.select();
 	    };
 
 	    this.serializeValue = function () {
-	    	return parseInt($input.val().trim(), 10) || 0;
+	    	var str = $input.val().trim();
+	    	var int = parseInt(str, 10);
+	    	if (!isNaN(int)) {
+	    		if (int.toString().indexOf('e') >= 0) {
+	    			return undefined; // Value has too many numbers
+	    		}
+	    		return int;
+	    	}
+	    	return undefined;
 	    };
 
 	    this.applyValue = function (item, state) {
@@ -652,13 +665,14 @@ editors = {
 	    };
 
 	    this.isValueChanged = function () {
-	    	return (!($input.val().trim() == "" && defaultValue == null)) && ($input.val().trim() != defaultValue);
+	    	return (!($input.val().trim() === "" && defaultValue === null)) && 
+	    		(parseInt($input.val().trim(), 10) !== defaultValue);
 	    };
 
 	    this.validate = function () {
-	    	var val = $input.val().trim();
-	    	if (val !== "") {
-		    	int = parseInt($input.val().trim(), 10);
+	    	var str = $input.val().trim();
+	    	if (str !== "") {
+		    	var int = parseInt(str, 10);
 		    	
 		    	if (isNaN(int)) {
 		    		return {
@@ -668,7 +682,118 @@ editors = {
 		    	} else if (!allowNegative && int < 0) {
 		    		return {
 		    			valid: false,
-		    			msg: sulka.strings.negativeInteger
+		    			msg: sulka.strings.negativeValue
+		    		};
+		    	} else if (int.toString().indexOf('e') >= 0) {
+		    		return {
+		    			valid: false,
+		    			msg: sulka.strings.tooManyNumbers
+		    		};
+		    	}
+	    	}
+
+	    	return {
+	    		valid: true,
+	    		msg: null
+	    	};
+	    };
+
+	    this.init();
+	},
+	
+	DecimalEditor: function (args) {
+	    var $input;
+	    var legalChars = {
+	    	1: true, 2: true, 3: true, 4: true, 5: true, 
+	    	6: true, 7: true, 8: true, 9: true, 0: true,
+	    	'.': true
+	    };
+	    var allowNegative = !!args.allowNegative;
+	    if (allowNegative) {
+	    	legalChars['-'] = true;
+	    }
+	    var defaultValue;
+
+	    this.init = function () {
+			$input = $('<INPUT type="text" class="editor-text editor-integer" />');
+			
+			$input.bind("keydown.nav", function (e) {
+				if (e.keyCode === $.ui.keyCode.LEFT || e.keyCode === $.ui.keyCode.RIGHT) {
+			    	e.stopImmediatePropagation();
+			    }
+			});
+			
+		    // Prevent inputting invalid chars
+		    $input.keypress(function (e) {
+		    	if (e.which >= 0x20 && !legalChars.hasOwnProperty(String.fromCharCode(e.which))) {
+		    		e.preventDefault();
+		    	}
+		    });
+		    
+			$input.appendTo(args.container);
+			$input.focus().select();
+	    };
+
+	    this.destroy = function () {
+	    	$input.remove();
+	    };
+
+	    this.focus = function () {
+	    	$input.focus();
+	    };
+
+	    this.loadValue = function (row) {
+	    	var val = row[args.column.field];
+	    	if (typeof(val) === "number" && isFinite(val)) {
+	    		defaultValue = val;
+		    	$input.val(String(defaultValue));
+		    	$input[0].defaultValue = String(defaultValue);
+	    	} else {
+	    		defaultValue = null;
+	    	}
+	    	$input.select();
+	    };
+
+	    this.serializeValue = function () {
+	    	var str = $input.val().trim();
+	    	var float = parseFloat(str);
+	    	if (isFinite(float)) {
+	    		if (float.toString().indexOf('e') >= 0) {
+	    			return undefined; // Value has too many numbers
+	    		}
+	    		return float;
+	    	}
+	    	return undefined;
+	    };
+
+	    this.applyValue = function (item, state) {
+	    	item[args.column.field] = state;
+	    };
+
+	    this.isValueChanged = function () {
+	    	return (!($input.val().trim() === "" && defaultValue === null)) && 
+    			(parseFloat($input.val().trim()) !== defaultValue);
+	    };
+
+	    this.validate = function () {
+	    	var str = $input.val().trim().replace(',', '.');
+	    	if (str !== "") {
+	    		var float = parseFloat(str);
+		    	
+		    	if (!isFinite(float)) {
+		    		return {
+		    			valid: false,
+		    			msg: sulka.strings.invalidDecimal
+		    		};
+		    	} else if (!allowNegative && float < 0) {
+		    		return {
+		    			valid: false,
+		    			msg: sulka.strings.negativeValue
+		    		};
+		    	} else if (float.toString().indexOf('e') >= 0) {
+		    		return {
+		    			valid: false,
+		    			msg: sulka.strings.tooManyNumbers
 		    		};
 		    	}
 	    	}
@@ -682,7 +807,6 @@ editors = {
 	    this.init();
 	},
 
-	
 	// Exported just for testing
 	_PrefixTree: PrefixTree
 }; 
