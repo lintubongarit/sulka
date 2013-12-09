@@ -1,10 +1,18 @@
 /**
- * The groups implementation is a hack that draws a different, aligned set of "group columns" above the SlickGrid columns, 
- * and enforces that the defined groups can not be broken.  
+ * The groups implementation is a hack that draws a secondary aligned set of "column groups" above the normal 
+ * SlickGrid columns, and enforces that the column groups can not be broken. It can be attached to any grid.
+ * @param grid The SlickGrid object to attach the groups to.
+ * @param container A jQuery closure for the container of the grid that the groups are attached to. 
  */
 sulka.groups = function (grid, container) {
+	/**
+	 * A rendering constant that is required for correct alignation of the groups.
+	 */
 	var COL_GROUP_OUTSIDE_WIDTH = 9;
 	
+	/**
+	 * Creates the container for the column groups.  
+	 */
 	var columnGroupsDiv = $(
 		'<div></div>'
 	).addClass(
@@ -15,7 +23,10 @@ sulka.groups = function (grid, container) {
 	sulka.helpers.disableSelection(columnGroupsDiv);
 	
 	/**
-	 * Create column group element. 
+	 * Create column group element.
+	 * @param name Name of the group
+	 * @param description Longer description of the group for hint
+	 * @param width The calculated total width of this group.
 	 */
 	function makeColumnGroup(name, description, width) {
 		return $(
@@ -42,8 +53,18 @@ sulka.groups = function (grid, container) {
 		);
 	}
 	
+	/**
+	 * The leading column of each group by group name. The leading columns
+	 * behave differently in column ordering and can be used to move the whole
+	 * group.
+	 */
 	var groupFirsts = {};
+	/**
+	 * The last column of each group by group name. The trailing columns behave
+	 * differently, much like the leading columns.
+	 */
 	var groupLasts = {};
+	
 	/**
 	 * Called whenever column groups need to be re-rendered.
 	 */
@@ -132,10 +153,16 @@ sulka.groups = function (grid, container) {
 		render();
 	}
 	
+	/** 
+	 * Attach event handlers.
+	 */
 	grid.onColumnsResized.subscribe(render);
 	grid.onColumnsReordered.subscribe(onReordered);
 	render();
 	
+	/**
+	 * Export public API.
+	 */
 	$.extend(this, {
 		render: render,
 		onReordered: onReordered

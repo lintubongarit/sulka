@@ -596,7 +596,10 @@ editors = {
 	    this.init();
 	},
 	
-	// This is expanded from Slick.Editors version with key handling (doesn't allow illegal chars to be inputted) 
+	/**
+	 * Editor for integer fields. 
+	 * Expanded from SlickGrid version. Doesn't allow illegal chars to be inputted etc. 
+	 */ 
 	IntegerEditor: function (args) {
 	    var $input;
 	    var legalChars = {
@@ -702,6 +705,10 @@ editors = {
 	    this.init();
 	},
 	
+	/**
+	 * Editor for decimal fields. 
+	 * Expanded from SlickGrid version. Doesn't allow illegal chars to be inputted etc. 
+	 */ 
 	DecimalEditor: function (args) {
 	    var $input;
 	    var legalChars = {
@@ -808,7 +815,9 @@ editors = {
 	    this.init();
 	},
 
-	// Exported just for testing
+	/**
+	 * (Exported just for testing)
+	 */
 	_PrefixTree: PrefixTree
 }; 
 return editors; })();

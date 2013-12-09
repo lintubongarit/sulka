@@ -1,5 +1,5 @@
 /***
- * Sets ringing specific settings for addCore
+ * Sets ringings view specific overrides
  */
 sulka.addRinging = function(addRinging) {
 	sulka.viewMode = "ringings";

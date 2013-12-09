@@ -129,7 +129,7 @@ formatters = {
 	},
 	
 	/**
-	 * 
+	 * Formatter for decimal and integer fields.
 	 * @param row Row of the cell
 	 * @param cell Column of the cell
 	 * @param number The data value of the cell

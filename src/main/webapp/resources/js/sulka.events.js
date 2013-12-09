@@ -388,6 +388,9 @@ events = {
 		}, 100);
 	},
 	
+	/**
+	 * Handler for the SlickGrid editor validation error.
+	 */
 	onValidationError: function (e, args) {
 		if (args.validationResults) {
 			if (!args.validationResults.valid) {

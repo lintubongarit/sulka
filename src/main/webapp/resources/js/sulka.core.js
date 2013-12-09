@@ -78,10 +78,16 @@ sulka = {
 	contextMenuItemById: {},
 	
 	/**
-	 * Reference to current view's columns, fieldGroups and list of date fields.
+	 * List of current view's columns.
 	 */
 	columns: [],
+	/**
+	 * List of current view's fieldGroups
+	 */
 	fieldGroups: [],
+	/**
+	 * Current view's field objects by field name.
+	 */
 	fieldsByName: {},
 	
 	/**
@@ -93,12 +99,15 @@ sulka = {
 		return width;
 	},
 	
+	/**
+	 * Rendering constants for initColumns()
+	 */
 	COL_PADDING: 20,
 	COL_MAX_WIDTH: 200,
 	COL_TYPE_IMAGE_WIDTH: 19,
 	
 	/**
-	 * Called at start to get columns. Calls initGrid() when done. 
+	 * Called at start to init column (field) data structures. Calls initGrid() when done. 
 	 */
 	initColumns: function () {
 		sulka.statusBar.showLoader();
@@ -655,9 +664,8 @@ sulka = {
 	},
 	
 	/**
-	 * Parameters used while initializing new dataview with createNewDataView.
+	 * Static metadata structures that can be returned by the data view returned by createDataView().
 	 */
-	
 	METADATA_SULKA : {"cssClasses" : "sulka-row"},
 	METADATA_SULKA_ODD : {"cssClasses" : "sulka-row-odd"},
 	

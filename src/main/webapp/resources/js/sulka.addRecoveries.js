@@ -1,5 +1,5 @@
 /***
- * Sets recovery specific settings for addCore
+ * Sets recoveries view specific overrides
  */
 sulka.addRecovery = function(addRecovery) {
 	sulka.viewMode = "recoveries";
