@@ -2,13 +2,10 @@ sulka.addMode = true;
 sulka.gridOptions.editable = true;
 
 /*
- * Overrides sulka.cores sulka.getRowMode to use always rowsMode defined on this page ("ringings")
+ * Overrides sulka.cores sulka.getRowMode to use always rowsMode defined on this page 
  */
 sulka.getRowMode = function() {};
 
-/*
- * Sets the date filter to be the last 12 months
- */
 sulka.addCore = function (addCore){
 addCore = {
 	/**
