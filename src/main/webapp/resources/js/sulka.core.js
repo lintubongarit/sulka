@@ -250,7 +250,6 @@ sulka = {
 			
 			sulka.grid.onValidationError.subscribe(sulka.events.onValidationError);
 			
-			//Init drop events?
 			sulka.initDrop();
 		}
 		
@@ -283,13 +282,16 @@ sulka = {
 			$slickGrid.mousewheel(sulka.events.onMouseWheel);
 		}
 		
+		if (sulka.addCore)
+			sulka.addCore.setDefaultDateFilter();
+		
 		sulka.reloadData();
 		
 		sulka.userSettings.restore();
 	},
 	
 	/**
-	 * InitDrop function is called when drop event is launched.
+	 * Define how "Roskakori" works.
 	 */
 	initDrop: function(){
 		 $.drop({mode: "mouse"});

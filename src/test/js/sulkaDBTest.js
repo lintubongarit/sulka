@@ -165,14 +165,13 @@ casper.test.begin('Sulka-database tests', 10, function suite(test) {
 	    	var editedRow = casper.evaluate(function(newRow){
 	    		return sulka.getData()[newRow];
 	    	}, newRow);
-	    	
 	    	test.assertEquals(editedRow.$valid, false,
 	    	"validated row contains $valid-variable and is not valid");
 	    	
 	    	test.assertEquals(editedRow.$errors, '["species"]',
 	    	"validated row contains $errors-variable which tells which property is invalid");
 	    	
-	    	test.assertTrue(editedRow.$invalid_msg.indexOf("species") >= 0,
+	    	test.assertTrue(editedRow.$invalid_msg.indexOf("Laji") >= 0,
 	    	"validated row complains about species field");
 	    	
 		}).then(function () {	  //DELETE TEST FOR SINGLE ROW BEGINS
@@ -188,7 +187,7 @@ casper.test.begin('Sulka-database tests', 10, function suite(test) {
 				
 				console.log(sulka.getData()[newRow].databaseId);
 				
-		        sulka.helpers.unsetErrorAndShowLoader();
+		        sulka.statusBar.unsetErrorAndShowLoader();
 				sulka.API.deleteSulkaDBRows(
 					toBeDeleted,
 					sulka.helpers.hideLoaderAndUnsetError,
