@@ -181,9 +181,7 @@ sulka.freeze = (function (freeze) { freeze = {
 		$(freeze.mainContainer).find(".slick-header-columns .slick-sort-indicator-asc").removeClass("slick-sort-indicator-asc");
 		$(freeze.mainContainer).find(".slick-header-columns .slick-sort-indicator-desc").removeClass("slick-sort-indicator-desc");
 		
-		console.log($(freeze.mainContainer).find(".slick-header-columns .slick-sort-indicator-asc").length);
-		
-		sulka.sort(args);
+		sulka.parseSort(args);
 	},
 	
 	removeSortMarkers: function () {

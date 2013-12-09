@@ -120,7 +120,7 @@ events = {
 			
 			sulka.statusBar.unsetErrorAndShowLoader();
 			sulka.API.validate(
-				sulka.formatRowOut(previousRow),
+				sulka.formatters.formatRowOut(previousRow),
 				function (data) {
 					previousRow.$valid = data.passes;
 					if (data.passes) {
@@ -343,8 +343,7 @@ events = {
 	 */
 	onGridSort: function (event, args) {
 		sulka.freeze.removeSortMarkers();
-		sulka.sort(args);
-		sulka.colouriseCellsWithErrors(sulka.getData());
+		sulka.parseSort(args);
 	},
 	
 	/**
