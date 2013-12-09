@@ -10,8 +10,7 @@ userSettings = {
 	 * 	- Columns order
 	 *  - Columns width
 	 *  - Columns visibility
-	 *  - Freezed columns
-	 * 
+	 *  - Freezed column count
 	 */
 	save: function() {
 		sulka.statusBar.showLoader();

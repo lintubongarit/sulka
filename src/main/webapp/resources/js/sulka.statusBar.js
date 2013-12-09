@@ -61,6 +61,7 @@ statusBar = {
 	
 	/**
 	 * Set the loading error text.
+	 * 
 	 * @param str New error text, or falsy value to clear error.
 	 */
 	setLoadingError: function (str) {
@@ -81,6 +82,7 @@ statusBar = {
 	
 	/**
 	 * Set the validation service error text.
+	 * 
 	 * @param str New error text, or falsy value to clear error.
 	 */
 	setValidationServiceError: function (str) {
@@ -101,6 +103,7 @@ statusBar = {
 	
 	/**
 	 * Set the grid validation error text.
+	 * 
 	 * @param str New error text, or falsy value to clear error.
 	 */
 	setGridValidationError: function (str) {
@@ -139,7 +142,7 @@ statusBar = {
 	hideLoader: function () {
 		if (--statusBar.loaderCounter <= 0) {
 			if (statusBar.loaderCounter < 0) {
-				console.log("hideLoader called without preceding showLoader!");
+				sulka.helpers.log("hideLoader called without preceding showLoader!");
 			}
 			$("#loader-animation").hide();
 		}
@@ -155,6 +158,7 @@ statusBar = {
 	
 	/**
 	 * Hide the loader animation and unset the error text.
+	 * 
 	 * @param errorMsg New error string.
 	 */
 	hideLoaderAndUnsetError: function () {
@@ -164,6 +168,7 @@ statusBar = {
 	
 	/**
 	 * Unset the error text and show the loader animation.
+	 * 
 	 * @param errorMsg New error string.
 	 */
 	unsetErrorAndShowLoader: function () {
