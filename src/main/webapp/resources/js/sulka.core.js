@@ -29,10 +29,14 @@ sulka = {
 		$sulkaVisible: true
 	},
 
-	/** In row inserting mode? */ 
+	/** addMode is true on add recoveries/ringing -pages. Is overridden in sulka.addCore */ 
 	addMode: false,
+	
+	/** viewMode implies the current page. Is overridden in sulka.addRecoveries and sulka.addRingings */ 
 	viewMode: "browsing",
-	rowsMode: "ringings",
+	
+	/** implies which rows are fetched at browsing-page. Is changed according to filters-form */ 
+	rowsMode: "all",
 	
 	/**
 	 * Called at start, when the document has fully loaded.
