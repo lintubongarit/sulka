@@ -79,7 +79,6 @@ sulka = {
 	 */
 	columns: [],
 	fieldGroups: [],
-	dateFields: [],
 	fieldsByName: {},
 	
 	/**
@@ -107,12 +106,14 @@ sulka = {
 			function (fieldGroups) {
 				sulka.statusBar.hideLoaderAndUnsetError();
 				var columns = [];
-				var dateFields = [];
+				var dateFields = {};
+				var integerFields = {};
+				var decimalFields = {};
 				var fieldsByName = {};
 				sulka.fieldGroups = fieldGroups;
 				
 				var $headerContextMenu = $("#header-context-menu");
-				dateFieldFormatter = sulka.makeDateFieldFormatter();
+				var dateFieldFormatter = sulka.formatters.makeDateFieldFormatter();
 				
 				fieldGroups.forEach(function (group) {
 					var contextHeader = $("<li></li>")
@@ -155,12 +156,11 @@ sulka = {
 							cssClass: "sulka-column-" + field.field
 						}, sulka.columnOptions);
 						
-						if (field.field === "type") {
+						if (group.name === "common" && field.field === "type") { // Empty formatter for "type" field
 							column.$sulkaFlexible = false;
 							column.formatter = function () { return ""; };
 							column.width  = sulka.COL_TYPE_IMAGE_WIDTH + sulka.COL_PADDING;
-						}
-						if (field.type === "ENUMERATION") {
+						} else if (field.type === "ENUMERATION") {
 							column.$sulkaEnumValues = field.enumerationValues.map(function (apiField) {
 								return apiField.value;
 							});
@@ -169,12 +169,24 @@ sulka = {
 							}
 						} else if (field.type === "DATE") {
 							column.formatter = dateFieldFormatter;
-							dateFields.push(field.field);
+							dateFields[field.field] = true;
 							if (sulka.addMode) {
 								column.editor = sulka.editors.DateEditor;
 							}
-						} 
-						else if (sulka.addMode) {
+						} else if (field.type === "INTEGER") {
+							column.formatter = sulka.formatters.numberFieldFormatter;
+							integerFields[field.field] = true;
+							if (sulka.addMode) {
+								column.editor = sulka.editors.IntegerEditor;
+							}
+						} else if (field.type === "DECIMAL") {
+							column.formatter = sulka.formatters.numberFieldFormatter;
+							decimalFields[field.field] = true;
+							if (sulka.addMode) {
+								column.editor = sulka.editors.DecimalEditor;
+							}
+							
+						} else if (sulka.addMode) {
 							column.editor = Slick.Editors.Text;
 						}
 						
@@ -198,7 +210,9 @@ sulka = {
 					});
 				});
 				sulka.columns = columns;
-				sulka.dateFields = dateFields;
+				sulka.formatters.dateFields = dateFields;
+				sulka.formatters.integerFields = integerFields;
+				sulka.formatters.decimalFields = decimalFields;
 				sulka.fieldsByName = fieldsByName;
 				sulka.initGrid();
 			},
@@ -338,7 +352,6 @@ sulka = {
 			sulka.statusBar.hideLoaderAndSetError
 		);
         
-		sulka.colouriseCellsWithErrors(sulka.getData());
         sulka.setData(data);
         sulka.grid.invalidate();
         sulka.grid.setSelectedRows([]);
@@ -356,20 +369,44 @@ sulka = {
 	},
 	
 	/**
-	 * Sort grid by columns.
+	 * Parse SlickGrid's sort arguments and then sort data accordingly.
 	 */
-	sort: function (args) {
+	parseSort: function (args) {
+		sulka.sortField = args.sortCol.field ? args.sortCol.field : null;
+		sulka.sortAscending = !!args.sortAsc;
+	    sulka.sortData();
+	},
+	
+	/**
+	 * Current sort field. Null = do not sort.
+	 */
+	sortField: null,
+	
+	/**
+	 * Whether current sort is ascending or descending.
+	 */
+	sortAscending: false,
+	
+	/**
+	 * Sort data according to current settings.
+	 */
+	sortData: function () {
+		var field = sulka.sortField;
+		if (typeof(field) !== "string") return;
+		
+		var sign = sulka.sortAscending ? 1 : -1;
 		var data = sulka.getData();
-	    
-		var sign = args.sortAsc ? 1 : -1;
-		var field = args.sortCol.field;
-		data.sort(function (dataRow1, dataRow2) {
-			var value1 = dataRow1[field], value2 = dataRow2[field];
-			return (value1 == value2) ? 0 : (sign * (value1 > value2 ? 1 : -1));
+		data.sort(function (row1, row2) {
+			var val1 = row1[field], val2 = row2[field];
+			if (val1 === undefined || val2 === undefined) {
+				// Sort "undefined" rows before everything else since in JS "" < "a"
+				if (val1 === val2) return 0;
+				if (val1 === undefined) return -sign;
+				return sign;
+			}
+			return (val1 === val2) ? 0 : (sign * (val1 > val2 ? 1 : -1));
 		});
 		sulka.setData(data);
-		sulka.grid.invalidate();
-		sulka.freeze.invalidate();
 	},
 	
 	/**
@@ -476,6 +513,7 @@ sulka = {
 		sulka.grid.setData(dataView);
 		sulka.grid.render();
 		sulka.freeze.setData(dataView);
+		sulka.colouriseCellsWithErrors(rows);
 	},
 	
 	/**
@@ -497,9 +535,11 @@ sulka = {
 		
 		var filters = sulka.getFilters();
 		if (typeof(filters) === "string") {
-			sulka.statusBar.setGridValidationError(filters);
+			sulka.statusBar.setLoadingError(filters);
 			sulka.setData([]);
 			return;
+		} else {
+			sulka.statusBar.clearLoadingError();
 		}
 		
 		sulka.statusBar.unsetErrorAndShowLoader();
@@ -524,11 +564,9 @@ sulka = {
 				combinedRows = combinedRows.concat({rowStatus: "inputRow"});
 			}
 			
-			sulka.formatRowsIn(combinedRows);
+			sulka.formatters.formatRowsIn(combinedRows);
 			sulka.setData(combinedRows);
-			
-			sulka.colouriseCellsWithErrors(sulka.getData());
-			sulka.grid.render();
+			sulka.sortData();
 			
 			if (combinedRows.length == 0) {
 				sulka.statusBar.hideLoaderAndSetError(sulka.strings.noResults);
@@ -637,8 +675,6 @@ sulka = {
 	RINGING_TYPE: "Rengastus",
 	RECOVERY_TYPE: "Tapaaminen",
 	
-	
-	
 	/**
 	 * Creates new DataView for the grid.
 	 */
@@ -745,7 +781,7 @@ sulka = {
 			localDbRow.id = row.databaseId;
 			localDbRow.userId = row.userId;
 		}
-		localDbRow.row = JSON.stringify(sulka.formatRowOut(row));
+		localDbRow.row = JSON.stringify(sulka.formatters.formatRowOut(row));
 		sulka.statusBar.unsetErrorAndShowLoader();
 		sulka.API.addRow(
 			localDbRow,
@@ -825,72 +861,6 @@ sulka = {
 			if (e.which >= 0x20 && !alphabetSet.hasOwnProperty(String.fromCharCode(e.which))) {
 				e.preventDefault();
 			}
-		};
-	},
-	
-	DATE_IN_REGEXP: /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/,
-	/**
-	 * Apply transformations to API row data on input from server. The transformations should happen in-place.
-	 * @param data Input rows from the API.
-	 */
-	formatRowsIn: function (data) {
-		var DATE_RE = sulka.DATE_IN_REGEXP;
-		var pad2 = sulka.helpers.pad2;
-		var dateFields = sulka.dateFields; 
-		data.forEach(function (row) {
-			if (row) {
-				dateFields.forEach(function (field) {
-					if (typeof(row[field]) === "string") { 
-						// Order dates year-month-day to make string sorting work
-						var match = row[field].match(DATE_RE);
-						if (match !== null) {
-							row[field] = match[3] + "." + pad2(match[2]) + "." + pad2(match[1]);  
-						}
-					}
-				});
-			}
-		});
-	},
-	
-	DATE_OUT_REGEXP: /^(\d{4})\.(\d{1,2})\.(\d{1,2})$/,
-	/**
-	 * Apply transformations to an API row on output back to server. Should do the
-	 * reverse of formatRowsIn for individual row. Should clone the row if it needs
-	 * to be modified.
-	 * @param row Row from the local grid that is being saved to the API.
-	 * @return Possibly modified row that conforms to the expectations of the API.
-	 */
-	formatRowOut: function (row) {
-		var copy = null;
-		var dateFields = sulka.dateFields;
-		if (row) {
-			dateFields.forEach(function (field) {
-				if (typeof(row[field]) === "string") {
-					var match = row[field].match(sulka.DATE_OUT_REGEXP);
-					if (match !== null) {
-						if (copy === null) copy = $.extend({}, row);  
-						copy[field] = match[3] + "." + match[2] + "." + match[1];  
-					}
-				}
-			});
-		}
-		return copy === null ? row : copy;
-	},
-	
-	/**
-	 * Create a new formatter for date fields.
-	 */
-	makeDateFieldFormatter: function () {
-		var DATE_RE = sulka.DATE_OUT_REGEXP;
-		return function (row, cell, date) {
-			if (typeof(date) === "string") {
-				var match = date.match(DATE_RE);
-				if (match !== null) {
-					return match[3] + "." + match[2] + "." + match[1];
-				}
-				return date;
-			}
-			return "";
 		};
 	}
 };
