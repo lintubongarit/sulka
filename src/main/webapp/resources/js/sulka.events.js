@@ -125,7 +125,7 @@ events = {
 			sulka.API.validate(
 				sulka.formatters.formatRowOut(previousRow),
 				function (data) {
-					previousRow.$valid = data.passes;
+					previousRow.$valid = !!data.passes;
 					if (data.passes) {
 						delete previousRow.$invalid_msg;
 						delete previousRow.$errors;
