@@ -3,10 +3,22 @@
  */
 sulka.formatters = (function (formatters) {
 formatters = {
+	/**
+	 * The set of date type fields in the current view.
+	 */
 	dateFields: {},
+	/**
+	 * The set of integer type fields in the current view.
+	 */
 	integerFields: {},
+	/**
+	 * The set of decimal type fields in the current view.
+	 */
 	decimalFields: {},
 	
+	/**
+	 * Recognizes date strings as they come from the API
+	 */
 	DATE_IN_REGEXP: /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/,
 	/**
 	 * Apply transformations to API row data on input from server. The transformations should happen in-place.
@@ -58,6 +70,9 @@ formatters = {
 		});
 	},
 	
+	/**
+	 * Recognizes date strings as they are stored internally for efficient sorting.
+	 */
 	DATE_OUT_REGEXP: /^(\d{4})\.(\d{1,2})\.(\d{1,2})$/,
 	/**
 	 * Apply transformations to an API row on output back to server. Should do the

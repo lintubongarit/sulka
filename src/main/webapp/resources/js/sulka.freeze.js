@@ -1,4 +1,5 @@
-sulka.freeze = (function (freeze) { freeze = {
+sulka.freeze = (function (freeze) { 
+freeze = {
 	columns: [],
 	visible: false,
 	grid: null,
