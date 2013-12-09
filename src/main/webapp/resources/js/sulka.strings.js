@@ -28,7 +28,8 @@ sulka.strings = {
 		return "Rivillä on virheitä (" + sulka.strings.listJoin(errors) + ")";
 	},
 	invalidInteger: "Virheellinen kokonaislukusyöte.",
-	negativeInteger: "Syötä positiivinen kokonaisluku.",
+	negativeValue: "Syötä positiivinen luku.",
+	tooManyNumbers: "Arvossa on liikaa numeroita.",
 	joinStatusBarErrors: function (errorArray) {
 		return errorArray.join(" – ");
 	},
