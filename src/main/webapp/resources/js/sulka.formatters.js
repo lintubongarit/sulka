@@ -88,18 +88,23 @@ formatters = {
 		var decimalFields = formatters.decimalFields; 
 		for (var field in row) if (row.hasOwnProperty(field)) {
 			var val = row[field];
-			if (typeof(val) === "string") {
-				if (dateFields.hasOwnProperty(field)) {
-					var match = val.match(formatters.DATE_OUT_REGEXP);
-					if (match !== null) {
-						copy[field] = match[3] + "." + match[2] + "." + match[1];  
+			if (field.match(/^\$/)) {
+				// Always pass implementation-private variables through as-is 
+				copy[field] = val;
+			} else { 
+				if (typeof(val) === "string") {
+					if (dateFields.hasOwnProperty(field)) {
+						var match = val.match(formatters.DATE_OUT_REGEXP);
+						if (match !== null) {
+							copy[field] = match[3] + "." + match[2] + "." + match[1];  
+						}
+					} else if (val !== "") {
+						copy[field] = val;
 					}
-				} else if (val !== "") {
-					copy[field] = val;
-				}
-			} else if (typeof(row[field]) === "number") {
-				if (integerFields.hasOwnProperty(field) || decimalFields.hasOwnProperty(field)) {
-					copy[field] = String(row[field]);  
+				} else if (typeof(row[field]) === "number") {
+					if (integerFields.hasOwnProperty(field) || decimalFields.hasOwnProperty(field)) {
+						copy[field] = String(row[field]);  
+					}
 				}
 			}
 		}
