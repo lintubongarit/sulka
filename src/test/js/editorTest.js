@@ -1,4 +1,11 @@
 casper.test.begin('EditorTests', function EditorTests(test) {
+	/**
+	 * This data structure fully specifies this test. It is an array of triples (3-tuples) that
+	 * each specify: 
+	 * 	* an array of possible values
+	 *  * how the the resulting prefix tree should be
+	 *  * a hash that maps some inputs to correct set of completions for those values  
+	 */
 	var ArrayTreeCompletionTestsTriplets = [
   	    [
   	     	[ "a" ],
