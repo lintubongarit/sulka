@@ -10,8 +10,7 @@ userSettings = {
 	 * 	- Columns order
 	 *  - Columns width
 	 *  - Columns visibility
-	 *  - Freezed columns
-	 * 
+	 *  - Freezed column count
 	 */
 	save: function() {
 		sulka.statusBar.showLoader();
@@ -126,8 +125,16 @@ userSettings = {
 					
 					var changed = false;
 					if (typeof(filters.date) === "string") {
-						if ($("#filters-date").val() !== filters.date) changed = true;
-						$("#filters-date").val(filters.date);
+						if (sulka.addCore){
+							if ($("#filters-date").val() != sulka.addCore.getDefaultDateFilter()
+								|| filters.date != "") {
+							changed = true;
+							$("#filters-date").val(filters.date);
+							}
+						} else {
+							if ($("#filters-date").val() !== filters.date) changed = true;
+							$("#filters-date").val(filters.date);
+						}
 					}
 					if (typeof(filters.species) === "string") {
 						if ($("#filters-species").val() !== filters.species) changed = true;

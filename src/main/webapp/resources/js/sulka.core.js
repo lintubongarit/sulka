@@ -29,11 +29,14 @@ sulka = {
 		$sulkaVisible: true
 	},
 
-	/** In row inserting mode? */ 
+	/** addMode is true on add recoveries/ringing -pages. Is overridden in sulka.addCore */ 
 	addMode: false,
-	viewMode: "browsing",
-	rowsMode: "ringings",
 	
+	/** viewMode implies the current page. Is overridden in sulka.addRecoveries and sulka.addRingings */ 
+	viewMode: "browsing",
+	
+	/** implies which rows are fetched at browsing-page. Is changed according to filters-form */ 
+	rowsMode: "all",
 	
 	/**
 	 * Called at start, when the document has fully loaded.
@@ -250,7 +253,6 @@ sulka = {
 			sulka.grid.registerPlugin(sulka.moveRowsPlugin);
 			
 			//Row move, drag & drop features
-			
             sulka.grid.onBeforeEditCell.subscribe(sulka.events.onBeforeEditCell);
 			sulka.moveRowsPlugin.onBeforeMoveRows.subscribe(sulka.events.onBeforeMoveRows); 	  
 			sulka.moveRowsPlugin.onMoveRows.subscribe(sulka.events.onMoveRows);
@@ -266,7 +268,6 @@ sulka = {
 			
 			sulka.grid.onValidationError.subscribe(sulka.events.onValidationError);
 			
-			//Init drop events?
 			sulka.initDrop();
 		}
 		
@@ -299,13 +300,16 @@ sulka = {
 			$slickGrid.mousewheel(sulka.events.onMouseWheel);
 		}
 		
+		if (sulka.addCore)
+			sulka.addCore.setDefaultDateFilter();
+		
 		sulka.reloadData();
 		
 		sulka.userSettings.restore();
 	},
 	
 	/**
-	 * InitDrop function is called when drop event is launched.
+	 * Define how "Roskakori" works.
 	 */
 	initDrop: function(){
 		 $.drop({mode: "mouse"});
@@ -330,7 +334,7 @@ sulka = {
 	},
 	
 	/**
-	 * Deletes selected rows
+	 * Delete selected rows
 	 */
 	deleteRows: function(e, dd){
         var data = sulka.getData();
@@ -355,8 +359,6 @@ sulka = {
         sulka.setData(data);
         sulka.grid.invalidate();
         sulka.grid.setSelectedRows([]);
-		
-		
 	},
 	
 	/**
@@ -525,7 +527,7 @@ sulka = {
 	
 	/**
 	 * Reload all data to table, applying new filters etc. If in add mode, the data is combined
-	 * from Tipu and Sulka DBs.
+	 * from Tipu- and SulkaDBs.
 	 */
 	reloadData: function () {
 		// Grid not yet initialised?
@@ -615,7 +617,6 @@ sulka = {
 		 * 
 		 * Latitude: lat
 		 * Longitude: lon 
-		 * 
 		 */
 		var selectedRows = sulka.grid.getSelectedRows();
 		var data = sulka.getData();
@@ -652,7 +653,6 @@ sulka = {
         sulka.grid.updateRowCount();
         sulka.grid.render();
 	},
-	
 	
 	/**
 	 * Parameters used while initializing new dataview with createNewDataView.
@@ -768,6 +768,11 @@ sulka = {
 		return filters;
 	},
 	
+	/**
+	 * Save row to the SulkaDB
+	 * 
+	 * @param row The data of the row to be saved.
+	 */
 	submitSulkaDBRow: function (row) {
 		if (!row || row.rowStatus !== "inputRow") {
 			// Refuse to submit undefined or read-only row
@@ -799,7 +804,7 @@ sulka = {
 	},
 	
 	/**
-	 * Gets the wanted rows mode from the checkboxes in filters-form
+	 * Get the wanted row-mode from the checkboxes in filters-form
 	 */
 	getRowMode: function () {
 		var	ringings = $("#filters-ringings").is(':checked'),
@@ -847,8 +852,9 @@ sulka = {
 	},
 	
 	/**
-	 * Create and return an keypress event handler that constrains the allowable input characters to the ones
-	 * specified in alphabet.
+	 * Create and return an keypress event handler that constrains the allowable
+	 * input characters to the ones specified in alphabet.
+	 * 
 	 * @param alphabet the allowed alphabet of the input string.
 	 * @return An jQuery event handler that discards any printable input keypresses that are not in the alphabet. 
 	 */

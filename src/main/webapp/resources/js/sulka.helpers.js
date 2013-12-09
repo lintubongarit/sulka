@@ -16,7 +16,10 @@ helpers = {
 
 	/**
 	 * A generic function that will cancel the jQuery or DOM event it is
-	 * supplied with. */
+	 * supplied with. 
+	 * 
+	 * @param event Event to be stopped.
+	 * */
 	cancelEvent: function (event) {
 		event.stopImmediatePropagation();
 		event.preventDefault();
@@ -24,6 +27,7 @@ helpers = {
 
 	/**
 	 * Parse user input date to a date range suitable for API.
+	 * 
 	 * @param date User input date string.
 	 * @returns API filter object with startDate and endDate from user input,
 	 * or a string describing the error if parsing failed. 
@@ -55,6 +59,7 @@ helpers = {
 	_dateFormat: /^((\d{1,2}\.)?\d{1,2}\.)?\d{4}$/,
 	/**
 	 * Parse user input date.
+	 * 
 	 * @param date String of date such as "1.6.2005", "6.2005" or "2005".
 	 * @param ceil Convert shorthands dates (2005, 6.2005 etc.) to end of 
 	 * the era, rather than beginning, which is the default.
@@ -95,15 +100,12 @@ helpers = {
 		
 		return null;
 	},
-	
-	requiredFieldValidator: function ($value) {
-		if (value == null || value == undefined || !value.length) {
-				return {valid: false, msg: "This is a required field"};
-		} else {
-				return {valid: true, msg: null};
-			}
-	},
-	
+
+	/**
+	 * Make target not selected.
+	 * 
+	 * @param $target Item not to be selected.
+	 */
     disableSelection: function ($target) {
     	if ($target && $target.jquery) {
     		$target
@@ -134,6 +136,7 @@ helpers = {
     
     /**
      * Pad string to two zeroes.
+     * 
      * @param str The string to pad.
      */
     pad2: function (str) {

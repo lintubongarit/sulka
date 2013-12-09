@@ -39,6 +39,9 @@ sulka.freeze = (function (freeze) { freeze = {
 		freeze.grid.setData(freeze.rows);
 	},
 	
+	/**
+	 * Freeze the leftmost column of unfreezed columns.
+	 */
 	freezeLeftColumn: function () {
 		if (!sulka.grid) return;
 		
@@ -60,6 +63,9 @@ sulka.freeze = (function (freeze) { freeze = {
 		sulka.reorderToColumnGroups();
 	},
 	
+	/**
+	 * Unfreeze the rightmost column of freezed columns.
+	 */
 	unfreezeRightColumn: function () {
 		if (!freeze.visible) return;
 		
@@ -85,6 +91,9 @@ sulka.freeze = (function (freeze) { freeze = {
 		}
 	},
 	
+	/**
+	 * Make freezed-grid visible.
+	 */
 	showFreeze: function () {
 		if (freeze.columns.length == 0 || freeze.visible) return;
 		
@@ -161,6 +170,9 @@ sulka.freeze = (function (freeze) { freeze = {
 		freeze.viewport.scrollTop(freeze.mainViewport.scrollTop());
 	},
 	
+	/**
+	 * Hide freezed-grid
+	 */
 	hideFreeze: function () {
 		if (!freeze.visible) return;
 		
@@ -169,6 +181,11 @@ sulka.freeze = (function (freeze) { freeze = {
 		freeze.visible = false;
 	},
 	
+	/**
+	 * Get width of freeze-grid.
+	 * 
+	 * @returns Width of grid.
+	 */
 	getWidth: function () {
 		if (!freeze.visible) return 0;
 		return freeze.width;

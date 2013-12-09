@@ -108,6 +108,13 @@ formatters = {
 		};
 	},
 	
+	/**
+	 * 
+	 * @param row Row of the cell
+	 * @param cell Column of the cell
+	 * @param number The data value of the cell
+	 * @returns String(number), or "" of number is not of the number type.
+	 */
 	numberFieldFormatter: function (row, cell, number) {
 		if (typeof(number) === "number") {
 			return String(number);
