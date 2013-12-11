@@ -16,14 +16,14 @@ import edu.helsinki.sulka.models.Coordinate;
 import edu.helsinki.sulka.services.CoordinateService;
 
 @Controller
-public class CoordinateController {
+public class CoordinateController extends JSONController {
 	
 	@Autowired
 	private CoordinateService coordinateService;
 
 	@RequestMapping(value = "/api/coordinate", method = RequestMethod.GET)
 	@ResponseBody
-	public ObjectResponse<Coordinate> convertCoordinates(
+	public ObjectResponse<Coordinate> convertCoordinates (
 			HttpSession session,
 			@RequestParam(value = "lat")BigDecimal lat,
 			@RequestParam(value = "lon")BigDecimal lon){

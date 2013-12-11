@@ -41,7 +41,6 @@ public class ValidationController extends JSONController {
 	@RequestMapping(value = "/api/validate", method = RequestMethod.POST, consumes = "application/json")
 	@ResponseBody
 	public Validation validate(@RequestBody Map<String, String> data) throws JsonProcessingException {
-		logger.info("HARE" + data.toString());
 		return validationService.validate(new Row(data, fieldsService.getAllFieldsByFieldName()));
 	}
 
