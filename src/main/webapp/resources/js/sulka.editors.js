@@ -106,7 +106,7 @@ editors = {
 	    var MAX_COMPLETIONS = 10;
 	    
 	    var defaultValue = null;
-	    var enumValues = args.column.$sulkaEnumValues;
+	    var descriptionByEnumValue = {};
 	    var valueSet = {};
 	    var legalChars = {};
 	    var caseSensitive = !!args.$caseSensitive;
@@ -118,20 +118,23 @@ editors = {
 	    var selectedCompletion = -1;
 	    var completionsReverse = false;
 	    
-	    if (!caseSensitive) {
-	    	enumValues = enumValues.map(function (enumValue) { return enumValue.toUpperCase(); });
-	    } else {
-	    	enumValues = enumValues.slice();
-	    }
+	    var enumValues = args.column.$sulkaEnumItems.map(function (enumItem) {
+	    	var value = String(enumItem.value);
+			if (!caseSensitive) {
+		    	value = value.toUpperCase();
+			}
+			descriptionByEnumValue[value] = enumItem.description;
+			return value;
+	    });
 	    
-	    enumValues.forEach(function (enumValue) {
-	    	for (var i=0, l=enumValue.length; i<l; i++) {
-	    		legalChars[enumValue[i]] = true;
+	    enumValues.forEach(function (value) {
+	    	for (var i=0, l=value.length; i<l; i++) {
+	    		legalChars[value[i]] = true;
 	    		if (!caseSensitive) {
-	    			legalChars[enumValue[i].toLowerCase()] = true;
+	    			legalChars[value[i].toLowerCase()] = true;
 	    		}
 	    	}
-	    	valueSet[enumValue] = true;
+	    	valueSet[value] = true;
 	    });
 	    if (!disallowEmpty) {
 	    	valueSet[""] = true;
@@ -196,11 +199,16 @@ editors = {
 	    function hideCompletions() {
 	    	$completions.hide();
 			completionsVisible = false;
+	    	sulka.statusBar.clearKeyboardSelectionHint();
 	    }
 
 	    function setCompletionValue(value) {
 	    	$input.val(value);
 	    	hideCompletions();
+	    }
+	    
+	    function getSelectedCompletionValue() {
+	    	return curCompletions[Math.max(0, Math.min(curCompletions.length-1, selectedCompletion))];
 	    }
 	    
 	    this.init = function () {
@@ -237,10 +245,12 @@ editors = {
 	    					$completions.find('div div:nth-child(' + 
 	    							(completionsReverse ? (curCompletions.length-selectedCompletion) : (selectedCompletion+1)) + 
 	    					')').addClass("selected-completion");
+	    			    	sulka.statusBar.setKeyboardSelectionHint(
+	    			    			descriptionByEnumValue[getSelectedCompletionValue()]);
 	    				}
 		    		} else if (e.keyCode === $.ui.keyCode.ENTER) {
 		    			if (0 <= selectedCompletion) {
-		    				setCompletionValue(curCompletions[Math.min(curCompletions.length-1, selectedCompletion)]);
+		    				setCompletionValue(getSelectedCompletionValue());
 		    			} else if (curCompletions.length === 1) {
 		    				setCompletionValue(curCompletions[0]);
 		    			}
@@ -257,15 +267,18 @@ editors = {
 	
 		    $('<div></div>').append($completions).append($input).appendTo(args.container);
 		    $input.focus().select();
+	    	sulka.statusBar.clearKeyboardSelectionHint();
 	    };
 	
 	    this.destroy = function () {
 	    	$input.remove();
 	    	$completions.remove();
+	    	sulka.statusBar.clearKeyboardSelectionHint();
 	    };
 	
 	    this.focus = function () {
 	    	$input.focus();
+	    	sulka.statusBar.clearKeyboardSelectionHint();
 	    };
 	
 	    this.loadValue = function (item) {

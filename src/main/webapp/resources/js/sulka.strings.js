@@ -30,8 +30,8 @@ sulka.strings = {
 	invalidInteger: "Virheellinen kokonaislukusyöte.",
 	negativeValue: "Syötä positiivinen luku.",
 	tooManyNumbers: "Arvossa on liikaa numeroita.",
-	joinStatusBarErrors: function (errorArray) {
-		return errorArray.join(" – ");
+	joinStatusBarMessages: function (mesasgeArray) {
+		return mesasgeArray.join(" – ");
 	},
 	spaceAndSpace: " ja ",
 	listSeparator: ", ",

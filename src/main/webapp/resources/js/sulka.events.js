@@ -401,6 +401,110 @@ events = {
 				sulka.statusBar.clearGridValidationError();
 			}
 		}
+	},
+	
+	/**
+	 * showColumnHeaderContextMenu layout adjustment constant value
+	 */
+	CONTEXT_HEIGHT_ADJUST: 6,
+	
+	/**
+	 * Called by SlickGrid to show context menu on headers. 
+	 */
+	showColumnHeaderContextMenu: function (event, args) {
+		event.preventDefault();
+		
+		var contextItem = undefined;
+		
+		var groupTarget = $(event.target).closest(".column-group-header");
+		if (groupTarget.length > 0 && groupTarget.data("sulka.group.id")) {
+			var groupId = groupTarget.data("sulka.group.id");
+			if (sulka.contextMenuItemById.hasOwnProperty(groupId)) {
+				contextItem = sulka.contextMenuItemById[groupId];
+			}
+		}
+		
+		if (args.column) {
+			var colId = args.column.id; 
+			if (sulka.contextMenuItemById.hasOwnProperty(colId)) {
+				contextItem = sulka.contextMenuItemById[colId];
+			}
+		}
+		
+		if (contextItem === undefined) {
+			return;
+		}
+		
+		$("#header-context-menu")
+			.find(".context-menu-item-selected")
+			.removeClass("context-menu-item-selected");
+		contextItem.addClass("context-menu-item-selected");
+		
+		var winWidth = $(window).width(),
+			winHeight = $(window).height();
+		
+		var menuWidth = $("#header-context-menu").width();
+		
+		var x = Math.max(0, Math.min(winWidth - menuWidth, event.pageX)),
+			y = Math.max(0, event.pageY);
+		
+		$("#header-context-menu")
+			.css("left", x + "px")
+			.css("top", y + "px")
+			.height(winHeight - event.pageY - sulka.events.CONTEXT_HEIGHT_ADJUST)
+			.show()
+			.scrollTop(Math.max(0, $("#header-context-menu").scrollTop() + contextItem.position().top));
+	
+		$("body").one("click", function () {
+			$("#header-context-menu").hide();
+		});
+	},
+	
+	/**
+	 * Called when a context menu item is clicked.
+	 */
+	headerContextMenuItemClicked: function () {
+		var column = $(this).data("column");
+		if (column) {
+			column.$sulkaVisible = !column.$sulkaVisible;
+			var visibleCols = sulka.getVisibleColumns();
+			if (visibleCols.length === 0) {
+				// Refuse to hide all columns
+				column.$sulkaVisible = true;
+				return;
+			}
+			sulka.setColumns(visibleCols);
+			sulka.renderColumnGroups();
+			sulka.contextMenuItemById[column.id].find("span.context-menu-tick").text(
+					column.$sulkaVisible ? sulka.TICK_MARK : "");
+		}
+	},
+	
+	/**
+	 * Called when a context menu title is clicked.
+	 */
+	headerContextMenuTitleClicked: function () {
+		var group = $(this).data("group");
+		if (group && group.$columns) {
+			var allHidden = group.$columns.every(function (column) { 
+				return !column.$sulkaVisible; 
+			});
+			group.$columns.forEach(function (column) { 
+				column.$sulkaVisible = allHidden; 
+			});
+			var visibleCols = sulka.getVisibleColumns();
+			if (visibleCols.length === 0) {
+				// Refuse to hide all columns
+				group.$columns[0].$sulkaVisible = true;
+				visibleCols = sulka.getVisibleColumns();
+			}
+			sulka.setColumns(visibleCols);
+			sulka.renderColumnGroups();
+			group.$columns.forEach(function (column) {
+				sulka.contextMenuItemById[column.id].find("span.context-menu-tick").text(
+						column.$sulkaVisible ? sulka.TICK_MARK : "");
+			});
+		}
 	}
 };
 return events;

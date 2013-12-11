@@ -90,7 +90,7 @@ userSettings = {
 						updatedColumns[columnSettings[0]] = oldColumn;
 					}
 					sulka.columns = updatedColumns;
-					sulka.grid.setColumns(sulka.getVisibleColumns());
+					sulka.setColumns(sulka.getVisibleColumns());
 					sulka.renderColumnGroups();
 					
 					if (sulka.viewMode == "browsing") {

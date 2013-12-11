@@ -187,7 +187,7 @@ img#loader-animation {
 	z-index: 60;
 }
 
-span#last-error {
+span#row-status-error {
 	color: red;
 }
 
@@ -244,10 +244,14 @@ span#last-error {
 	overflow-y: scroll;
 }
 
+.context-menu li.context-menu-item, .context-menu li.context-menu-title {
+	cursor: pointer;
+}
+ 
+
 .context-menu li.context-menu-item {
 	padding: 4px 4px 4px 4px;
 	list-style: none;
-	cursor: pointer;
 }
 
 .context-menu li.context-menu-item:hover {
@@ -394,6 +398,8 @@ span#last-error {
 	width: 0;
 	z-index: 80;
 	border-right: 1px solid black;
+	/* Default to hidden */
+	display: none;
 }
 .sulka-completions {
 	position: absolute;
@@ -414,4 +420,9 @@ span#last-error {
 }
 .editor-completions {
 	float: left;
+}
+#header-context-menu {
+	position: absolute;
+	/* Defaults to hidden */
+	display: none;
 }

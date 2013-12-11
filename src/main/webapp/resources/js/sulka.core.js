@@ -65,6 +65,7 @@ sulka = {
 		// Prevent inputting invalid chars to filter fields
 		$("#filters-date").keypress(
 				sulka.createInputLimitter("1234567890-."));
+		// Percent is the wild card
 		var letterPercentLimitter = sulka.createInputLimitter("ABCDEFGHJIJKLMNOPQRSTUVWXYZÅÄÖabcdefghijklmnopqrstyuvwxyzåäö%");
 		$("#filters-species").keypress(letterPercentLimitter);
 		$("#filters-municipality").keypress(letterPercentLimitter);
@@ -130,9 +131,11 @@ sulka = {
 				fieldGroups.forEach(function (group) {
 					var contextHeader = $("<li></li>")
 						.addClass("context-menu-title")
-						.text(group.description);
+						.text(group.description)
+						.data("group", group);
 					sulka.contextMenuItemById[group.name] = contextHeader; 
 					$headerContextMenu.append(contextHeader);
+					group.$columns = [];
 					
 					group.fields.forEach(function (field) {
 						var id = group.name + "/" + field.field;
@@ -173,9 +176,7 @@ sulka = {
 							column.formatter = function () { return ""; };
 							column.width  = sulka.COL_TYPE_IMAGE_WIDTH + sulka.COL_PADDING;
 						} else if (field.type === "ENUMERATION") {
-							column.$sulkaEnumValues = field.enumerationValues.map(function (apiField) {
-								return apiField.value;
-							});
+							column.$sulkaEnumItems = field.enumerationValues;
 							if (sulka.addMode) {
 								column.editor = sulka.editors.EnumerationEditor;
 							}
@@ -203,6 +204,7 @@ sulka = {
 						}
 						
 						columns.push(column);
+						group.$columns.push(column);
 						fieldsByName[field.field] = field;
 
 						var contextItem = $("<li></li>")
@@ -216,7 +218,8 @@ sulka = {
 								$("<span></span>")
 									.text(field.name)
 							)
-							.data("column", column);
+							.data("column", column)
+							.hoverHint(field.description);
 						sulka.contextMenuItemById[id] = contextItem;
 						$headerContextMenu.append(contextItem);
 					});
@@ -292,8 +295,9 @@ sulka = {
 		
 		sulka.freeze.init();
 
-		sulka.grid.onHeaderContextMenu.subscribe(sulka.showColumnHeaderContextMenu);
-		$("#header-context-menu li.context-menu-item").click(sulka.headerContextMenuItemClicked);
+		sulka.grid.onHeaderContextMenu.subscribe(sulka.events.showColumnHeaderContextMenu);
+		$("#header-context-menu li.context-menu-item").click(sulka.events.headerContextMenuItemClicked);
+		$("#header-context-menu li.context-menu-title").click(sulka.events.headerContextMenuTitleClicked);
 		
 		sulka.grid.onSort.subscribe(sulka.events.onGridSort);
 		
@@ -309,8 +313,9 @@ sulka = {
 			$slickGrid.mousewheel(sulka.events.onMouseWheel);
 		}
 		
-		if (sulka.addCore)
+		if (sulka.addCore) {
 			sulka.addCore.setDefaultDateFilter();
+		}
 		
 		sulka.reloadData();
 		
@@ -418,80 +423,6 @@ sulka = {
 			return (val1 === val2) ? 0 : (sign * (val1 > val2 ? 1 : -1));
 		});
 		sulka.setData(data);
-	},
-	
-	/**
-	 * showColumnHeaderContextMenu parameters
-	 */
-	CONTEXT_HEIGHT_ADJUST: 6,
-	
-	/**
-	 * Called by SlickGrid to show context menu on headers. 
-	 */
-	showColumnHeaderContextMenu: function (event, args) {
-		event.preventDefault();
-		
-		var contextItem = undefined; 
-		if ($(event.target).data("sulka.group.id")) {
-			var groupId = $(event.target).data("sulka.group.id");
-			if (sulka.contextMenuItemById.hasOwnProperty(groupId)) {
-				contextItem = sulka.contextMenuItemById[groupId];
-			}
-		}
-		
-		if (args.column) {
-			var colId = args.column.id; 
-			if (sulka.contextMenuItemById.hasOwnProperty(colId)) {
-				contextItem = sulka.contextMenuItemById[colId];
-			}
-		}
-		
-		if (contextItem === undefined) {
-			return;
-		}
-		
-		$("#header-context-menu")
-			.find(".context-menu-item-selected")
-			.removeClass("context-menu-item-selected");
-		contextItem.addClass("context-menu-item-selected");
-		
-		var winWidth = $(window).width(),
-			winHeight = $(window).height();
-		
-		var menuWidth = $("#header-context-menu").width();
-		
-		var x = Math.max(0, Math.min(winWidth - menuWidth, event.pageX)),
-			y = Math.max(0, event.pageY);
-		
-		$("#header-context-menu")
-			.css("left", x + "px")
-			.css("top", y + "px")
-			.height(winHeight - event.pageY - sulka.CONTEXT_HEIGHT_ADJUST)
-			.show()
-			.scrollTop(Math.max(0, $("#header-context-menu").scrollTop() + contextItem.position().top));
-	
-		$("body").one("click", function () {
-			$("#header-context-menu").hide();
-		});
-	},
-
-	/**
-	 * Called when a context menu item is clicked.
-	 */
-	headerContextMenuItemClicked: function () {
-		var column = $(this).data("column");
-		if (column) {
-			column.$sulkaVisible = !column.$sulkaVisible;
-			var visibleCols = sulka.getVisibleColumns();
-			if (visibleCols.length == 0) {
-				// Refuse to hide all columns
-				column.$sulkaVisible = true;
-				return;
-			}
-			sulka.grid.setColumns(visibleCols);
-			sulka.renderColumnGroups();
-			$(this).closest("li").find("span.context-menu-tick").text(column.$sulkaVisible ? sulka.TICK_MARK : "");
-		}
 	},
 	
 	/**
@@ -876,6 +807,14 @@ sulka = {
 				e.preventDefault();
 			}
 		};
+	},
+	
+	/**
+	 * Set new grid columns.
+	 * @param newCols New columns to set 
+	 */
+	setColumns: function (newCols) {
+		sulka.grid.setColumns(newCols);
 	}
 };
 

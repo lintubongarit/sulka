@@ -6,7 +6,7 @@
  */
 sulka.groups = function (grid, container) {
 	/**
-	 * A rendering constant that is required for correct alignation of the groups.
+	 * A rendering constant that is required for correct alignment of the groups.
 	 */
 	var COL_GROUP_OUTSIDE_WIDTH = 9;
 	
@@ -148,7 +148,7 @@ sulka.groups = function (grid, container) {
 		}
 		groupArray.sort(function(x, y) { return x.index - y.index; });
 		var newCols = groupArray.reduce(function (cols, group) { return cols.concat(group.columns); }, []);
-		sulka.grid.setColumns(newCols);
+		sulka.setColumns(newCols);
 		
 		render();
 	}
