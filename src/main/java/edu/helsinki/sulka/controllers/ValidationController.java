@@ -38,7 +38,7 @@ public class ValidationController extends JSONController {
 	 * @returns Validation of row
 	 */
 	@PreAuthorize("hasRole('USER')")
-	@RequestMapping(value = "/api/validate", method = RequestMethod.POST, consumes = "application/json")
+	@RequestMapping(value = "/api/validate", method = RequestMethod.POST, consumes = "application/json", produces="application/json")
 	@ResponseBody
 	public Validation validate(@RequestBody Map<String, String> data) throws JsonProcessingException {
 		return validationService.validate(new Row(data, fieldsService.getAllFieldsByFieldName()));

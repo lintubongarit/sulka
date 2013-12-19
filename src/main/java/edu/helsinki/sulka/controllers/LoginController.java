@@ -44,9 +44,6 @@ public class LoginController implements AuthenticationEntryPoint {
 
 	@Autowired
 	private LoginService loginService;
-	
-	@Autowired
-	private LintuvaaraAuthDecryptService authService;
 
 	/**
 	 * This value should be set from a bean and disabled for production.
