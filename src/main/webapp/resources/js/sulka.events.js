@@ -469,11 +469,11 @@ events = {
 			column.$sulkaVisible = !column.$sulkaVisible;
 			var visibleCols = sulka.getVisibleColumns();
 			if (visibleCols.length === 0) {
-				// Refuse to hide all columns
+				// Refuse to hide all main grid columns
 				column.$sulkaVisible = true;
 				return;
 			}
-			sulka.setColumns(visibleCols);
+			sulka.setColumns(visibleCols, sulka.getVisibleColumns(true));
 			sulka.renderColumnGroups();
 			sulka.contextMenuItemById[column.id].find("span.context-menu-tick").text(
 					column.$sulkaVisible ? sulka.TICK_MARK : "");
@@ -494,11 +494,16 @@ events = {
 			});
 			var visibleCols = sulka.getVisibleColumns();
 			if (visibleCols.length === 0) {
-				// Refuse to hide all columns
-				group.$columns[0].$sulkaVisible = true;
+				// Refuse to hide all main grid columns
+				for (var i=0; i<group.$columns.length; i++) {
+					if (group.$columns[i].$sulkaVisible && !sulka.freeze.isFrozen(group.$columns[i].id)) {
+						group.$columns[i].$sulkaVisible = true;
+						break;
+					} 
+				}
 				visibleCols = sulka.getVisibleColumns();
 			}
-			sulka.setColumns(visibleCols);
+			sulka.setColumns(visibleCols, sulka.getVisibleColumns(true));
 			sulka.renderColumnGroups();
 			group.$columns.forEach(function (column) {
 				sulka.contextMenuItemById[column.id].find("span.context-menu-tick").text(

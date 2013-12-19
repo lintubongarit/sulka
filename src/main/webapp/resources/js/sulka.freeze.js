@@ -9,14 +9,22 @@ freeze = {
 	 * Currently frozen columns.
 	 */ 
 	columns: [],
+	
+	/**
+	 * Currently frozen columns as a set by column ID.
+	 */
+	columnsSet: {},
+	
 	/**
 	 * Does the freeze grid currently exist? The invariant is that visible=true iff columns.length > 0
 	 */
 	visible: false,
+	
 	/**
 	 * Reference to the SlickGrid object of the freeze grid, if visible. 
 	 */
 	grid: null,
+	
 	/**
 	 * The current total display width of the freeze grid.
 	 */
@@ -26,6 +34,7 @@ freeze = {
 	 * Reference to the viewport container of the freeze grid.
 	 */
 	viewport: null,
+	
 	/**
 	 * Reference to the main grid viewport.
 	 */
@@ -78,18 +87,15 @@ freeze = {
 		
 		var cols = sulka.grid.getColumns();
 		
-		if (cols.length == 0) {
+		if (cols.length <= 1) {
 			return;
 		}
 		
-		freeze.columns.push(cols.shift());
-		
+		var newCol = cols.shift();
+		freeze.columns.push(newCol);
 		sulka.grid.setColumns(cols);
-		if (!freeze.visible) {
-			freeze.showFreeze();
-		} else {
-			freeze.grid.setColumns(freeze.columns);
-		}
+		freeze.setColumns(freeze.columns);
+		
 		sulka.events.resizeGrid();
 		sulka.reorderToColumnGroups();
 	},
@@ -101,13 +107,32 @@ freeze = {
 		if (!freeze.visible) return;
 		
 		var mainCols = sulka.grid.getColumns();
-		mainCols.unshift(freeze.columns.pop());
-		
+		var unfrozenColumn = freeze.columns.pop();
+		mainCols.unshift(unfrozenColumn);
 		sulka.grid.setColumns(mainCols);
-		if (freeze.columns.length === 0) {
+		freeze.setColumns(freeze.columns);
+	},
+	
+	/**
+	 * Set freeze columns by array.
+	 */
+	setColumns: function (columns) {
+		if (columns.length === 0 && !freeze.visible) return;
+		
+		freeze.columns = columns;
+		if (columns.length === 0) {
 			freeze.hideFreeze();
+			freeze.columnsSet = {};
 		} else {
-			freeze.grid.setColumns(freeze.columns);
+			freeze.columnsSet = {};
+			columns.forEach(function (column) {
+				freeze.columnsSet[column.id] = true;
+			});
+			if (!freeze.visible) {
+				freeze.showFreeze();
+			} else {
+				freeze.grid.setColumns(columns);
+			}
 		}
 		sulka.events.resizeGrid();
 		sulka.reorderToColumnGroups();
@@ -271,5 +296,12 @@ freeze = {
 		$(freeze.freezeContainer).find(".slick-header-columns .slick-header-column-sorted").removeClass("slick-header-column-sorted");
 		$(freeze.freezeContainer).find(".slick-header-columns .slick-sort-indicator-asc").removeClass("slick-sort-indicator-asc");
 		$(freeze.freezeContainer).find(".slick-header-columns .slick-sort-indicator-desc").removeClass("slick-sort-indicator-desc");
+	},
+	
+	/**
+	 * Returns whether specified column id is currently in the frozen columns set.
+	 */
+	isFrozen: function (columnId) {
+		return freeze.columnsSet.hasOwnProperty(columnId);
 	}
 }; return freeze; })();

@@ -9,7 +9,7 @@ sulka = {
 	grid: null,
 	
 	/**
-	 * Slick grid options that are used to initialize the grid.
+	 * Slick grid options that are used to initialise the grid.
 	 */
 	gridOptions: {
 		enableCellNavigation: true,
@@ -376,11 +376,14 @@ sulka = {
 	},
 	
 	/**
-	 * Return currently visible columns (even those not currently on grid)
+	 * Return currently visible columns.
+	 * @param frozen If true, then returns columns from the frozen grid. Otherwise
+	 * returns returns columns on the main grid. 
 	 */
-	getVisibleColumns: function () {
+	getVisibleColumns: function (frozen) {
+		frozen = !!frozen;
 		return sulka.columns.filter(function (column) {
-			return column.$sulkaVisible;
+			return column.$sulkaVisible && (frozen ? sulka.freeze.isFrozen(column.id) : !sulka.freeze.isFrozen(column.id));
 		});
 	},
 	
@@ -521,7 +524,10 @@ sulka = {
 			sulka.rowsMode,
 			filters,
 			combine,
-			sulka.statusBar.hideLoaderAndSetError
+			function (error) {
+				sulka.statusBar.hideLoaderAndSetError(error);
+				sulka.setData([]);
+			}
 		);
 		
 		if (sulka.addMode) {
@@ -543,7 +549,10 @@ sulka = {
 					}
 					combine(sulkaRows);
 				},
-				sulka.statusBar.hideLoaderAndSetError
+				function (error) {
+					sulka.statusBar.hideLoaderAndSetError(error);
+					sulka.setData([]);
+				}
 			);
 		}
 	},
@@ -810,11 +819,15 @@ sulka = {
 	},
 	
 	/**
-	 * Set new grid columns.
-	 * @param newCols New columns to set 
+	 * Set new grid columns to main and freeze grids.
+	 * @param newMainCols New main grid columns. 
+	 * @param newFreezeCols Optionally new freeze grid columns to set. 
 	 */
-	setColumns: function (newCols) {
-		sulka.grid.setColumns(newCols);
+	setColumns: function (newMainCols, newFreezeCols) {
+		sulka.grid.setColumns(newMainCols);
+		if (newFreezeCols !== undefined) {
+			sulka.freeze.setColumns(newFreezeCols);
+		}
 	}
 };
 
