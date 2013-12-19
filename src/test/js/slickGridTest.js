@@ -19,13 +19,22 @@ casper.test.begin('SlickGrid tests', 13, function suite(test) {
 			var grid = this.getGlobal('grid');
 			test.assertNotEquals(grid, null, "SlickGrid -grid is not null");
 	    }).then(function () {
-			test.assertNotEquals(get("sulka.grid.getColumns()"), null, "Column variable is not null.");
+			test.assertEval(function () {
+				return sulka.grid.getColumns() !== null;
+			}, "Column variable is not null.");
 		}).then(function () {
 			test.assert(
-					get("sulka.grid.getColumns()").length >= correctColumnCount, 
+					get("sulka.grid.getColumns().length") >= correctColumnCount, 
 					"Grid has at least " + correctColumnCount + " columns.");
 		}).then(function () {
-			var columns = get("sulka.grid.getColumns()");
+			var columns = casper.evaluate(function () {
+				return sulka.grid.getColumns().map(function (column) {
+					var clone = $.extend({}, column);
+					// Delete $sulkaGroup since it's cyclic and can not be serialized to the CasperJS host
+					delete clone.$sulkaGroup;
+					return clone;
+				});
+			});
 	
 			var allColumnsFound = false;
 			for(var i = 0; i < wantedColumns.length; i++){

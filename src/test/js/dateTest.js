@@ -7,7 +7,7 @@ casper.test.begin('Date tests', 5, function suite(test) {
 			}, true);
 			
 		}).then(function () {
-			test.assertSelectorHasText("#last-error", get("sulka.strings.invalidDate"), 
+			test.assertSelectorHasText("#row-status-error", get("sulka.strings.invalidDate"), 
 					"Inputting an invalid date gives the right error.");
 			test.assertNotVisible('#loader-animation', "Loader animation is not shown.");
 			
@@ -17,7 +17,7 @@ casper.test.begin('Date tests', 5, function suite(test) {
 			}, true);
 			
     	}).then(function () {
-			test.assertSelectorHasText("#last-error", get("sulka.strings.inverseDateRange"), 
+			test.assertSelectorHasText("#row-status-error", get("sulka.strings.inverseDateRange"), 
 				"Inputting an inverse date range gives the right error.");
 			test.assertNotVisible('#loader-animation', "Loader animation is not shown.");
 			

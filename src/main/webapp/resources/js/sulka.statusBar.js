@@ -55,34 +55,25 @@ function clearStatusInfo() {
 var hoverJq = null;
 
 /**
- * Handle hover in event (see attachHoverHint). 
- * this refers to a container for the current jQuery closure and
- * hint.
- */
-function hoverIn(e) {
-	hoverJq = this.jq;
-	statusBar.setMouseOverHint(this.hint);
-}
-
-/**
- * Handle hover out event (see attachHoverHint).
- * this refers to the current jQuery closure.
- */
-function hoverOut(e) {
-	if (hoverJq === this) {
-		hoverJq = null;
-		statusBar.clearMouseOverHint();
-	}
-}
-
-/**
  * Extend jQuery with method to attach a mouse hover status bar info message to
  * any jQuery closure.
  * @param hint The contextual info message string to show in status bar on hover. 
  */
 $.fn.extend({
 	hoverHint: function (hint) {
-		this.hover(hoverIn.bind({ jq: this, hint: hint }), hoverOut.bind(this));
+		var thisJq = this;
+		this.hover(
+			function () {
+				hoverJq = thisJq;
+				statusBar.setMouseOverHint(hint);
+			},
+			function () {
+				if (hoverJq === thisJq) {
+					hoverJq = null;
+					statusBar.clearMouseOverHint();
+				}
+			}
+		);
 		return this;
 	}
 });
