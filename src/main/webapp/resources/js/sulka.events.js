@@ -59,26 +59,13 @@ events = {
 				}
 				sulka.helpers.cancelEvent(e);
 			}else if (e.which === $.ui.keyCode.DELETE){
-				var data = sulka.grid.getData().data;
-				var index = 0;
-				
-				console.log(Object.keys(sulka.grid.getActiveCell().row)[sulka.grid.getActiveCell().cell]);
-				
-				delete data[sulka.grid.getActiveCell().row][Object.keys(sulka.grid.getActiveCell().row)[sulka.grid.getActiveCell().cell]];
-				
-//				data[sulka.grid.getActiveCell().row].forEach(function(i){
-//					console.log(i);
-//				});
-				
-//				for (var i in data.data[sulka.grid.getActiveCell().row]){
-//					if (index === sulka.grid.getActiveCell().cell){
-//						console.log(data.data[sulka.grid.getActiveCell().row][i]);
-//						delete data.data[sulka.grid.getActiveCell().row][i];
-//						break;
-//					}
-//					index++;
-//				}
-//				sulka.grid.setData(data);
+				var data = sulka.getData();
+				var activeField = sulka.grid.getColumns()[sulka.grid.getActiveCell().cell].field
+				delete data[sulka.grid.getActiveCell().row][activeField]
+				var activeRowData = sulka.getData()[sulka.grid.getActiveCell().row];
+				sulka.submitSulkaDBRow(activeRowData);
+				sulka.setData(data);
+				sulka.grid.navigateRight();
 			} else if (!ignoreKeys.hasOwnProperty(e.which) && sulka.grid.getCellEditor() === null) {
 				// Show editor if user starts typing in a cell
 				sulka.grid.editActiveCell();
