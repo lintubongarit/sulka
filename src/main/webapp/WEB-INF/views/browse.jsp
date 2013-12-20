@@ -23,24 +23,26 @@
 		<script src="resources/js/lib/plugins/slick.rowselectionmodel.js"></script>
 		<script src="resources/js/lib/plugins/slick.columnpicker.js"></script>
 		<script src="resources/js/lib/slick.core.js"></script>
-		<script src="resources/js/lib/slick.editors.js"></script>
 		<script src="resources/js/lib/slick.grid.js"></script>
-		<script src="resources/js/lib/slick.editors.js"></script>
 		<script src="resources/js/sulka.core.js"></script>
 		<script src="resources/js/sulka.strings.js"></script>
 		<script src="resources/js/sulka.helpers.js"></script>
+		<script src="resources/js/sulka.formatters.js"></script>
+		<script src="resources/js/sulka.statusBar.js"></script>
 		<script src="resources/js/sulka.API.js"></script>
 		<script src="resources/js/sulka.groups.js"></script>
 		<script src="resources/js/sulka.freeze.js"></script>
+		<script src="resources/js/sulka.events.js"></script>
+		<script src="resources/js/sulka.userSettings.js"></script>
 	</head>
 	<body>
 		<%@include file="_header.jsp" %>
-		<table class="local-toolbar">
+		<table id="local-toolbar">
 			<tr>
 				<td>
 					<form id="filters">
 					    <sec:authorize access="hasRole('ADMIN')">
-        				Rengastaja: <input type="text" id="filters-ringer" name="ringer"/>
+        					Rengastaja: <input type="text" id="filters-ringer" name="ringer"/>
         				</sec:authorize>
 						Aika (esim. 2005 tai 2005-2006): <input type="text" id="filters-date" name="date" />
 						Laji: <input type="text" id="filters-species" name="species" />
@@ -53,8 +55,8 @@
 					</form>
 				</td>
 				<td>
-				    <button type="button" id="saveSettings" class="local-toolbar-menu" onclick="sulka.saveSettings();">Tallenna asetukset</button>
-				    <button type="button" id="loadSettings" class="local-toolbar-menu" onclick="sulka.fetchSettings();">Lataa asetukset</button>
+				    <button type="button" id="saveSettings" class="local-toolbar-menu"">Tallenna asetukset</button>
+				    <button type="button" id="loadSettings" class="local-toolbar-menu">Lataa asetukset</button>
 				</td>
 			</tr>
 		</table>

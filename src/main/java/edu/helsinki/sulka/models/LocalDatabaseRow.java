@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
-@Table(name="Recoveries")
+@Table(name="LocalDatabaseRow")
 @JsonIgnoreProperties(ignoreUnknown=false)
 public class LocalDatabaseRow implements Serializable {
 	public LocalDatabaseRow() {}

@@ -1,6 +1,6 @@
 var moment = require('lib/moment.min.js');
 
-casper.test.begin('addRecoveries pages form tests', 12, function suite(test) {
+casper.test.begin('addRecoveries pages form tests', 11, function suite(test) {
     browse('/addRecoveries', function () {
     	// Data loading and filtering
 		
@@ -41,18 +41,14 @@ casper.test.begin('addRecoveries pages form tests', 12, function suite(test) {
 			for (var filter in formValues) if (formValues.hasOwnProperty(filter)) {
 				test.assertEquals(formValues[filter], "", 'The "' + filter + ' field is cleared.'); 
 			}
+		}).waitWhileVisible("#loader-animation"
+		).then(function(){
 			test.assertNotVisible('#loader-animation', "Loader animation is not shown.");
-		
-		}).then(function (){
-			this.test.assertExists('button#validate', 
-			'The "validate" button exists.');
 		}).then(function (){
 			this.test.assertExists('.recycle-bin', 
 			'The "poistarivi" button exists.');
-
 		});
-
-	    });
+	});
 		
     casper.run(function () {
         test.done();

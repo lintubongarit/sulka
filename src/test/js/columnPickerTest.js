@@ -10,7 +10,7 @@ casper.test.begin('Column picker tests', 3, function suite(test) {
 				var cols = $("#slick-grid .slick-header-column");
 		    	var fakeEvent = {pageX: 0, pageY: 0, preventDefault: function () {}};
 		    	var fakeArgs = {column: { id: "common"} };
-				sulka.showColumnHeaderContextMenu.call(cols[0], fakeEvent, fakeArgs);
+				sulka.events.showColumnHeaderContextMenu.call(cols[0], fakeEvent, fakeArgs);
 				return cols.length;
 			});
 			

@@ -1,12 +1,48 @@
-sulka.freeze = (function (freeze) { freeze = {
+/**
+ * To allow for "freezing" leftmost columns, there can be a second "shadow" SlickGrid 
+ * to the left of the main SlickGrid. The freeze module is responsible for creating, 
+ * updating and deconstructing this "shadow" SlickGrid ("the freeze grid").   
+ */
+sulka.freeze = (function (freeze) { 
+freeze = {
+	/**
+	 * Currently frozen columns.
+	 */ 
 	columns: [],
+	
+	/**
+	 * Currently frozen columns as a set by column ID.
+	 */
+	columnsSet: {},
+	
+	/**
+	 * Does the freeze grid currently exist? The invariant is that visible=true iff columns.length > 0
+	 */
 	visible: false,
+	
+	/**
+	 * Reference to the SlickGrid object of the freeze grid, if visible. 
+	 */
 	grid: null,
+	
+	/**
+	 * The current total display width of the freeze grid.
+	 */
 	width: 0,
 	
+	/**
+	 * Reference to the viewport container of the freeze grid.
+	 */
 	viewport: null,
+	
+	/**
+	 * Reference to the main grid viewport.
+	 */
 	mainViewport: null,
 	
+	/**
+	 * Freeze grid SlickGrid options. Inherits main grid options. 
+	 */
 	gridOptions: {
 		enableCellNavigation: true,
 	    editable: false,
@@ -15,12 +51,24 @@ sulka.freeze = (function (freeze) { freeze = {
 	    autoEdit: false
 	},
 	
+	/**
+	 * The CSS selector for the freeze grid container to use.
+	 */
 	freezeContainer: "#freeze-grid",
+	/**
+	 * The CSS selectro for the main grid container.
+	 */
 	mainContainer: "#slick-grid",
 	
+	/**
+	 * String shorthand constants.
+	 */
 	RIGHT_TRIANGLE: "▶",
 	LEFT_TRIANGLE: "◀",
 	
+	/**
+	 * Init the freeze grid (called always from main grid init) 
+	 */
 	init: function () {
 		if (sulka.viewMode != "browsing") return;
 		var freezeButton = $("<div></div>")
@@ -31,51 +79,69 @@ sulka.freeze = (function (freeze) { freeze = {
 		$(freeze.mainContainer).append(freezeButton);
 	},
 	
-	rows: [],
-	setRows: function (rows) {
-		if (!freeze.visible) {
-			return;
-		}
-		freeze.grid.setData(freeze.rows);
-	},
-	
+	/**
+	 * Freeze the leftmost column of main grid's unfreezed columns.
+	 */
 	freezeLeftColumn: function () {
 		if (!sulka.grid) return;
 		
 		var cols = sulka.grid.getColumns();
 		
-		if (cols.length == 0) {
+		if (cols.length <= 1) {
 			return;
 		}
 		
-		freeze.columns.push(cols.shift());
-		
+		var newCol = cols.shift();
+		freeze.columns.push(newCol);
 		sulka.grid.setColumns(cols);
-		if (!freeze.visible) {
-			freeze.showFreeze();
-		} else {
-			freeze.grid.setColumns(freeze.columns);
-		}
-		sulka.resizeGrid();
-		sulka.renderColumnGroups();
+		freeze.setColumns(freeze.columns);
+		
+		sulka.events.resizeGrid();
+		sulka.reorderToColumnGroups();
 	},
 	
+	/**
+	 * Unfreeze the rightmost column of the freezed columns.
+	 */
 	unfreezeRightColumn: function () {
 		if (!freeze.visible) return;
 		
 		var mainCols = sulka.grid.getColumns();
-		mainCols.unshift(freeze.columns.pop());
-		
+		var unfrozenColumn = freeze.columns.pop();
+		mainCols.unshift(unfrozenColumn);
 		sulka.grid.setColumns(mainCols);
-		if (freeze.columns.length === 0) {
-			freeze.hideFreeze();
-		} else {
-			freeze.grid.setColumns(freeze.columns);
-		}
-		sulka.resizeGrid();
-		sulka.renderColumnGroups();
+		freeze.setColumns(freeze.columns);
 	},
 	
+	/**
+	 * Set freeze columns by array.
+	 */
+	setColumns: function (columns) {
+		if (columns.length === 0 && !freeze.visible) return;
+		
+		freeze.columns = columns;
+		if (columns.length === 0) {
+			freeze.hideFreeze();
+			freeze.columnsSet = {};
+		} else {
+			freeze.columnsSet = {};
+			columns.forEach(function (column) {
+				freeze.columnsSet[column.id] = true;
+			});
+			if (!freeze.visible) {
+				freeze.showFreeze();
+			} else {
+				freeze.grid.setColumns(columns);
+			}
+		}
+		sulka.events.resizeGrid();
+		sulka.reorderToColumnGroups();
+	},
+	
+	/**
+	 * Position the container's top. Called from main grid positioning routine. 
+	 * @param y Top y
+	 */
 	position: function (y) {
 		$(freeze.freezeContainer).css({
 			top: y + "px"
@@ -85,6 +151,9 @@ sulka.freeze = (function (freeze) { freeze = {
 		}
 	},
 	
+	/**
+	 * Make the freeze grid visible.
+	 */
 	showFreeze: function () {
 		if (freeze.columns.length == 0 || freeze.visible) return;
 		
@@ -94,12 +163,16 @@ sulka.freeze = (function (freeze) { freeze = {
 			freeze.grid = new Slick.Grid(freeze.freezeContainer, sulka.grid.getData(), freeze.columns, 
 					$.extend({}, freeze.gridOptions, sulka.gridOptions));
 			freeze.grid.$columnGroups = new sulka.groups(freeze.grid, freezeContainer);
-			freeze.grid.onColumnsResized.subscribe(sulka.resizeGrid);
+			freeze.grid.onColumnsResized.subscribe(sulka.events.resizeGrid);
 			freeze.grid.onSort.subscribe(freeze.onGridSort);
+			freeze.grid.setSelectionModel(new (sulka.grid.getSelectionModel().constructor)());
+			freeze.grid.onSelectedRowsChanged.subscribe(freeze.onFreezeSelect);
 			freeze.viewport = freezeContainer.find(".slick-viewport").first();
 			freeze.mainViewport = sulka.viewport;
 			freeze.viewport.css("overflow", "hidden");
-			freezeContainer.mousewheel(freeze.onMouseWheel);
+			if (typeof(freezeContainer.mousewheel) === "function") {
+				freezeContainer.mousewheel(freeze.onMouseWheel);
+			}
 			var unfreezeButton = $("<div></div>")
 				.addClass("header-unfreeze-button")
 				.text(freeze.LEFT_TRIANGLE)
@@ -108,32 +181,97 @@ sulka.freeze = (function (freeze) { freeze = {
 			freezeContainer.append(unfreezeButton);
 		}
 		
+		// Attach event handlers
 		sulka.grid.onScroll.subscribe(freeze.onMainScroll);
 		freeze.onMainScroll();
+		
+		sulka.grid.onSelectedRowsChanged.subscribe(freeze.onMainSelect);
+		freeze.grid.setSelectedRows(sulka.grid.getSelectedRows());
 		
 		freezeContainer.show();
 		freeze.visible = true;
 	},
 	
 	/**
-	 * Scrolls main container on mouse wheel.
+	 * Hide the freeze grid
+	 */
+	hideFreeze: function () {
+		if (!freeze.visible) return;
+		
+		// Detach event handlers
+		sulka.grid.onScroll.unsubscribe(freeze.onMainScroll);
+		
+		$(freeze.freezeContainer).hide();
+		freeze.visible = false;
+	},
+	
+	/**
+	 * Mouse scroll wheel listener on the freeze grid. Synchronizes
+	 * the scrolling with main grid.  
 	 */
 	onMouseWheel: function (event, delta, deltaX, deltaY) {
 		if (!freeze.visible) return;
-		sulka.onMouseWheel(event, delta, deltaX, deltaY);
+		sulka.events.onMouseWheel(event, delta, deltaX, deltaY);
 	},
 	
+	/**
+	 * Called from the main grid to notify of scrolling. Synchronizes
+	 * freeze grid scroll position with main grid.
+	 */
+	onMainScroll: function (event, args) {
+		freeze.viewport.scrollTop(freeze.mainViewport.scrollTop());
+	},
+	
+	/**
+	 * Called from the main grid to notify of selection. Selects
+	 * the same rows on freeze grid.
+	 */
+	onMainSelect: function (event, args) {
+		// Set only if the selection is different from current to avoid feedback loop  
+		var rows = args.rows;
+		var curSelection = freeze.grid.getSelectedRows(); 
+		if (rows instanceof Array && (!(curSelection instanceof Array) || curSelection.length !== rows.length ||
+				curSelection.some(function (elem, i) { return rows[i] !== elem; }))) {
+			freeze.grid.setSelectedRows(args.rows);
+		}
+	},
+	
+	/**
+	 * Called from the freeze grid to notify of selection. Selects
+	 * the same rows on main grid.
+	 */
+	onFreezeSelect: function (event, args) {
+		if (!freeze.visible) return;
+		// Set only if the selection is different from current to avoid feedback loop  
+		var rows = args.rows;
+		var curSelection = sulka.grid.getSelectedRows(); 
+		if (rows instanceof Array && (!(curSelection instanceof Array) || curSelection.length !== rows.length ||
+				curSelection.some(function (elem, i) { return rows[i] !== elem; }))) {
+			sulka.grid.setSelectedRows(args.rows);
+		}
+	},
+	
+	/**
+	 * Set current data
+	 * @param rows the new data (rows)
+	 */
 	setData: function(rows) {
 		if (!freeze.visible)  return;
 		freeze.grid.setData(rows);
 		freeze.grid.render();
 	},
 	
+	/**
+	 * Redraw. 
+	 */
 	invalidate: function () {
 		if (!freeze.visible)  return;
 		freeze.grid.invalidate();
 	},
 	
+	/**
+	 * Called from main grid to notify that the freeze grid should resize itself.
+	 */
 	resize: function () {
 		if (!freeze.visible) return;
 		
@@ -147,27 +285,34 @@ sulka.freeze = (function (freeze) { freeze = {
 		setTimeout(function () { freeze.grid.resizeCanvas(); }, 0);
 	},
 	
+	/**
+	 * Call render on the freeze grid's local column groups module.
+	 */
 	renderColumnGroups: function () {
 		if (freeze.visible && freeze.grid.$columnGroups) freeze.grid.$columnGroups.render();
 	},
 	
-	onMainScroll: function (event, args) {
-		freeze.viewport.scrollTop(freeze.mainViewport.scrollTop());
+	/**
+	 * Notify the freeze grid's local column groups module of column reordering.
+	 */
+	reorderToColumnGroups: function () {
+		if (freeze.visible && freeze.grid.$columnGroups) freeze.grid.$columnGroups.onReordered();
 	},
 	
-	hideFreeze: function () {
-		if (!freeze.visible) return;
-		
-		sulka.grid.onScroll.unsubscribe(freeze.onMainScroll);
-		$(freeze.freezeContainer).hide();
-		freeze.visible = false;
-	},
-	
+	/**
+	 * Get the width of freeze-grid.
+	 * 
+	 * @returns Width of grid.
+	 */
 	getWidth: function () {
 		if (!freeze.visible) return 0;
 		return freeze.width;
 	},
 	
+	/**
+	 * Listener for the sort event on the freeze grid. Removes sort markers from
+	 * the main grid, and then sorts according to the freeze grid.
+	 */
 	onGridSort: function (event, args) {
 		if (!freeze.visible) return;
 		
@@ -175,16 +320,25 @@ sulka.freeze = (function (freeze) { freeze = {
 		$(freeze.mainContainer).find(".slick-header-columns .slick-sort-indicator-asc").removeClass("slick-sort-indicator-asc");
 		$(freeze.mainContainer).find(".slick-header-columns .slick-sort-indicator-desc").removeClass("slick-sort-indicator-desc");
 		
-		console.log($(freeze.mainContainer).find(".slick-header-columns .slick-sort-indicator-asc").length);
-		
-		sulka.sort(args);
+		sulka.parseSort(args);
 	},
 	
+	/**
+	 * Called by the main grid to notify that it is now dictating the sort order, and the
+	 * freeze grid should remove its sort markers.  
+	 */
 	removeSortMarkers: function () {
 		if (!freeze.visible) return;
 		
 		$(freeze.freezeContainer).find(".slick-header-columns .slick-header-column-sorted").removeClass("slick-header-column-sorted");
 		$(freeze.freezeContainer).find(".slick-header-columns .slick-sort-indicator-asc").removeClass("slick-sort-indicator-asc");
 		$(freeze.freezeContainer).find(".slick-header-columns .slick-sort-indicator-desc").removeClass("slick-sort-indicator-desc");
+	},
+	
+	/**
+	 * Returns whether specified column id is currently in the frozen columns set.
+	 */
+	isFrozen: function (columnId) {
+		return freeze.columnsSet.hasOwnProperty(columnId);
 	}
 }; return freeze; })();

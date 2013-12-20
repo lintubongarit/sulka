@@ -125,7 +125,7 @@ ul.feature-list-tabs li.current-feature-item:hover {
 	background-color: darkred;
 }
 
-.local-toolbar {
+#local-toolbar {
 	height: 38px;
 	background-color: rgb(253, 214, 136);
 	width: 100%;
@@ -134,7 +134,7 @@ ul.feature-list-tabs li.current-feature-item:hover {
 	border-collapse: collapse;
 }
 
-.local-toolbar td {
+#local-toolbar td {
 	padding: 4px;
 	height: 30px;
 }
@@ -156,15 +156,19 @@ img#loader-animation {
 }
 
 #row-status-box-container {
-	background-color: rgb(253, 214, 136);
-	height: 24px;
+	position: absolute;
+	bottom: 0;
+	background-color: lightgray;
+	/* This border should be covered by the grid once it's loaded */
+	border-top: 1px solid black;
+	height: 20px;
 	width: 100%;
-	border-bottom: 1px solid black;
 	border-collapse: collapse;
+	z-index: 20;
 }
 
 #row-status-box {
-	padding: 4px;
+	padding: 2px;
 	height: 16px;
 	overflow: hidden;
 	vertical-align: middle;
@@ -173,21 +177,22 @@ img#loader-animation {
 #slick-grid, #freeze-grid {
     position: absolute;
     left: 0;
-    bottom: 0;
-    top: 186px;
+    bottom: 20px;
+    top: 161px;
     vertical-align: middle;
     text-align: center;
 }
 #slick-grid {
 	right: 0;
+	z-index: 60;
 }
 
-span#last-error {
+span#row-status-error {
 	color: red;
 }
 
 .slick-cell.selected {
-	background-color: rgba(0, 0, 0, .05); /* show selected row background */
+	background: rgba(0, 0, 255, 0.1)
 }
 
 
@@ -235,14 +240,18 @@ span#last-error {
 	box-shadow: 2px 2px 2px silver;
 	-moz-box-shadow: 2px 2px 2px silver;
 	-webkit-box-shadow: 2px 2px 2px silver;
-	z-index: 99999;
+	z-index: 9000;
 	overflow-y: scroll;
 }
+
+.context-menu li.context-menu-item, .context-menu li.context-menu-title {
+	cursor: pointer;
+}
+ 
 
 .context-menu li.context-menu-item {
 	padding: 4px 4px 4px 4px;
 	list-style: none;
-	cursor: pointer;
 }
 
 .context-menu li.context-menu-item:hover {
@@ -290,35 +299,75 @@ span#last-error {
   background: #fafafa;
 }*/
 
-.recovery-row-color .r0, .ringing-row-color .r0 {
+.recovery-row .sulka-column-type, .ringing-row .sulka-column-type {
 	background-repeat: no-repeat;
 	background-position: center;
 }
-.recovery-row-color .r0 {
+.recovery-row .sulka-column-type {
 	background-image: url('../img/recovery.png');
 }
-.ringing-row-color .r0 {
+.ringing-row .sulka-column-type {
 	background-image: url('../img/ringing.png');
 }
 
-.tipu-row-color {
-	background: #e6f3ff; 
+.tipu-row {
+	background: #E3F2FF; 
 }
 
-.sulka-row-color {
+.tipu-row-color-odd {
+	background: #D3E2EF; 
+}
+
+.sulka-row {
 	background: #ffffff; 
 }
 
-.sulka-valid-row-color {
+.sulka-row-odd {
+	background: #f5f5f5; 
+}
+
+.sulka-ready-row {
 	background: #ebffec; 
 }
 
-.sulka-invalid-row-color {
-	background: #fcebeb; 
+.sulka-ready-row-odd {
+	background: #dbefdc; 
 }
 
-.sulka-invalid-cell-color {
-	background: #f49696; 
+.sulka-invalid-row {
+	background: #fcdbdb; 
+}
+
+.sulka-invalid-row-odd {
+	background: #ffcbcb; 
+}
+
+.sulka-invalid-cell {
+	background: rgba(255, 0, 0, 0.3);
+}
+
+.sulka-invalid-cell.selected {
+	background: rgba(255, 0, 0, 0.5); 
+}
+
+.active.selected {
+	border: 2px solid black;
+}
+
+.slick-cell.editable {
+	background: rgba(255, 255, 255, 1);
+}
+
+
+.tipu-row-color-even {
+	background: #7EE2FF; 
+}
+.sulka-row-color-odd {
+	background: #E85E26; 
+}
+
+.sulka-row-color-even {
+	background: #FFA433; 
 }
 
 .header-freeze-button, .header-unfreeze-button {
@@ -349,4 +398,31 @@ span#last-error {
 	width: 0;
 	z-index: 80;
 	border-right: 1px solid black;
+	/* Default to hidden */
+	display: none;
+}
+.sulka-completions {
+	position: absolute;
+	width: 100%;
+	z-index: 8000;
+}
+.sulka-completions div div:first-child {
+	border-top: 1px solid black;
+}
+.sulka-completions div div {
+	border: 1px solid black;
+	border-top: none;
+	background-color: white;
+	height: 20px;
+}
+.sulka-completions div div.selected-completion {
+	background-color: gray;
+}
+.editor-completions {
+	float: left;
+}
+#header-context-menu {
+	position: absolute;
+	/* Defaults to hidden */
+	display: none;
 }
