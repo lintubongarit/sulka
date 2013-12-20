@@ -165,6 +165,8 @@ freeze = {
 			freeze.grid.$columnGroups = new sulka.groups(freeze.grid, freezeContainer);
 			freeze.grid.onColumnsResized.subscribe(sulka.events.resizeGrid);
 			freeze.grid.onSort.subscribe(freeze.onGridSort);
+			freeze.grid.setSelectionModel(new (sulka.grid.getSelectionModel().constructor)());
+			freeze.grid.onSelectedRowsChanged.subscribe(freeze.onFreezeSelect);
 			freeze.viewport = freezeContainer.find(".slick-viewport").first();
 			freeze.mainViewport = sulka.viewport;
 			freeze.viewport.css("overflow", "hidden");
@@ -179,8 +181,12 @@ freeze = {
 			freezeContainer.append(unfreezeButton);
 		}
 		
+		// Attach event handlers
 		sulka.grid.onScroll.subscribe(freeze.onMainScroll);
 		freeze.onMainScroll();
+		
+		sulka.grid.onSelectedRowsChanged.subscribe(freeze.onMainSelect);
+		freeze.grid.setSelectedRows(sulka.grid.getSelectedRows());
 		
 		freezeContainer.show();
 		freeze.visible = true;
@@ -192,7 +198,9 @@ freeze = {
 	hideFreeze: function () {
 		if (!freeze.visible) return;
 		
+		// Detach event handlers
 		sulka.grid.onScroll.unsubscribe(freeze.onMainScroll);
+		
 		$(freeze.freezeContainer).hide();
 		freeze.visible = false;
 	},
@@ -208,10 +216,39 @@ freeze = {
 	
 	/**
 	 * Called from the main grid to notify of scrolling. Synchronizes
-	 * the scrolling with main grid.
+	 * freeze grid scroll position with main grid.
 	 */
 	onMainScroll: function (event, args) {
 		freeze.viewport.scrollTop(freeze.mainViewport.scrollTop());
+	},
+	
+	/**
+	 * Called from the main grid to notify of selection. Selects
+	 * the same rows on freeze grid.
+	 */
+	onMainSelect: function (event, args) {
+		// Set only if the selection is different from current to avoid feedback loop  
+		var rows = args.rows;
+		var curSelection = freeze.grid.getSelectedRows(); 
+		if (rows instanceof Array && (!(curSelection instanceof Array) || curSelection.length !== rows.length ||
+				curSelection.some(function (elem, i) { return rows[i] !== elem; }))) {
+			freeze.grid.setSelectedRows(args.rows);
+		}
+	},
+	
+	/**
+	 * Called from the freeze grid to notify of selection. Selects
+	 * the same rows on main grid.
+	 */
+	onFreezeSelect: function (event, args) {
+		if (!freeze.visible) return;
+		// Set only if the selection is different from current to avoid feedback loop  
+		var rows = args.rows;
+		var curSelection = sulka.grid.getSelectedRows(); 
+		if (rows instanceof Array && (!(curSelection instanceof Array) || curSelection.length !== rows.length ||
+				curSelection.some(function (elem, i) { return rows[i] !== elem; }))) {
+			sulka.grid.setSelectedRows(args.rows);
+		}
 	},
 	
 	/**
