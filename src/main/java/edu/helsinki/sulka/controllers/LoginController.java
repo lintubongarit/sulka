@@ -95,7 +95,7 @@ public class LoginController implements AuthenticationEntryPoint {
 	@Autowired
 	private TestLoginCodeConfiguration testLoginCodeConfiguration;
 
-	private static final boolean ALLOW_ONLY_LOCALHOST_TEST_LOGIN = false;
+	private static final boolean ALLOW_ONLY_LOCALHOST_TEST_LOGIN = true;
 
 	/**
 	 * Creates a fake user session for JS tests.
