@@ -510,6 +510,19 @@ events = {
 						column.$sulkaVisible ? sulka.TICK_MARK : "");
 			});
 		}
+	},
+	
+	/**
+	 * Update selected row count to status bar on selection.
+	 */
+	onSelectedRowsChanged: function (event, data) {
+		if (data.rows) {
+			if (data.rows.length > 1) {
+				sulka.statusBar.setSelectionInfo(sulka.strings.rowsSelected(data.rows.length));
+				return;
+			}
+		}
+		sulka.statusBar.clearSelectionInfo();
 	}
 };
 return events;

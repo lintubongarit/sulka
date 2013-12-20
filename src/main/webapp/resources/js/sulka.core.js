@@ -306,6 +306,8 @@ sulka = {
 		sulka.grid.onColumnsResized.subscribe(sulka.events.updateWidthToSulkaColumns);
 		sulka.grid.onColumnsReordered.subscribe(sulka.events.updateOrderToSulkaColumns);
 		
+		sulka.grid.onSelectedRowsChanged.subscribe(sulka.events.onSelectedRowsChanged);
+		
 		$(window).resize(sulka.events.resizeGrid);
 		sulka.events.resizeGrid();
 		
@@ -459,6 +461,14 @@ sulka = {
 		sulka.grid.render();
 		sulka.freeze.setData(dataView);
 		sulka.colouriseCellsWithErrors(rows);
+		
+		// Add mode always has one empty row
+		var len = sulka.addMode ? (rows.length - 1) : rows.length; 
+		if (len > 0) {
+			sulka.statusBar.setDataInfo(sulka.strings.totalRows(len));
+		} else {
+			sulka.statusBar.clearDataInfo();
+		}
 	},
 	
 	/**
@@ -556,6 +566,10 @@ sulka = {
 			);
 		}
 	},
+	
+	/**
+	 * Call to update status bar row count.
+	 */
 	
 	/**
 	 * Sets coordinates to selected rows, this function is called from the Colorbox

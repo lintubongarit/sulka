@@ -45,5 +45,19 @@ sulka.strings = {
 			return listOfStrings[0];
 		}
 		return "";
+	},
+	totalRows: function (amount) {
+		if (amount === 1) {
+			return "Yhteensä 1 rivi.";
+		} else {
+			return "Yhteensä " + amount + " riviä.";
+		}
+	},
+	rowsSelected: function (amount) {
+		if (amount === 1) {
+			return "Valittu 1 rivi.";
+		} else {
+			return "Valittu " + amount + " riviä.";
+		}
 	}
 };
