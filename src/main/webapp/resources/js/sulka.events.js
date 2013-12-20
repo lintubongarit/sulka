@@ -58,6 +58,14 @@ events = {
 					sulka.grid.editActiveCell();
 				}
 				sulka.helpers.cancelEvent(e);
+			}else if (e.which === $.ui.keyCode.DELETE){
+				var data = sulka.getData();
+				var activeField = sulka.grid.getColumns()[sulka.grid.getActiveCell().cell].field
+				delete data[sulka.grid.getActiveCell().row][activeField]
+				var activeRowData = sulka.getData()[sulka.grid.getActiveCell().row];
+				sulka.submitSulkaDBRow(activeRowData);
+				sulka.setData(data);
+				sulka.grid.navigateRight();
 			} else if (!ignoreKeys.hasOwnProperty(e.which) && sulka.grid.getCellEditor() === null) {
 				// Show editor if user starts typing in a cell
 				sulka.grid.editActiveCell();
